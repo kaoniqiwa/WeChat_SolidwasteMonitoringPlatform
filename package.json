@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "parcel ./src/index.html --open",
-    "build": "NODE_ENV=production rm -rf dist && tsc --noEmit && parcel build src/index.html",
+    "start": "parcel ./app/index.html --open",
+    "build": "NODE_ENV=production rm -rf dist && tsc --noEmit && parcel build app/index.html",
     "clean": "rm -rf dist",
-    "test": "parcel ./src/index.html"
+    "test": "parcel ./app/index.html"
   },
   "keywords": [],
   "author": "",
