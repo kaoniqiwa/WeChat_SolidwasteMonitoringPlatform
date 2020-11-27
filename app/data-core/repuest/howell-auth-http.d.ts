@@ -8,9 +8,9 @@ export declare class HowellAuthHttp {
      set clientCredentials(credentials: ClientCredentials);
      get clientCredentials(): ClientCredentials;
     get<TResult = any>(path: string, config?: AxiosRequestConfig): Promise<AxiosResponse<TResult>>;
-    post<TRequest = any, TResult = any>(path: string, data?: TRequest, config?: AxiosRequestConfig): Promise<AxiosResponse<TResult>>;
-    put<TRequest = any, TResult = any>(path: string, data?: TRequest, config?: AxiosRequestConfig): Promise<AxiosResponse<TResult>>;
-    delete<TResult = any>(path: string, config?: AxiosRequestConfig): Promise<AxiosResponse<TResult>>;
+    post<TRequest = any, TResult = any>(path: string, data?: TRequest, config?: AxiosRequestConfig): Promise<TResult>;
+    put<TRequest = any, TResult = any>(path: string, data?: TRequest, config?: AxiosRequestConfig): Promise<TResult>;
+    delete<TResult = any>(path: string, config?: AxiosRequestConfig): Promise<TResult>;
     // head<TResult = any>(path: string, config?: AxiosRequestConfig): Promise<AxiosResponse<TResult>>;
     // patch<TRequest = any, TResult = any>(path: string, data?: TRequest, config?: AxiosRequestConfig): Promise<AxiosResponse<TResult>>;
     // private getWwwAuth;

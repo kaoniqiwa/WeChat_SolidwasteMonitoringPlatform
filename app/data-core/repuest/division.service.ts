@@ -37,10 +37,7 @@ export class DivisionRequestService extends SaveModel{
     }
 
     list(item:GetDivisionsParams){
-        return this.requestService.post<GetDivisionsParams, Response<PagedList<Division>>>(this.url.list(), item)
-        .then(x=>{ debugger
-            return x;
-        });
+        return this.requestService.post<GetDivisionsParams, Response<PagedList<Division>>>(this.url.list(), item);         
     }
 
     tree(){

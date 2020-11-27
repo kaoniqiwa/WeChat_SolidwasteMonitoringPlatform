@@ -4,7 +4,7 @@ export namespace HowellHttpClient {
 
     export class HttpClient {
 
-        constructo() {
+        constructor() {
 
         }
 

@@ -1,0 +1,139 @@
+﻿ 
+@font-face {
+    font-family: "Source Han Sans CN Normal";
+    src: url("Source Han Sans CN Normal.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+html, body {
+    height: 100%;
+    font-family: 'Source Han Sans CN Normal';
+    background: #f5f5f5;
+    color: #99abb4;
+} 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {    
+    font-family: 'Source Han Sans CN Normal'; 
+}
+
+h5{
+    line-height: 1;
+}
+
+.app.weui-media-box{
+    padding: 20px;
+}
+ 
+.page{
+    width: 100%;
+    height: 100%;
+}
+
+.page__bd{
+    margin: 0 10px;
+    width: calc(100% -  20px);
+    height: calc(100% -  62px);
+    overflow: auto;
+}
+
+.page__ft{
+    width: 100%;
+    height: 62px;
+}
+ 
+.m-b-20{
+    margin-bottom: 20px;
+}
+
+.m-r-10{
+    margin-right: 10px;
+}
+ 
+    .p-r-5{
+        padding-right:5px;
+    }
+    
+    .p-l-5{
+        padding-left:5px;
+    }
+
+    .p-15{
+        padding:15px; 
+    }
+
+    
+ 
+    .fill-height{
+        height: 100%;
+    }
+
+    .fill-width{
+        width: 100%;
+    }
+
+    .text-center{
+        text-align: center;
+    }
+   
+    .m-t-10{
+        margin-top: 10px !important;
+    }
+    .m-b-10{
+        margin-bottom: 10px;
+    }
+
+    .pull-left{
+        float: left;
+    }
+
+    .pull-right{
+        float: right;
+    }
+
+    .sky-blue-text{
+        color: #3a93ff;
+    }
+    .gray-text{
+        color:#b2b2b2;
+    }
+
+    .white-text{
+        color: white;
+    }
+
+    .black-text{
+        color:var(--weui-FG-0);
+    }
+
+    .orange-bg{
+        background-color: orange;
+    }
+
+    .red-bg{
+        background-color:   #fd2f2d;;
+    }
+
+    .card-box-title,.weui-media-box__title.card-box-title{
+        font-size:22px;
+        line-height: 1;
+    }
+
+    .card-box-desc{
+        font-size: 32px;     
+        line-height: 1;
+    }
+
+
+.card-box-desc-unit{
+    font-size:22px;
+    font-weight: normal;
+}
+.list-desc-unit{
+    font-size: 18px;
+    color:#b2b2b2;
+}
