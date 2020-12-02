@@ -2,7 +2,7 @@ import { EventNumber } from "../../data-core/model/waste-regulation/event-number
 import { DivisionRequestDao } from "../../data-core/dao/division-request";
 import { GarbageStationRequestDao } from "../../data-core/dao/garbage-station-request";
 import { AppEChart } from "../../common/echart-line"; 
-
+import { DivisionTypeEnum } from "../../common/enum-helper";
 
 namespace GarbageCondition {
         async function getDivisionType(divisionId = '310109011000') {
@@ -328,16 +328,7 @@ new GarbageCondition.DivisionGarbageSpecification().init();
                 }[]
         }
 
-        enum DivisionTypeEnum {
-                None,
-                Province,
-                City,
-                /**县、街道 */
-                County,
-                /**	居委会 */
-                Committees,
-                Village
-        }
+       
         enum EventTypeEnum {
                 IllegalDrop = 1,
                 MixedInto,

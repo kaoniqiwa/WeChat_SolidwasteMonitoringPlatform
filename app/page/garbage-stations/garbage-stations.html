@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="../../assets/howell.font/howell.font.css">
+    <link crossorigin="anonymous"
+        integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+        href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/mui/3.7.1/css/mui.min.css">
+    <link rel="stylesheet" href="../../assets/howell.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/mui/3.7.1/js/mui.min.js"></script>
+    <script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
+
+    <style>
+        .weui-panel__hd {
+            font-weight: 400;
+            font-size: 17px;
+            line-height: 1.4;
+            color: var(--weui-FG-0);
+        }
+
+        .weui-panel__hd:after {
+            border-bottom: unset;
+        }
+
+        .weui-panel__hd {
+            padding: 16px 16px 0px;
+        }
+
+        .weui-panel__ft {
+            height: 30px;
+            padding: 0 16px; 
+        }
+
+        .ft-btn1 {
+            border: 1px solid #3a93ff;
+            height: 40px;
+            width: calc(50% - 5px);
+            text-align: center;
+            line-height: 40px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #3a93ff;
+        }
+
+        .ft-btn2 {
+            height: 40px;
+            width: calc(50% - 5px);
+            background-color: #3a93ff;
+            text-align: center;
+            line-height: 40px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: white;
+        }
+
+        .weui-media-box {
+            padding: 10px 10px 10px;
+        }
+
+        .weui-media-box_appmsg .weui-media-box__hd {
+            width: 130px;
+            height: 70px;
+            line-height: 70px;
+        }
+
+        .app-table-view {
+            position: relative;
+            margin-top: 0;
+            margin-bottom: 0;
+            padding-left: 0;
+            list-style: none;
+            background-color: #fff;
+            height: calc(100% - 50px);
+        }
+
+        .weui-media-box .list-title {
+            color: var(--weui-FG-2);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .weui-media-box .time-box {
+            font-size: 14px;
+            width: calc(44% + 4px);
+            background-color: var(--weui-BG-0);
+            height: 32px;
+            font-size: 14px;
+            text-align: center;
+            line-height: 32px;
+            border-radius: 20px;
+        }
+
+        .weui-media-box .time-type-box {
+            font-size: 14px;
+            line-height: 32px;
+            width: 30%;
+            background-color: var(--weui-BG-0);
+            height: 32px;
+            border-radius: 20px;
+        }
+
+        .weui-media-box .time-type-box.selected {
+            background-color: rgb(58, 147, 255, 0.4);
+        }
+
+        .app-table-view li {
+            color: var(--weui-FG-2);
+            width: 47.6%;
+            height: 32px;
+            background-color: var(--weui-BG-0);
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 32px;
+            text-align: center;
+            padding: 0 10px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .app-table-view li.selected {
+            color: #3a93ff;
+            background-color: rgb(58, 147, 255, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="offCanvasWrapper" class="mui-draggable mui-slide-in">
+        <aside id="offCanvasSide" class="mui-off-canvas-right mui-transitioning">
+            <div id="offCanvasSideScroll" class="mui-scroll-wrapper">
+                <div class="page " style="background-color:white;">
+                    <div class="weui-panel__bd" style="height: calc(100% - 60px);">
+                      
+                        <div class="weui-media-box weui-media-box_text" style="height: calc(100% - 120px);">
+                            <h4 class="list-title">居委</h4>
+                            <ul class="app-table-view" id="stationView">
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="weui-panel__ft">
+                        <div class="pull-left m-r-10 ft-btn1">
+                            重置</div>
+                        <div class="pull-left ft-btn2">
+                            确定</div>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+        <div class="mui-inner-wrap mui-transitioning">
+            <div class="mui-content mui-scroll-wrapper">
+                <div class="page ">
+                    <div class="page__bd">
+                        <div class="weui-panel weui-panel_access">
+                            <div class="weui-panel__bd" style="height: 48px;">
+                                <div class="pull-left" style="width: 87%;">
+                                    <div class="weui-search-bar" style="background-color: white;" id="searchBar">
+                                        <form class="weui-search-bar__form" style="background-color: var(--weui-BG-0);">
+                                            <div class="weui-search-bar__box">
+                                                <i class="weui-icon-search"></i>
+                                                <input type="search" class="weui-search-bar__input"
+                                                    style="margin-bottom: 0;" id="searchInput" placeholder="搜索" />
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="pull-right" style="width: 13%;line-height: 48px;">
+                                    <a href="javascript:" style="font-size: 14px;color:var(--weui-FG-0)"
+                                        id="offCanvasShow">
+                                        筛选
+                                        <i class="howell-icon-screen"></i>
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="fill-height mui-scroll " style=" height: calc(100% - 152px);   overflow: scroll;"
+                            id="refreshContainer">
+                            <div class="mui-table-view" id="listPanel">
+                                <div class="weui-panel weui-panel_access fill-height">
+                                    <div class="weui-panel__hd" style="    place-content: space-between;
+                                    display: flex;">
+                                       <label for="">顶顶顶顶</label>
+                                        <label  style="    padding: 4px 10px 2px 10px;
+                                        font-size: 14px;    line-height: 1;
+                                        border-radius: 6px;" class="green-bg green-text">对的</label>
+                                      
+                                    </div>
+                                    <div class="weui-panel__bd"  style=" overflow: auto;">
+                                        <div style="width: 110%;height: 80px;padding: 0 16px;">
+                                            <img style="width: calc(100%/3 - 5px);margin-right: 5px;" class="pull-left" height="80" src="//www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png" alt=""> 
+                                            <img style="width: calc(100%/3 - 5px);margin-right: 5px;"   class="pull-left" height="80" src="//www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png" alt=""> 
+                                            <img style="width: calc(100%/3 - 5px);"  class="pull-left"  height="80" src="//www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png" alt=""> 
+                                        </div> 
+                                    </div>
+                                    <div class="weui-panel__ft" >223</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="page__ft">
+                        <iframe src="../menu-bar/menu-bar.html" name="menuBar" class="fill-width fill-height"
+                            frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+         
+    </div>
+</body>
+
+</html>

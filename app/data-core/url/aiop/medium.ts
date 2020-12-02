@@ -1,16 +1,11 @@
-import { IUrl } from "../IUrl";
-
-export class MediumPicture {
-    add() {
-        return `Medium/Pictures`;
-    }
-
+ 
+export class MediumPicture {  
     getData(id: string) {
-        return `Medium/Pictures/${id}/Data`;
+        return `Pictures/${id}/Data`;
     }
 
     getJPG(id: string) {
-        return `Medium/Pictures/${id}.jpg`;
+        return `Pictures/${id}.jpg`;
     }
 
 
