@@ -1,3 +1,4 @@
+import { WeChatUser } from "../data-core/model/we-chat";
 
  
 export class SessionUser {
@@ -5,6 +6,19 @@ export class SessionUser {
     constructor(){
 
         this.division='310109011000';
+        this.user= {
+            name:'guangzhong',
+            pwd:'123456'
+        }
+    }
+
+    set WUser(val:WeChatUser){
+        localStorage.setItem('WUser', JSON.stringify(val));
+    }
+
+    get WUser(){
+        const val = localStorage.getItem('WUser');
+        return JSON.parse(val);
     }
     set user(val: { name: string, pwd: string }) {
         this.pwd = val.pwd;

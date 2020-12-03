@@ -1,11 +1,12 @@
- 
-export class MediumPicture {  
+import {  IUrl, BaseUrl} from "../IUrl";
+
+export class MediumPicture extends BaseUrl   {  
     getData(id: string) {
-        return `Pictures/${id}/Data`;
+        return this.gateway+`Pictures/${id}/Data`;
     }
 
     getJPG(id: string) {
-        return `Pictures/${id}.jpg`;
+        return this.gateway+`Pictures/${id}.jpg`;
     }
 
 
