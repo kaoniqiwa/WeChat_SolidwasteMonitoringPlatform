@@ -7,44 +7,55 @@
   <title></title>
   <link rel="stylesheet" href="../../assets/howell.font/howell.font.css"/>
   <link rel="stylesheet" href="../../assets/howell.css"/> 
-  <link crossorigin="anonymous" integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA==" href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
- 
+  <link crossorigin="anonymous" 
+  integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA==" 
+  href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">   
+   <script src="https://cdn.bootcdn.net/ajax/libs/mui/3.7.1/js/mui.min.js"></script>
+  
+  <style>
+     .bar-item-text{
+      display: inline-block;
+      font-size: large; 
+      position: relative;
+      height: 28px;
+      width: 28px;
+     }
+
+    .weui-tabbar__item.weui-bar__item_on .weui-tabbar__label, .weui-tabbar__item.weui-bar__item_on .bar-item-text{
+       color: #3a93ff;
+    }
+  </style>
 </head>
 
 <body>
   <div class="weui-tab">
     <div class="weui-tabbar">
-      <div class="weui-tabbar__item weui-bar__item_on" id="barItem1">
-        <div class="howell-icon-task_misson"
-          style="display: inline-block;font-size: large; position: relative;height: 28px;width: 28px;">
+      <div   class="weui-tabbar__item weui-bar__item_on" id="barItem1">
+        <div class="howell-icon-task_misson bar-item-text">
 
         </div>
         <p class="weui-tabbar__label">每日数据</p>
       </div>
       <div class="weui-tabbar__item" id="barItem2">
-        <div class="howell-icon-task_misson"
-          style="display: inline-block;font-size: large; position: relative;height: 28px;width: 28px;">
+        <div class="howell-icon-task_misson bar-item-text">
 
         </div>
         <p class="weui-tabbar__label">报警记录</p>
       </div>
       <div class="weui-tabbar__item" id="barItem3">
-        <div class="howell-icon-task_misson"
-          style="display: inline-block;font-size: large; position: relative;height: 28px;width: 28px;">
+        <div class="howell-icon-task_misson bar-item-text">
 
         </div>
         <p class="weui-tabbar__label">垃圾厢房</p>
       </div>
       <div class="weui-tabbar__item" id="barItem4">
-        <div class="howell-icon-task_misson"
-          style="display: inline-block;font-size: large; position: relative;height: 28px;width: 28px;">
+        <div class="howell-icon-task_misson bar-item-text">
 
         </div>
         <p class="weui-tabbar__label">清运路线</p>
       </div>
       <div class="weui-tabbar__item" id="barItem5">
-        <div class="howell-icon-task_misson"
-          style="display: inline-block;font-size: large; position: relative;height: 28px;width: 28px;">
+        <div class="howell-icon-task_misson bar-item-text">
 
         </div>
         <p class="weui-tabbar__label">个人中心</p>
