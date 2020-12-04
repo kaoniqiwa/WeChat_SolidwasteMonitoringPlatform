@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <script>        
+    document.write('<link href="./mui/css/mui.min.css">');
+        document.write('<script type="text/javascript" src="./mui/js/mui.js"><\/script>');
+    </script> -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/mui/3.7.1/css/mui.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/mui/3.7.1/js/mui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        .template {
+            display: none;
+        }
+
+        .mui-card-header {
+            color: #191919;
+        }
+
+        .mui-card-footer {
+            color: #b2b2b2;
+        }
+
+        .tag {
+            float: right;
+            font-size: 12px;
+            width: 38px;
+            height: 18px;
+            line-height: 18px;
+            text-align: center;
+            border-radius: 2px;
+        }
+
+        .tag.green {
+            background-color: #33ff6633;
+            color: #32b43e;
+        }
+
+        .tag.red {
+            background-color: #ff2e2e33;
+            color: #ec2b2b
+        }
+
+        .tag.orange {
+            background-color: #f7cc2833;
+            color: #ff9100
+        }
+        .content{
+            height: 111px;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        .content ul
+        {
+            margin: 0;
+            padding: 0;
+            white-space:nowrap;            
+            list-style: none;
+            display: inline;
+        }
+        .content ul li{
+            /* float: left;
+            display: flex;
+            position: relative; */
+            width:130px;
+height:73.125px;
+margin:3px;
+/* float:left;
+
+display:block; */
+display: inline-block;
+        }
+
+        .content ul li img {                        
+            width: 130px;
+            margin-right: 3px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="template">
+        <div class="mui-card" id="card-template">
+            <div class="mui-card-header header">页眉</div>
+            <div class="mui-card-content">
+                <div class="mui-card-content-inner content">
+
+                </div>
+            </div>
+            <div class="mui-card-footer footer">页脚</div>
+        </div>
+    </div>
+
+
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">cardview（卡片视图）</h1>
+    </header>
+    <div class="mui-content" id="content">
+        <div class="mui-card">
+            <div class="mui-card-header header">页眉 <div class="tag green">正常</div>
+            </div>
+            <div class="mui-card-content">
+                <div class="mui-card-content-inner content">
+                    包含页眉页脚的卡片，页眉常用来显示面板标题，页脚用来显示额外信息或支持的操作（比如点赞、评论等）
+                </div>
+            </div>
+            <div class="mui-card-footer footer">页脚</div>
+        </div>
+        <!-- <div class="mui-card">
+            <div class="mui-card-content">
+                <div class="mui-card-content-inner">
+                    这是一个最简单的卡片视图控件；卡片视图常用来显示完整独立的一段信息，比如一篇文章的预览图、作者信息、点赞数量等
+                </div>
+            </div>
+        </div> -->
+        <!-- <div class="mui-card">
+            <div class="mui-card-header">页眉</div>
+            <div class="mui-card-content">
+                <div class="mui-card-content-inner">
+                    包含页眉页脚的卡片，页眉常用来显示面板标题，页脚用来显示额外信息或支持的操作（比如点赞、评论等）
+                </div>
+            </div>
+            <div class="mui-card-footer">页脚</div>
+        </div> -->
+
+        <!-- <div class="mui-card">
+            background-image:url(../images/cbd.jpg)
+            <div class="mui-card-header mui-card-media" style="height:40vw;"></div>
+            <div class="mui-card-content">
+                <div class="mui-card-content-inner">
+                    <p>Posted on January 18, 2016</p>
+                    <p style="color: #333;">这里显示文章摘要，让读者对文章内容有个粗略的概念...</p>
+                </div>
+            </div>
+            <div class="mui-card-footer">
+                <a class="mui-card-link">Like</a>
+                <a class="mui-card-link">Read more</a>
+            </div>
+        </div> -->
+
+
+        <!--<div class="mui-card">
+            <div class="mui-card-header mui-card-media">
+                <div class="mui-card-media-object mui-pull-left">
+                    <img src="../images/logo.png" width="34px" height="34px" />
+                </div>
+                <div class="mui-card-media-body">
+                    小M
+                    <p class="mui-ellipsis">发表于 6小时前</p>
+                </div>
+            </div>
+            <div class="mui-card-content mui-card-media" style="height:40vw;background-image:url(../images/yuantiao.jpg)"></div>
+            <div class="mui-card-footer">
+                <a class="mui-card-link">Like</a>
+                <a class="mui-card-link">Comment</a>
+                <a class="mui-card-link">Read more</a>
+            </div>
+        </div>-->
+
+        <!-- <div class="mui-card">
+            <div class="mui-card-header mui-card-media">
+                <img src="../images/logo.png" />
+                <div class="mui-media-body">
+                    小M
+                    <p>发表于 2016-06-30 15:30</p>
+                </div>
+                <img class="mui-pull-left" src="../images/logo.png" width="34px" height="34px" />
+                <h2>小M</h2>
+                <p>发表于 2016-06-30 15:30</p>
+            </div>
+            <div class="mui-card-content" >
+                <img src="../images/yuantiao.jpg" alt="" width="100%"/>
+            </div>
+            <div class="mui-card-footer">
+                <a class="mui-card-link">Like</a>
+                <a class="mui-card-link">Comment</a>
+                <a class="mui-card-link">Read more</a>
+            </div>
+        </div> -->
+    </div>
+</body>
+
+<script src="./code/GarbageStationList.ts"></script>
+
+</html>
