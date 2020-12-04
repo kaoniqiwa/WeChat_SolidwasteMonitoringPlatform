@@ -1,9 +1,19 @@
 
+import { HowellHttpClient } from "../../data-core/repuest/http-client";
+import { WeChatRequestService } from "../../data-core/repuest/we-chat.service"; 
+import { SessionUser } from "../../common/session-user";
+
 namespace HowellBar {
     export class MenuBar {
+        httpClient: HowellHttpClient.HttpClient;
+        requestService: WeChatRequestService; 
+        user :SessionUser;
         items = ['barItem1', 'barItem2', 'barItem3', 'barItem4', 'barItem5'];
         links = ['index.html', 'event-history.html', 'garbage-stations.html', 'map.html', 'me.html'];
         constructor(){
+            this.user=new SessionUser();
+            this.httpClient = new HowellHttpClient.HttpClient(); 
+            this.requestService = new WeChatRequestService(this.httpClient.http);
            const index=  sessionStorage.getItem('pageIndex')
 
            ,dom = document.getElementById(this.items[index]);
@@ -17,12 +27,14 @@ namespace HowellBar {
                 var itemClass =dom.getAttribute('class');
                 itemClass += ' weui-bar__item_on';
                 dom.setAttribute('class', itemClass);
-            }
-          
-
+            }          
         }
-        changeItem() {
-           
+
+        async auth(){
+            if(this.user.WUser == null)
+               await   this.httpClient.login();
+        }
+        changeItem() {        
 
             for (let i = 0; i < this.items.length; i++) {
                 document.getElementById(this.items[i]).addEventListener('click', () => {
@@ -34,13 +46,8 @@ namespace HowellBar {
 
                     });
                 });
-
             }
-
-
         }
-
-
     }
 }
 
