@@ -1,5 +1,16 @@
 import { TrashCan } from "./trashCan";
 import { Camera } from "./camera";
+
+export enum StationState {
+    // 正常
+    Normal = 0,
+    // 满溢
+    Full = 1,
+    // 异常
+    Error = 2
+}
+
+
 /**投放点信息 */
 export class GarbageStation {
     /**垃圾房ID */
@@ -68,5 +79,5 @@ export class GetGarbageStationsParams {
     WetFull: boolean | null;
     /**祖辈ID(可选)，返回该ID下的所有子孙区划及其本身的垃圾房 */
     AncestorId: string;
-    
+
 }
