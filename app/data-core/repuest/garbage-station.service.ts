@@ -78,7 +78,7 @@ export class CameraRequestService extends SaveModel {
     }
 
     list(garbageStationId: string) {
-        return this.requestService.get<Camera[]>(this.url.create(garbageStationId));
+        return this.requestService.get<Response<Camera[]>>(this.url.create(garbageStationId));
     }
 
     set(item: Camera) {
