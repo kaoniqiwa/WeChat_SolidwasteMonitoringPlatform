@@ -62,7 +62,7 @@ export namespace GarbageStationList {
                     tag.className += "red";
                     tag.innerHTML = "异常"
                     break;
-                case StationState.Normal:
+                case StationState.Full:
                     tag.className += "orange";
                     tag.innerHTML = "满溢"
                     break;
@@ -150,7 +150,7 @@ export namespace GarbageStationList {
     client.login((http:HowellAuthHttp) => {
 
 
-        
+
         const client = new GarbageStationClient({
             garbageStation: new GarbageStationRequestService(http),
             division: new DivisionRequestService(http),

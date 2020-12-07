@@ -12,13 +12,13 @@ export namespace HowellHttpClient {
             this.userService = new WeChatRequestService(this.http);
         }
 
-        async login(fn?:()=>void) {
+        async login(fn?:(http:HowellAuthHttp)=>void) { 
         if(window['DIGEST'] == null){
             const a=    await this.userService.login();        
-            this.user.WUser=a['data'];
-            console.log(a['data']);
+            this.user.WUser=a['data']; 
+            if(fn)fn(this.http); 
         }
-        if(fn)fn(); 
+      
         }
 
         get http() {             
