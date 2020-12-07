@@ -147,11 +147,7 @@ export namespace GarbageStationList {
     }
 
     const client = new HowellHttpClient.HttpClient();
-    client.login(() => {
-
-
-
-        const http = new HowellAuthHttp('guangzhong', '123456', true);
+    client.login((http:HowellAuthHttp) => {
         const client = new GarbageStationClient({
             garbageStation: new GarbageStationRequestService(http),
             division: new DivisionRequestService(http),
