@@ -1,14 +1,14 @@
 import { SearchControl } from "./search";
-import { MediumPicture } from "../../data-core/url/aiop/medium";
+import { Mediume as MediumPicture } from "../../data-core/url/medium";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { EventRequestService } from "../../data-core/repuest/Illegal-drop-event-record";
 import { SessionUser } from "../../common/session-user";
-import { TheDayTime, TableAttribute, unique, dateFormat } from "../../common/tool";
+import { TheDayTime, TableAttribute, unique, dateFormat, TheDay } from "../../common/tool";
 import { DivisionTypeEnum } from "../../common/enum-helper";
 import { GetEventRecordsParams, IllegalDropEventRecord } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
 import { GarbageStationRequestDao } from "../../data-core/dao/garbage-station-request";
 import { DivisionRequestDao } from "../../data-core/dao/division-request";
-
+import { ResourceRoleType } from "../../common/enum-helper";
 export namespace EventHistoryPage {
     export class EventDetail {
         constructor() {
@@ -19,9 +19,9 @@ export namespace EventHistoryPage {
                 defaultPage: '#appList' //默认页面的选择器  
             });
 
-            document.getElementById('back__btn').addEventListener('tap', () => { 
+            document.getElementById('back__btn').addEventListener('tap', () => {
                 var oldBack = mui.back;
-                mui.back =  () =>{
+                mui.back = () => {
                     if (viewApi.canBack()) {
                         viewApi.back();
                     } else {
@@ -37,12 +37,15 @@ export namespace EventHistoryPage {
                 camera__name = document.getElementById('camera__name'),
                 station__name = document.getElementById('station__name'),
                 rc__name = document.getElementById('rc__name'),
-                police__time = document.getElementById('police__time');
+                police__time = document.getElementById('police__time'),
+                detail_img = document.getElementById('detail_img');
             police__type.innerText = '乱扔垃圾报警';
             camera__name.innerText = item.ResourceName;
             station__name.innerText = item.Data.StationName;
             rc__name.innerText = item.Data.DivisionName;
             police__time.innerText = dateFormat(new Date(item.EventTime), 'yyyy-MM-dd HH:mm:ss');
+
+            detail_img?.setAttribute('src', new MediumPicture().getData(item.ImageUrl));
         }
     }
 
@@ -51,20 +54,42 @@ export namespace EventHistoryPage {
         eventService: EventRequestService;
         search: SearchControl;
         pageIndex = 1;
+        pageTotal = 0;
+        totalRecordCount = 0;
         dataSource = new Array<IllegalDropEventRecord>();
+        user: SessionUser;
         constructor(private detail: EventDetail) {
             this.httpClient = new HowellHttpClient.HttpClient();
             this.eventService = new EventRequestService(this.httpClient.http);
             this.search = new SearchControl();
-            this.search.divisionId = new SessionUser().division;
+            this.user = new SessionUser();
+          
+        }
+
+      async  defaultParam(){
+            if (this.user.WUser && this.user.WUser.Resources && this.user.WUser.Resources.length) {                
+                if (this.user.WUser.Resources[0].ResourceType == ResourceRoleType.GarbageStations)
+                    this.search.stationId = this.user.WUser.Resources[0].Id;
+                else {
+                    const divisionRequest = new DivisionRequestDao.DivisionRequest()
+                    ,divisionData= await divisionRequest.getDivisions();
+                    const committees = divisionData.Data.Data.filter(c => c.DivisionType == DivisionTypeEnum.Committees);
+                    this.search.divisionId = committees[0].Id;
+                } 
+            }
         }
 
         async init() {
             const data = await this.requestData(this.pageIndex),
-                viewModel = this.convert(data),
+                viewModel = this.convert(data.Data),
                 dom = document.getElementById('listPanel');
+            this.pageTotal = data.Page.PageCount;
+            this.totalRecordCount = data.Page.TotalRecordCount;
+            console.log(data.Page);
+
             var html = '', groupDom: HTMLElement;
-            this.dataSource = [...this.dataSource ,...data];
+            this.dataSource = [...this.dataSource, ...data.Data];
+
             viewModel.map(x => {
 
                 var listHtml = '';
@@ -74,7 +99,7 @@ export namespace EventHistoryPage {
                     <a href="#detail" data-tag="${v.id}" class="weui-media-box weui-media-box_appmsg box__item" >
                         <div class="weui-media-box__hd">
                             <img class="weui-media-box__thumb" style="border-radius: 6px;"
-                            src="/api/howell/ver10/aiop_service/Medium/Pictures/5fc025480000002440001f16.jpg" alt="">
+                            src="${v.imgSrc}" alt="">
                         </div>
                         <div class="weui-media-box__bd">
                             <h4 class="weui-media-box__title">${v.topDesc}</h4>
@@ -85,11 +110,14 @@ export namespace EventHistoryPage {
                 });
                 const nodeList = document.getElementsByName(x.title);
                 groupDom = nodeList && nodeList.length ? nodeList[0] : null;
-                if (groupDom)
+                if (groupDom) {
                     groupDom.insertAdjacentHTML('afterend', listHtml);
+                    document.getElementById(`${x.title}_page`).innerText = `${this.dataSource.length}/${this.totalRecordCount}`;
+                }
 
                 html += `<div class="weui-panel weui-panel_access fill-height" style=" overflow: auto;">
-                <div class="weui-panel__hd">${x.title}</div> 
+                <div class="weui-panel__hd">${x.title}                   
+                    <label style="float: right;" id="${x.title}_page">${this.dataSource.length}/${this.totalRecordCount}</label></div> 
                 <div class="weui-panel__bd" name="${x.title}">
                 ${listHtml}
                 </div>
@@ -103,8 +131,9 @@ export namespace EventHistoryPage {
                     const findItem = this.dataSource.find(x => x.EventId == event.currentTarget.dataset.tag);
                     this.detail.fillDetail(findItem);
                 });
-
             }
+            this.pageIndex += 1;
+            return (data.Page.RecordCount == data.Page.TotalRecordCount) || data.Page.RecordCount == 0;
         }
 
         clearDom() {
@@ -112,9 +141,18 @@ export namespace EventHistoryPage {
             dom.innerHTML = '';
         }
 
+        destroy(is:boolean=true) {
+            this.clearDom();
+            this.dataSource = new Array();
+            this.pageIndex = 1;
+            this.pageTotal = 0;
+            this.totalRecordCount = 0;
+            if(is)mui('#refreshContainer').pullRefresh().refresh(true);
+        }
+
         async requestData(pageIndex: number) {
             var responseData = await this.eventService.list(this.getRequsetParam(pageIndex, this.search));
-            return responseData.Data.Data;
+            return responseData.Data;
 
         }
 
@@ -156,7 +194,7 @@ export namespace EventHistoryPage {
 
             return new ListImageDesc(
                 item.EventId,
-                new MediumPicture().getJPG(item.ImageUrl)
+                new MediumPicture().getData(item.ImageUrl)
                 , item.Data.DivisionName
                 , [item.ResourceName, dateFormat(new Date(item.EventTime), 'HH:mm')]);
         }
@@ -173,33 +211,49 @@ export namespace EventHistoryPage {
             if (s.SearchText && search.other == false) {
                 param.StationName = s.SearchText;
             }
-            else {
-                if (s.BeginTime) param.BeginTime = s.BeginTime;
-                if (s.EndTime) param.EndTime = s.EndTime;
-                if (s.DivisionId) param.DivisionIds = [s.DivisionId];
-                if (s.StationId) param.StationIds = [s.StationId];
-            }
+            if (s.BeginTime) param.BeginTime = s.BeginTime;
+            if (s.EndTime) param.EndTime = s.EndTime;
+            if (s.DivisionId) param.DivisionIds = [s.DivisionId];
+            if (s.StationId) param.StationIds = [s.StationId];
+            //    alert(JSON.stringify(param)); 
+            console.log(param);
+
             return param;
         }
     }
 
     export class Refresh {
+        constructor(private dropEvent: IllegalDropEvent) {
+
+        }
         init() {
+            var a = async (f: (v: boolean) => void) => {
+                var b = await this.dropEvent.init(); 
+                f(b);
+            },d = ()=>{
+                this.dropEvent.destroy(false)
+                this.dropEvent.init();
+               
+            };
             mui.init({
                 pullRefresh: {
                     container: '#refreshContainer',
                     down: {
-                        callback: () => {
-                            const e = new EventHistoryPage.IllegalDropEvent();
-                            e.clearDom();
-                            e.init();
-                            mui('#refreshContainer').pullRefresh().endPulldownToRefresh();
+                        callback: function(){
+                            d();
+                            this.endPulldownToRefresh(false);
+                            this.refresh(true);
+                            
                         }
                     },
                     up: {
-                        callback: () => {
-                            new EventHistoryPage.IllegalDropEvent().init();
-                            mui('#refreshContainer').pullRefresh().endPullupToRefresh();
+                        auto: true,
+                        callback: function () {
+                            a((b) => {
+                                console.log(b);
+                             
+                                this.endPullupToRefresh(b);
+                            });
                         }
                     }
                 }
@@ -218,15 +272,91 @@ export namespace EventHistoryPage {
             });
             //侧滑容器父节点
             var offCanvasWrapper = mui('#offCanvasWrapper');
+            const wrapperDom = document.getElementById('offCanvasWrapper')
+                , sideDom = document.getElementById('offCanvasSide');
 
-            document.getElementById('offCanvasShow').addEventListener('tap', function () {
-                offCanvasWrapper.offCanvas('show');
+            document.getElementById('offCanvasShow').addEventListener('tap', () => {
+                const className = wrapperDom.getAttribute('class');
+                wrapperDom.setAttribute('class', className + ' mui-active');
+                sideDom.style.visibility = 'visible';
+                sideDom.style.transform = 'translate3d(0px, 0px, 0px)';
+                // offCanvasWrapper.offCanvas('show');
+
+
             });
-            document.getElementById('viewMark').addEventListener('tap', function () {
-                offCanvasWrapper.offCanvas('close');
+            document.getElementById('viewMark').addEventListener('tap', () => {
+                const className = wrapperDom.getAttribute('class');
+                wrapperDom.setAttribute('class', className.replace('mui-active', ''));
+                sideDom.removeAttribute("style");
+                // offCanvasWrapper.offCanvas('close');
             });
             mui('#offCanvasSideScroll').scroll();
 
+            document.getElementById('searchBtn').addEventListener('tap', async() => {
+                this.event.dataSource = new Array();
+                this.event.destroy();
+                this.event.init();   
+              
+            });
+
+            const fillTime = (begin?: Date, end?: Date) => {
+                const beginDom = document.getElementById('beginTime'), endDom = document.getElementById('endTime')
+                    , day = TheDayTime(new Date());
+                var b = '', e = '';
+                if (begin && end) {
+                    b = dateFormat(begin, 'yyyy-MM-dd HH:mm').substring(2);
+                    e = dateFormat(end, 'yyyy-MM-dd HH:mm').substring(2);
+
+                }
+                else {
+                    b = dateFormat(day.begin, 'yyyy-MM-dd HH:mm').substring(2);
+                    e = dateFormat(day.end, 'yyyy-MM-dd HH:mm').substring(2);
+                }
+                beginDom.innerText = b;
+                endDom.innerText = e;
+                beginDom.setAttribute('data-time'b);
+                endDom.setAttribute('data-time', e);
+            }
+            fillTime();
+            document.getElementById('the_day').addEventListener('tap', () => {
+                this.event.search.day = 0;
+                const day = TheDay(0);
+                fillTime(day.begin, day.end);
+            });
+            document.getElementById('the_yesterday').addEventListener('tap', () => {
+                this.event.search.day = -1;
+                const day = TheDay(-1);
+                fillTime(day.begin, day.end);
+            });
+            document.getElementById('the_before_day').addEventListener('tap', () => {
+                this.event.search.day = -2;
+                const day = TheDay(-2);
+                fillTime(day.begin, day.end);
+            });
+
+            document.getElementById('resetBtn').addEventListener('tap', () => {
+                const childDoms = document.getElementById('stationView').children;
+                for (let i = 0; i < childDoms.length; i++) {
+                    const ele = childDoms[i];
+                    const className = ele.getAttribute('class');
+                    if (i == 0)
+                        ele.setAttribute('class', className + ' selected');
+                    else ele.setAttribute('class', className.replace('selected', ''));
+                }
+                this.clearDayType()
+                fillTime();
+            });
+        }
+
+
+        clearDayType() {
+            ['the_day', 'the_yesterday', 'the_before_day'].map(x => {
+                const dom = document.getElementById(x)
+                    , className = dom.getAttribute('class');
+                if (x == 'the_day') dom.setAttribute('class', className + ' selected');
+                else
+                    dom.setAttribute('class', className.replace('selected', ''))
+            });
         }
 
         async loadDivisionView() {
@@ -234,7 +364,7 @@ export namespace EventHistoryPage {
                 , user = new SessionUser()
                 , divisionRequest = new DivisionRequestDao.DivisionRequest()
                 , divisionResponse = await divisionRequest.getDivisions()
-
+                , stationTextDom = document.getElementById('stationText')
                 , stationViewDom = document.getElementById('stationView'), selected = (id: string, add: boolean) => {
                     const tag = document.getElementsByName(id)[0];
                     var classNames = tag.getAttribute('class');
@@ -242,18 +372,21 @@ export namespace EventHistoryPage {
                     else classNames = classNames.replace('selected', '');
                     tag.setAttribute('class', classNames);
                 };
-            var html = '', isCommittees = false;
-            if (divisionResponse && divisionResponse.Data) {
-                const division = divisionResponse.Data.Data.find(x => x.Id == user.division);
-                isCommittees = division.DivisionType == DivisionTypeEnum.Committees;
-                if (division.DivisionType == DivisionTypeEnum.County) {
+            var html = '';
+            stationTextDom.innerHTML = '';
+            if (this.event.user.WUser.Resources && this.event.user.WUser.Resources.length) {
+                if (this.event.user.WUser.Resources[0].ResourceType == ResourceRoleType.County) {
+                    stationTextDom.innerHTML = '居委';
                     const committees = divisionResponse.Data.Data.filter(c => c.DivisionType == DivisionTypeEnum.Committees)
                         , addSelected = (i: number) => {
                             if (i == 0) return 'selected';
                         };
 
                     for (let i = 0; i < committees.length; i++) {
-                        if (i == 0) this.event.search.stationId = committees[i].Id;
+                        if (i == 0) {
+                            // this.event.search.stationId = committees[i].Id;
+                            this.event.search.divisionId = committees[i].Id;
+                        }
                         if (i % 2 == 0)
                             html += ` <li class="pull-left m-r-10 m-b-10 ${addSelected(i)}  " name="${committees[i].Id}">${committees[i].Name}</li>`;
                         else html += ` <li class="pull-left m-b-10  ${addSelected(i)}" name="${committees[i].Id}">${committees[i].Name}</li>`;
@@ -265,24 +398,42 @@ export namespace EventHistoryPage {
 
                         const gDom = document.getElementsByName(m.Id)[0];
                         gDom.addEventListener('tap', () => {
-                            selected(this.event.search.stationId, false);
-                            this.event.search.stationId = m.Id;
+                            selected(this.event.search.divisionId, false);
+                            this.event.search.divisionId = m.Id;
                             selected(m.Id, true);
                         });
                     });
                 }
+                else if (this.event.user.WUser.Resources[0].ResourceType == ResourceRoleType.Committees) {
+                    stationTextDom.innerHTML = '垃圾房';
+                    const stationsResponse = await request.getGarbageStations(user.WUser.Resources[0].Id), addSelected = (i: number) => {
+                        if (i == 0) return 'selected';
+                    }
+                    if (stationsResponse && stationsResponse.Data) {
+                        for (let i = 0; i < stationsResponse.Data.Data.length; i++) {
+                            const stations = stationsResponse.Data.Data[i];
+                            if (i == 0)
+                                this.event.search.stationId = stations.Id;
+                            if (i % 2 == 0)
+                                html += ` <li class="pull-left m-r-10 m-b-10 ${addSelected(i)}  " name="${stations.Id}">${stations.Name}</li>`;
+                            else html += ` <li class="pull-left m-b-10  ${addSelected(i)}" name="${stations.Id}">${stations.Name}</li>`;
+                        }
+                        stationViewDom.insertAdjacentHTML('afterbegin', html);
+
+                        stationsResponse.Data.Data.map(m => {
+
+                            const gDom = document.getElementsByName(m.Id)[0];
+                            gDom.addEventListener('tap', () => {
+                                selected(this.event.search.stationId, false);
+                                this.event.search.stationId = m.Id;
+                                selected(m.Id, true);
+                            });
+                        });
+                    }
+                }
 
             }
-            if (isCommittees) {
-                const stationsResponse = await request.getGarbageStations(user.division);
-                if (stationsResponse && stationsResponse.Data) {
-                    for (let i = 0; i < stationsResponse.Data.Data.length; i++) {
-                        const data = stationsResponse.Data.Data[i];
-                        html += ` <li class="pull-left m-r-10 m-b-10 division-tag" name="${data.Id}">${data.Name}</li>`;
-                    }
-                    stationViewDom.insertAdjacentHTML('afterbegin', html);
-                }
-            }
+
         }
 
         changeDayNum() {
@@ -311,10 +462,10 @@ export namespace EventHistoryPage {
             endDom.addEventListener('tap', () => {
                 const date = new Date();
                 var picker = new mui.DtPicker({
-                    "value": dateFormat(date, 'yyyy-MM-dd HH:ss')
+                    "value": endDom.getAttribute('data-time')
                     , "beginYear": date.getFullYear(), "endYear": date.getFullYear() + 100
                 });
-                picker.show(function (rs) {
+                picker.show((rs) => {
                     /*
                      * rs.value 拼合后的 value
                      * rs.text 拼合后的 text
@@ -327,24 +478,28 @@ export namespace EventHistoryPage {
                     console.log('选择结果: ' + rs.text);
                     endDom.innerText = '';
                     endDom.insertAdjacentText('afterbegin', rs.value.substring(2));
+                    this.event.search.formEndDate = new Date(rs.value);
+                    this.clearDayType();
                     picker.dispose();
                 });
             });
             beginDom.addEventListener('tap', () => {
                 const date = new Date();
                 var picker = new mui.DtPicker({
-                    "value": dateFormat(date, 'yyyy-MM-dd HH:ss')
+                    "value": beginDom.getAttribute('data-time')
                     , "beginYear": date.getFullYear(), "endYear": date.getFullYear() + 100
                 });
-                picker.show(function (rs) {
+                picker.show((rs) => {
                     beginDom.innerText = '';
                     beginDom.insertAdjacentText('afterbegin', rs.value.substring(2))
+                    this.event.search.formBeginDate = new Date(rs.value);
+                    this.clearDayType();
                     picker.dispose();
                 });
             });
 
         }
-    } 
+    }
 
     export class IllegalDropEventsRecord {
         items: Map<string, IllegalDropEventRecord[]>;
@@ -373,8 +528,9 @@ export namespace EventHistoryPage {
     }
 
     export class SearchBar {
+
         val = '';
-        constructor() {
+        constructor(private event: IllegalDropEvent) {
 
             const searchBar = document.getElementById('searchBar')
                 , searchInput = document.getElementById('searchInput');
@@ -385,9 +541,15 @@ export namespace EventHistoryPage {
                 searchInput.focus();
             });
             searchInput.addEventListener('input', (event: InputEvent) => {
-                this.val += event.data;
-                console.log(this.val);
+                this.event.search.text = searchInput.value;
+            });
+            searchInput.addEventListener('keypress', (event) => {
 
+                if (event.code == "Enter" || event.code) {
+                    this.event.destroy();
+                    //this.refresh.d();
+                    this.event.init();
+                }
             });
         }
 
@@ -395,18 +557,24 @@ export namespace EventHistoryPage {
     }
 }
 
-const eventDetail = new EventHistoryPage.EventDetail();
-new EventHistoryPage.SearchBar();
-const event = new EventHistoryPage.IllegalDropEvent(eventDetail);
-event.init()
-setTimeout(() => {
+new HowellHttpClient.HttpClient().login(() => {
+    const eventDetail = new EventHistoryPage.EventDetail();
 
-    new EventHistoryPage.Refresh().init();
-    const sw = new EventHistoryPage.SideWrapper(event);
-    sw.init();
-    sw.loadDivisionView();
-    sw.changeDayNum();
-    sw.datePicker();
+    const event = new EventHistoryPage.IllegalDropEvent(eventDetail);
+       event.defaultParam()
+  
 
-}, 500);
+    setTimeout(() => {
+        const refresh = new EventHistoryPage.Refresh(event);
+        refresh.init();
+        new EventHistoryPage.SearchBar(event);
+        const sw = new EventHistoryPage.SideWrapper(event);
+        sw.init();
+        sw.loadDivisionView();
+        sw.changeDayNum();
+        sw.datePicker();
+
+    }, 1000);
+
+});
 

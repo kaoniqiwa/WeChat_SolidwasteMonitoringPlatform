@@ -1,6 +1,6 @@
 
-
-import { dateFormat } from "../../common/tool";
+ 
+import { TheDay } from "../../common/tool";
 export class SearchControl {
 
     beginDate = '';
@@ -16,18 +16,22 @@ export class SearchControl {
     }
     constructor() {
 
-        const day = new Date();
-
-        this.searchform.BeginTime = dateFormat(day, 'yyyy-MM-dd') + ' 00:00';
-        this.searchform.EndTime = dateFormat(day, 'yyyy-MM-dd') + ' 23:59';
+       this.day=0;
 
     }
 
+    set day(val: number) {
+        const d = TheDay(val);
+        this.searchform.BeginTime = d.begin.toISOString();
+        this.searchform.EndTime = d.end.toISOString();
+    } 
     set divisionId(val: string) {
+      
         this.searchform.DivisionId = val;
     }
 
     set stationId(val: string) {
+     
         this.searchform.StationId = val;
     }
 
@@ -35,18 +39,22 @@ export class SearchControl {
         return this.searchform.DivisionId;
     }
 
-    get stationId(){
-        return     this.searchform.StationId;
+    get stationId() {
+        return this.searchform.StationId;
     }
 
     set formBeginDate(v: Date) {
-        this.searchform.BeginTime = dateFormat(v, 'yyyy-MM-dd HH:mm');
+        this.searchform.BeginTime =v.toISOString();
     }
 
     set formEndDate(v: Date) {
-        this.searchform.EndTime = dateFormat(v, 'yyyy-MM-dd HH:mm');
+        this.searchform.EndTime=v.toISOString();
     }
 
+    set text(val:string){
+        this.searchform.SearchText=val;
+    }
+ 
     clearState() {
         this.state = false;
         this.searchform = {

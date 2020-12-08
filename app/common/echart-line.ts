@@ -17,7 +17,7 @@ export namespace AppEChart{
                                 show: true,
                                 position: 'top',
                                 textStyle: {
-                                    fontSize: "16",
+                                    fontSize: "14",
                                     color: "#fff"
                                 },
                                 formatter: function (obj: any) {
@@ -63,7 +63,7 @@ export namespace AppEChart{
                                     show: true,
                                     position: 'top',
                                     textStyle: {
-                                        fontSize: "16",
+                                        fontSize: "14",
                                         color: options.colors[i]
                                     },
                                     formatter: function (obj: any) {
@@ -138,7 +138,7 @@ export namespace AppEChart{
                         data: options.xAxisData,
                         axisLabel: {
                             color: '#CFD7FE',
-                            fontSize: "16",
+                            fontSize: "14",
                             interval: function (index: number, value: string) {
                                 return options.xAxisInterval.indexOf(index) > -1;
                             }

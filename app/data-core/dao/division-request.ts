@@ -1,18 +1,18 @@
- 
-import { DivisionRequestService } from "../repuest/division.service"; 
+
+import { DivisionRequestService } from "../repuest/division.service";
 import { GetDivisionsParams } from "../model/waste-regulation/division";
-import { HowellHttpClient } from "../repuest/http-client";   
+import { HowellHttpClient } from "../repuest/http-client";
 import { GetDivisionEventNumbersParams } from "../model/waste-regulation/division-event-numbers";
 import { GetDivisionStatisticNumbersParams } from "../model/waste-regulation/division-number-statistic";
 
 export namespace DivisionRequestDao {
         export class DivisionRequest {
-                maxSize = 99999; 
+                maxSize = 99999;
                 divisionService: DivisionRequestService;
                 httpClient: HowellHttpClient.HttpClient;
                 constructor() {
                         this.httpClient = new HowellHttpClient.HttpClient();
-                        this.divisionService = new DivisionRequestService(this.httpClient.http) 
+                        this.divisionService = new DivisionRequestService(this.httpClient.http); 
                 }
 
                 getDivisions() {
@@ -22,8 +22,8 @@ export namespace DivisionRequestDao {
                         return this.divisionService.list(param);
                 }
 
-                  getDivisionStatisticNumber(divisionsId: string) {
-                     return this.divisionService.statisticNumber(divisionsId);
+                getDivisionStatisticNumber(divisionsId: string) {
+                        return this.divisionService.statisticNumber(divisionsId);
                 }
 
                 getDivisionEventNumbers(divisionsId: string, timeUnit: TimeUnitEnum) {
@@ -37,14 +37,14 @@ export namespace DivisionRequestDao {
 
                 }
 
-                  postDivisionStatisticNumbers(divisionsIds: string[]) {
-                    const param = new GetDivisionStatisticNumbersParams();
-                    param.PageIndex = 1;
-                    param.PageSize = this.maxSize;
-                    param.Ids = divisionsIds;
-                    return this.divisionService.statisticNumberList(param);
+                postDivisionStatisticNumbers(divisionsIds: string[]) {
+                        const param = new GetDivisionStatisticNumbersParams();
+                        param.PageIndex = 1;
+                        param.PageSize = this.maxSize;
+                        param.Ids = divisionsIds;
+                        return this.divisionService.statisticNumberList(param);
                 }
-            
+
 
                 TheDayTime(date: Date) {
                         let y = date.getFullYear(), m = date.getMonth(), d = date.getDate();
@@ -55,7 +55,7 @@ export namespace DivisionRequestDao {
                 }
         }
 
-       export enum TimeUnitEnum {
+        export enum TimeUnitEnum {
                 Hour = 1,
                 Day
         }

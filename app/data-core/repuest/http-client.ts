@@ -1,27 +1,38 @@
 
 import { HowellAuthHttp } from "./howell-auth-http";
-import { WeChatRequestService } from "./we-chat.service"; 
+import { WeChatRequestService } from "./we-chat.service";
 import { SessionUser } from "../../common/session-user";
 export namespace HowellHttpClient {
 
     export class HttpClient {
         userService: WeChatRequestService;
-        user:SessionUser;
+        user: SessionUser;
         constructor() {
-           this.user = new SessionUser();
+            this.user = new SessionUser();
             this.userService = new WeChatRequestService(this.http);
         }
 
-        async login(fn?:(http:HowellAuthHttp)=>void) { 
-        if(window['DIGEST'] == null){
-            const a=    await this.userService.login();        
-            this.user.WUser=a['data']; 
-            if(fn)fn(this.http); 
-        }
-      
+        async login(fn?: (http: HowellAuthHttp) => void) {
+            if (window['DIGEST'] == null) {
+                const a = await this.userService.login();
+                // a['data'].Resources[0].Id='310109011029';
+                // a['data'].Resources[0].Name='黄山路居委会';
+                // a['data'].Resources[0].ResourceType=2;   
+                // a['data'].Resources[0].Id='310109011013002000';
+                // a['data'].Resources[0].Name='新中新村-厢1';
+                // a['data'].Resources[0].ResourceType=3;    
+                this.user.WUser = a['data'];
+
+
+              
+
+
+                if (fn) fn(this.http);
+            }
+               
         }
 
-        get http() {             
+        get http() {
             var http_: HowellAuthHttp;
             if (window['APPHTTP'] == null)
                 window['APPHTTP'] = new HowellAuthHttp(this.user.name, this.user.pwd);

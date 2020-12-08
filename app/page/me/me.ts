@@ -5,20 +5,24 @@ import { SessionUser } from "../../common/session-user";
 namespace MePage{
 
     export class Me{
-        httpClient: HowellHttpClient.HttpClient;
-        requestService: WeChatRequestService; 
         user :SessionUser;
         constructor(){
-            this.httpClient = new HowellHttpClient.HttpClient(); 
-            this.requestService = new WeChatRequestService(this.httpClient.http);
-            this.user=new SessionUser();
-             
-
+            this.user=new SessionUser();     
         }
-
-     async   getUser(){
-        await   this.httpClient.login();
-        //  const r = await  this.requestService.get(this.user.name);
+         getUser(){
+           const u_name =  document.getElementById('u_name'),
+           division_name = document.getElementById('division_name'),
+           tel=document.getElementById('tel');
+           if(this.user.WUser){
+            
+            u_name.innerText=(this.user.WUser.FirstName||'-')+(this.user.WUser.LastName||'');
+       
+            tel.innerText=this.user.WUser.MobileNo||'-';
+            if(this.user.WUser.Resources&&this.user.WUser.Resources.length)
+                division_name.innerText=this.user.WUser.Resources[0].Name;
+            
+           }
+       
         }
     }
 }

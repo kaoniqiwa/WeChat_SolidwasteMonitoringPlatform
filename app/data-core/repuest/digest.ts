@@ -63,7 +63,7 @@ export class Digest {
             this.buildField("opaque", challenge.opaque) +
             this.buildField("qop", challenge.qop) +
             this.buildField("nc", nc) +
-            this.buildField("cnonce", cnonce)).slice(0, -2);console.log(authHeader);
+            this.buildField("cnonce", cnonce)).slice(0, -2); 
             
         return  { 'Authorization': authHeader, 'X-WebBrowser-Authentication': 'Forbidden' };
     }
