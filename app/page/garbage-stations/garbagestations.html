@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <script>        
+    document.write('<link href="./mui/css/mui.min.css">');
+        document.write('<script type="text/javascript" src="./mui/js/mui.js"><\/script>');
+    </script> -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/mui/3.7.1/css/mui.min.css" rel="stylesheet">
+
+
+    <style>
+        .template {
+            display: none;
+        }
+
+        .mui-card-footer,
+        .mui-card-header {
+            position: initial;
+        }
+
+
+        .mui-card-header {
+            color: #191919;
+        }
+
+        .mui-card-footer {
+            color: #b2b2b2;
+        }
+
+
+
+
+        .tag {
+            float: right;
+            font-size: 12px;
+            width: 38px;
+            height: 18px;
+            line-height: 18px;
+            text-align: center;
+            border-radius: 2px;
+        }
+
+        .tag.green {
+            background-color: #33ff6633;
+            color: #32b43e;
+        }
+
+        .tag.red {
+            background-color: #ff2e2e33;
+            color: #ec2b2b
+        }
+
+        .tag.orange {
+            background-color: #f7cc2833;
+            color: #ff9100
+        }
+
+        .content {
+            height: 111px;
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        .content ul {
+            margin: 0;
+            padding: 0;
+            white-space: nowrap;
+            list-style: none;
+            display: inline;
+        }
+
+        .content ul li {
+            /* float: left;
+            display: flex;
+            position: relative; */
+            width: 130px;
+            height: 73.125px;
+            margin: 3px;
+            /* float:left;
+
+display:block; */
+            display: inline-block;
+        }
+
+        .content ul li img {
+            width: 130px;
+            margin-right: 3px;
+        }
+    </style>
+
+
+    <style>
+        .mui-preview-image.mui-fullscreen {
+            position: fixed;
+            z-index: 20;
+            background-color: #000;
+        }
+
+        .mui-preview-header,
+        .mui-preview-footer {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            z-index: 10;
+        }
+
+        .mui-preview-header {
+            height: 44px;
+            top: 0;
+        }
+
+        .mui-preview-footer {
+            height: 50px;
+            bottom: 0px;
+        }
+
+        .mui-preview-header .mui-preview-indicator {
+            display: block;
+            line-height: 25px;
+            color: #fff;
+            text-align: center;
+            margin: 15px auto 4;
+            width: 70px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            font-size: 16px;
+        }
+
+        .mui-preview-image {
+            display: none;
+            -webkit-animation-duration: 0.5s;
+            animation-duration: 0.5s;
+            -webkit-animation-fill-mode: both;
+            animation-fill-mode: both;
+        }
+
+        .mui-preview-image.mui-preview-in {
+            -webkit-animation-name: fadeIn;
+            animation-name: fadeIn;
+        }
+
+        .mui-preview-image.mui-preview-out {
+            background: none;
+            -webkit-animation-name: fadeOut;
+            animation-name: fadeOut;
+        }
+
+        .mui-preview-image.mui-preview-out .mui-preview-header,
+        .mui-preview-image.mui-preview-out .mui-preview-footer {
+            display: none;
+        }
+
+        .mui-zoom-scroller {
+            position: absolute;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
+            justify-content: center;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .mui-zoom {
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
+        }
+
+        .mui-slider .mui-slider-group .mui-slider-item img {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .mui-android-4-1 .mui-slider .mui-slider-group .mui-slider-item img {
+            width: 100%;
+        }
+
+        .mui-android-4-1 .mui-slider.mui-preview-image .mui-slider-group .mui-slider-item {
+            display: inline-table;
+        }
+
+        .mui-android-4-1 .mui-slider.mui-preview-image .mui-zoom-scroller img {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .mui-preview-loading {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: none;
+        }
+
+        .mui-preview-loading.mui-active {
+            display: block;
+        }
+
+        .mui-preview-loading .mui-spinner-white {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -25px;
+            margin-top: -25px;
+            height: 50px;
+            width: 50px;
+        }
+
+        .mui-preview-image img.mui-transitioning {
+            -webkit-transition: -webkit-transform 0.5s ease, opacity 0.5s ease;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        @-webkit-keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @-webkit-keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        p img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="template">
+        <div class="mui-card" id="card-template">
+            <div class="mui-card-header header">页眉</div>
+            <div class="mui-card-content">
+                <div class="mui-card-content-inner content">
+
+                </div>
+            </div>
+            <div class="mui-card-footer footer">页脚</div>
+        </div>
+    </div>
+
+
+    <header class="mui-bar mui-bar-nav">
+        <input />
+
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">cardview（卡片视图）</h1>
+    </header>
+    <div class="mui-content" id="content">
+
+    </div>
+</body>
+
+<script src="./GarbageStationList.ts"></script>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/mui/3.7.1/js/mui.js"></script>
+<script src="./mui/js/mui.zoom.js"></script>
+<script src="./mui/js/mui.previewimage.js"></script>
+
+<script>
+    mui.previewImage();
+</script>
+
+</html>

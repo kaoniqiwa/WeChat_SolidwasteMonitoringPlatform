@@ -1,12 +1,12 @@
-import { Map } from "../app/data-core/model/aiop/map";
-import { Camera } from "../app/data-core/model/waste-regulation/camera";
-import { Division, GetDivisionsParams } from "../app/data-core/model/waste-regulation/division";
-import { GarbageStation, GetGarbageStationsParams, StationState } from "../app/data-core/model/waste-regulation/garbage-station";
-import { DivisionRequestService } from "../app/data-core/repuest/division.service";
-import { CameraRequestService, GarbageStationRequestService } from "../app/data-core/repuest/garbage-station.service";
-import { HowellAuthHttp } from "../app/data-core/repuest/howell-auth-http";
-import { HowellHttpClient } from "../app/data-core/repuest/http-client";
-import { ResourceMediumRequestService } from "../app/data-core/repuest/resources.service";
+import { Map } from "../../data-core/model/aiop/map";
+import { Camera } from "../../data-core/model/waste-regulation/camera";
+import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
+import { GarbageStation, GetGarbageStationsParams, StationState } from "../../data-core/model/waste-regulation/garbage-station";
+import { DivisionRequestService } from "../../data-core/repuest/division.service";
+import { CameraRequestService, GarbageStationRequestService } from "../../data-core/repuest/garbage-station.service";
+import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
+import { HowellHttpClient } from "../../data-core/repuest/http-client";
+import { ResourceMediumRequestService } from "../../data-core/repuest/resources.service";
 
 export namespace GarbageStationList {
 
@@ -114,22 +114,29 @@ export namespace GarbageStationList {
                 let cameras = res.data.Data.sort((a, b) => {
                     return a.Name.localeCompare(b.Name);
                 });
+
+                let ul = document.createElement("ul");
                 for (let i = 0; i < cameras.length; i++) {
                     const camera = cameras[i];
-                    let ul = document.createElement("ul");
                     let li = document.createElement("li");
                     const img = this.createImgByCamera(camera);
+
+                    img.setAttribute("data-preview-src", "");
+                    img.setAttribute("data-preview-group", stationId);
                     li.appendChild(img);
                     ul.appendChild(li);
-                    let content = this.elements[camera.GarbageStationId].getElementsByClassName("content")[0];
-                    content.appendChild(ul);
+
                 }
+                let content = this.elements[stationId].getElementsByClassName("content")[0];
+                content.appendChild(ul);
             });
         }
 
         createImgByCamera(camera: Camera) {
             let img = document.createElement("img");
             img.id = camera.Id;
+            img.className = 'mui-zoom';
+            img.setAttribute("data-preview-lazyload", '');
             if (camera.ImageUrl) {
                 img.src = this.service.media.getData(camera.ImageUrl);
             }
@@ -147,7 +154,7 @@ export namespace GarbageStationList {
     }
 
     const client = new HowellHttpClient.HttpClient();
-    client.login((http:HowellAuthHttp) => {
+    client.login((http: HowellAuthHttp) => {
 
 
 
