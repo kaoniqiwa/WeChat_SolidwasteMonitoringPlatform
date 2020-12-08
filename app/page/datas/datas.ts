@@ -1,10 +1,13 @@
 import { EventNumber } from "../../data-core/model/waste-regulation/event-number";
 import { DivisionRequestDao } from "../../data-core/dao/division-request";
 import { GarbageStationRequestDao } from "../../data-core/dao/garbage-station-request";
-import { AppEChart } from "../../common/echart-line"; 
-import { DivisionTypeEnum } from "../../common/enum-helper";
-
+import { AppEChart } from "../../common/echart-line";
+import { DivisionTypeEnum, ResourceRoleType } from "../../common/enum-helper";
+import { HowellHttpClient } from "../../data-core/repuest/http-client";
+import { SessionUser } from "../../common/session-user";
 namespace GarbageCondition {
+
+
         async function getDivisionType(divisionId = '310109011000') {
                 const divisions = await getDivisions();
                 var divisionsType: DivisionTypeEnum;
@@ -25,15 +28,18 @@ namespace GarbageCondition {
         export class IllegalDropHistory {
                 async getData() {
                         const model = new IllegalDropEventData()
-                                , request = new DivisionRequestDao.DivisionRequest();
+                                , request = new DivisionRequestDao.DivisionRequest()
+                                , user = new SessionUser();
                         model.datas = new Array();
-                        const data = await request.getDivisionEventNumbers('310109011000', DivisionRequestDao.TimeUnitEnum.Hour);
-                        for (var x of data.Data.Data) {
-                                for (const y of x.EventNumbers)
-                                        if (y.EventType == EventTypeEnum.IllegalDrop)
-                                                model.datas.push(y);
+                        if (user.WUser.Resources && user.WUser.Resources.length) {
+                                const data = await request.getDivisionEventNumbers(user.WUser.Resources[0].Id, DivisionRequestDao.TimeUnitEnum.Hour);
+                                for (var x of data.Data.Data) {
+                                        for (const y of x.EventNumbers)
+                                                if (y.EventType == EventTypeEnum.IllegalDrop)
+                                                        model.datas.push(y);
+                                }
+                                return model;
                         }
-                        return model;
                 }
 
                 Convert(input: IllegalDropEventData): AppEChart.LineOption {
@@ -49,6 +55,7 @@ namespace GarbageCondition {
                 }
 
                 async init() {
+
                         const datas = await this.getData(),
                                 chartOptions = this.Convert(datas);
                         new AppEChart.EChartLine().init(document.getElementById('chart'), chartOptions);
@@ -79,25 +86,15 @@ namespace GarbageCondition {
                         const request = new DivisionRequestDao.DivisionRequest()
                                 , garbageStationRequest = new GarbageStationRequestDao.GarbageStationRequest()
                                 , divisions = await getDivisions()
-                                , divisionId = '310109011000';
-                        var divisionsType: DivisionTypeEnum;
-                        for (const x of divisions) {
-                                if (x.Id == divisionId)
-                                        divisionsType = x.DivisionType;
-                        }
+                                , user = new SessionUser();
 
                         const model = new IllegalDropOrderInfo();
                         model.items = new Array();
-
-                        if (divisionsType == DivisionTypeEnum.Committees) {
-                                const responseStations = await garbageStationRequest.getGarbageStations(divisionId)
-                                        , stationIds = new Array<string>();
-
-
-                                for (const x of responseStations.Data.Data)
-                                        stationIds.push(x.Id);
-                                if (stationIds.length) {
-                                        const responseStatistic = await garbageStationRequest.postGarbageStationStatisticNumbers(stationIds);
+                        if (user.WUser.Resources && user.WUser.Resources.length) {
+                                if (user.WUser.Resources[0].ResourceType == ResourceRoleType.County) {
+                                        const divisionsIds = new Array();
+                                        divisions.filter(x => x.DivisionType == DivisionTypeEnum.Committees).map(x => divisionsIds.push(x.Id));
+                                        const responseStatistic = await request.postDivisionStatisticNumbers(divisionsIds);
                                         for (const x of responseStatistic.Data.Data) {
                                                 const info = new IllegalDropInfo();
                                                 model.items.push(info);
@@ -108,26 +105,30 @@ namespace GarbageCondition {
                                                                 info.dropNum += v.DayNumber;
                                         }
                                 }
+                                else if (user.WUser.Resources[0].ResourceType == ResourceRoleType.Committees) {
+                                        const responseStations = await garbageStationRequest.getGarbageStations(user.WUser.Resources[0].Id)
+                                                , stationIds = new Array<string>();
 
-                        }
-                        else if (divisionsType == DivisionTypeEnum.County || divisionsType == void 0) {
-                                const divisionsIds = new Array();
-                                if (divisionId && divisionId == void 0) {
-                                        divisions.filter(x => x.DivisionType == DivisionTypeEnum.Committees).map(x => divisionsIds.push(x.Id));
+
+                                        for (const x of responseStations.Data.Data)
+                                                stationIds.push(x.Id);
+                                        if (stationIds.length) {
+                                                const responseStatistic = await garbageStationRequest.postGarbageStationStatisticNumbers(stationIds);
+                                                for (const x of responseStatistic.Data.Data) {
+                                                        const info = new IllegalDropInfo();
+                                                        model.items.push(info);
+                                                        info.division = x.Name;
+                                                        info.dropNum = 0;
+                                                        for (const v of x.TodayEventNumbers)
+                                                                if (v.EventType == EventTypeEnum.IllegalDrop)
+                                                                        info.dropNum += v.DayNumber;
+                                                }
+                                        }
                                 }
-                                const responseStatistic = await request.postDivisionStatisticNumbers(divisionsIds);
-                                for (const x of responseStatistic.Data.Data) {
-                                        const info = new IllegalDropInfo();
-                                        model.items.push(info);
-                                        info.division = x.Name;
-                                        info.dropNum = 0;
-                                        for (const v of x.TodayEventNumbers)
-                                                if (v.EventType == EventTypeEnum.IllegalDrop)
-                                                        info.dropNum += v.DayNumber;
-                                }
+                                return model;
                         }
 
-                        return model;
+                       
 
                 }
 
@@ -164,9 +165,9 @@ namespace GarbageCondition {
                                 viewModel = this.Convert(datas)
                                 , dom = document.getElementById('top5')
                                 , bgColor = ['red-bg', 'red-bg', 'red-bg', 'orange-bg', 'orange-bg'];
-                     
+
                         var html = '';
-                        dom.innerHTML='';
+                        dom.innerHTML = '';
                         for (let i = 0; i < viewModel.table.length; i++) {
                                 const t = viewModel.table[i];
                                 if (i == viewModel.table.length - 1) {
@@ -197,14 +198,27 @@ namespace GarbageCondition {
                 async getData() {
                         const request = new DivisionRequestDao.DivisionRequest()
                                 , garbageStationRequest = new GarbageStationRequestDao.GarbageStationRequest()
-                                , divisionId = '310109011000'
+                                , user = new SessionUser()
                                 , divisions = await getDivisions()
-                                , model = new Specification()
-                                , divisionType = await getDivisionType();
+                                , model = new Specification();
 
                         model.illegalDropNumber = 0;
-                        if (divisionType == DivisionTypeEnum.Committees) {
-                                const responseStations = await garbageStationRequest.getGarbageStations(divisionId)
+                        if (user.WUser.Resources[0].ResourceType == ResourceRoleType.County) {
+                                const divisionIds = new Array<string>();
+                                divisions.filter(x => x.ParentId == user.WUser.Resources[0].Id).map(y => {
+                                        divisionIds.push(y.Id);
+                                });
+                                const responseData = await request.postDivisionStatisticNumbers(divisionIds);
+                                for (const x of responseData.Data.Data) {
+                                        for (const v of x.TodayEventNumbers)
+                                                if (v.EventType == EventTypeEnum.IllegalDrop)
+                                                        model.illegalDropNumber += v.DayNumber;
+                                                else if (v.EventType == EventTypeEnum.MixedInto)
+                                                        model.hybridPushNumber += v.DayNumber;
+                                }
+                        }
+                        else if (user.WUser.Resources[0].ResourceType == ResourceRoleType.Committees) {
+                                const responseStations = await garbageStationRequest.getGarbageStations(user.WUser.Resources[0].Id)
                                         , stationIds = new Array<string>();
 
 
@@ -220,32 +234,24 @@ namespace GarbageCondition {
                                                                 model.hybridPushNumber += v.DayNumber;
                                         }
                                 }
+                        }
+                        // if (divisionType == DivisionTypeEnum.Committees) {
 
-                        }
-                        else if (divisionType == DivisionTypeEnum.County) {
-                                const divisionIds = new Array<string>();
-                                divisions.filter(x => x.ParentId == divisionId).map(y => {
-                                        divisionIds.push(y.Id);
-                                });
-                                const responseData = await request.postDivisionStatisticNumbers(divisionIds);
-                                for (const x of responseData.Data.Data) {
-                                        for (const v of x.TodayEventNumbers)
-                                                if (v.EventType == EventTypeEnum.IllegalDrop)
-                                                        model.illegalDropNumber += v.DayNumber;
-                                                else if (v.EventType == EventTypeEnum.MixedInto)
-                                                        model.hybridPushNumber += v.DayNumber;
-                                }
-                        }
-                        else if (divisionType == void 0) {
-                                const responseData = await request.postDivisionStatisticNumbers([divisionId]);
-                                for (const x of responseData.Data.Data) {
-                                        for (const v of x.TodayEventNumbers)
-                                                if (v.EventType == EventTypeEnum.IllegalDrop)
-                                                        model.illegalDropNumber += v.DayNumber;
-                                                else if (v.EventType == EventTypeEnum.MixedInto)
-                                                        model.hybridPushNumber += v.DayNumber;
-                                }
-                        }
+
+                        // }
+                        // else if (divisionType == DivisionTypeEnum.County) {
+
+                        // }
+                        // else if (divisionType == void 0) {
+                        //         const responseData = await request.postDivisionStatisticNumbers([divisionId]);
+                        //         for (const x of responseData.Data.Data) {
+                        //                 for (const v of x.TodayEventNumbers)
+                        //                         if (v.EventType == EventTypeEnum.IllegalDrop)
+                        //                                 model.illegalDropNumber += v.DayNumber;
+                        //                         else if (v.EventType == EventTypeEnum.MixedInto)
+                        //                                 model.hybridPushNumber += v.DayNumber;
+                        //         }
+                        // }
                         return model;
                 }
 
@@ -280,10 +286,10 @@ namespace GarbageCondition {
                                         container: '#refreshContainer',
                                         down: {
                                                 callback: () => {
-                                                    new GarbageCondition.IllegalDropHistory().init();
-new GarbageCondition
-        .IllegalDropOrder().init();
-new GarbageCondition.DivisionGarbageSpecification().init();
+                                                        new GarbageCondition.IllegalDropHistory().init();
+                                                        new GarbageCondition
+                                                                .IllegalDropOrder().init();
+                                                        new GarbageCondition.DivisionGarbageSpecification().init();
                                                         mui('#refreshContainer').pullRefresh().endPulldownToRefresh();
                                                 }
                                         }
@@ -328,7 +334,7 @@ new GarbageCondition.DivisionGarbageSpecification().init();
                 }[]
         }
 
-       
+
         enum EventTypeEnum {
                 IllegalDrop = 1,
                 MixedInto,
@@ -339,8 +345,11 @@ new GarbageCondition.DivisionGarbageSpecification().init();
 
 
 }
-new GarbageCondition.Refresh().init();
-new GarbageCondition.IllegalDropHistory().init();
-new GarbageCondition
-        .IllegalDropOrder().init();
-new GarbageCondition.DivisionGarbageSpecification().init();
+
+new HowellHttpClient.HttpClient().login(() => {
+        new GarbageCondition.IllegalDropHistory().init();
+        new GarbageCondition.Refresh().init();
+
+        new GarbageCondition.IllegalDropOrder().init();
+        new GarbageCondition.DivisionGarbageSpecification().init();
+})

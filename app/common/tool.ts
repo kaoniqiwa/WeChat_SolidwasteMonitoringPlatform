@@ -44,6 +44,15 @@ export function TheDayTime(date: Date) {
     }
 }
 
+export function TheDay(day = 0) {
+    const date = new Date();
+    let y = date.getFullYear(), m = date.getMonth(), d = date.getDate();
+   return {
+    begin: new Date(y, m, d+day, 0, 0, 0)
+    , end:new Date(y, m, d+day,23, 59, 59)
+   }
+}
+
 export function unique(arr:any[]){
     var hash=[];
   for (var i = 0; i < arr.length; i++) {

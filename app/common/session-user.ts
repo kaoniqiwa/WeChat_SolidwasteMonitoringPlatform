@@ -5,7 +5,7 @@ export class SessionUser {
  
     constructor(){
 
-        this.division='310109011000';
+       // this.division='310109011000';
         this.user= {
             name:'guangzhong',
             pwd:'123456'

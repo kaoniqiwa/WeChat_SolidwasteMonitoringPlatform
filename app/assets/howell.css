@@ -11,6 +11,7 @@ html, body {
     font-family: 'Source Han Sans CN Normal';
     background: #f5f5f5;
     color: #99abb4;
+    touch-action:none;
 } 
 h1,
 h2,
@@ -24,6 +25,8 @@ h6 {
 h5{
     line-height: 1;
 }
+
+
 
 .app.weui-media-box{
     padding: 20px;
@@ -137,7 +140,9 @@ h5{
     .green-text{
         color:#21E452;
     }
-  
+    .red-text{
+        color:   #fd2f2d;;
+    }
 
     .orange-bg{
         background-color: orange;
