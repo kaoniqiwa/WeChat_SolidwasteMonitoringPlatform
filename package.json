@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "parcel ./app/index.html --open",
+    "start": "parcel garbagestations.html --open --port 4200",
     "build": "NODE_ENV=production rm -rf dist && tsc --noEmit && parcel build app/index.html",
     "clean": "rm -rf dist",
     "test": "parcel ./app/index.html"
@@ -20,6 +20,7 @@
   "dependencies": {
     "axios": "^0.21.0",
     "parcel-bundler": "^1.12.4",
+    "ts-md5": "^1.2.7",
     "tslib": "^2.0.3"
   }
 }

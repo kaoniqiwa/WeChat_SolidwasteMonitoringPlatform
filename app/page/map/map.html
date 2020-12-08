@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="stylesheet" href="../../assets/howell.font/howell.font.css" />
+  <link rel="stylesheet" href="../../assets/howell.css" />
+  <link crossorigin="anonymous"
+    integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+    href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
+  <script src="https://cdn.bootcdn.net/ajax/libs/mui/3.7.1/js/mui.min.js"></script>
+  <style>
+    html {
+      font-size: 62.5%;
+    }
+
+    html,
+    body,
+    #container {
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+    }
+
+    #container {
+      font-family: Avenir, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-align: left;
+      color: #2c3e50;
+    }
+
+    #control_bar {
+      width: 37px;
+      position: absolute;
+      z-index: 999;
+      background: var(--weui-BG-5);
+      bottom: 70px;
+      left: 12px;
+      font-size: 10px;
+      padding: 0 0;
+    }
+
+    .weui-cell {
+      padding: 0;
+      flex-direction: column;
+      margin: 5px 0;
+    }
+
+    .weui-cell__hd img {
+
+      width: 30px;
+
+    }
+
+    #solid_waste {
+      width: 70%;
+      height: 100%;
+      position: absolute;
+      z-index: 999;
+      background: var(--weui-BG-0);
+      right: -0;
+      top: 0
+    }
+
+
+    .page .weui-form {
+      padding: calc(20px + env(safe-area-inset-top)) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+
+    .page .weui-form__control-area {
+      margin: 0;
+    }
+
+    .page .weui-form__control-area .weui-cells {
+      font-size: 4vw;
+
+    }
+
+    .page .weui-form__control-area .weui-cells .weui-check__label {
+      padding: 16px 10px;
+    }
+
+    .page .weui-form__control-area .weui-cell__icon {
+      width: 7vw;
+      height: 7vw;
+      border-radius: 7vw;
+      background-image: url(./dustbin.png);
+      background-position: center;
+      background-size: 60% 60%;
+      background-repeat: no-repeat;
+    }
+
+    .page .weui-form__control-area .weui-cell__bd {
+      padding-left: 2vw;
+    }
+
+    .page .weui-form__control-area .weui-cells_checkbox .weui-cell__hd {
+      padding-right: 0;
+    }
+
+    #solid_waste .weui-form__text-area {
+      text-align: left;
+      padding: 0 10px;
+
+    }
+
+    #solid_waste .weui-form__text-area .weui-form__title {
+      display: flex;
+      justify-content: flex-start;
+
+    }
+
+    #solid_waste .weui-form__text-area .weui-form__title .weui-flex__btns {
+      justify-content: flex-end;
+    }
+
+    #solid_waste .weui-cells .weui-cell {
+      flex-direction: row;
+    }
+
+    .weui-cells__group_form .weui-cells:after,
+    .weui-cells__group_form .weui-cells:before,
+    .weui-cells__group_form .weui-cells_checkbox .weui-check__label:before {
+      left: 2vw;
+    }
+
+    #solid_waste .weui-btn {
+      margin: 0 5px;
+    }
+
+    #solid_waste .weui-btn:last-child {
+      margin: 0;
+    }
+
+
+    .default .weui-cell__icon {
+      background: var(--weui-FG-1);
+    }
+
+    .default .weui-cell__bd {
+      color: var(--weui-FG-1);
+    }
+
+    .primary .weui-cell__icon {
+      background: var(--weui-ORANGE);
+    }
+
+    .primary .weui-cell__bd {
+      color: var(--weui-ORANGE);
+    }
+
+
+    .warn .weui-cell__icon {
+      background: var(--weui-INDIGO);
+    }
+
+    .warn .weui-cell__bd {
+      color: var(--weui-FG-HALF);
+    }
+
+
+    @media screen and (min-width: 900px) {
+      #solid_waste {
+        width: 20%;
+
+
+      }
+
+      #solid_waste .weui-form__control-area {
+        margin: 0;
+
+      }
+
+      #solid_waste .weui-form__control-area .weui-cells {
+        font-size: 16px !important;
+      }
+
+      #solid_waste .weui-form__control-area .weui-cells .weui-check__label {
+        padding: 16px 10px;
+      }
+
+      #solid_waste .weui-form__control-area .weui-cell__icon {
+        width: 30px !important;
+        height: 30px !important;
+        border-radius: 30px !important;
+      }
+
+      #solid_waste .weui-form__control-area .weui-cell__bd {
+        padding-left: 2vw;
+      }
+    }
+/* 
+    #solid_waste {
+      transform: translateX(300px);
+      opacity: 0;
+    } */
+
+    .slide-fade-enter-active {
+      transition: all 0.3s ease;
+    }
+
+    .slide-fade-leave-active {
+      transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+    }
+
+
+    .slide-fade-leave-to {
+      transform: translateX(300px);
+      opacity: 0;
+    }
+
+    .slide-fade-enter {
+      transform: translateX(0px);
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+
+  <div id="control_bar" class="weui-cells weui-cells_button">
+    <div class="weui-cell">
+      <div class="weui-cell__hd">
+        <img src="./che.png" alt="" />
+      </div>
+      <div class="weui-cell__bd">清运车</div>
+    </div>
+    <div class="weui-cell" id='show_path'>
+      <div class="weui-cell__hd">
+        <img src="./path.png" alt="" />
+      </div>
+      <div class="weui-cell__bd">线路</div>
+    </div>
+  </div>
+
+  <div id="solid_waste" class='slide-fade-leave-to'>
+    <div class="page">
+      <div class="weui-form">
+        <div class="weui-form__text-area">
+          <h2 class="weui-form__title weui-flex">
+            <span>清运线路</span>
+            <div class="weui-flex weui-flex__item weui-flex__btns">
+              <a class="weui-btn weui-btn_mini weui-btn_default" @click="confirSelect">确定</a>
+              <a class="weui-btn weui-btn_mini weui-btn_warn" @click="cancelSelect">取消</a>
+            </div>
+          </h2>
+        </div>
+        <div class="weui-form__control-area">
+          <div class="weui-cells__group weui-cells__group_form">
+            <div class="weui-cells weui-cells_checkbox">
+              <label class="weui-cell weui-cell_active weui-check__label" for="s11" class='default'>
+                <div class="weui-cell__icon"></div>
+                <div class="weui-cell__bd">
+                  <p>新中新村-厢2</p>
+                </div>
+                <div class="weui-cell__hd">
+                  <input type="checkbox" class="weui-check" name="checkbox1" id="s11" lng="item.lnglat.lng"
+                    lat="item.lnglat.lat" />
+                  <i class="weui-icon-checked"></i>
+                </div>
+              </label>
+
+              <label class="weui-cell weui-cell_active weui-check__label warn" for="s12">
+                <div class="weui-cell__icon"></div>
+                <div class="weui-cell__bd">
+                  <p>新中新村-厢2</p>
+                </div>
+                <div class="weui-cell__hd">
+                  <input type="checkbox" class="weui-check" name="checkbox1" id="s12" lng="item.lnglat.lng"
+                    lat="item.lnglat.lat" />
+                  <i class="weui-icon-checked"></i>
+                </div>
+              </label>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
+<script src="map.ts"></script>

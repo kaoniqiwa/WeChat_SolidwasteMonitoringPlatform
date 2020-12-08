@@ -1,5 +1,3 @@
-import { HowellHttpClient } from "../app/data-core/repuest/http-client"
-
 import { Map } from "../app/data-core/model/aiop/map";
 import { Camera } from "../app/data-core/model/waste-regulation/camera";
 import { Division, GetDivisionsParams } from "../app/data-core/model/waste-regulation/division";
@@ -7,17 +5,15 @@ import { GarbageStation, GetGarbageStationsParams, StationState } from "../app/d
 import { DivisionRequestService } from "../app/data-core/repuest/division.service";
 import { CameraRequestService, GarbageStationRequestService } from "../app/data-core/repuest/garbage-station.service";
 import { HowellAuthHttp } from "../app/data-core/repuest/howell-auth-http";
+import { HowellHttpClient } from "../app/data-core/repuest/http-client";
 import { ResourceMediumRequestService } from "../app/data-core/repuest/resources.service";
 
 export namespace GarbageStationList {
 
 
-    interface DivisionList {
-
-    }
 
 
-    export class GarbageStationClient {
+    class GarbageStationClient {
 
         content: HTMLElement | null;
         template: HTMLElement | null;
@@ -66,7 +62,7 @@ export namespace GarbageStationList {
                     tag.className += "red";
                     tag.innerHTML = "异常"
                     break;
-                case StationState.Normal:
+                case StationState.Full:
                     tag.className += "orange";
                     tag.innerHTML = "满溢"
                     break;
@@ -150,20 +146,24 @@ export namespace GarbageStationList {
         }
     }
 
+    const client = new HowellHttpClient.HttpClient();
+    client.login((http:HowellAuthHttp) => {
+
+
+
+        const client = new GarbageStationClient({
+            garbageStation: new GarbageStationRequestService(http),
+            division: new DivisionRequestService(http),
+            camera: new CameraRequestService(http),
+            media: new ResourceMediumRequestService(http)
+        }
+        );
+        let promis = client.LoadDivisionList();
+        promis = promis.then(() => {
+            client.LoadGarbageStation();
+        });
+    });
 }
 
 
-new HowellHttpClient.HttpClient().login(() => {
-    const http = new HowellAuthHttp('admin', '123456', true);
-    const client = new GarbageStationList.GarbageStationClient({
-        garbageStation: new GarbageStationRequestService(http),
-        division: new DivisionRequestService(http),
-        camera: new CameraRequestService(http),
-        media: new ResourceMediumRequestService(http)
-    }
-    );
-    let promis = client.LoadDivisionList();
-    promis = promis.then(() => {
-        client.LoadGarbageStation();
-    });
-})
+
