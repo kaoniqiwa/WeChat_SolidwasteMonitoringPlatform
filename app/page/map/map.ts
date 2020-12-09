@@ -157,18 +157,18 @@ client.login((http: HowellAuthHttp) => {
 })(mui);
 
 
-// let mapClient = new CesiumMapClient("iframe");
-// let dataController: any;
+let mapClient = new CesiumMapClient("iframe");
+let dataController: any;
 
-// console.log(mapClient.Events)
-// mapClient.Events.OnLoading = function () {
-//     alert('sss')
-//     console.log("client.Events.OnLoading");
-//     //    let  dataController = new CesiumDataController.Controller('192.168.21.241',8890,function(){
+console.log(mapClient.Events)
+mapClient.Events.OnLoading = function () {
+    alert('sss')
+    console.log("client.Events.OnLoading");
+    //    let  dataController = new CesiumDataController.Controller('192.168.21.241',8890,function(){
 
-//     //     })
-//     // let lng = // dataController.Point.Get(DivisionId,Id)
+    //     })
+    // let lng = // dataController.Point.Get(DivisionId,Id)
 
-//     // client.Draw.Routing.Draw([begin, end], CesiumDataController.RoutingType.Driving);
+    // client.Draw.Routing.Draw([begin, end], CesiumDataController.RoutingType.Driving);
 
-// }
+}
