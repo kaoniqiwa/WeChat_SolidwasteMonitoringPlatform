@@ -10,17 +10,20 @@
   <link crossorigin="anonymous"
     integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
     href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
+
   <!-- <link rel="stylesheet" href="https://weui.io/style/weui.css"> -->
   <link rel="stylesheet" href="https://img.cdn.aliyun.dcloud.net.cn/mui/dist/css/mui.min.css">
   <script src="https://cdn.bootcdn.net/ajax/libs/mui/3.7.1/js/mui.min.js"></script>
-  
-  <script src="http://localhost:8899/amap/js/howell/howell.js"></script>
-  <script src="http://localhost:8899/amap/js/howell/ext.js"></script>
-  <script src="http://localhost:8899/amap/js/MapTools.js"></script>
-  <script src="http://localhost:8899/amap/js/CesiumMapClient.js"></script>
-  <script src="http://localhost:8899/amap/js/CesiumDataController.js"></script>
+  <script crossorigin="anonymous"
+    integrity="sha512-WNLxfP/8cVYL9sj8Jnp6et0BkubLP31jhTG9vhL/F5uEZmg5wEzKoXp1kJslzPQWwPT1eyMiSxlKCgzHLOTOTQ=="
+    src="https://lib.baomitu.com/jquery/3.5.1/jquery.js"></script>
 
-
+  <script src="http://localhost:8080/amap/js/howell/howell.js"></script>
+  <script src="http://localhost:8080/amap/js/howell/httpService.js"></script>
+  <script src="http://localhost:8080/amap/js/howell/ext.js"></script>
+  <script src="http://localhost:8080/amap/js/MapTools.js"></script>
+  <script src="http://localhost:8080/amap/js/CesiumMapClient.js"></script>
+  <script src="http://localhost:8080/amap/js/CesiumDataController.js"></script>
 
 
   <style>
@@ -51,7 +54,7 @@
       width: 50px;
       position: fixed;
       z-index: 999;
-      background: var(--weui-BG-5);
+      background: #fff;
       bottom: 70px;
       left: 12px;
       font-size: 10px;
@@ -77,7 +80,7 @@
       height: 100%;
       position: absolute;
       z-index: 999;
-      background: var(--weui-BG-0);
+      background: #fff;
       right: -0;
       top: 00;
       font-size: 17px;
@@ -113,7 +116,7 @@
       text-align: center;
       position: absolute;
       bottom: 0;
-      background-color: var(--weui-WHITE);
+      background-color: #fff;
     }
 
     .page .weui-form__control-area .weui-cells .weui-check__label {
@@ -189,12 +192,16 @@
 
     @media screen and (min-width: 900px) {
       #solid_waste {
-        width: 20%;
+        width: 213px;;
       }
 
       #solid_waste .weui-form__control-area {
         margin: 0;
 
+      }
+
+      .weui-flex__btns .weui-btn {
+        font-size: 1.3rem;
       }
 
       #solid_waste .weui-form__control-area .weui-cells {
@@ -274,7 +281,7 @@
     </label>
 
   </template>
-  <iframe class="col-md-9 map" src="http://localhost:8899/Amap/map_ts.html?maptype=AMapOffline&v=20191106" id="iframe"
+  <iframe class="col-md-9 map" src="http://localhost:8080/Amap/map_ts.html?maptype=AMapOffline&v=20191106" id="iframe"
     width="100%" height="100%"></iframe>
 
   <div id="control_bar" class="weui-cells weui-cells_button">

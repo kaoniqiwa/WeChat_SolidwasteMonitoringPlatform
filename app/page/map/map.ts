@@ -27,7 +27,9 @@ let page: Page;
 let list: StationList;
 
 let isShow: boolean = true;
-let selectData = new Set();
+let selectData = new Map();
+let selectPositions = [];
+
 
 let h = document.querySelector('.weui-form__control-area')?.clientHeight as number;
 let h2 = document.querySelector('.mui-content')?.clientHeight as number;
@@ -53,10 +55,7 @@ showPath.addEventListener('click', function () {
 
 resetBtn.addEventListener('click', function () {
     console.log('reset')
-    selectData.clear();
-    document.querySelectorAll('input[type=checkbox]').forEach(item => {
-        (item as HTMLInputElement).checked = false
-    })
+    reset()
 })
 confirmBtn.addEventListener('click', function () {
     console.log('confirm')
@@ -64,15 +63,30 @@ confirmBtn.addEventListener('click', function () {
     solidWaste.classList.add('slide-fade-leave-active');
     solidWaste.classList.add('slide-fade-leave-to');
     isShow = false;
-    console.log(selectData)
+
+    selectData.forEach((v, k, m) => {
+        let point: CesiumDataController.Point = dataController.Village.Point.Get(
+            v.divisionId, v.id)
+        selectPositions.push(point.position)
+
+    })
+
+    mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving);
+
+    reset()
 })
+function reset() {
+    selectData.clear();
+    document.querySelectorAll('input[type=checkbox]').forEach(item => {
+        (item as HTMLInputElement).checked = false
+    })
+}
 
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { GarbageStationRequestService } from "../../data-core/repuest/garbage-station.service";
 import { GetGarbageStationsParams } from "../../data-core/model/waste-regulation/garbage-station";
 import { Page } from "../../data-core/model/page";
-import { Point } from "../../data-core/model/point";
 
 
 
@@ -108,16 +122,19 @@ class StationList {
                     p.textContent = item.Name;//+ item.Id;
                     let checkbox = info.querySelector('input[type=checkbox]') as HTMLInputElement
                     checkbox.setAttribute('id', item.Id);
+                    checkbox.setAttribute('divisionId', item.DivisionId)
 
                     checkbox.addEventListener('click', function (e) {
                         let id = this.getAttribute('id');
-                        console.log(id)
+                        let divisionId = this.getAttribute('divisionId');
+
                         if (selectData.has(id)) {
                             selectData.delete(id)
                         } else {
-                            selectData.add(this.getAttribute('id'))
+                            selectData.set(id, {
+                                id, divisionId
+                            })
                         }
-                        console.log(selectData)
                     })
 
                     this.myList?.appendChild(info)
@@ -158,17 +175,15 @@ client.login((http: HowellAuthHttp) => {
 
 
 let mapClient = new CesiumMapClient("iframe");
-let dataController: any;
+let dataController: CesiumDataController.Controller;
 
 console.log(mapClient.Events)
 mapClient.Events.OnLoading = function () {
-    alert('sss')
     console.log("client.Events.OnLoading");
-    //    let  dataController = new CesiumDataController.Controller('192.168.21.241',8890,function(){
+    dataController = new CesiumDataController.Controller('localhost', 8080, function () {
 
-    //     })
-    // let lng = // dataController.Point.Get(DivisionId,Id)
-
+    })
+    console.log(mapClient.Draw.Routing)
     // client.Draw.Routing.Draw([begin, end], CesiumDataController.RoutingType.Driving);
 
 }

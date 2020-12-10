@@ -188,7 +188,7 @@ declare namespace CesiumMap {
 
     }
     interface DrawRouting {
-        Draw: (positions: Array<CesiumDataController.Position>, type: CesiumDataController.RoutingType, opts: CesiumDataController.DrawLineOptions) => CesiumDataController.Polyline;
+        Drawing: (positions: Array<CesiumDataController.Position>, type: CesiumDataController.RoutingType, opts?: CesiumDataController.DrawLineOptions) => CesiumDataController.Polyline;
         Remove: (id: string) => boolean;
     }
 

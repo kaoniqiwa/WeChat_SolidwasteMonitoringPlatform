@@ -529,6 +529,15 @@ declare namespace CesiumDataController {
         // 骑行
         Riding = "riding"
     }
+    enum RoutingType {
+        // 驾车
+        Driving = "driving",
+        // 步行
+        Walking = "walking",
+        // 骑行
+        Riding = "riding"
+    }
+    
 
 }
 
