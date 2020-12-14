@@ -14,11 +14,13 @@ export class WeChatRequestService extends SaveModel{
         this.url = new url.WeChat();
     }
 
-    login(){
+    login(error:()=>void){
         const   su=new SessionUser(); 
         return this.requestService.auth<Response<WeChatUser>>(this.url.get(su.name),(header)=>{ 
             const digest = new Digest(header,  this.url.get(su.name));             
             return digest;
+        },()=>{
+            error();
         });
     }
     create(item:WeChatUser){ 

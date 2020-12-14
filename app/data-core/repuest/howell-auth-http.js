@@ -16,14 +16,14 @@ class HowellAuthHttp {
         this.axios = axios_1.default;
     }
 
-    get(path, config) {
+    get(path, error) {
         const myHeaders = this.getHttpHeaders('GET', path);
         const httpOptions = {
             headers: myHeaders
         };
         return this.axios
             .get(path, httpOptions)
-            .catch(this.getWwwAuth)
+            .catch(error)
             .then(wwwAuth => {
                 return wwwAuth;
             });
@@ -72,17 +72,19 @@ class HowellAuthHttp {
             });
     }
 
-    auth(path, digestFn) {
+    auth(path, digestFn,fn) {
         const httpOptions = {
             headers: { 'X-WebBrowser-Authentication': 'Forbidden' }
         };
         return this.axios
             .get(path, httpOptions)
-            .catch((error) => {
+            .catch((error) => { 
                 if (error.response.status == 403) {
+                     
                     window['DIGEST'] = digestFn(error.response.headers);
-
-                    return this.get(path);
+                    return this.get(path,()=>{
+                        fn()
+                    });                  
                 }
             })
             .then(wwwAuth => {
