@@ -18,12 +18,23 @@
     integrity="sha512-WNLxfP/8cVYL9sj8Jnp6et0BkubLP31jhTG9vhL/F5uEZmg5wEzKoXp1kJslzPQWwPT1eyMiSxlKCgzHLOTOTQ=="
     src="https://lib.baomitu.com/jquery/3.5.1/jquery.js"></script>
 
-  <script src="http://localhost:8899/amap/js/howell/howell.js"></script>
-  <script src="http://localhost:8899/amap/js/howell/httpService.js"></script>
-  <script src="http://localhost:8899/amap/js/howell/ext.js"></script>
-  <script src="http://localhost:8899/amap/js/MapTools.js"></script>
-  <script src="http://localhost:8899/amap/js/CesiumMapClient.js"></script>
-  <script src="http://localhost:8899/amap/js/CesiumDataController.js"></script>
+  <script>
+
+    document.write('<script src="http://' + window.location.host + '/amap/js/howell/howell.js"><\/script>');
+    document.write('<script src="http://' + window.location.host + '/amap/js/howell/httpService.js"><\/script>');
+
+
+  </script>
+
+  <script>
+
+    loadJS("ext", '<script src="http://' + window.location.host + '/amap/js/howell/ext.js"><\/script>');
+    loadJS("MapTools", '<script src="http://' + window.location.host + '/amap/js/MapTools.js"><\/script>');
+
+
+    loadJS("CesiumMapClient", '<script src="' + window.location.host + '/amap/js/CesiumMapClient.js"><\/script>');
+    loadJS("CesiumDataController", '<script src="' + window.location.host + '/amap/js/CesiumDataController.js"><\/script>');
+  </script>
 
 
   <style>
@@ -55,7 +66,7 @@
       position: fixed;
       z-index: 999;
       background: #fff;
-      bottom: 70px;
+      bottom: 90px;
       left: 12px;
       font-size: 10px;
       padding: 0 0;
@@ -192,7 +203,8 @@
 
     @media screen and (min-width: 900px) {
       #solid_waste {
-        width: 32vw;;
+        width: 32vw;
+        ;
       }
 
       #solid_waste .weui-form__control-area {
@@ -281,37 +293,36 @@
     </label>
 
   </template>
-  <iframe class="col-md-9 map" src="http://localhost:8899/Amap/map_ts.html?maptype=AMapOffline&
-  v=20191106" id="iframe"
-    width="100%" height="100%"></iframe>
+  <div class="page">
+    <iframe class="col-md-9 map" src="" id="iframe" width="100%" height="100%"></iframe>
 
-  <div id="control_bar" class="weui-cells weui-cells_button">
-    <div class="weui-cell">
-      <div class="weui-cell__hd">
-        <img src="./che.png" alt="" />
-      </div>
-      <div class="weui-cell__bd">清运车</div>
-    </div>
-    <div class="weui-cell" id='show_path'>
-      <div class="weui-cell__hd">
-        <img src="./path.png" alt="" />
-      </div>
-      <div class="weui-cell__bd">线路</div>
-    </div>
-  </div>
-
-  <div id="solid_waste" class='slide-fade-leave-tos'>
-    <div class="page">
-      <div class="weui-form">
-        <div class="weui-form__text-area">
-          <h2 class="weui-form__title weui-flex">
-            <span>清运线路</span>
-          </h2>
+    <div id="control_bar" class="weui-cells weui-cells_button">
+      <div class="weui-cell">
+        <div class="weui-cell__hd">
+          <img src="./che.png" alt="" />
         </div>
-        <div class="weui-form__control-area">
-          <div class="weui-cells__group weui-cells__group_form">
-            <div class="weui-cells weui-cells_checkbox" id='myList'>
-              <!-- <label class="weui-cell weui-cell_active weui-check__label">
+        <div class="weui-cell__bd">清运车</div>
+      </div>
+      <div class="weui-cell" id='show_path'>
+        <div class="weui-cell__hd">
+          <img src="./path.png" alt="" />
+        </div>
+        <div class="weui-cell__bd">线路</div>
+      </div>
+    </div>
+
+    <div id="solid_waste" class='slide-fade-leave-tos'>
+      <div class="page">
+        <div class="weui-form">
+          <div class="weui-form__text-area">
+            <h2 class="weui-form__title weui-flex">
+              <span>清运线路</span>
+            </h2>
+          </div>
+          <div class="weui-form__control-area">
+            <div class="weui-cells__group weui-cells__group_form">
+              <div class="weui-cells weui-cells_checkbox" id='myList'>
+                <!-- <label class="weui-cell weui-cell_active weui-check__label">
                 <div class="weui-cell__icon"></div>
                 <div class="weui-cell__bd">
                   <p></p>
@@ -344,36 +355,41 @@
                 </div>
               </label> -->
 
+              </div>
             </div>
-          </div>
-          <div class="mui-content">
-            <div class="mui-content-padded">
-              <ul class="mui-pagination mui-pagination-sm">
-                <li class="mui-previous mui-active">
-                  <a href="#">
-                    上一页
-                  </a>
-                </li>
-                <li class="mui-next">
-                  <a href="#">
-                    下一页
-                  </a>
-                </li>
-              </ul>
+            <div class="mui-content">
+              <div class="mui-content-padded">
+                <ul class="mui-pagination mui-pagination-sm">
+                  <li class="mui-previous mui-active">
+                    <a href="#">
+                      上一页
+                    </a>
+                  </li>
+                  <li class="mui-next">
+                    <a href="#">
+                      下一页
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
-          </div>
 
-        </div>
-        <div class="weui-form__btn-area">
-          <div class="weui-flex weui-flex__item weui-flex__btns">
-            <a class="weui-btn  weui-btn_cancel" id="resetBtn">重置</a>
-            <a class=" weui-btn weui-btn_confirm" id="confirmBtn">确认</a>
+          </div>
+          <div class="weui-form__btn-area">
+            <div class="weui-flex weui-flex__item weui-flex__btns">
+              <a class="weui-btn  weui-btn_cancel" id="resetBtn">重置</a>
+              <a class=" weui-btn weui-btn_confirm" id="confirmBtn">确认</a>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
+
+    <div class="page__ft">
+      <iframe src="../menu-bar/menu-bar.html" name="menuBar" class="fill-width fill-height" frameborder="0"></iframe>
+    </div>
+  </div>
 </body>
 
 </html>
