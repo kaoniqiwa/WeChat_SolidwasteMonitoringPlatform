@@ -1,10 +1,10 @@
 import { SaveModel } from "../model/save-model"; 
 import { WeChatUser } from "../model/we-chat";
-import * as url from "../url/user-url";   
+import * as url from "../url/user-url";    
 import { HowellAuthHttp } from "./howell-auth-http";
 import { Digest } from "./digest";
 import { SessionUser } from "../../common/session-user";
-import { Response } from '../model/Response';
+import { Response } from '../model/response';
  
 export class WeChatRequestService extends SaveModel{
     url: url.WeChat;
@@ -23,6 +23,10 @@ export class WeChatRequestService extends SaveModel{
     }
     create(item:WeChatUser){ 
         return this.requestService.post<WeChatUser, WeChatUser>(this.url.create(), item);
+    }
+
+    bingingUser(phoneNumber:string,openId:string){
+        return this.requestService.post<any,any>(this.url.binding(phoneNumber,openId));
     }
 
    
@@ -46,5 +50,21 @@ export class WeChatRequestService extends SaveModel{
 
     
 }
+ 
 
+export class WeChatCodeRequestService{
+    url: url.UserCode;
+    
+    constructor(private requestService: HowellAuthHttp) {
+     
+        this.url = new url.UserCode();
+    }
 
+    getCode(phoneNumber:string){
+        return this.requestService.post<any,any>(this.url.getCode(phoneNumber));
+    }
+
+    checkCode(phoneNumber:string,code:string){
+        return this.requestService.post<any,any>(this.url.checkCode(phoneNumber,code));
+    }
+}

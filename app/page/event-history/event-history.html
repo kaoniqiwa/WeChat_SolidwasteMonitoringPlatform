@@ -18,6 +18,7 @@
     <script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
     <script src="../../assets/mui.picker.min.js"></script>
     <script src="../../assets/page-manager.js"></script>
+    <!-- <script src="../../common/string-compare.js"></script> -->
     <style>
         .weui-form-preview__hd {
             height: 16em;
@@ -94,6 +95,7 @@
             list-style: none;
             background-color: #fff;
             height: calc(100% - 50px);
+            overflow: auto;
         }
 
         .weui-media-box .list-title {
@@ -283,7 +285,7 @@
 
     <div class="mui-page mui-page-center" id="detail">
         <div class="mui-page-content">
-            <div class="page__bd">
+            <div class="page__bd" style="height: calc(100% - 150px);">
                 <div class="weui-form-preview">
                     <div class="weui-form-preview__hd">
                         <div class="weui-form-preview__item fill-width fill-height">
