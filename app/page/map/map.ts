@@ -81,7 +81,7 @@ function reset() {
     document.querySelectorAll('input[type=checkbox]').forEach(item => {
         (item as HTMLInputElement).checked = false
     });
-    mapClient.Draw.Routing.Drawing.Remove(polyLine.id);
+    mapClient.Draw.Routing.Remove(polyLine.id);
     polyLine = null;
 }
 
