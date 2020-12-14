@@ -56,6 +56,8 @@ export namespace WeChatVerification {
                     if (result.success) {
                       const  buser=await  this.userRequest.bingingUser(phDom.value,u.name);
                       console.log(buser);
+                      if(buser.OpenId)
+                         u.name=buser.OpenId;
                       this.user.WUser = buser;    
                         msgDom.innerText = '注册成功';
                         toastDom.style.display = 'block';
