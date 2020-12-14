@@ -97,6 +97,8 @@ import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { GarbageStationRequestService } from "../../data-core/repuest/garbage-station.service";
 import { GetGarbageStationsParams } from "../../data-core/model/waste-regulation/garbage-station";
 import { Page } from "../../data-core/model/page";
+import { DivisionRequestService } from "../../data-core/repuest/division.service";
+import { GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 
 
 
@@ -104,15 +106,30 @@ class StationList {
     myList: HTMLElement | null;
     myTemplate: HTMLTemplateElement | null;
     constructor(private service: {
+        division: DivisionRequestService,
         garbageStation: GarbageStationRequestService,
     }) {
         this.myList = document.querySelector('#myList') as HTMLElement;
         this.myTemplate = document.querySelector('#myTemplate') as HTMLTemplateElement;
     }
-    LoadGarbageStation(pageIndex: number) {
+
+    async GetLocalDivision() {
+        const params = new GetDivisionsParams();
+        params.DivisionType = 3;
+        const res = await this.service.division.list(params);
+        if (res && res.Data && res.Data.Data && res.Data.Data.length > 0) {
+            return res.Data.Data[0];
+        }
+    }
+
+    async LoadGarbageStation(pageIndex: number) {
+
+        const division = await this.GetLocalDivision();
+
         const request = new GetGarbageStationsParams();
         request.PageSize = pageSize;
         request.PageIndex = pageIndex;
+        request.DivisionId = division.Id;
 
         return this.service.garbageStation.list(request).then(x => {
             console.log('garbageStation', x)
@@ -157,9 +174,43 @@ class StationList {
 const client = new HowellHttpClient.HttpClient();
 client.login((http: HowellAuthHttp) => {
     list = new StationList({
+        division: new DivisionRequestService(http),
         garbageStation: new GarbageStationRequestService(http),
     });
     list.LoadGarbageStation(pageIndex);
+
+
+    let iframe = document.getElementById('iframe');
+    iframe.src = "http://" + window.location.hostname + ":" + window.location.port + "/Amap/map_ts.html?maptype=AMapOffline&v=20191106";
+    let mapClient = new CesiumMapClient("iframe");
+    let dataController: CesiumDataController.Controller;
+
+    console.log(mapClient.Events)
+    mapClient.Events.OnLoading = function () {
+        console.log("client.Events.OnLoading");
+        dataController = new CesiumDataController.Controller(window.location.hostname, window.location.port, function () {
+
+        })
+
+    }
+    mapClient.Events.OnLoaded = async ()=> {
+
+        const division = await list.GetLocalDivision();
+
+        mapClient.Village.Select(division.Id);
+
+        myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
+        selectPositions[0] = myLocation;
+
+
+        mapClient.Map?.GetLocation?.().then((res) => {
+            myLocation = res;
+            selectPositions[0] = myLocation
+        })
+    }
+
+
+
 });
 
 
@@ -184,22 +235,3 @@ client.login((http: HowellAuthHttp) => {
 })(mui);
 
 
-let mapClient = new CesiumMapClient("iframe");
-let dataController: CesiumDataController.Controller;
-
-console.log(mapClient.Events)
-mapClient.Events.OnLoading = function () {
-    console.log("client.Events.OnLoading");
-    dataController = new CesiumDataController.Controller(window.location.hostname, window.location.port, function () {
-
-    })
-    myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
-    selectPositions[0] = myLocation;
-
-
-    mapClient.Map?.GetLocation?.().then((res) => {
-        myLocation = res;
-        selectPositions[0] = myLocation
-    })
-
-}
