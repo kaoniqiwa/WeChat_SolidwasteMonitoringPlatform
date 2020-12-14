@@ -73,7 +73,9 @@ confirmBtn.addEventListener('click', function () {
             v.divisionId, v.id)
         selectPositions.push(point.position)
     })
-
+    if (polyLine) {
+        mapClient.Draw.Routing.Remove(polyLine.id);
+    }
     polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: 'cyan' });
 
     // reset()
@@ -191,7 +193,6 @@ mapClient.Events.OnLoading = function () {
     myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
     selectPositions[0] = myLocation;
 
-    console.log(myLocation)
 
     mapClient.Map?.GetLocation?.().then((res) => {
         myLocation = res;
