@@ -31,6 +31,9 @@ let selectData = new Map();
 let selectPositions = [];
 let polyLine: CesiumDataController.Polyline;
 
+let myLocation: CesiumDataController.Position;
+
+
 
 let h = document.querySelector('.weui-form__control-area')?.clientHeight as number;
 let h2 = document.querySelector('.mui-content')?.clientHeight as number;
@@ -69,7 +72,6 @@ confirmBtn.addEventListener('click', function () {
         let point: CesiumDataController.Point = dataController.Village.Point.Get(
             v.divisionId, v.id)
         selectPositions.push(point.position)
-
     })
 
     polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: 'cyan' });
@@ -183,10 +185,10 @@ let dataController: CesiumDataController.Controller;
 console.log(mapClient.Events)
 mapClient.Events.OnLoading = function () {
     console.log("client.Events.OnLoading");
-    dataController = new CesiumDataController.Controller('localhost', 8080, function () {
+    dataController = new CesiumDataController.Controller('localhost', 8899, function () {
 
     })
-    console.log(mapClient.Draw.Routing)
-    // client.Draw.Routing.Draw([begin, end], CesiumDataController.RoutingType.Driving);
+    myLocation = mapClient.Map?.GetLocation?.() ?? new CesiumDataController.Position(121.45155234063192, 31.23953);
+    selectPositions[0] = myLocation;
 
 }
