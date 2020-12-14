@@ -2,6 +2,7 @@
 import { HowellAuthHttp } from "./howell-auth-http";
 import { WeChatRequestService } from "./we-chat.service";
 import { SessionUser } from "../../common/session-user";
+import { getQueryVariable } from "../../common/tool";
 export namespace HowellHttpClient {
 
     export class HttpClient {
@@ -13,7 +14,17 @@ export namespace HowellHttpClient {
         }
 
         async login(fn?: (http: HowellAuthHttp) => void) {
-            if (window['DIGEST'] == null) {
+            const openid = getQueryVariable('openid');
+            if(!openid) mui.openWindow({
+                url: '../../verification.html',
+                id: '../../verification.html',
+
+            });     
+            if (window['DIGEST'] == null&&openid) {
+                this.user.user = {
+                    name:openid,
+                    pwd:'123456'
+                }
                 const a = await this.userService.login();
                 // a['data'].Resources[0].Id='310109011029';
                 // a['data'].Resources[0].Name='黄山路居委会';
@@ -21,15 +32,15 @@ export namespace HowellHttpClient {
                 // a['data'].Resources[0].Id='310109011013002000';
                 // a['data'].Resources[0].Name='新中新村-厢1';
                 // a['data'].Resources[0].ResourceType=3;    
-                this.user.WUser = a['data'];
+                this.user.WUser = a['data'];    
+                if( !a['data'])
+                mui.openWindow({
+                    url: '../../verification.html',
+                    id: '../../verification.html',
 
-
-              
-
-
-                if (fn) fn(this.http);
+                });             
             }
-               
+            if (fn) fn(this.http);
         }
 
         get http() {
