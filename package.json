@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "parcel garbagestations.html --open --port 4200",
+    "start": "parcel ./app/page/garbage-stations/garbagestations.html --open --port 4200",
     "build": "NODE_ENV=production rm -rf dist && tsc --noEmit && parcel build app/index.html",
     "clean": "rm -rf dist",
     "test": "parcel ./app/index.html"
