@@ -40,7 +40,7 @@ export namespace WeChatVerification {
             // phDom.addEventListener('blur',()=>{
 
             // });
-            codeDom?.addEventListener('input', (e) => {
+            codeDom?.addEventListener('change', (e) => {
                 if (!/^[1-9]\d*$/.test(e.data))
                     codeDom.value = '';
                 if(codeDom.value.length){
@@ -59,13 +59,13 @@ export namespace WeChatVerification {
                       this.user.WUser = buser;    
                         msgDom.innerText = '注册成功';
                         toastDom.style.display = 'block';
-                        // setTimeout(() => {
-                        //     mui.openWindow({
-                        //         url: '../../index.html?openid='+phDom.value,
-                        //         id: '../../index.html?openid='+phDom.value',
+                        setTimeout(() => {
+                            mui.openWindow({
+                                url: '../../index.html?openid='+phDom.value,
+                                id: '../../index.html?openid='+phDom.value',
 
-                        //     });
-                        // }, 1500);
+                            });
+                        }, 1500);
                     } 
                     else{
                         msgDom.innerText = '验证失败';
