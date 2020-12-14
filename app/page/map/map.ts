@@ -68,8 +68,6 @@ confirmBtn.addEventListener('click', function () {
     solidWaste.classList.add('slide-fade-leave-to');
     isShow = false;
     selectPositions = [myLocation]
-    console.log('sss')
-    console.log(selectData)
     selectData.forEach((v, k, m) => {
         let point: CesiumDataController.Point = dataController.Village.Point.Get(
             v.divisionId, v.id)
