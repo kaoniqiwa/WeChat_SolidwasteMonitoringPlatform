@@ -70,10 +70,7 @@ confirmBtn.addEventListener('click', function () {
     mapClient.Map?.GetLocation?.().then((res) => {
         myLocation = res;
         selectPositions[0] = myLocation;
-        solidWaste.className = '';
-        solidWaste.classList.add('slide-fade-leave-active');
-        solidWaste.classList.add('slide-fade-leave-to');
-        isShow = false;
+        
         selectPositions = [myLocation]
         selectData.forEach((v, k, m) => {
             let point: CesiumDataController.Point = dataController.Village.Point.Get(
@@ -86,7 +83,10 @@ confirmBtn.addEventListener('click', function () {
         }
         polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: 'cyan' });
     })
-
+    solidWaste.className = '';
+    solidWaste.classList.add('slide-fade-leave-active');
+    solidWaste.classList.add('slide-fade-leave-to');
+    isShow = false;
 
     // reset()
 })
@@ -207,7 +207,8 @@ client.login((http: HowellAuthHttp) => {
         const division = await list.GetLocalDivision();
 
         mapClient.Village.Select(division.Id);
-
+        const village = dataController.Village.Get(division.Id);
+        mapClient.Viewer.MoveTo(village.position);
 
     }
 
