@@ -71,9 +71,9 @@ confirmBtn.addEventListener('click', function () {
 
     })
 
-    mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving);
+    mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving,{color:'cyan'});
 
-    reset()
+    // reset()
 })
 function reset() {
     selectData.clear();
