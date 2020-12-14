@@ -26,7 +26,7 @@ let totalRecordCount: number;
 let page: Page;
 let list: StationList;
 
-let isShow: boolean = true;
+let isShow: boolean = false;
 let selectData = new Map();
 let selectPositions = [];
 let polyLine: CesiumDataController.Polyline;
@@ -63,21 +63,30 @@ resetBtn.addEventListener('click', function () {
 })
 confirmBtn.addEventListener('click', function () {
     console.log('confirm')
-    solidWaste.className = '';
-    solidWaste.classList.add('slide-fade-leave-active');
-    solidWaste.classList.add('slide-fade-leave-to');
-    isShow = false;
-    selectPositions = [myLocation]
-    selectData.forEach((v, k, m) => {
-        let point: CesiumDataController.Point = dataController.Village.Point.Get(
-            v.divisionId, v.id)
-        selectPositions.push(point.position)
+    myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
+    selectPositions[0] = myLocation;
+
+
+    mapClient.Map?.GetLocation?.().then((res) => {
+        myLocation = res;
+        selectPositions[0] = myLocation;
+        solidWaste.className = '';
+        solidWaste.classList.add('slide-fade-leave-active');
+        solidWaste.classList.add('slide-fade-leave-to');
+        isShow = false;
+        selectPositions = [myLocation]
+        selectData.forEach((v, k, m) => {
+            let point: CesiumDataController.Point = dataController.Village.Point.Get(
+                v.divisionId, v.id)
+            selectPositions.push(point.position)
+        })
+        if (polyLine) {
+            console.log(mapClient.Draw.Routing.Remove)
+            mapClient.Draw.Routing.Remove(polyLine.id);
+        }
+        polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: 'cyan' });
     })
-    if (polyLine) {
-        console.log(mapClient.Draw.Routing.Remove)
-        mapClient.Draw.Routing.Remove(polyLine.id);
-    }
-    polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: 'cyan' });
+
 
     // reset()
 })
@@ -183,7 +192,7 @@ client.login((http: HowellAuthHttp) => {
     let iframe = document.getElementById('iframe');
     iframe.src = "http://" + window.location.hostname + ":" + window.location.port + "/Amap/map_ts.html?maptype=AMapOffline&v=20191106";
     mapClient = new CesiumMapClient("iframe");
-    
+
 
     console.log(mapClient.Events)
     mapClient.Events.OnLoading = function () {
@@ -193,20 +202,13 @@ client.login((http: HowellAuthHttp) => {
         })
 
     }
-    mapClient.Events.OnLoaded = async ()=> {
+    mapClient.Events.OnLoaded = async () => {
 
         const division = await list.GetLocalDivision();
 
         mapClient.Village.Select(division.Id);
 
-        myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
-        selectPositions[0] = myLocation;
 
-
-        mapClient.Map?.GetLocation?.().then((res) => {
-            myLocation = res;
-            selectPositions[0] = myLocation
-        })
     }
 
 
