@@ -9,7 +9,8 @@ namespace HowellBar {
         requestService: WeChatRequestService; 
         user :SessionUser;
         items = ['barItem1', 'barItem2', 'barItem3', 'barItem4', 'barItem5'];
-        links = ['index.html', 'event-history.html', 'garbage-stations.html', 'map.html', 'me.html'];
+        links = ['index.html', 'event-history.html'
+        , 'garbagestations.html', 'map.html', 'me.html'];
         constructor(){
             this.user=new SessionUser();
             this.httpClient = new HowellHttpClient.HttpClient(); 
@@ -41,8 +42,8 @@ namespace HowellBar {
                    
                     sessionStorage.setItem('pageIndex',i+'');
                     mui.openWindow({
-                        url: '../../' + this.links[i],
-                        id: '../../' + this.links[i],
+                        url: '../../' + this.links[i]+`?openid=${this.user.name}`,
+                        id: '../../' + this.links[i]+`?openid=${this.user.name}`
 
                     });
                 });

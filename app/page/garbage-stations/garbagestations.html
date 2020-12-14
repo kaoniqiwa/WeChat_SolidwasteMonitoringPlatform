@@ -12,7 +12,7 @@
     </script> -->
     <link href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
     <link href="https://cdn.bootcdn.net/ajax/libs/mui/3.7.1/css/mui.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="../../assets/howell.css">
     <style>
         .weui-search-bar {
             margin: 5px;
@@ -394,6 +394,9 @@ white-space: nowrap;
             background-color: #fff;
             text-align: center;
         }
+        .mui-off-canvas-wrap{
+            height: calc(100% - 62px);
+        }
     </style>
 
 </head>
@@ -411,7 +414,7 @@ white-space: nowrap;
             <div class="mui-card-footer footer">页脚</div>
         </div>
     </div>
-
+<div class="page">
 
     <header class="mui-bar mui-bar-nav">
         <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
@@ -475,11 +478,14 @@ white-space: nowrap;
             <div class="mui-off-canvas-backdrop"></div>
         </div>
     </div>
-
+    <div class="page__ft">
+        <iframe src="../menu-bar/menu-bar.html" name="menuBar" class="fill-width fill-height"
+            frameborder="0"></iframe>
+    </div>
     <!-- <div id="right" class="mui-off-canvas-right mui-transitioning mui-active mui-scalable">
 
     </div> -->
-
+</div>
 </body>
 <script>
 
@@ -498,7 +504,7 @@ document.querySelector('#offCanvasWrapper').addEventListener('drag',function(e){
 
 <script src="./GarbageStationList.ts"></script>
 <script>
-    // mui.previewImage();
+    mui.previewImage();
 </script>
 
 </html>

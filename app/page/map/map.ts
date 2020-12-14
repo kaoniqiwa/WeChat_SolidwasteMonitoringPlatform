@@ -170,6 +170,8 @@ class StationList {
 }
 
 const client = new HowellHttpClient.HttpClient();
+let dataController: CesiumDataController.Controller;
+let mapClient: CesiumMapClient;
 client.login((http: HowellAuthHttp) => {
     list = new StationList({
         division: new DivisionRequestService(http),
@@ -180,8 +182,8 @@ client.login((http: HowellAuthHttp) => {
 
     let iframe = document.getElementById('iframe');
     iframe.src = "http://" + window.location.hostname + ":" + window.location.port + "/Amap/map_ts.html?maptype=AMapOffline&v=20191106";
-    let mapClient = new CesiumMapClient("iframe");
-    let dataController: CesiumDataController.Controller;
+    mapClient = new CesiumMapClient("iframe");
+    
 
     console.log(mapClient.Events)
     mapClient.Events.OnLoading = function () {

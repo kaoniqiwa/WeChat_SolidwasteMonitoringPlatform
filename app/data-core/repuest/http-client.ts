@@ -14,11 +14,10 @@ export namespace HowellHttpClient {
         }
 
         async login(fn?: (http: HowellAuthHttp) => void) {
-            const openid = getQueryVariable('openid');
+            const openid = getQueryVariable('openid');            
             if(!openid) mui.openWindow({
                 url: '../../verification.html',
-                id: '../../verification.html',
-
+                id: '../../verification.html', 
             });     
             if (window['DIGEST'] == null&&openid) {
                 this.user.user = {
