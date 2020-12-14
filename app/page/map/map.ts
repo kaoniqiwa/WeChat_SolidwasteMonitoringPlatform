@@ -67,13 +67,16 @@ confirmBtn.addEventListener('click', function () {
     solidWaste.classList.add('slide-fade-leave-active');
     solidWaste.classList.add('slide-fade-leave-to');
     isShow = false;
-
+    selectPositions = [myLocation]
+    console.log('sss')
+    console.log(selectData)
     selectData.forEach((v, k, m) => {
         let point: CesiumDataController.Point = dataController.Village.Point.Get(
             v.divisionId, v.id)
         selectPositions.push(point.position)
     })
     if (polyLine) {
+        console.log(mapClient.Draw.Routing.Remove)
         mapClient.Draw.Routing.Remove(polyLine.id);
     }
     polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: 'cyan' });
@@ -187,7 +190,7 @@ let dataController: CesiumDataController.Controller;
 console.log(mapClient.Events)
 mapClient.Events.OnLoading = function () {
     console.log("client.Events.OnLoading");
-    dataController = new CesiumDataController.Controller('localhost', 8899, function () {
+    dataController = new CesiumDataController.Controller(window.location.hostname, window.location.port, function () {
 
     })
     myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
