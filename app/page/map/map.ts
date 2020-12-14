@@ -188,7 +188,14 @@ mapClient.Events.OnLoading = function () {
     dataController = new CesiumDataController.Controller('localhost', 8899, function () {
 
     })
-    myLocation = mapClient.Map?.GetLocation?.() ?? new CesiumDataController.Position(121.45155234063192, 31.23953);
+    myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
     selectPositions[0] = myLocation;
+
+    console.log(myLocation)
+
+    mapClient.Map?.GetLocation?.().then((res) => {
+        myLocation = res;
+        selectPositions[0] = myLocation
+    })
 
 }
