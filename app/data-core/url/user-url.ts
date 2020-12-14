@@ -3,6 +3,17 @@
  * LastUpdateTime  
  */
 import { BaseUrl, IUrl } from "./IUrl";
+
+export class UserCode extends BaseUrl{
+    getCode(phoneNumber:string){
+        return this.wechat+'GetVerificationCode?phoneNumber='+phoneNumber;
+    }
+
+    checkCode(phoneNumber:string,code:string){
+        return this.wechat+`CheckVerificationCode?phoneNumber=${phoneNumber}&code=${code}`;
+    }
+}
+
 export class User  extends BaseUrl  {
     list() {
         return this.user+`Users`;
@@ -49,8 +60,8 @@ export class WeChat  extends BaseUrl{
         return  this.user+`WeChat/Users/${id}`;
     }
 
-    binding(){
-        return this.user+'WeChat/Users/Binding';
+    binding(phoneNumber:string,openId:string){
+        return this.user + `'WeChat/Users/Binding?MobileNo=${phoneNumber}&OpenId=${openId}`;
     }
 
     openIds(id:string){

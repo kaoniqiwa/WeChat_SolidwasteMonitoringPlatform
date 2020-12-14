@@ -297,7 +297,7 @@ namespace GarbageCondition {
                         });
 
                 }
-        }
+        } 
 
         class IllegalDropEventData {
                 datas: EventNumber[];

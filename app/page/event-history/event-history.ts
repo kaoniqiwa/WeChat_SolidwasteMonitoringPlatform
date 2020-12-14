@@ -58,24 +58,25 @@ export namespace EventHistoryPage {
         totalRecordCount = 0;
         dataSource = new Array<IllegalDropEventRecord>();
         user: SessionUser;
+        defaultDivisionId = '';
         constructor(private detail: EventDetail) {
             this.httpClient = new HowellHttpClient.HttpClient();
             this.eventService = new EventRequestService(this.httpClient.http);
             this.search = new SearchControl();
             this.user = new SessionUser();
-          
+
         }
 
-      async  defaultParam(){
-            if (this.user.WUser && this.user.WUser.Resources && this.user.WUser.Resources.length) {                
+        async defaultParam() {
+            if (this.user.WUser && this.user.WUser.Resources && this.user.WUser.Resources.length) {
                 if (this.user.WUser.Resources[0].ResourceType == ResourceRoleType.GarbageStations)
                     this.search.stationId = this.user.WUser.Resources[0].Id;
                 else {
                     const divisionRequest = new DivisionRequestDao.DivisionRequest()
-                    ,divisionData= await divisionRequest.getDivisions();
+                        , divisionData = await divisionRequest.getDivisions();
                     const committees = divisionData.Data.Data.filter(c => c.DivisionType == DivisionTypeEnum.Committees);
                     this.search.divisionId = committees[0].Id;
-                } 
+                }
             }
         }
 
@@ -141,13 +142,13 @@ export namespace EventHistoryPage {
             dom.innerHTML = '';
         }
 
-        destroy(is:boolean=true) {
+        destroy(is: boolean = true) {
             this.clearDom();
             this.dataSource = new Array();
             this.pageIndex = 1;
             this.pageTotal = 0;
             this.totalRecordCount = 0;
-            if(is)mui('#refreshContainer').pullRefresh().refresh(true);
+            if (is) mui('#refreshContainer').pullRefresh().refresh(true);
         }
 
         async requestData(pageIndex: number) {
@@ -228,30 +229,31 @@ export namespace EventHistoryPage {
         }
         init() {
             var a = async (f: (v: boolean) => void) => {
-                var b = await this.dropEvent.init(); 
+                var b = await this.dropEvent.init();
                 f(b);
-            },d = ()=>{
+            }, d = () => {
                 this.dropEvent.destroy(false)
                 this.dropEvent.init();
-               
+
             };
             mui.init({
                 pullRefresh: {
                     container: '#refreshContainer',
                     down: {
-                        callback: function(){
+                        callback: function () {
                             d();
                             this.endPulldownToRefresh(false);
                             this.refresh(true);
-                            
+
                         }
                     },
                     up: {
+                        // contentnomore:'',
                         auto: true,
                         callback: function () {
                             a((b) => {
                                 console.log(b);
-                             
+
                                 this.endPullupToRefresh(b);
                             });
                         }
@@ -292,11 +294,11 @@ export namespace EventHistoryPage {
             });
             mui('#offCanvasSideScroll').scroll();
 
-            document.getElementById('searchBtn').addEventListener('tap', async() => {
+            document.getElementById('searchBtn').addEventListener('tap', async () => {
                 this.event.dataSource = new Array();
                 this.event.destroy();
-                this.event.init();   
-              
+                this.event.init();
+
             });
 
             const fillTime = (begin?: Date, end?: Date) => {
@@ -318,21 +320,40 @@ export namespace EventHistoryPage {
                 endDom.setAttribute('data-time', e);
             }
             fillTime();
-            document.getElementById('the_day').addEventListener('tap', () => {
+            const dayDom =document.getElementById('the_day'),
+            yesterDayDom =document.getElementById('the_yesterday'),
+            beforeDayDom =document.getElementById('the_before_day'),
+            dayDomSelect = (dom:Element,select:boolean)=>{
+                var classNames = dom.getAttribute('class');
+                if(select)   classNames += ' selected';
+                else  classNames = classNames.replace('selected', '').replace('selected', '');
+                dom.setAttribute('class',classNames);
+            };
+            dayDom.addEventListener('tap', () => {
                 this.event.search.day = 0;
                 const day = TheDay(0);
                 fillTime(day.begin, day.end);
+                dayDomSelect(dayDom,true);
+                dayDomSelect(yesterDayDom,false);
+                dayDomSelect(beforeDayDom,false);
             });
-            document.getElementById('the_yesterday').addEventListener('tap', () => {
+            yesterDayDom.addEventListener('tap', () => {
                 this.event.search.day = -1;
                 const day = TheDay(-1);
                 fillTime(day.begin, day.end);
+                dayDomSelect(dayDom,false);
+                dayDomSelect(yesterDayDom,true);
+                dayDomSelect(beforeDayDom,false);
             });
-            document.getElementById('the_before_day').addEventListener('tap', () => {
+            beforeDayDom.addEventListener('tap', () => {
                 this.event.search.day = -2;
                 const day = TheDay(-2);
                 fillTime(day.begin, day.end);
+                dayDomSelect(dayDom,false);
+                dayDomSelect(yesterDayDom,false);
+                dayDomSelect(beforeDayDom,true);
             });
+
 
             document.getElementById('resetBtn').addEventListener('tap', () => {
                 const childDoms = document.getElementById('stationView').children;
@@ -343,6 +364,7 @@ export namespace EventHistoryPage {
                         ele.setAttribute('class', className + ' selected');
                     else ele.setAttribute('class', className.replace('selected', ''));
                 }
+                this.event.search.divisionId = this.event.defaultDivisionId;
                 this.clearDayType()
                 fillTime();
             });
@@ -369,7 +391,7 @@ export namespace EventHistoryPage {
                     const tag = document.getElementsByName(id)[0];
                     var classNames = tag.getAttribute('class');
                     if (add) classNames += ' selected';
-                    else classNames = classNames.replace('selected', '');
+                    else classNames = classNames.replace('selected', '').replace('selected', '');
                     tag.setAttribute('class', classNames);
                 };
             var html = '';
@@ -380,11 +402,12 @@ export namespace EventHistoryPage {
                     const committees = divisionResponse.Data.Data.filter(c => c.DivisionType == DivisionTypeEnum.Committees)
                         , addSelected = (i: number) => {
                             if (i == 0) return 'selected';
+                            else return '';
                         };
 
                     for (let i = 0; i < committees.length; i++) {
                         if (i == 0) {
-                            // this.event.search.stationId = committees[i].Id;
+                            this.event.defaultDivisionId = committees[i].Id;
                             this.event.search.divisionId = committees[i].Id;
                         }
                         if (i % 2 == 0)
@@ -397,7 +420,7 @@ export namespace EventHistoryPage {
                     committees.map(m => {
 
                         const gDom = document.getElementsByName(m.Id)[0];
-                        gDom.addEventListener('tap', () => {
+                        gDom.addEventListener('tap', () => { 
                             selected(this.event.search.divisionId, false);
                             this.event.search.divisionId = m.Id;
                             selected(m.Id, true);
@@ -405,15 +428,17 @@ export namespace EventHistoryPage {
                     });
                 }
                 else if (this.event.user.WUser.Resources[0].ResourceType == ResourceRoleType.Committees) {
-                    stationTextDom.innerHTML = '垃圾房';
+                    stationTextDom.innerHTML = '投放点';
                     const stationsResponse = await request.getGarbageStations(user.WUser.Resources[0].Id), addSelected = (i: number) => {
                         if (i == 0) return 'selected';
                     }
                     if (stationsResponse && stationsResponse.Data) {
                         for (let i = 0; i < stationsResponse.Data.Data.length; i++) {
                             const stations = stationsResponse.Data.Data[i];
-                            if (i == 0)
+                            if (i == 0) {
                                 this.event.search.stationId = stations.Id;
+                                this.event.defaultDivisionId = stations.Id;
+                            }
                             if (i % 2 == 0)
                                 html += ` <li class="pull-left m-r-10 m-b-10 ${addSelected(i)}  " name="${stations.Id}">${stations.Name}</li>`;
                             else html += ` <li class="pull-left m-b-10  ${addSelected(i)}" name="${stations.Id}">${stations.Name}</li>`;
@@ -435,26 +460,7 @@ export namespace EventHistoryPage {
             }
 
         }
-
-        changeDayNum() {
-            const types = document.getElementsByClassName('time-type-box')
-                , clearSelected = () => {
-                    for (let i = 0; i < types.length; i++) {
-                        var classNames = types[i].getAttribute('class');
-                        classNames = classNames.replace('selected', '');
-                        types[i].setAttribute('class', classNames);
-                    }
-                };
-            for (let i = 0; i < types.length; i++) {
-                types[i].addEventListener('tap', () => {
-                    clearSelected();
-                    var classNames = types[i].getAttribute('class');
-                    classNames += ' selected';
-                    types[i].setAttribute('class', classNames);
-                });
-
-            }
-        }
+ 
 
         datePicker() {
             const beginDom = document.getElementById('beginTime'), endDom = document.getElementById('endTime')
@@ -561,8 +567,8 @@ new HowellHttpClient.HttpClient().login(() => {
     const eventDetail = new EventHistoryPage.EventDetail();
 
     const event = new EventHistoryPage.IllegalDropEvent(eventDetail);
-       event.defaultParam()
-  
+    event.defaultParam()
+
 
     setTimeout(() => {
         const refresh = new EventHistoryPage.Refresh(event);
@@ -570,8 +576,7 @@ new HowellHttpClient.HttpClient().login(() => {
         new EventHistoryPage.SearchBar(event);
         const sw = new EventHistoryPage.SideWrapper(event);
         sw.init();
-        sw.loadDivisionView();
-        sw.changeDayNum();
+        sw.loadDivisionView();      
         sw.datePicker();
 
     }, 1000);
