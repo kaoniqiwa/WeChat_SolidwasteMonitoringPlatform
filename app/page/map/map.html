@@ -64,7 +64,7 @@
 
     #control_bar {
       width: 37px;
-      position: fixed;
+      position: absolute;
       z-index: 999;
       background: #fff;
       bottom: 90px;
@@ -89,7 +89,7 @@
 
     #solid_waste {
       width: 65vw;
-      height: 100%;
+      height: calc(100% - 62px);
       position: absolute;
       z-index: 999;
       background: #fff;
@@ -294,8 +294,8 @@
     </label>
 
   </template>
-  <div class="page">
-    <iframe class="col-md-9 map" src="" id="iframe" width="100%" height="100%"></iframe>
+  <div class="page" style="position: relative;">
+    <iframe class="col-md-9 map" src="" id="iframe" width="100%" style="height: calc(100% - 62px);"></iframe>
 
     <div id="control_bar" class="weui-cells weui-cells_button">
       <div class="weui-cell">
@@ -312,7 +312,7 @@
       </div>
     </div>
 
-    <div id="solid_waste" class='slide-fade-leave-tos'>
+    <div id="solid_waste" class='slide-fade-leave-to'>
       <div class="page">
         <div class="weui-form">
           <div class="weui-form__text-area">

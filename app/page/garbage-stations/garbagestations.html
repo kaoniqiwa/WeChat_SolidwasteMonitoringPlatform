@@ -470,7 +470,7 @@ white-space: nowrap;
                 <h1 class="mui-title">左滑导航</h1> -->
             </header>
             <div id="offCanvasContentScroll" class="mui-content mui-scroll-wrapper">
-                <div class="mui-scroll garbage-station" id="content">
+                <div class="mui-scroll garbage-station" id="content" style="overflow: auto;">
 
                 </div>
             </div>
@@ -490,8 +490,30 @@ white-space: nowrap;
 <script>
 
 document.querySelector('#offCanvasWrapper').addEventListener('drag',function(e){
+    if(e.path.length >= 13)
+    {
+        e.stopImmediatePropagation();        
+    }
     if(e.target.tagName.toLowerCase() == 'img'){
-        e.stopImmediatePropagation()
+        console.log(e);
+        //e.target.parentElement.parentElement.scrollLeft =  e.target.parentElement.parentElement.offsetWidth -  e.detail.center.x;
+        //          li          ul              div
+        switch(e.detail.direction)
+        {
+            case 'left':
+            e.target.parentElement.parentElement.scrollLeft += 6;
+                break;
+                case 'right':
+                e.target.parentElement.parentElement.scrollLeft -= 6;
+                    break;
+        }
+        
+        
+        // direction
+        //  e.detail.deltaX
+
+        // e.target.parent 
+        
     }
 })
 
