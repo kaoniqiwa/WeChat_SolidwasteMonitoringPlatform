@@ -29,6 +29,7 @@ let list: StationList;
 let isShow: boolean = true;
 let selectData = new Map();
 let selectPositions = [];
+let polyLine: CesiumDataController.Polyline;
 
 
 let h = document.querySelector('.weui-form__control-area')?.clientHeight as number;
@@ -71,7 +72,7 @@ confirmBtn.addEventListener('click', function () {
 
     })
 
-    mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving,{color:'cyan'});
+    polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: 'cyan' });
 
     // reset()
 })
@@ -79,7 +80,9 @@ function reset() {
     selectData.clear();
     document.querySelectorAll('input[type=checkbox]').forEach(item => {
         (item as HTMLInputElement).checked = false
-    })
+    });
+    mapClient.Draw.Routing.Drawing.Remove(polyLine.id);
+    polyLine = null;
 }
 
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
