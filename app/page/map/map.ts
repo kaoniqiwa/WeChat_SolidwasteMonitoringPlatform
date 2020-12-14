@@ -67,7 +67,8 @@ confirmBtn.addEventListener('click', function () {
     selectPositions[0] = myLocation;
 
 
-    mapClient.Map?.GetLocation?.().then((res) => {
+    mapClient.Map?.GetLocation?.(function(res){
+        console.log(res)
         myLocation = res;
         selectPositions[0] = myLocation;
         
