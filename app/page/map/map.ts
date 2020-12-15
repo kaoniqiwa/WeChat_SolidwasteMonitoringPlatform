@@ -82,7 +82,7 @@ confirmBtn.addEventListener('click', function () {
             console.log(mapClient.Draw.Routing.Remove)
             mapClient.Draw.Routing.Remove(polyLine.id);
         }
-        polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: 'cyan' });
+        polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: '#007aff', alpha:1 });
     })
     solidWaste.className = '';
     solidWaste.classList.add('slide-fade-leave-active');
