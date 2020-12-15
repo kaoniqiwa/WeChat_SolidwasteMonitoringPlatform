@@ -191,7 +191,7 @@ client.login((http: HowellAuthHttp) => {
 
 
     let iframe = document.getElementById('iframe');
-    iframe.src = "http://" + window.location.hostname + ":" + window.location.port + "/Amap/map_ts.html?maptype=AMapOffline&v=20191106";
+    iframe.src = "http://" + window.location.hostname + ":" + window.location.port + "/Amap/map_ts.html?maptype=2D&v="+(new Date()).toISOString();
     mapClient = new CesiumMapClient("iframe");
 
 
