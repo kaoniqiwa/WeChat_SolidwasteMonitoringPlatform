@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <title>生活垃圾监管平台</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -18,7 +19,7 @@
             margin: 5px;
             height: 34px;
             border-radius: 50px;
-            width: calc(100% - 138px);
+            width: calc(100% - 120px);
             padding: 0;
         }
 
@@ -44,6 +45,10 @@
             display: none;
         }
 
+        .mui-card {
+            margin: 10px 0;
+        }
+
         .mui-card-footer,
         .mui-card-header {
             position: initial;
@@ -57,8 +62,8 @@
         .mui-card-footer {
             color: #b2b2b2;
         }
-        .mui-card .mui-card-content-inner
-        {
+
+        .mui-card .mui-card-content-inner {
             padding: 0 15px;
         }
 
@@ -93,7 +98,7 @@
         }
 
         .mui-scroll.garbage-station {
-            
+
             max-width: 100%;
             overflow-y: auto;
             overflow-x: hidden;
@@ -331,24 +336,35 @@ display:block; */
             max-width: 100%;
             height: auto;
         }
+
+        .mui-bar-tab {}
     </style>
 
 
     <style>
+        .mui-off-canvas-wrap {
+            height: calc(100% - 62px);
+        }
+
         .mui-draggable .mui-scroll {
-            padding-left: 10px;
+
             /* height: 100%; */
         }
 
-        .mui-draggable .mui-scroll .title {
+        .mui-draggable .title {
             margin-top: 44px;
+            margin-left: 20px;
         }
 
-        .mui-draggable .mui-scroll .mui-btn {
+        .mui-draggable .mui-btn {
             border-radius: 50px;
             height: 40px;
             width: calc(50% - 25px);
             margin: 10px;
+        }
+
+        .mui-draggable .divisions {
+            margin-left: 15px;
         }
 
         .divisions ul {
@@ -370,12 +386,13 @@ display:block; */
             background-color: #f5f5f5;
             color: #a5a3a2;
             border: none;
-            margin: 10px;
+            margin: 5px;
             height: 30px;
-            width: calc(50% - 25px);
+            width: calc(50% - 20px);
+            font-size: 12px;
             overflow: hidden;
-text-overflow: ellipsis;
-white-space: nowrap;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .mui-draggable .mui-scroll .mui-btn.mui-btn-division.selected {
@@ -386,15 +403,18 @@ white-space: nowrap;
 
         .mui-draggable .mui-scroll .content.divisions {
             height: calc(100% - 140px);
-            overflow: auto;            
-            -webkit-overflow-scrolling:touch;            
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .mui-bar-tab {
+        .bar {
             background-color: #fff;
             text-align: center;
+            position:absolute;
+            bottom: 0;
         }
-        .mui-off-canvas-wrap{
+
+        .mui-off-canvas-wrap {
             height: calc(100% - 62px);
         }
     </style>
@@ -414,44 +434,45 @@ white-space: nowrap;
             <div class="mui-card-footer footer">页脚</div>
         </div>
     </div>
-<div class="page">
+    <div class="page">
 
-    <header class="mui-bar mui-bar-nav">
-        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-        <div class="mui-pull-left weui-search-bar" id="searchBar">
-            <!-- <input type="search" class="mui-input-clear" placeholder=""> -->
+        <header class="mui-bar mui-bar-nav">
+            <div class="mui-pull-left weui-search-bar" id="searchBar">
+                <!-- <input type="search" class="mui-input-clear" placeholder=""> -->
 
-            <div class="weui-search-bar__box">
-                <i class="weui-icon-search" id="btn_search"></i>
-                <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" />
+                <div class="weui-search-bar__box">
+                    <i class="weui-icon-search" id="btn_search"></i>
+                    <input type="search" class="weui-search-bar__input" id="searchInput" placeholder="搜索" />
+                </div>
+
+            </div>
+            <div class="mui-pull-right title" id="btn_division">
+                筛选
+                <span class="mui-icon mui-icon-arrowright"></span>
+            </div>
+            <div class="mui-pull-right title">
+                图片
+                <span class="mui-icon mui-icon-arrowdown"></span>
             </div>
 
-        </div>
-        <div class="mui-pull-right title" id="btn_division">
-            居委
-            <span class="mui-icon mui-icon-arrowright"></span>
-        </div>
-        <div class="mui-pull-right title">
-            图片
-            <span class="mui-icon mui-icon-arrowdown"></span>
-        </div>
 
 
+        </header>
+        <!--侧滑菜单容器-->
+        <div id="offCanvasWrapper" class="mui-off-canvas-wrap mui-draggable">
+            <!--菜单部分-->
+            <aside id="offCanvasSide" class="mui-off-canvas-right">
+                <div id="offCanvasSideScroll" class="mui-scroll-wrapper">
+                    <div class="mui-scroll">
+                        <div class="title">
+                            居委
+                        </div>
+                        <div class="content divisions">
+                            <ul class="" id="division_list"></ul>
+                        </div>
 
-    </header>
-    <!--侧滑菜单容器-->
-    <div id="offCanvasWrapper" class="mui-off-canvas-wrap mui-draggable" >
-        <!--菜单部分-->
-        <aside id="offCanvasSide" class="mui-off-canvas-right">
-            <div id="offCanvasSideScroll" class="mui-scroll-wrapper">
-                <div class="mui-scroll">
-                    <div class="title">
-                        居委
                     </div>
-                    <div class="content divisions">
-                        <ul class="" id="division_list"></ul>
-                    </div>
-                    <div style="width: 100%;" class="mui-bar mui-bar-tab">
+                    <div style="width: 100%;" class="bar">
                         <button type="button" class="mui-btn mui-btn-primary mui-btn-outlined" id="btn_reset">
                             重置
                         </button>
@@ -460,62 +481,79 @@ white-space: nowrap;
                         </button>
                     </div>
                 </div>
-            </div>
-        </aside>
-        <div class="mui-inner-wrap">
-            <header class="mui-bar mui-bar-nav">
-                <!-- <a class="mui-action-back mui-icon mui-icon-back mui-pull-left"></a>
+            </aside>
+            <div class="mui-inner-wrap">
+                <header class="mui-bar mui-bar-nav">
+                    <!-- <a class="mui-action-back mui-icon mui-icon-back mui-pull-left"></a>
                 <a id="offCanvasBtn" href="#offCanvasSide"
                     class="mui-icon mui-action-menu mui-icon-bars mui-pull-right"></a>
                 <h1 class="mui-title">左滑导航</h1> -->
-            </header>
-            <div id="offCanvasContentScroll" class="mui-content mui-scroll-wrapper">
-                <div class="mui-scroll garbage-station" id="content" style="overflow: auto;">
+                </header>
+                <div id="offCanvasContentScroll" class="mui-content mui-scroll-wrapper">
+                    <div class="mui-scroll garbage-station" id="content" style="overflow: auto;">
 
+                    </div>
                 </div>
+                <!-- off-canvas backdrop -->
+                <div class="mui-off-canvas-backdrop"></div>
             </div>
-            <!-- off-canvas backdrop -->
-            <div class="mui-off-canvas-backdrop"></div>
         </div>
-    </div>
-    <div class="page__ft">
-        <iframe src="../menu-bar/menu-bar.html" name="menuBar" class="fill-width fill-height"
-            frameborder="0"></iframe>
-    </div>
-    <!-- <div id="right" class="mui-off-canvas-right mui-transitioning mui-active mui-scalable">
+        <div class="page__ft">
+            <iframe src="../menu-bar/menu-bar.html" name="menuBar" class="fill-width fill-height"
+                frameborder="0"></iframe>
+        </div>
+        <!-- <div id="right" class="mui-off-canvas-right mui-transitioning mui-active mui-scalable">
 
     </div> -->
-</div>
+    </div>
 </body>
 <script>
 
-document.querySelector('#offCanvasWrapper').addEventListener('drag',function(e){
-    if(e.path.length >= 13)
-    {
-        e.stopImmediatePropagation();        
-    }
-    if(e.target.tagName.toLowerCase() == 'img'){
-        console.log(e);
-        //e.target.parentElement.parentElement.scrollLeft =  e.target.parentElement.parentElement.offsetWidth -  e.detail.center.x;
-        //          li          ul              div
-        switch(e.detail.direction)
-        {
-            case 'left':
-            e.target.parentElement.parentElement.scrollLeft += 6;
+
+    function img_move(e, step) {
+        
+        e.stopImmediatePropagation();
+        switch (e.target.tagName.toLowerCase()) {
+            case 'img':
+
+                console.log(e);
+                //e.target.parentElement.parentElement.scrollLeft =  e.target.parentElement.parentElement.offsetWidth -  e.detail.center.x;
+                //          li          ul              div
+                switch (e.detail.direction) {
+                    case 'left':
+                        
+                        e.target.parentElement.parentElement.scrollLeft += step;
+                        break;
+                    case 'right':
+                        e.target.parentElement.parentElement.scrollLeft -= step;
+                        break;
+                    default:
+                        break;
+                }
                 break;
-                case 'right':
-                e.target.parentElement.parentElement.scrollLeft -= 6;
-                    break;
+
+            default:
+                break;
         }
-        
-        
+
+
         // direction
         //  e.detail.deltaX
 
         // e.target.parent 
-        
     }
-})
+    document.querySelector('#offCanvasWrapper').addEventListener('drag', function (e) {
+
+        img_move(e, 6);
+    })    
+    var selected;
+    document.querySelector("#offCanvasWrapper").addEventListener('mousedown', function (e) {        
+        selected = e.target;
+    });
+    document.querySelector("#offCanvasWrapper").addEventListener('mousemove', function (e) {
+        img_move(selected, 15);
+    });
+    // document.querySelector('#offCanvasWrapper').addEventListener('mousemove', img_move)
 
 </script>
 
