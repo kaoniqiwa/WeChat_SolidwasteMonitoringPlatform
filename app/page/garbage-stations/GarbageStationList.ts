@@ -57,6 +57,7 @@ export namespace GarbageStationList {
                     const data = x.Data.Data[i];
                     this.divisions[data.Id] = data;
                     const li = document.createElement('li');
+                    li.style.display = 'none';
                     const btn = document.createElement('button');
                     btn.type = "button"
                     btn.id = data.Id;
@@ -113,7 +114,7 @@ export namespace GarbageStationList {
             const request = new GetGarbageStationsParams();
             return this.service.garbageStation.list(request).then(x => {
                 if (this.content && this.template) {
-
+                    this.content.innerHTML = '';
                     var datas = x.Data.Data.sort((a, b) => {
                         return a.Name.localeCompare(b.Name);
                     });
@@ -133,6 +134,7 @@ export namespace GarbageStationList {
 
                         let footer = div.getElementsByClassName("footer")[0];
                         footer.innerHTML = this.divisions[data.DivisionId].Name;
+                        document.getElementById(data.DivisionId).parentElement.style.display = '';
                         div["DivisionId"] = data.DivisionId;
                         this.content.appendChild(div);
                         this.elements[data.Id] = div;
@@ -170,6 +172,9 @@ export namespace GarbageStationList {
 
         createImgByCamera(camera: Camera) {
             let img = document.createElement("img");
+            img.addEventListener("error", function(){
+                this.src = "./img/black.png";
+            });
             img.id = camera.Id;
             img.className = 'mui-zoom';
             img.setAttribute("data-preview-lazyload", '');
@@ -208,6 +213,36 @@ export namespace GarbageStationList {
             });
         }
 
+        RegistRefresh() {
+            mui.init({
+                pullRefresh: {
+                    container: '#offCanvasContentScroll',
+                    down: {
+                        style: 'circle',
+                        callback: () => {
+                            this.Refresh();
+                        }
+                    }
+                }
+            });
+        }
+
+        Refresh() {            
+            
+                const p = this.LoadGarbageStation();
+            p.then(()=>{
+                setTimeout(()=>{
+                    let m = mui('#offCanvasContentScroll')
+                    let r =m.pullRefresh()
+                    let e = r.endPulldownToRefresh(true); //参数为true代表没有更多数据了。
+                }, 0);
+                
+            });
+                
+            
+        }
+
+
         LoadDivisionsFilter() {
             //侧滑容器父节点
             const offCanvasWrapper = mui('#offCanvasWrapper');
@@ -239,9 +274,7 @@ export namespace GarbageStationList {
             document.getElementById('btn_division').addEventListener('tap', function () {
                 offCanvasWrapper.offCanvas('show');
             });
-            document.getElementById('btn_ok').addEventListener('tap', () => {
-                offCanvasWrapper.offCanvas('close');
-
+            document.getElementById('btn_ok').addEventListener('tap', (e) => {
                 const selected = document.getElementsByClassName("selected");
                 var array = new Array<string>();
                 for (let i = 0; i < selected.length; i++) {
@@ -250,6 +283,10 @@ export namespace GarbageStationList {
                 const input = document.getElementById('searchInput') as HTMLInputElement;
                 input.value = '';
                 this.GarbageStationFilter(array);
+
+                setTimeout(function(){
+                    offCanvasWrapper.offCanvas('close');
+                }, 50)
             });
             //主界面和侧滑菜单界面均支持区域滚动；
             mui('#offCanvasSideScroll').scroll();
@@ -269,7 +306,8 @@ export namespace GarbageStationList {
             }
 
             const reset = document.getElementById("btn_reset")
-            reset.addEventListener('click', function () {
+            reset.addEventListener('click', function (e) {
+                e.stopPropagation();
                 setTimeout(() => {
                     const selected = document.getElementsByClassName("selected");
                     for (let i = 0; i < selected.length; i++) {
@@ -307,6 +345,8 @@ export namespace GarbageStationList {
         promis = promis.then(() => {
             client.LoadGarbageStation();
             client.InitNav();
+            
+            client.RegistRefresh();
             client.LoadDivisionsFilter();
         });
     });
