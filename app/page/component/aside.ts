@@ -39,15 +39,20 @@ export class FilterAside {
         this.loaded = opts.loaded;
         this.ok = opts.ok;
         this.reset = opts.reset;
-        if (opts.inner)
-            this.inner = opts.inner
         if (opts.asideId)
             this.asideId = opts.asideId;
         this.html = document.createElement("aside");
         this.html.className = "mui-off-canvas-right";
         this.html.innerHTML = this.inner;
+
+        
+        if (opts.inner)
+            this.inner = opts.inner
+
         this.html.id = this.asideId;
         document.getElementById(this.parentId).appendChild(this.html);
+        let scroll = this.html.getElementsByClassName("mui-scroll")[0];
+        scroll.innerHTML = this.inner;
         this.Init();
     }
 
