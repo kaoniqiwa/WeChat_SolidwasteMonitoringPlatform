@@ -461,7 +461,7 @@ display:block; */
         <!--侧滑菜单容器-->
         <div id="offCanvasWrapper" class="mui-off-canvas-wrap mui-draggable">
             <!--菜单部分-->
-            <aside id="offCanvasSide" class="mui-off-canvas-right">
+            <!-- <aside id="offCanvasSide" class="mui-off-canvas-right">
                 <div id="offCanvasSideScroll" class="mui-scroll-wrapper">
                     <div class="mui-scroll">
                         <div class="title">
@@ -481,7 +481,7 @@ display:block; */
                         </button>
                     </div>
                 </div>
-            </aside>
+            </aside> -->
             <div class="mui-inner-wrap">
                 <header class="mui-bar mui-bar-nav">
                     <!-- <a class="mui-action-back mui-icon mui-icon-back mui-pull-left"></a>
@@ -499,7 +499,7 @@ display:block; */
             </div>
         </div>
         <div class="page__ft">
-            <iframe src="../menu-bar/menu-bar.html" name="menuBar" class="fill-width fill-height"
+            <iframe src="../menu-bar/menu-bar.html?page=barItem3" name="menuBar" class="fill-width fill-height"
                 frameborder="0"></iframe>
         </div>
         <!-- <div id="right" class="mui-off-canvas-right mui-transitioning mui-active mui-scalable">
@@ -511,7 +511,8 @@ display:block; */
 
 
     function img_move(e, step) {
-        
+        if(!e)return;
+        if(e.stopImmediatePropagation)
         e.stopImmediatePropagation();
         switch (e.target.tagName.toLowerCase()) {
             case 'img':
