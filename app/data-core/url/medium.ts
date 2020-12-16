@@ -2,14 +2,14 @@
 import {  IUrl, BaseUrl} from "./IUrl";
 export class Mediume extends BaseUrl {
     add(){
-        return this.aiop+`Medium/Pictures`;
+        return this.gateway+`Pictures`;
     }
     
     getData(id:string){
-        return this.aiop+`Medium/Pictures/${id}.jpg`;
+        return this.gateway+`Pictures/${id}.jpg`;
     }
 
     getJPG(jpg:string){
-        return this.aiop+`Medium/Pictures/${jpg}`; 
+        return this.gateway+`Pictures/${jpg}`; 
     }
 } 

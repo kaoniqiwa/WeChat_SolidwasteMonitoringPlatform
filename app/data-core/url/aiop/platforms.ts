@@ -2,25 +2,25 @@ import {  IUrl, BaseUrl} from "../IUrl";
 
 export class Platform extends BaseUrl implements IUrl{
     create(): string {
-        return this.aiop + 'Platforms';
+        return this.gateway + 'Platforms';
     }
     edit(id:string): string {
-       return this.aiop + `Platforms/${id}`;
+       return this.gateway + `Platforms/${id}`;
     }
     del(id:string): string {
-        return this.aiop + `Platforms/${id}`;
+        return this.gateway + `Platforms/${id}`;
     }
     get(id:string): string {
-        return this.aiop + `Platforms/${id}`;
+        return this.gateway + `Platforms/${id}`;
     }
     list(): string {
-       return this.aiop + 'Platforms/List';
+       return this.gateway + 'Platforms/List';
     }
     sync(id:string): string {
-        return this.aiop + `Platforms/${id}/Sync`;
+        return this.gateway + `Platforms/${id}/Sync`;
     }
 
     protocols(){
-        return this.aiop + `Platforms/Protocols`;
+        return this.gateway + `Platforms/Protocols`;
     }
 }
