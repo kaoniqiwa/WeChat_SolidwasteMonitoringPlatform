@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="../../assets/mui.picker.min.css">
     <link rel="stylesheet" href="../../assets/howell.css">
     <link rel="stylesheet" href="../../assets/page-view.css">
-
+    <link rel="stylesheet" href="../component/aside.css">
     <script src="https://cdn.bootcdn.net/ajax/libs/mui/3.7.1/js/mui.min.js"></script>
     <script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
     <script src="../../assets/mui.picker.min.js"></script>
@@ -171,49 +171,7 @@
     <div id="appList" class="mui-page mui-page-center">
         <div class="mui-page-content">
             <div id="offCanvasWrapper" class="mui-off-canvas-wrap mui-draggable mui-slide-in">
-                <aside id="offCanvasSide" class="mui-off-canvas-right mui-transitioning">
-                    <div id="offCanvasSideScroll" class="mui-scroll-wrapper">
-                        <div class="page " style="background-color:white;">
-                            <div class="weui-panel__bd" style="height: calc(100% - 60px);">
-                                <div class="weui-media-box weui-media-box_text">
-                                    <h4 class="list-title">时间</h4>
-                                    <div style="height:32px">
-                                        <div class="pull-left time-box" id="beginTime">
-
-                                        </div>
-                                        <div class="pull-left " style="position: relative;top:4px">&nbsp - &nbsp</div>
-                                        <div class="pull-left time-box" id="endTime">
-                                        </div>
-                                    </div>
-                                    <div style="width: auto;height:32px" class="m-t-10">
-                                        <div id="the_day"
-                                            class="pull-left text-center sky-blue-text m-r-10 time-type-box selected">
-                                            今日</div>
-                                        <div id="the_yesterday"
-                                            class="pull-left text-center sky-blue-text m-r-10 time-type-box">
-                                            昨天</div>
-                                        <div id="the_before_day"
-                                            class="pull-left text-center sky-blue-text time-type-box">
-                                            前天</div>
-                                    </div>
-                                </div>
-                                <div class="weui-media-box weui-media-box_text" style="height: calc(100% - 120px);">
-                                    <h4 class="list-title" id="stationText"></h4>
-                                    <ul class="app-table-view" id="stationView">
-
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="weui-panel__ft">
-                                <div class="pull-left m-r-10 ft-btn1" id="resetBtn">
-                                    重置</div>
-                                <div class="pull-left ft-btn2" id="searchBtn">
-                                    确定</div>
-                            </div>
-                        </div>
-
-                    </div>
-                </aside>
+                
                 <div class="mui-inner-wrap mui-transitioning">
                     <div class="mui-content mui-scroll-wrapper">
                         <div class="page ">
