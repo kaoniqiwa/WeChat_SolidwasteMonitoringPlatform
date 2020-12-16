@@ -15,6 +15,10 @@ export class EventRecord extends GarbageBaseUrl{
 
     mixedIntoList() {
         return this.gateway+`Events/Records/MixedInto/List`;
+    } 
+
+    illegalDropSingle(id:string){
+        return this.gateway+`Events/Records/IllegalDrop/${id}`;
     }
 }
  

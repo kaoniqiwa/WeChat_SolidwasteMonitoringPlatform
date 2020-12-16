@@ -61,7 +61,7 @@ export class WeChat  extends BaseUrl{
     }
 
     binding(phoneNumber:string,openId:string){
-        return this.user + `'WeChat/Users/Binding?MobileNo=${phoneNumber}&OpenId=${openId}`;
+        return this.user + `WeChat/Users/Binding?MobileNo=${phoneNumber}&OpenId=${openId}`;
     }
 
     openIds(id:string){
