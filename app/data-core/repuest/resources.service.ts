@@ -17,6 +17,7 @@ import { BatchResult } from '../model/batch';
 import { HowellAuthHttp } from './howell-auth-http';
 import { SRService } from '../url/aiop/sr-server';
 import { GetPreviewUrlParams, GetVodUrlParams, VideoUrl } from '../model/aiop/video-url';
+import { SessionUser } from '../../common/session-user';
  
 export class ResourceRequestService extends SaveModel {
     url: url.Resource;
@@ -195,17 +196,21 @@ export class ResourceMediumRequestService {
     url: url.MediumPicture;
     constructor(private requestService: HowellAuthHttp) {
         this.url = new url.MediumPicture();
+        this.session = new SessionUser();
     }
+
+     session:SessionUser;
 
     binary() {
         return this.url.binary();
     }
 
     getJPG(id: string) {
-        return this.url.getJPG(id);
+        
+        return this.url.getJPG(id, this.session.WUser.ServerId);
     }
     getData(id: string) {
-        return this.url.getData(id);
+        return this.url.getData(id, this.session.WUser.ServerId);
     }
 
 }

@@ -16,26 +16,25 @@ export class Resource extends BaseUrl implements IUrl {
     list(): string {
         return this.gateway + 'Resources/List';
     }
-
 }
 
 export class MediumPicture extends BaseUrl{
 
     add() {
-        return this.gateway + `Medium/Pictures`;
+        return this.gateway + `Pictures`;
     }
 
     binary() {
-        return this.gateway + 'Medium/Pictures/Binary';
+        return this.gateway + 'Pictures/Binary';
     }
 
 
-    getData(id: string) {
-        return this.gateway + `Medium/Pictures/${id}/Data`;
+    getData(id: string, serverId:string) {
+        return this.gateway + `Pictures/${id}/Data?ServerId=${serverId}`;
     }
 
-    getJPG(id: string) {
-        return this.gateway + `Medium/Pictures/${id}.jpg`;
+    getJPG(id: string, serverId:string) {
+        return this.gateway + `Pictures/${id}.jpg?ServerId=${serverId}`;
     }
 
 
