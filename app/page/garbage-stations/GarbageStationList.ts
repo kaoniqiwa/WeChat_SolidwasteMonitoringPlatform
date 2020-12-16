@@ -7,6 +7,7 @@ import { CameraRequestService, GarbageStationRequestService } from "../../data-c
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { ResourceMediumRequestService } from "../../data-core/repuest/resources.service";
+import { FilterAside } from "../component/aside";
 
 declare var mui: any;
 
@@ -61,7 +62,7 @@ export namespace GarbageStationList {
             ul.innerHTML = '';
             return this.service.division.list(req).then(x => {
 
-                const divisions = x.Data.Data.sort((a,b)=>{
+                const divisions = x.Data.Data.sort((a, b) => {
                     return a.Name.localeCompare(b.Name);
                 });
 
@@ -247,7 +248,8 @@ export namespace GarbageStationList {
         Refresh() {
 
             const p = this.LoadGarbageStation();
-            document.getElementById('btn_ok').tap();
+            const reset = document.getElementById("btn_reset");
+            reset.click();
             p.then(() => {
                 setTimeout(() => {
                     let m = mui('#offCanvasContentScroll')
@@ -264,7 +266,48 @@ export namespace GarbageStationList {
 
         }
 
+
+        InitAside(loaded: () => void) {
+            const aside = new FilterAside({
+                parentId: "offCanvasWrapper",
+                triggerId: "btn_division",
+                asideId: "offCanvasSide",
+                loaded: loaded,
+                ok: () => {
+                    const selected = document.getElementsByClassName("selected");
+                    var array = new Array<string>();
+                    for (let i = 0; i < selected.length; i++) {
+                        array.push(selected[i].id);
+                    }
+                    const input = document.getElementById('searchInput') as HTMLInputElement;
+                    input.value = '';
+                    this.GarbageStationFilter(array);
+                },
+                reset: () => {
+                    setTimeout(() => {
+                        const selected = document.getElementsByClassName("selected");
+                        for (let i = 0; i < selected.length; i++) {
+                            const element = selected[i];
+                            (function (element) {
+                                setTimeout(function () {
+                                    element.className = element.className.replace(" selected", '');
+                                }, 0)
+
+                            })(element);
+                        }
+                    }, 0)
+                }
+            });
+
+            mui('#offCanvasSideScroll').scroll();
+            mui('#offCanvasContentScroll').scroll();
+        }
+
+
         LoadDivisionsFilter() {
+
+
+
             //侧滑容器父节点
             const offCanvasWrapper = mui('#offCanvasWrapper');
             mui.init({
@@ -310,8 +353,6 @@ export namespace GarbageStationList {
                 }, 50)
             });
             //主界面和侧滑菜单界面均支持区域滚动；
-            mui('#offCanvasSideScroll').scroll();
-            mui('#offCanvasContentScroll').scroll();
             //实现ios平台的侧滑关闭页面；
             if (mui.os.plus && mui.os.ios) {
                 offCanvasWrapper[0].addEventListener('shown', function (e) { //菜单显示完成事件
@@ -355,6 +396,8 @@ export namespace GarbageStationList {
 
 
 
+
+
         const client = new GarbageStationClient({
             garbageStation: new GarbageStationRequestService(http),
             division: new DivisionRequestService(http),
@@ -362,14 +405,17 @@ export namespace GarbageStationList {
             media: new ResourceMediumRequestService(http)
         }
         );
-        let promis = client.LoadDivisionList();
-        promis = promis.then(() => {
-            client.LoadGarbageStation();
-            client.InitNav();
-
-            client.RegistRefresh();
-            client.LoadDivisionsFilter();
+        client.InitAside(()=>{
+            let promis = client.LoadDivisionList();
+            promis = promis.then(() => {
+                client.LoadGarbageStation();
+                client.InitNav();
+    
+                client.RegistRefresh();
+                // client.LoadDivisionsFilter();
+            });
         });
+        
     });
 }
 
