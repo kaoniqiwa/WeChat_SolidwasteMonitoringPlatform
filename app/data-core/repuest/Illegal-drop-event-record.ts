@@ -15,4 +15,8 @@ export class EventRequestService{
     list(item:GetEventRecordsParams){
         return this.requestService.post<GetEventRecordsParams, Response<PagedList<IllegalDropEventRecord>>>(this.url.illegalDrop(), item);
     }
+
+    single(id:string){
+        return this.requestService.get<Response<IllegalDropEventRecord>>(this.url.illegalDropSingle(id));
+    }
 }

@@ -14,47 +14,49 @@ export namespace HowellHttpClient {
         }
 
         async login(fn?: (http: HowellAuthHttp) => void) {
-            const openid = getQueryVariable('openid');             
-            if(!openid) mui.openWindow({
-                url: '../../verification.html',
-                id: '../../verification.html', 
-            });     
-            if (window['DIGEST'] == null&&openid) {
+            const openid = getQueryVariable('openid');
+            if (window['DIGEST'] == null && openid) {
                 this.user.user = {
-                    name:openid,
-                    pwd:'123456'
-                } 
-                 
-                const a = await this.userService.login(()=>{
-                    mui.openWindow({
-                        url: '../../verification.html',
-                        id: '../../verification.html',
-    
-                    });    
-                });
-                // a['data'].Resources[0].Id='310109011029';
-                // a['data'].Resources[0].Name='黄山路居委会';
-                // a['data'].Resources[0].ResourceType=2;   
-                // a['data'].Resources[0].Id='310109011013002000';
-                // a['data'].Resources[0].Name='新中新村-厢1';
-                // a['data'].Resources[0].ResourceType=3;    
-                this.user.WUser = a['data'];    
-                  
-                if( !a['data'])
-                mui.openWindow({
-                    url: '../../verification.html',
-                    id: '../../verification.html',
+                    name: openid.trim(),
+                    pwd: '123456'
+                }
 
-                }); 
-                else
+                const a = await this.userService.login(() => {
                     mui.openWindow({
-                        url: '../../me.html'+`?openid=${this.user.name}`,
-                        id: '../../me.html' +`?openid=${this.user.name}`
-
+                        url: '../../wechat/verification.html',
+                        id: '../../wechat/verification.html',
                     });
-                       
+                });
+
+                if (a && a['data'])
+                    this.user.WUser = a['data'];
+                if (fn) fn(this.http);
             }
-            if (fn) fn(this.http);
+            
+        }
+
+       async login2(fn?: (http: HowellAuthHttp) => void) { 
+            const openid = getQueryVariable('openid'), eventId = getQueryVariable('eventid');
+
+            if (eventId && !openid) {
+                window.location.href = "http://51kongkong.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetUserOpenId?appid=wx119358d61e31da01&returnUrl="
+                    + window.location.href;
+            }
+            else if (eventId && openid) {
+                if (window['DIGEST'] == null) {
+                    this.user.user = {
+                        name: openid,
+                        pwd: '123456'
+                    }
+
+                    const a = await this.userService.login(() => {
+                       
+                    });
+                    if (a && a['data'])
+                        this.user.WUser = a['data'];
+                    if (fn) fn(this.http);
+                }
+            }
         }
 
         get http() {

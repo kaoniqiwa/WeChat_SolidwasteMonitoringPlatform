@@ -16,6 +16,20 @@ class HowellAuthHttp {
         this.axios = axios_1.default;
     }
 
+    getHtml(path){
+       return this.axios({
+            method: 'get',
+            url:path,
+            responseType: 'html'
+          })
+          .catch(x=>{
+
+          })
+            .then(wwwAuth => { 
+                return wwwAuth;
+            });
+    }
+
     get(path, error) {
         const myHeaders = this.getHttpHeaders('GET', path);
         const httpOptions = {
@@ -72,7 +86,8 @@ class HowellAuthHttp {
             });
     }
 
-    auth(path, digestFn,fn) {
+    auth(username,path, digestFn,fn) { 
+        this.username=username;
         const httpOptions = {
             headers: { 'X-WebBrowser-Authentication': 'Forbidden' }
         };
@@ -82,9 +97,7 @@ class HowellAuthHttp {
                 if (error.response.status == 403) {
                      
                     window['DIGEST'] = digestFn(error.response.headers);
-                    return this.get(path,()=>{
-                        fn()
-                    });                  
+                    return this.get(path,fn);                  
                 }
             })
             .then(wwwAuth => {
@@ -93,8 +106,8 @@ class HowellAuthHttp {
     }
     //获取已授权的头部
     getHttpHeaders(method, uri) {
-        if (window['DIGEST']) {
-            var challenge = window['DIGEST'].parseServerChallenge(null);
+        if (window['DIGEST']) {  
+            var challenge = window['DIGEST'].parseServerChallenge(null); 
             this.nc += 1;
             return window['DIGEST'].generateRequestHeader(this.nc, challenge, this.username, '123456', method, uri);
         }

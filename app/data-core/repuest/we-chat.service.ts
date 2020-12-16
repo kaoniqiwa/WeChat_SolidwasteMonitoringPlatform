@@ -5,7 +5,7 @@ import { HowellAuthHttp } from "./howell-auth-http";
 import { Digest } from "./digest";
 import { SessionUser } from "../../common/session-user";
 import { Response } from '../model/response';
- 
+  
 export class WeChatRequestService extends SaveModel{
     url: url.WeChat;
     
@@ -14,14 +14,13 @@ export class WeChatRequestService extends SaveModel{
         this.url = new url.WeChat();
     }
 
-    login(error:()=>void){
-        const   su=new SessionUser(); 
-        return this.requestService.auth<Response<WeChatUser>>(this.url.get(su.name),(header)=>{ 
+   async login(error:()=>void){
+        const   su=new SessionUser();  
+        
+        return this.requestService.auth<Response<WeChatUser>>(su.name,this.url.get(su.name),(header)=>{ 
             const digest = new Digest(header,  this.url.get(su.name));             
             return digest;
-        },()=>{
-            error();
-        });
+        },error);
     }
     create(item:WeChatUser){ 
         return this.requestService.post<WeChatUser, WeChatUser>(this.url.create(), item);
