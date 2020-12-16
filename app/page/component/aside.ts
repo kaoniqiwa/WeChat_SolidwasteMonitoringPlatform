@@ -29,7 +29,7 @@ export class FilterAside {
         parentId: string,
         triggerId: string,
         asideId?: string,
-        inner?:string,
+        inner?: string,
         loaded: () => void,
         ok: () => void,
         reset: () => void
@@ -39,6 +39,8 @@ export class FilterAside {
         this.loaded = opts.loaded;
         this.ok = opts.ok;
         this.reset = opts.reset;
+        if (opts.inner)
+            this.inner = opts.inner
         if (opts.asideId)
             this.asideId = opts.asideId;
         this.html = document.createElement("aside");

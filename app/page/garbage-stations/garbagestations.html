@@ -142,10 +142,6 @@ display:block; */
             margin-left: 5px;
         }
 
-        .mui-off-canvas-left,
-        .mui-off-canvas-right {
-            background-color: #fff;
-        }
 
         .title .mui-icon {
             font-size: 14px;
@@ -417,8 +413,17 @@ display:block; */
         .mui-off-canvas-wrap {
             height: calc(100% - 62px);
         }
+
+        
+        .mui-off-canvas-right {
+            background-color: #fff;
+        }
     </style>
 
+
+
+<style>
+</style>
 </head>
 
 <body>
@@ -512,7 +517,7 @@ display:block; */
 
     function img_move(e, step) {
         if(!e)return;
-        if(e.stopImmediatePropagation)
+        if(e.st)
         e.stopImmediatePropagation();
         switch (e.target.tagName.toLowerCase()) {
             case 'img':
