@@ -36,7 +36,7 @@ let selectedData = new Map();
 let storedData = new Map();
 
 let selectPositions = [];
-let polyLine: CesiumDataController.Polyline;
+let polyLine: CesiumDataController.Polyline | null;
 
 let myLocation: CesiumDataController.Position;
 
@@ -71,8 +71,10 @@ resetBtn.addEventListener('click', function () {
 })
 confirmBtn.addEventListener('click', function () {
     console.log('confirm')
+    if(selectedData.size == 0)return
     myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
     selectPositions[0] = myLocation;
+
 
     mapClient.Map?.GetLocation?.(function (res) {
         console.log(res)
@@ -80,13 +82,14 @@ confirmBtn.addEventListener('click', function () {
         selectPositions[0] = myLocation;
 
         selectPositions = [myLocation]
+       
         selectedData.forEach((v, k, m) => {
             let point: CesiumDataController.Point = dataController.Village.Point.Get(
                 v.divisionId, v.id)
             selectPositions.push(point.position)
         })
         if (polyLine) {
-            console.log(mapClient.Draw.Routing.Remove)
+            // console.log(mapClient.Draw.Routing.Remove)
             mapClient.Draw.Routing.Remove(polyLine.id);
         }
         polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: '#007aff', alpha: 1 });
@@ -99,11 +102,24 @@ confirmBtn.addEventListener('click', function () {
     // reset()
 })
 function reset() {
-    selectedData.clear();
-    document.querySelectorAll('input[type=checkbox]').forEach(item => {
-        (item as HTMLInputElement).checked = false
+    // 清除所有选中的记录
+
+    // 当前页按钮重置
+    document.querySelectorAll('.weui-cell.weui-check__label.active').forEach(div=>{
+        div.classList.remove('active')
+    })
+
+    // 本地数据库重置状态
+    selectedData.forEach(item => {
+        let id = item.id;
+        storedData.get(id).checked = false;
+
     });
-    mapClient.Draw.Routing.Remove(polyLine.id);
+    selectedData.clear();
+
+
+    if (polyLine)
+        mapClient.Draw.Routing.Remove(polyLine.id);
     polyLine = null;
 }
 
@@ -144,7 +160,7 @@ class StationList {
         const request = new GetGarbageStationsParams();
         request.PageSize = pageSize;
         request.PageIndex = pageIndex;
-        request.DivisionId = division.Id;
+        request.DivisionId = division!?.Id;
 
         return this.service.garbageStation.list(request).then(x => {
             console.log('garbageStation data')
@@ -163,28 +179,43 @@ class StationList {
                             checked: false
                         })
                     }
+                    // 每条记录克隆一次模板
                     let info = content.cloneNode(true) as DocumentFragment;
 
-                    let label = info.querySelector('label') as HTMLLabelElement;
+                    // 模板最外层元素
+                    let infoContainer = info.querySelector('.weui-cell.weui-check__label') as HTMLDivElement;
+                    infoContainer.setAttribute('id', item.Id);
+                    infoContainer.setAttribute('divisionId', item.DivisionId)
 
 
                     let p = info.querySelector('div.weui-cell__bd > p') as HTMLParagraphElement;
-                    p.textContent = item.Name;//+ item.Id;
-                    let checkbox = info.querySelector('input[type=checkbox]') as HTMLInputElement
-                    checkbox.setAttribute('id', item.Id);
-                    checkbox.setAttribute('divisionId', item.DivisionId)
+                    p.textContent = item.Name;
+                    // p.textContent = item.Id;
 
                     // 根据本地数据库设置初始状态
-                    checkbox.checked = storedData.get(item.Id).checked;
+                    if (storedData.get(item.Id).checked) {
+                        infoContainer.classList.add('active');
+                    } else {
+                        infoContainer.classList.remove('active');
+
+                    }
 
 
-                    checkbox.addEventListener('click', function (e) {
+                    infoContainer.addEventListener('click', function () {
                         let id = this.getAttribute('id');
                         let divisionId = this.getAttribute('divisionId');
 
-                        storedData.get(id).checked =  !storedData.get(id).checked
+                        if (this.classList.contains('active')) {
+                            this.classList.remove('active');
+                            storedData.get(id).checked = false;
 
-                        // 保存当前选择的 Id 信息
+                        } else {
+                            this.classList.add('active');
+                            storedData.get(id).checked = true;
+                        }
+
+
+                        // 保存当前选择的 Id 信息 用于路径规划
                         if (selectedData.has(id)) {
                             selectedData.delete(id)
                         } else {
@@ -192,6 +223,7 @@ class StationList {
                                 id, divisionId
                             })
                         }
+
                     })
 
                     this.myList?.appendChild(info)
@@ -217,9 +249,9 @@ client.login((http: HowellAuthHttp) => {
     mapClient = new CesiumMapClient("iframe");
 
 
-    console.log(mapClient.Events)
+    // console.log(mapClient.Events)
     mapClient.Events.OnLoading = function () {
-        console.log("client.Events.OnLoading");
+        // console.log("client.Events.OnLoading");
         dataController = new CesiumDataController.Controller(window.location.hostname, Number(window.location.port), function () {
 
         })
@@ -227,9 +259,9 @@ client.login((http: HowellAuthHttp) => {
     }
     mapClient.Events.OnLoaded = async () => {
         const division = await list.GetLocalDivision();
-        console.log('divi', division)
-        mapClient.Village.Select(division.Id);
-        const village = dataController.Village.Get(division.Id);
+        // console.log('divi', division)
+        mapClient.Village.Select(division!.Id);
+        const village = dataController.Village.Get(division!.Id);
         mapClient.Viewer.MoveTo(village.position);
     }
 });
@@ -254,9 +286,9 @@ client.login((http: HowellAuthHttp) => {
 
 
 
-document.addEventListener('touchmove',function(){
+document.addEventListener('touchmove', function () {
 
-},{
-    passive:false,
-    once:false
+}, {
+    passive: false,
+    once: false
 })
