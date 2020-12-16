@@ -74,7 +74,7 @@ declare namespace CesiumMap {
     interface Map {
         SetStyle: (style: string) => void;
         SetFloorModel: (floorModel: string) => void;
-        GetLocation:()=>CesiumDataController.Position
+        GetLocation:(callback:(res:any)=>void)=>CesiumDataController.Position
     }
 
     interface Viewer {

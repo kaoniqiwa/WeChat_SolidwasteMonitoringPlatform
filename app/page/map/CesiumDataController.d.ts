@@ -175,18 +175,18 @@ declare namespace CesiumDataController {
     **/
     class DrawOptions {
 
-        id: string;
-        name: string;
-        color: string;
-        alpha: number;
+        id?: string;
+        name?: string;
+        color?: string;
+        alpha?: number;
     }
     /**
      *  绘制线段参数
     **/
     class DrawLineOptions extends DrawOptions {
-        extrudedHeight: number;
-        width: number;
-        img: string;
+        extrudedHeight?: number;
+        width?: number;
+        img?: string;
     }
 
 

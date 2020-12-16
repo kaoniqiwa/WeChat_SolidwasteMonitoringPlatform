@@ -26,36 +26,44 @@ let totalRecordCount: number;
 let page: Page;
 let list: StationList;
 
-let isShow: boolean = true;
-let selectData = new Map();
+// 侧面板的开关
+let isShow: boolean = false;
+
+// 单次请求到的数据
+let selectedData = new Map();
+
+// 所有操作请求到的数据,用于状态还原
+let storedData = new Map();
+
 let selectPositions = [];
 let polyLine: CesiumDataController.Polyline;
 
 let myLocation: CesiumDataController.Position;
 
+// 初始化侧面板显示状态
+isShow ? show() : hide();
 
 
 let h = document.querySelector('.weui-form__control-area')?.clientHeight as number;
 let h2 = document.querySelector('.mui-content')?.clientHeight as number;
+
+// 当前容器能放置的记录条目数
 pageSize = Math.floor((h - h2) / 50);
 
 showPath.addEventListener('click', function () {
-    if (!isShow) {
-
-        solidWaste.className = '';
-
-        solidWaste.classList.add('slide-fade-enter-active');
-        solidWaste.classList.add('slide-fade-enter');
-        isShow = true;
-
-    } else {
-        solidWaste.className = '';
-
-        solidWaste.classList.add('slide-fade-leave-active');
-        solidWaste.classList.add('slide-fade-leave-to');
-        isShow = false
-    }
+    isShow = !isShow;
+    isShow ? show() : hide();
 })
+function show() {
+    solidWaste.className = '';
+    solidWaste.classList.add('slide-fade-enter-active');
+    solidWaste.classList.add('slide-fade-enter');
+}
+function hide() {
+    solidWaste.className = '';
+    solidWaste.classList.add('slide-fade-leave-active');
+    solidWaste.classList.add('slide-fade-leave-to');
+}
 
 resetBtn.addEventListener('click', function () {
     console.log('reset')
@@ -63,26 +71,35 @@ resetBtn.addEventListener('click', function () {
 })
 confirmBtn.addEventListener('click', function () {
     console.log('confirm')
+    myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
+    selectPositions[0] = myLocation;
+
+    mapClient.Map?.GetLocation?.(function (res) {
+        console.log(res)
+        myLocation = res;
+        selectPositions[0] = myLocation;
+
+        selectPositions = [myLocation]
+        selectedData.forEach((v, k, m) => {
+            let point: CesiumDataController.Point = dataController.Village.Point.Get(
+                v.divisionId, v.id)
+            selectPositions.push(point.position)
+        })
+        if (polyLine) {
+            console.log(mapClient.Draw.Routing.Remove)
+            mapClient.Draw.Routing.Remove(polyLine.id);
+        }
+        polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: '#007aff', alpha: 1 });
+    })
     solidWaste.className = '';
     solidWaste.classList.add('slide-fade-leave-active');
     solidWaste.classList.add('slide-fade-leave-to');
     isShow = false;
-    selectPositions = [myLocation]
-    selectData.forEach((v, k, m) => {
-        let point: CesiumDataController.Point = dataController.Village.Point.Get(
-            v.divisionId, v.id)
-        selectPositions.push(point.position)
-    })
-    if (polyLine) {
-        console.log(mapClient.Draw.Routing.Remove)
-        mapClient.Draw.Routing.Remove(polyLine.id);
-    }
-    polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: 'cyan' });
 
     // reset()
 })
 function reset() {
-    selectData.clear();
+    selectedData.clear();
     document.querySelectorAll('input[type=checkbox]').forEach(item => {
         (item as HTMLInputElement).checked = false
     });
@@ -130,18 +147,26 @@ class StationList {
         request.DivisionId = division.Id;
 
         return this.service.garbageStation.list(request).then(x => {
-            console.log('garbageStation', x)
+            console.log('garbageStation data')
+            console.log(x);
 
             page = x.Data.Page;
             if (this.myList && this.myTemplate) {
                 let content = this.myTemplate?.content as DocumentFragment;
                 this.myList.innerHTML = '';
                 x.Data.Data.forEach(item => {
+                    // 如果本地数据库没有记录，则保存记录，且checkbox 初始状态为未选择
+                    if (!storedData.has(item.Id)) {
+                        storedData.set(item.Id, {
+                            id: item.Id,
+                            divisionId: item.DivisionId,
+                            checked: false
+                        })
+                    }
                     let info = content.cloneNode(true) as DocumentFragment;
 
                     let label = info.querySelector('label') as HTMLLabelElement;
 
-                    label.setAttribute('for', item.Id);
 
                     let p = info.querySelector('div.weui-cell__bd > p') as HTMLParagraphElement;
                     p.textContent = item.Name;//+ item.Id;
@@ -149,14 +174,21 @@ class StationList {
                     checkbox.setAttribute('id', item.Id);
                     checkbox.setAttribute('divisionId', item.DivisionId)
 
+                    // 根据本地数据库设置初始状态
+                    checkbox.checked = storedData.get(item.Id).checked;
+
+
                     checkbox.addEventListener('click', function (e) {
                         let id = this.getAttribute('id');
                         let divisionId = this.getAttribute('divisionId');
 
-                        if (selectData.has(id)) {
-                            selectData.delete(id)
+                        storedData.get(id).checked =  !storedData.get(id).checked
+
+                        // 保存当前选择的 Id 信息
+                        if (selectedData.has(id)) {
+                            selectedData.delete(id)
                         } else {
-                            selectData.set(id, {
+                            selectedData.set(id, {
                                 id, divisionId
                             })
                         }
@@ -180,41 +212,27 @@ client.login((http: HowellAuthHttp) => {
     list.LoadGarbageStation(pageIndex);
 
 
-    let iframe = document.getElementById('iframe');
-    iframe.src = "http://" + window.location.hostname + ":" + window.location.port + "/Amap/map_ts.html?maptype=AMapOffline&v=20191106";
+    let iframe = document.getElementById('iframe') as HTMLIFrameElement;
+    iframe.src = "http://" + window.location.hostname + ":" + window.location.port + "/Amap/map_ts.html?maptype=2D&v=" + (new Date()).toISOString();
     mapClient = new CesiumMapClient("iframe");
-    
+
 
     console.log(mapClient.Events)
     mapClient.Events.OnLoading = function () {
         console.log("client.Events.OnLoading");
-        dataController = new CesiumDataController.Controller(window.location.hostname, window.location.port, function () {
+        dataController = new CesiumDataController.Controller(window.location.hostname, Number(window.location.port), function () {
 
         })
 
     }
-    mapClient.Events.OnLoaded = async ()=> {
-
+    mapClient.Events.OnLoaded = async () => {
         const division = await list.GetLocalDivision();
-
+        console.log('divi', division)
         mapClient.Village.Select(division.Id);
-
-        myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
-        selectPositions[0] = myLocation;
-
-
-        mapClient.Map?.GetLocation?.().then((res) => {
-            myLocation = res;
-            selectPositions[0] = myLocation
-        })
+        const village = dataController.Village.Get(division.Id);
+        mapClient.Viewer.MoveTo(village.position);
     }
-
-
-
 });
-
-
-
 
 (function ($: any) {
     $('.mui-pagination').on('tap', 'a', function (this: HTMLAnchorElement) {
@@ -235,3 +253,10 @@ client.login((http: HowellAuthHttp) => {
 })(mui);
 
 
+
+document.addEventListener('touchmove',function(){
+
+},{
+    passive:false,
+    once:false
+})

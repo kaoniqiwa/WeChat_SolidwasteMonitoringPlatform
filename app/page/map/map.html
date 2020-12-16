@@ -63,14 +63,15 @@
     }
 
     #control_bar {
-      width: 37px;
-      position: fixed;
+      width: 34px;
+      position: absolute;
       z-index: 999;
       background: #fff;
-      bottom: 90px;
+      bottom: 130px;
       left: 12px;
       font-size: 10px;
       padding: 0 0;
+      
     }
 
     #control_bar .weui-cell {
@@ -89,13 +90,15 @@
 
     #solid_waste {
       width: 65vw;
-      height: 100%;
+      height: calc(100% - 0px);
       position: absolute;
       z-index: 999;
       background: #fff;
       right: -0;
       top: 00;
       font-size: 17px;
+      transform: translateX(300px);
+      opacity: 0;
     }
 
 
@@ -245,12 +248,12 @@
     }
 
 
-    .slide-fade-leave-to {
+    #solid_waste.slide-fade-leave-to {
       transform: translateX(300px);
       opacity: 0;
     }
 
-    .slide-fade-enter {
+    #solid_waste.slide-fade-enter {
       transform: translateX(0px);
       opacity: 1;
     }
@@ -282,7 +285,7 @@
 
 <body>
   <template id='myTemplate'>
-    <label class="weui-cell weui-cell_active weui-check__label">
+    <div class="weui-cell weui-cell_active weui-check__label">
       <div class="weui-cell__icon"></div>
       <div class="weui-cell__bd">
         <p></p>
@@ -291,11 +294,11 @@
         <input type="checkbox" class="weui-check2" name="checkbox1" />
         <i class="weui-icon-checked"></i>
       </div>
-    </label>
+    </div>
 
   </template>
-  <div class="page">
-    <iframe class="col-md-9 map" src="" id="iframe" width="100%" height="100%"></iframe>
+  <div class="page" style="position: relative;font-size:0;line-height: 0;">
+    <iframe class="col-md-9 map" src="" id="iframe" width="100%" style="height: calc(100% - 62px);border:none;background:none"></iframe>
 
     <div id="control_bar" class="weui-cells weui-cells_button">
       <div class="weui-cell">
@@ -312,7 +315,7 @@
       </div>
     </div>
 
-    <div id="solid_waste" class='slide-fade-leave-tos'>
+    <div id="solid_waste">
       <div class="page">
         <div class="weui-form">
           <div class="weui-form__text-area">
