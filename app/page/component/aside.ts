@@ -2,8 +2,7 @@ declare var mui: any;
 
 export class FilterAside {
 
-    inner = `<aside id="template" class="mui-off-canvas-right">
-                <div id="offCanvasSideScroll" class="mui-scroll-wrapper">
+    inner = `<div id="offCanvasSideScroll" class="mui-scroll-wrapper">
                     <div class="mui-scroll">
                         <div class="title">
                             居委
@@ -21,8 +20,7 @@ export class FilterAside {
                             确认
                         </button>
                     </div>
-                </div>
-            </aside>`;
+                </div>`;
 
 
     html: HTMLElement;
@@ -31,6 +29,7 @@ export class FilterAside {
         parentId: string,
         triggerId: string,
         asideId?: string,
+        inner?:string,
         loaded: () => void,
         ok: () => void,
         reset: () => void
