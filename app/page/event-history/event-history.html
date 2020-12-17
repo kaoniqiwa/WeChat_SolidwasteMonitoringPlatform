@@ -20,6 +20,19 @@
     <script src="../../assets/page-manager.js"></script>
     <!-- <script src="../../common/string-compare.js"></script> -->
     <style>
+        .weui-panel.n-b::after{
+            color: transparent;
+        }
+        .mui-scroll-wrapper, .mui-scroll {
+    background-color: white;
+}
+          .mui-off-canvas-wrap {
+            height: 100%;
+        }
+
+        .weui-btn_primary{
+          background-color:  #007aff
+        }
         .weui-form-preview__hd {
             height: 16em;
         }
@@ -106,13 +119,13 @@
 
         .weui-media-box .time-box {
             font-size: 14px;
-            width: calc(44% + 4px);
+            width: 100%;
             background-color: var(--weui-BG-0);
             height: 32px;
-            font-size: 14px;
-            text-align: center;
+            font-size: 14px; 
             line-height: 32px;
             border-radius: 20px;
+            padding-left: 10px;
         }
 
         .weui-media-box .time-type-box {
@@ -180,32 +193,7 @@
                         <div class="page ">
                             <div class="page__bd">
                                 <div class="weui-panel weui-panel_access">
-                                    <div class="weui-panel__bd" style="height: 48px;">
-                                        <div class="pull-left" style="width: 88%;">
-                                            <div class="weui-search-bar" style="background-color: white;"
-                                                id="searchBar">
-                                                <div class="weui-search-bar__form"
-                                                    style="background-color: var(--weui-BG-0);">
-                                                    <div class="weui-search-bar__box">
-                                                        <i class="weui-icon-search"></i>
-                                                        <input type="search" class="weui-search-bar__input"
-                                                            style="margin-bottom: 0;" id="searchInput"
-                                                            placeholder="搜索" />
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="pull-right" style="width: 12%;line-height: 48px;">
-                                            <a href="javascript:" style="font-size: 14px;color:var(--weui-FG-0)"
-                                                id="offCanvasShow">
-                                                筛选
-                                                <span class="mui-icon mui-icon-arrowright"></span>
-                                            </a>
-                                        </div>
-
-                                    </div>
-                                    <div class="weui-panel__ft">
+                                    <div class="weui-panel__bd">
                                         <div class="fill-width">
                                             <div id="segmentedControl"
                                                 class="app mui-segmented-control mui-segmented-control-inverted mui-segmented-control-negative">
@@ -218,15 +206,32 @@
                                                 <a class=" mui-control-item" href="#item3">
                                                     混合投放
                                                 </a>
+                                                <a href="javascript:" class=" mui-control-item"  id="offCanvasShow">
+                                                    筛选
+                                                    <i class="howell-icon-screen"></i>
+                                                </a>
                                             </div>
                                         </div>
-
+                                    </div>
+                                </div>
+                                <div class="weui-panel n-b weui-panel_access" style="margin-top: 0;">
+                                    <div class="weui-panel__bd" style="padding:10px;" id="page_count">
+                                        -
+                                        <label style="float: right;">0/0
+                                        </label>
                                     </div>
                                 </div>
                                 <div class="fill-height mui-scroll "
                                     style=" height: calc(100% - 152px);   overflow: scroll;" id="refreshContainer">
-                                    <div class="mui-table-view" id="listPanel">
+
+                                    <div class="weui-panel weui-panel_access">
+                                      
+                                        <div class="weui-panel__bd">
+                                            <div class="mui-table-view" id="listPanel">
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
 
                             </div>

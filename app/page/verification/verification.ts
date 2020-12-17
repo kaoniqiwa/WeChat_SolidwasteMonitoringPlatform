@@ -1,17 +1,17 @@
 
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
-import { WeChatCodeRequestService ,WeChatRequestService} from "../../data-core/repuest/we-chat.service";
+import { WeChatCodeRequestService, WeChatRequestService } from "../../data-core/repuest/we-chat.service";
 import { SessionUser } from "../../common/session-user";
 export namespace WeChatVerification {
 
     export class Verification {
         httpClient: HowellHttpClient.HttpClient;
         request: WeChatCodeRequestService;
-        userRequest:WeChatRequestService;
+        userRequest: WeChatRequestService;
         constructor() {
             this.httpClient = new HowellHttpClient.HttpClient();
             this.request = new WeChatCodeRequestService(this.httpClient.http);
-            this.userRequest=new WeChatRequestService(this.httpClient.http); 
+            this.userRequest = new WeChatRequestService(this.httpClient.http);
 
         }
         init() {
@@ -22,14 +22,24 @@ export namespace WeChatVerification {
                 codeDom = document.getElementById('code'),
                 subBtnDom = document.getElementById('to_submit');
             codeBtnDom.addEventListener('click', async () => {
+                var countDown = 60, codeInterval: any;
                 if (phDom.value.length < 11) {
                     msgDom.innerText = '手机号有误';
                     toastDom.style.display = 'block';
                 }
                 else {
-                    const code = await this.request.getCode(phDom.value);
+                    codeBtnDom.disabled = true;
+                    codeInterval = window.setInterval(() => {
+                        codeBtnDom.innerText = `重新发送(${countDown})`;
+                        countDown -= 1;
+                        if (countDown == 0) {
+                            window.clearInterval(codeInterval);
+                            codeBtnDom.innerText = `重新发送`;
+                            codeBtnDom.disabled = false;
+                        }
+                    }, 1000);
+                    await this.request.getCode(phDom.value);
 
-                    codeDom.value = code;
                 }
 
                 setTimeout(() => {
@@ -40,45 +50,45 @@ export namespace WeChatVerification {
             // phDom.addEventListener('blur',()=>{
 
             // });
-            codeDom?.addEventListener('change', (e) => {
-                if (!/^[1-9]\d*$/.test(e.data))
+            codeDom?.addEventListener('input', (e) => {
+                if (!/^[0-9]\d*$/.test(e.data))
                     codeDom.value = '';
-                if(codeDom.value.length){
-                    subBtnDom?.style.backgroundColor='#3a93ff';
+                if (codeDom.value.length) {
+                    subBtnDom?.style.backgroundColor = '#3a93ff';
                 }
             });
 
             subBtnDom.addEventListener('click', async () => {
-                if (phDom.value.length == 11 && (/^[1-9]\d*$/.test(codeDom.value))) {
+                if (phDom.value.length == 11 && (/^[0-9]\d*$/.test(codeDom.value))) {
                     const result = await this.request.checkCode(phDom.value, codeDom.value),
-                    u = new SessionUser();
-                    u.name=phDom.value;
+                        u = new SessionUser();
+                   
                     if (result.success) {
-                      const  buser=await  this.userRequest.bingingUser(phDom.value,u.name);
-                      console.log(buser);
-                      if(buser.OpenId)
-                         u.name=buser.OpenId;
-                      this.user.WUser = buser;    
+                        const buser = await this.userRequest.bingingUser(phDom.value, u.name);
+                       // console.log(buser);
+                        if (buser.OpenId)
+                            u.name = buser.OpenId;
+                        u.WUser = buser;
                         msgDom.innerText = '注册成功';
                         toastDom.style.display = 'block';
                         setTimeout(() => {
                             mui.openWindow({
-                                url: '../../index.html?openid='+phDom.value,
-                                id: '../../index.html?openid='+phDom.value',
+                                url: '../../wechat/me.html?openid=' + phDom.value,
+                                id: '../../wechat/me.html?openid=' + phDom.value,
 
                             });
                         }, 1500);
-                    } 
-                    else{
+                    }
+                    else {
                         msgDom.innerText = '验证失败';
                         toastDom.style.display = 'block';
                     }
 
                     setTimeout(() => {
                         msgDom.innerText = '';
-                        toastDom.style.display = 'none';                      
+                        toastDom.style.display = 'none';
                     }, 1500);
-                } 
+                }
             });
         }
     }

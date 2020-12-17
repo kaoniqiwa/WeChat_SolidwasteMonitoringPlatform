@@ -24,3 +24,10 @@ export enum ResourceRoleType{
       /**厢房 */
       GarbageStations
 }
+
+export enum  EventTypeEnum{
+    '乱扔垃圾事件'=1,
+'混合投放事件',
+'垃圾容量事件',
+'垃圾满溢事件'
+}

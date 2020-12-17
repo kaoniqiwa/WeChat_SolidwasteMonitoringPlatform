@@ -7,17 +7,6 @@ import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { SessionUser } from "../../common/session-user";
 namespace GarbageCondition {
 
-
-        async function getDivisionType(divisionId = '310109011000') {
-                const divisions = await getDivisions();
-                var divisionsType: DivisionTypeEnum;
-                for (const x of divisions) {
-                        if (x.Id == divisionId)
-                                divisionsType = x.DivisionType;
-                }
-                return divisionsType;
-        }
-
         async function getDivisions() {
                 const request = new DivisionRequestDao.DivisionRequest()
                         , responseDivisions = await request.getDivisions();
@@ -140,7 +129,7 @@ namespace GarbageCondition {
                         const sort = input.items.sort((a, b) => {
                                 return b.dropNum - a.dropNum
                         });
-                        for (const x of sort.slice(0, 5)) {
+                        for (const x of sort.slice(0, 10)) {
                                 viewModel.table.push({
                                         name: x.division,
                                         subName: x.dropNum + '',
@@ -164,7 +153,7 @@ namespace GarbageCondition {
                         const datas = await this.getData(),
                                 viewModel = this.Convert(datas)
                                 , dom = document.getElementById('top5')
-                                , bgColor = ['red-bg', 'red-bg', 'red-bg', 'orange-bg', 'orange-bg'];
+                                , bgColor = ['red-bg', 'red-bg', 'red-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg'];
 
                         var html = '';
                         dom.innerHTML = '';
@@ -175,7 +164,7 @@ namespace GarbageCondition {
                                         <div class="pull-left number-item text-center m-r-10  ${bgColor[i]}">
                                             <label class="white-text ">${i + 1}</label>
                                         </div>
-                                        <div class="pull-left card-box-title black-text">${t.name}</div>
+                                        <div class="pull-left card-box-title width black-text">${t.name}</div>
                                         <div class="pull-right card-box-title sky-blue-text">${t.subName} <label class="list-desc-unit">${t.subNameAfter}</label></div>
                                     </div> `;
                                 }
@@ -183,7 +172,7 @@ namespace GarbageCondition {
                               <div class="pull-left number-item text-center m-r-10  ${bgColor[i]}">
                                   <label class="white-text ">${i + 1}</label>
                               </div>
-                              <div class="pull-left card-box-title black-text">${t.name}</div>
+                              <div class="pull-left card-box-title width black-text">${t.name}</div>
                               <div class="pull-right card-box-title sky-blue-text">${t.subName} <label class="list-desc-unit">${t.subNameAfter}</label></div>
                           </div> `;
 
@@ -235,23 +224,6 @@ namespace GarbageCondition {
                                         }
                                 }
                         }
-                        // if (divisionType == DivisionTypeEnum.Committees) {
-
-
-                        // }
-                        // else if (divisionType == DivisionTypeEnum.County) {
-
-                        // }
-                        // else if (divisionType == void 0) {
-                        //         const responseData = await request.postDivisionStatisticNumbers([divisionId]);
-                        //         for (const x of responseData.Data.Data) {
-                        //                 for (const v of x.TodayEventNumbers)
-                        //                         if (v.EventType == EventTypeEnum.IllegalDrop)
-                        //                                 model.illegalDropNumber += v.DayNumber;
-                        //                         else if (v.EventType == EventTypeEnum.MixedInto)
-                        //                                 model.hybridPushNumber += v.DayNumber;
-                        //         }
-                        // }
                         return model;
                 }
 
@@ -281,6 +253,9 @@ namespace GarbageCondition {
         export class Refresh {
 
                 init() {
+                        mui('.mui-scroll-wrapper').scroll({
+                                deceleration: 0.0005  
+                        }); 
                         mui.init({
                                 pullRefresh: {
                                         container: '#refreshContainer',
@@ -346,10 +321,12 @@ namespace GarbageCondition {
 
 }
 
-new HowellHttpClient.HttpClient().login(() => {
+new HowellHttpClient.HttpClient().login(async (http) => {  
+       
         new GarbageCondition.IllegalDropHistory().init();
         new GarbageCondition.Refresh().init();
 
         new GarbageCondition.IllegalDropOrder().init();
         new GarbageCondition.DivisionGarbageSpecification().init();
-})
+});
+ 

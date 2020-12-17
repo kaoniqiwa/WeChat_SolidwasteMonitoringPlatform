@@ -12,6 +12,7 @@
     <script crossorigin="anonymous" integrity="sha384-xtrmUNWJ2tdS4FJyVhTG4xpPXkfHBFY36SOeegdD40rRPQOCNBfiaxPY1ji+RKS2" src="https://lib.baomitu.com/echarts/3.8.5/echarts.min.js"></script>
     <!-- <script src="../../assets/echarts.min.3x.js"></script> -->
     <script src="https://cdn.bootcdn.net/ajax/libs/mui/3.7.1/js/mui.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
     <style type="text/css">
         .number-item {
             width: 25px;
@@ -29,74 +30,76 @@
         }
 
         .top5-list-wrap {
-            height: 22px;
+            height: 30px;
+        }
+
+        .card-box-title.width{
+            max-width: 68%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
         }
     </style>
 </head>
 
 <body>
     <div class="page">
-        <div id="refreshContainer" style=" height: calc(100% -  62px);">
-
-
-            <div class="page__bd fill-height m-w">
-                <div class="weui-panel weui-panel_access m-t-10">
-                    <div class="weui-panel__bd">
-                        <div class="weui-media-box weui-media-box_text">
-                            <h4 class="weui-media-box__title card-box-title m-b-20">今日乱扔垃圾</h4>
-                            <div id="illegalDrop">
-
+        <div style=" height: calc(100% -  62px);position: relative;">
+            <div class="mui-scroll-wrapper"  id="refreshContainer">
+                <div class="mui-scroll">
+                    <div class="page__bd fill-height m-w">
+                        <div class="weui-panel weui-panel_access m-t-10">
+                            <div class="weui-panel__bd">
+                                <div class="weui-media-box weui-media-box_text">
+                                    <h4 class="weui-media-box__title card-box-title m-b-20">乱扔垃圾</h4>
+                                    <div id="illegalDrop">
+        
+                                    </div>
+                                </div>
                             </div>
-                            <!-- <h4 class="card-box-desc sky-blue-text" > <label
-                                class="card-box-desc-unit gray-text">起</label></h4> -->
                         </div>
-                    </div>
-                </div>
-                <div class="weui-panel weui-panel_access">
-                    <div class="weui-panel__bd">
-                        <div class="weui-media-box weui-media-box_text">
-                            <h4 class="weui-media-box__title card-box-title m-b-20">今日混合投放</h4>
-                            <div id="hybridPush">
-
+                        <div class="weui-panel weui-panel_access">
+                            <div class="weui-panel__bd">
+                                <div class="weui-media-box weui-media-box_text">
+                                    <h4 class="weui-media-box__title card-box-title m-b-20">混合投放</h4>
+                                    <div id="hybridPush">
+        
+                                    </div>
+                                </div>
                             </div>
-                            <!-- <h4 class="card-box-desc sky-blue-text">372 <label
-                                class="card-box-desc-unit gray-text">起</label></h4> -->
                         </div>
-                    </div>
-                </div>
-                <div class="weui-panel weui-panel_access">
-                    <div class="weui-panel__bd">
-                        <div class="weui-media-box weui-media-box_text">
-                            <h4 class="weui-media-box__title  card-box-title m-b-20">乱扔垃圾行为TOP5</h4>
-                            <div id="top5">
-
+                        <div class="weui-panel weui-panel_access">
+                            <div class="weui-panel__bd">
+                                <div class="weui-media-box weui-media-box_text">
+                                    <h4 class="weui-media-box__title  card-box-title m-b-20">乱扔垃圾行为TOP10</h4>
+                                    <div  style="position: relative;height: 200px;">
+                                        <div class="mui-scroll-wrapper">
+                                            <div class="mui-scroll" id="top5">
+                                                <!--这里放置真实显示的DOM内容-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                 
+                                </div>
                             </div>
-                            <!-- <div class="fill-width top5-list-wrap m-b-10">
-                            <div class="pull-left number-item text-center m-r-10  red-bg">
-                                <label class="white-text ">1</label>
-                            </div>
-                            <div class="pull-left card-box-title black-text">大大居委</div>
-                            <div class="pull-right card-box-title sky-blue-text">1213 <label class="list-desc-unit">起</label></div>
-                        </div>  -->
                         </div>
-                    </div>
-                </div>
-                <div class="weui-panel weui-panel_access">
-                    <div class="weui-panel__bd">
-                        <div class="weui-media-box weui-media-box_text">
-                            <h4 class="weui-media-box__title  card-box-title m-b-20">今日乱扔垃圾</h4>
-                            <div class="fill-width" style="height: 160px;" id="chart">
-
+                        <div class="weui-panel weui-panel_access">
+                            <div class="weui-panel__bd">
+                                <div class="weui-media-box weui-media-box_text">
+                                    <h4 class="weui-media-box__title  card-box-title m-b-20">乱扔垃圾</h4>
+                                    <div class="fill-width" style="height: 160px;" id="chart">
+        
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
+            </div> 
             
         </div>
         <div class="page__ft" id="ff">
-            <iframe src="../menu-bar/menu-bar.html" name="menuBar" class="fill-width fill-height"
+            <iframe src="../menu-bar/menu-bar.html?page=barItem1" name="menuBar" class="fill-width fill-height"
                 frameborder="0"></iframe>
         </div>
     </div>
