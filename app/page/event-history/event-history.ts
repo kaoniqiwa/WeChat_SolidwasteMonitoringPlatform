@@ -250,6 +250,7 @@ export namespace EventHistoryPage {
             param.PageIndex = pageIndex;
             param.BeginTime = day.begin.toISOString();
             param.EndTime = day.end.toISOString();
+            param.Desc=true;
             if (pageSize) param.PageSize = pageSize;
             else param.PageSize = new TableAttribute().pageSize;
             const s = search.toSearchParam();
