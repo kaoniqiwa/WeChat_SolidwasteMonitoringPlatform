@@ -2280,3 +2280,27 @@ a .howell-icon-flip-vertical:before {
 .howell-icon-garbage2:before {
     content: "\f321";
 }
+.howell-icon-route:before {
+    content: "\f322";
+}
+.howell-icon-alarm2:before {
+    content: "\f323";
+}
+.howell-icon-human:before {
+    content: "\f324";
+}
+.howell-icon-list:before {
+    content: "\f325";
+}
+.howell-icon-list2:before {
+    content: "\f326";
+}
+.howell-icon-chart:before {
+    content: "\f327";
+}
+.howell-icon-centre:before {
+    content: "\f328";
+}
+.howell-icon-dustcart:before {
+    content: "\f329";
+}
