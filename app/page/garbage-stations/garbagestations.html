@@ -342,6 +342,10 @@ display:block; */
             height: calc(100% - 62px);
         }
 
+        .mui-scroll-wrapper .mui-scroll.division {
+            height: 100%;
+        }
+
         .mui-draggable .mui-scroll {
 
             /* height: 100%; */
@@ -383,7 +387,7 @@ display:block; */
             color: #a5a3a2;
             border: none;
             margin: 5px;
-            height: 30px;
+            height: 100px;
             width: calc(50% - 20px);
             font-size: 12px;
             overflow: hidden;
@@ -406,7 +410,7 @@ display:block; */
         .bar {
             background-color: #fff;
             text-align: center;
-            position:absolute;
+            position: absolute;
             bottom: 0;
         }
 
@@ -414,7 +418,7 @@ display:block; */
             height: calc(100% - 62px);
         }
 
-        
+
         .mui-off-canvas-right {
             background-color: #fff;
         }
@@ -422,8 +426,8 @@ display:block; */
 
 
 
-<style>
-</style>
+    <style>
+    </style>
 </head>
 
 <body>
@@ -468,7 +472,7 @@ display:block; */
             <!--菜单部分-->
             <!-- <aside id="offCanvasSide" class="mui-off-canvas-right">
                 <div id="offCanvasSideScroll" class="mui-scroll-wrapper">
-                    <div class="mui-scroll">
+                    <div class="mui-scroll division">
                         <div class="title">
                             居委
                         </div>
@@ -516,9 +520,25 @@ display:block; */
 
 
     function img_move(e, step) {
-        if(!e)return;
-        if(e.st)
-        e.stopImmediatePropagation();
+
+
+        if (!e || !e.target) return;
+
+
+        console.log(e);
+
+        if (e.path) {
+            for (let i = 0; i < e.path.length; i++) {
+                if(!e.path[i].className)continue;
+                let index = e.path[i].className.indexOf("garbage-station");
+                if (index >= 0) {
+                    if (e.stopImmediatePropagation)
+                        e.stopImmediatePropagation();
+                        break;
+                }
+            }
+        }
+
         switch (e.target.tagName.toLowerCase()) {
             case 'img':
 
@@ -527,7 +547,7 @@ display:block; */
                 //          li          ul              div
                 switch (e.detail.direction) {
                     case 'left':
-                        
+
                         e.target.parentElement.parentElement.scrollLeft += step;
                         break;
                     case 'right':
@@ -551,10 +571,12 @@ display:block; */
     document.querySelector('#offCanvasWrapper').addEventListener('drag', function (e) {
 
         img_move(e, 6);
-    })    
+    })
+
+
     var selected;
-    document.querySelector("#offCanvasWrapper").addEventListener('mousedown', function (e) {        
-        selected = e.target;
+    document.querySelector("#offCanvasWrapper").addEventListener('mousedown', function (e) {
+        selected = e;
     });
     document.querySelector("#offCanvasWrapper").addEventListener('mousemove', function (e) {
         img_move(selected, 15);

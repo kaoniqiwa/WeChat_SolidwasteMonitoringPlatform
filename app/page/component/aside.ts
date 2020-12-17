@@ -3,7 +3,7 @@ declare var mui: any;
 export class FilterAside {
 
     inner = `<div id="offCanvasSideScroll" class="mui-scroll-wrapper">
-                    <div class="mui-scroll">
+                    <div class="mui-scroll division">
                         <div class="title">
                             居委
                         </div>
