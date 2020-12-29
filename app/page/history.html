@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生活垃圾监管平台</title>
+    <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
+
+
+    <link href="../../minirefresh/minirefresh.css" rel="stylesheet" />
+    <link href="./css/index.css" rel="stylesheet" />
+    <link href="./css/history.css" rel="stylesheet" />
+
+    </style>
+</head>
+
+<body>
+    <div id="template">
+        <div class="record-item">
+            <div class="left">
+                <img
+                    src="http://192.168.21.241:9000/api/howell/ver10/aiop_service/garbage_gateway/Pictures/5fe428ce00000004bc000e74.jpg?pictureId=5fe428ce00000004bc000e74&ServerId=1">
+            </div>
+            <div class="left content">
+                <div class="title">title</div>
+                <div class="footer">
+                    <div class="left footer-title">footer</div>
+                    <div class="remark">2020年12月20日</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bar header">
+        <div class="content ">
+            <ul id="navigation">
+                <li tab="illegalDropTab" class="selected">乱扔垃圾</li>
+                <li tab="overflow">满溢情况</li>
+                <li tab="hybridPush">混合投放</li>
+            </ul>
+            <div class="btn filter">
+                筛选<i class="howell-icon-screen"></i>
+            </div>
+        </div>
+    </div>
+    <div class="main">
+        <div class="tab" id="illegalDropTab" style="display: block;">
+            
+            <div class="header">
+                <div class="date" id="illegalDropDate">2020年12月20日</div>
+                <div class="count"><span id="illegalDropRecordCount">0</span>/<span id="illegalDropTotalRecordCount">0</span></div>
+            </div>
+            <div class="minirefresh-wrap" id="illegalDropRefreshContainer">
+                <div class="minirefresh-scroll">
+                    <div id="illegalDrop"></div>
+                </div>
+            </div>
+        </div>
+        <div class="tab" id="overflow">
+            
+            <div class="header">
+                <div class="date" id="date">2020年12月20日</div>
+                <div class="count"><span id="recordCount">0</span>/<span id="totalRecordCount">0</span></div>
+            </div>
+            <div class="minirefresh-wrap" id="illegalDropRefreshContainer">
+                <div class="minirefresh-scroll">
+                    <div id="illegalDrop"></div>
+                </div>
+            </div>
+        </div>
+        <div class="tab" id="hybridPush">            
+            <div class="header">
+                <div class="date" id="date">2020年12月20日</div>
+                <div class="count"><span id="recordCount">0</span>/<span id="totalRecordCount">0</span></div>
+            </div>
+            <div class="minirefresh-wrap" id="illegalDropRefreshContainer">
+                <div class="minirefresh-scroll">
+                    <div id="illegalDrop"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script src="../../minirefresh/minirefresh.js"></script>
+<script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
+<!-- <script src="./ts/history.ts"></script> -->
+
+<script src="./ts/history.ts"></script>
+
+</html>

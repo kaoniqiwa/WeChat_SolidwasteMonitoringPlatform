@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生活垃圾监管平台</title>
+    <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
+    <link crossorigin="anonymous"
+        integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+        href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
+
+    <link href="../../minirefresh/minirefresh.css" rel="stylesheet" />
+    <link href="./css/event-details.css" rel="stylesheet" />
+
+    </style>
+</head>
+
+<body>
+    <div class="mui-page mui-page-center" id="detail">
+        <div class="mui-page-content">
+            <div class="page__bd">
+                <div class="weui-form-preview">
+                    <div class="weui-form-preview__hd pic">
+                        <div class="weui-form-preview__item fill-width fill-height">
+                            <img class="weui-media-box__thumb" width="100%" height="100%" id="detail_img" alt="">
+                        </div>
+                    </div>
+                    <div class="weui-form-preview__bd">
+                        <div class="weui-form-preview__item">
+                            <label class="weui-form-preview__label">报警类型</label>
+                            <span class="weui-form-preview__value red-text" id="police__type"></span>
+                        </div>
+                        <div class="weui-form-preview__item">
+                            <label class="weui-form-preview__label">摄像机</label>
+                            <span class="weui-form-preview__value sky-blue-text" id="camera__name"></span>
+                        </div>
+                        <div class="weui-form-preview__item">
+                            <label class="weui-form-preview__label">垃圾厢房</label>
+                            <span class="weui-form-preview__value" id="station__name"></span>
+                        </div>
+                        <div class="weui-form-preview__item">
+                            <label class="weui-form-preview__label">所属居委</label>
+                            <span class="weui-form-preview__value" id="rc__name"></span>
+                        </div>
+                        <div class="weui-form-preview__item">
+                            <label class="weui-form-preview__label">报警时间</label>
+                            <span class="weui-form-preview__value" id="police__time"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="page__ft item-content-center">
+                <div class="weui-btn" id="back__btn">返回报警记录</div>
+            </div>
+        </div>
+
+    </div>
+</body>
+<script src="./ts/EventInformation.ts"></script>
+
+</html>

@@ -1,0 +1,134 @@
+html, body{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    border: none;   
+    
+}
+body{
+    -webkit-overflow-scrolling: touch;
+    　　　　overflow-scrolling: touch; 
+    background-color: #efeff4;
+}
+ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+iframe{
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+a {
+    color:#252525;
+     text-decoration:none;
+     background-color: white;
+    }
+a:visited {
+    text-decoration:none;
+    outline: none;
+}
+a:hover {
+    text-decoration:none;
+    outline: none;
+}
+a:active {
+    color: #3a94ff;
+    outline: none;
+}
+a:focus{
+    outline: none;
+    text-decoration:none;
+}
+
+
+.page
+{
+    background-color: #efeff4;
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y;
+}
+
+.main{
+    height: calc(100% - 60px);
+    width: 100%;
+}
+.bar{
+    position: fixed;
+    width: calc(100% - 24px);
+    height: 60px;
+    background-color: #f7f7f7;    
+    padding-left: 12px;
+    padding-right: 12px;    
+}
+.bar .icon{
+    font-size: 18px;
+}
+
+.bar.bottom
+{
+    bottom: 0;
+}
+.bar ul{
+    width: 100%;
+    display: table;
+    color: #b2b2b2;
+    margin-top: 12px;
+}
+.bar ul li{    
+    
+    display: table-cell;
+    text-align: center;
+    cursor:pointer;
+    font-size: 12px;
+}
+.bar ul li a{    
+    width: 100%;
+    background-color: #f7f7f7;
+    
+    color: #b2b2b2;
+}
+.bar ul li .selected{    
+    color: #3a93ff;
+}
+
+.card{
+    background-color: #fff;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.header{
+    padding: 0;
+    position: fixed;
+    width: 100%;
+    width: 100%;
+    background-color: #f7f7f7;
+    height: 40px;
+    z-index: 999;
+}
+.header .content{
+    height: 100%;
+}
+.header ul{
+    margin-top: 0;
+    height: 100%;
+}
+.header ul li{
+    border-bottom: 1px solid #f7f7f7;
+    vertical-align: middle;
+    font-size: 14.4px;
+}
+.header ul li.selected{
+    border-bottom: 1px solid #4097ff;
+    color: #4097ff;
+}
+
+#template{
+    display: none;
+}

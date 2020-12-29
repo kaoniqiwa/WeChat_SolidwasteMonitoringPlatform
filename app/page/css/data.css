@@ -1,0 +1,87 @@
+
+.page{
+    width: calc(100% - 24px);
+    padding: 12px;
+    
+    position: absolute;
+}
+.page .card{
+    border-radius: 15px;
+    padding: 16px;
+    width: 100%;
+    width: calc(100% - 32px);
+}
+
+.card:last-child{
+    margin-bottom: 24px;
+}
+
+.card .title
+{
+    font-size: 24px;
+}
+.card .content .body
+{
+    height: 100%;
+    
+    touch-action: pan-y;
+}
+.card.count{
+    height: 102px;
+    
+}
+
+.card.count .content
+{
+    margin-top: 22px;
+    font-size: 24px;
+    color: #c9c8ce;    
+}
+.card.count .value
+{
+    font-size: 28px;
+    color: #3a93ff;
+}
+
+
+.card.top, .card.chart{
+    height: 256px;
+}
+.card.top .content, .card.chart .content{
+    height: calc(100% - 31px);
+}
+
+.card.top .content{
+    font-size: 20px;
+text-overflow: ellipsis;
+white-space: nowrap;
+overflow: auto;
+margin-top: 10px;
+}
+.number-item {
+    width: 25px;
+    height: 18px;
+    line-height: 18px;
+    font-size: 16px;
+    color: white;
+    border-radius: 4px;    
+    text-align: center;
+    margin-right: 10px;
+    vertical-align: middle;
+    
+}
+.sky-blue-text{
+    color: #3a93ff;
+}
+.list-desc-unit{
+    font-size: 16px;
+    color: #c9c8ce;
+}
+.red-bg{
+    background-color:  #fd2f2d;
+
+}
+
+.orange-bg{
+    background-color: orange;
+}

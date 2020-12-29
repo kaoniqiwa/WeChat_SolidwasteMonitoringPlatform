@@ -252,26 +252,26 @@ namespace GarbageCondition {
 
         export class Refresh {
 
-                init() {
-                        mui('.mui-scroll-wrapper').scroll({
-                                deceleration: 0.0005  
-                        }); 
-                        mui.init({
-                                pullRefresh: {
-                                        container: '#refreshContainer',
-                                        down: {
-                                                callback: () => {
-                                                        new GarbageCondition.IllegalDropHistory().init();
-                                                        new GarbageCondition
-                                                                .IllegalDropOrder().init();
-                                                        new GarbageCondition.DivisionGarbageSpecification().init();
-                                                        mui('#refreshContainer').pullRefresh().endPulldownToRefresh();
-                                                }
-                                        }
-                                }
-                        });
+                // init() {
+                //         mui('.mui-scroll-wrapper').scroll({
+                //                 deceleration: 0.0005  
+                //         }); 
+                //         mui.init({
+                //                 pullRefresh: {
+                //                         container: '#refreshContainer',
+                //                         down: {
+                //                                 callback: () => {
+                //                                         new GarbageCondition.IllegalDropHistory().init();
+                //                                         new GarbageCondition
+                //                                                 .IllegalDropOrder().init();
+                //                                         new GarbageCondition.DivisionGarbageSpecification().init();
+                //                                         mui('#refreshContainer').pullRefresh().endPulldownToRefresh();
+                //                                 }
+                //                         }
+                //                 }
+                //         });
 
-                }
+                // }
         } 
 
         class IllegalDropEventData {
@@ -324,7 +324,7 @@ namespace GarbageCondition {
 new HowellHttpClient.HttpClient().login(async (http) => {  
        
         new GarbageCondition.IllegalDropHistory().init();
-        new GarbageCondition.Refresh().init();
+        // new GarbageCondition.Refresh().init();
 
         new GarbageCondition.IllegalDropOrder().init();
         new GarbageCondition.DivisionGarbageSpecification().init();

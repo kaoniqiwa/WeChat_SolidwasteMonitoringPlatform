@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生活垃圾监管平台</title>
+    <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
+
+    <link href="./css/index.css" rel="stylesheet" />
+    <link href="./css/data.css" rel="stylesheet" />
+
+    <link href="../../minirefresh/minirefresh.css" rel="stylesheet" />
+
+    <script crossorigin="anonymous" integrity="sha384-xtrmUNWJ2tdS4FJyVhTG4xpPXkfHBFY36SOeegdD40rRPQOCNBfiaxPY1ji+RKS2"
+        src="https://lib.baomitu.com/echarts/3.8.5/echarts.min.js"></script>
+    
+    <style>
+        .top5-list-wrap {
+            height: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="minirefresh-wrap" id="refreshContainer">
+        <div class="minirefresh-scroll">
+            <div class="page">
+                <div class="card count">
+                    <div class="text title">
+                        今日乱丢垃圾
+                    </div>
+                    <div class="content">
+                        <span class="value" id="illegalDrop">0</span>
+                        <span class="text">起</span>
+                    </div>
+                </div>
+                <div class="card count">
+                    <div class="text title">
+                        今日混合投放
+                    </div>
+                    <div class="content">
+                        <span class="value" id="hybridPush">0</span>
+                        <span class="text">起</span>
+                    </div>
+                </div>
+                <div class="card top">
+                    <div class="text title">
+                        今日乱丢垃圾行为排行
+                    </div>
+                    <div class="content top_content">
+                        <div class="body" id="top">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="card chart">
+                    <div class="text title">
+                        今日乱丢垃圾图表
+                    </div>
+                    <div class="content" id="chart">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../../minirefresh/minirefresh.js"></script>
+<script src="./ts/data.ts"></script>
+
+</html>

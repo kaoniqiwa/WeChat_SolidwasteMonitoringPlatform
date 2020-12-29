@@ -1,0 +1,122 @@
+
+.weui-btn_primary {
+    background-color: #c5dfff;
+    color: #4097ff;
+    border: none;
+    border-radius: 50px;
+}
+
+.weui-btn_primary:not(.weui-btn_disabled):active {
+    background-color: #c5dfff;
+    color: #4097ff;
+    border: none;
+    opacity: 0.8;
+}
+.bar.header{
+    top:0;
+}
+.header .content{
+    font-size: 12px;
+    color: #b2b2b2;
+}
+
+.bar.header .content ul{
+    width: calc(100% - 100px);
+    float: left;
+    
+}
+.header .content .btn.filter{
+    float: right;
+    width: 50px;
+    height: 100%;
+    line-height: 40px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+.main .header{
+    
+    padding-top: 12px;
+    background-color: #fff;
+    color: #b2b2b2;
+    height: 35px;
+    line-height: 30px;
+    font-size: 19.2px;
+    vertical-align: bottom;
+    position: relative;
+}
+
+.main .header .date{
+    margin-left: 10px;
+    float: left;
+}
+.main .header .count{
+    margin-right: 10px;
+    float: right;
+}
+
+.tab{
+    top: 48px;
+    position: relative;
+    width: 100%;
+    display: none;    
+    min-height: calc(100% + 12px);
+}
+
+.record-item{
+    height: 80px;
+    width: calc(100% - 24px);
+    padding: 12px;
+    background-color: #fff;
+    clear: both;
+}
+.record-item .left{
+    float: left;
+}
+.record-item .rig
+{
+    float: right;
+}
+.record-item img{
+    width: 140px;
+    height: 80px;
+    border-radius: 10px;
+}
+.record-item .content{
+    width: calc(100% - 156px);
+    height: 100%;
+    margin-left: 16px;
+    padding-bottom: 12px;
+    margin-bottom: -12px;
+    border-bottom: 2px solid #eaeaea;
+}
+.record-item .content > .title{
+    font-size: 19px;
+    height: 50%;
+    line-height: 40px;
+    vertical-align: middle;
+}
+.record-item .content .footer{    
+    height: 40px;
+    line-height: 40px;
+    vertical-align: middle;
+    
+}
+.record-item .content .footer > .footer-title{
+    font-size: 14.4px;
+    color: #888;
+}
+.record-item .content .footer > .remark{
+    font-size: 12px;
+    color: #b2b2b2;
+    float: right;
+}
+
+.page{
+    overflow: hidden;
+}
+
+.minirefresh-wrap{
+    margin-top: 38px;
+}
