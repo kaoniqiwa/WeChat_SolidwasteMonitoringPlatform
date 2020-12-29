@@ -13,7 +13,7 @@ export namespace HowellHttpClient {
             this.userService = new WeChatRequestService(this.http);
         }
 
-        async login(fn?: (http: HowellAuthHttp) => void) {
+        async login(seccess?: (http: HowellAuthHttp) => void, faild?: () => void) {
             const openid = getQueryVariable('openid');
             if (window['DIGEST'] == null && openid) {
                 this.user.user = {
@@ -22,20 +22,26 @@ export namespace HowellHttpClient {
                 }
 
                 const a = await this.userService.login(() => {
-                    mui.openWindow({
-                        url: '../../wechat/verification.html',
-                        id: '../../wechat/verification.html',
-                    });
+
                 });
 
-                if (a && a['data'])
+                console.log(a);
+
+                if (a && a['data']) {
                     this.user.WUser = a['data'];
-                if (fn) fn(this.http);
+                    if (seccess) seccess(this.http);
+                }
+                else {
+                    if (faild) {
+                        faild();
+                    }
+                }
+
             }
-            
+
         }
 
-       async login2(fn?: (http: HowellAuthHttp) => void) { 
+        async login2(fn?: (http: HowellAuthHttp) => void) {
             const openid = getQueryVariable('openid'), eventId = getQueryVariable('eventid');
 
             if (eventId && !openid) {
@@ -50,7 +56,7 @@ export namespace HowellHttpClient {
                     }
 
                     const a = await this.userService.login(() => {
-                       
+
                     });
                     if (a && a['data'])
                         this.user.WUser = a['data'];
