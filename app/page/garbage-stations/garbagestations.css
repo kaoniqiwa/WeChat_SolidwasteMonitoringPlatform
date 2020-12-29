@@ -106,9 +106,6 @@ body {
 .hw-bar #searchBar input[type=search]::-webkit-input-placeholder {
   color: #b2b2b2;
 }
-.hw-bar #searchBar input[type=search]::-webkit-search-cancel-button {
-  -webkit-appearance: none;
-}
 .hw-bar #searchBar #btn_search {
   width: 16px;
   height: 16px;
