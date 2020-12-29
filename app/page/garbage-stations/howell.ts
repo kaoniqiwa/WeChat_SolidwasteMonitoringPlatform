@@ -33,7 +33,7 @@ class GarbageStationClient {
     searchInput: HTMLInputElement;
     btnSearch: HTMLElement;
     originImg: HTMLDivElement;
-    hwBar:HTMLDivElement
+    hwBar: HTMLDivElement
 
     zoomStatus: string = 'zoomIn';
     swiper: typeof Swiper;
@@ -81,11 +81,11 @@ class GarbageStationClient {
                 type: 'fraction',
             },
             on: {
-                click: ()=> {
+                click: () => {
                     // console.log(this.swiper)
                     this.originImg.classList.remove('fadeIn');
                     this.originImg.classList.add('fadeOut');
-                    
+
                     this.hwBar.classList.remove('fadeOut');
                     this.hwBar.classList.add('fadeIn');
 
@@ -147,6 +147,13 @@ class GarbageStationClient {
         // 创建侧边
         this.createAside();
 
+        if (!refreshed) {
+            console.log('bind event')
+            this.bindEvents();
+        }
+
+    }
+    bindEvents() {
         this.backdrop.addEventListener('click', () => {
             this.showOrHideAside()
         })
@@ -272,7 +279,7 @@ class GarbageStationClient {
                     let target = e.target as HTMLElement;
                     // 如果点击图片，则传递图片index和父元素id
                     // 小窗口的时候才会全屏显示功能
-                    if ( target.tagName.toString().toLowerCase() == 'img') {
+                    if (target.tagName.toString().toLowerCase() == 'img') {
                         let ev = new CustomEvent('cat', {
                             detail: {
                                 index: target.getAttribute('index'),
@@ -440,7 +447,7 @@ class GarbageStationClient {
 
         this.originImg.classList.remove('fadeOut');
         this.originImg.classList.add('fadeIn');
-        
+
         this.hwBar.classList.remove('fadeIn');
         this.hwBar.classList.add('fadeOut');
 
@@ -455,6 +462,8 @@ class GarbageStationClient {
 
 }
 
+let refreshed = false;
+
 const client = new HowellHttpClient.HttpClient();
 client.login((http: HowellAuthHttp) => {
     const stationClient = new GarbageStationClient(
@@ -466,15 +475,43 @@ client.login((http: HowellAuthHttp) => {
         }
     );
 
+    let MiniRefresh = Reflect.get(window, 'MiniRefresh')
+    let miniRefresh = new MiniRefresh({
+        container: '#minirefresh',
+        down: {
+            callback: function () {
+                // 下拉事件
+                console.log('down');
+                refreshed = true;
+                render().then(() => {
+                    miniRefresh.endDownLoading();
+                })
+
+            }
+        },
+        up: {
+            isAuto: false,
+            callback: function () {
+                // 上拉事件
+                miniRefresh.endUpLoading(true);
+                console.log('up')
+
+            }
+        }
+    });
+
     // 加载数据，数据加载完成，创建页面内容
-    stationClient.loadData()
-        .then((res) => {
-            stationClient.init();
+    render()
 
-        })
-        .catch((e) => {
-            console.error(`出错了~ ${e}`)
-        })
-
-
+    function render() {
+        return stationClient.loadData()
+            .then((res) => {
+                stationClient.init();
+            })
+            .catch((e) => {
+                console.error(`出错了~ ${e}`)
+            })
+    }
 });
+
+
