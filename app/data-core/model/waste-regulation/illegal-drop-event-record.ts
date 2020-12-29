@@ -45,5 +45,5 @@ import { EventDataObject } from "./event-data-object";
         StationName: string;
         /**资源名称(可选)，支持LIKE */
         ResourceName: string;
-
+        Desc:boolean;
     }
