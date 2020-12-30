@@ -66,6 +66,7 @@ class GarbageStationClient {
         this.backdrop = document.querySelector('.backdrop') as HTMLDivElement;
 
         this.searchInput = document.querySelector('#searchInput') as HTMLInputElement;
+
         this.btnSearch = document.querySelector('#btn_search') as HTMLInputElement;
 
         this.originImg = document.querySelector('#origin-img') as HTMLDivElement;
@@ -491,6 +492,7 @@ client.login((http: HowellAuthHttp) => {
         },
         up: {
             isAuto: false,
+            isLock:true,
             callback: function () {
                 // 上拉事件
                 miniRefresh.endUpLoading(true);
@@ -513,5 +515,3 @@ client.login((http: HowellAuthHttp) => {
             })
     }
 });
-
-
