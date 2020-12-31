@@ -359,3 +359,8 @@ body {
 .minirefresh-upwrap.minirefresh-hardware-speedup {
   display: none;
 }
+
+.hw-content .minirefresh-scroll
+{
+  background-color: #f5f5f5;
+}
