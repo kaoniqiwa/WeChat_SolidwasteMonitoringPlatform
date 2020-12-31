@@ -352,3 +352,10 @@ body {
   color: white;
   padding-right: 10px;
 }
+#minirefresh {
+  position: relative;
+  height: 100%;
+}
+.minirefresh-upwrap.minirefresh-hardware-speedup {
+  display: none;
+}

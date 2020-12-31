@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
     <title>生活垃圾监管平台</title>
-    <link rel="stylesheet" href="./swiper.min.css">
-    <link rel="stylesheet" href="../../assets/howell.css">
-    <link rel="stylesheet" href="./minirefresh.min.css">
-    <link rel="stylesheet" href="./garbagestations.css">
+    <link rel="stylesheet" href="./swiper.min.css" type='text/css'>
+    <link rel="stylesheet" href="../../assets/howell.css" type='text/css'>
+    <link rel="stylesheet" href="./minirefresh.min.css" type='text/css'>
+    <link rel="stylesheet" href="./garbagestations.css" type='text/css'>
     <script src="https://unpkg.com/swiper/swiper-bundle.js"></script>
     <script src="./minirefresh.min.js"></script>
 
@@ -17,26 +17,26 @@
 <body>
 
 
-    <div id="minirefresh" class="minirefresh-wrap">
-        <div class="minirefresh-scroll">
-            <header class='hw-bar'>
-                <div class="weui-search-bar" id="searchBar">
-                    <i id="btn_search"></i>
-                    <input type="search" id="searchInput" placeholder="搜索" />
-                </div>
-                <div class=" title" id="img_division">
-                    图片
-                    <span class="hw-icon hw-icon-arrowdown"></span>
-                </div>
-                <div class=" title" id="btn_division">
-                    筛选
-                    <span class="hw-icon hw-icon-arrowright"></span>
-                </div>
-            </header>
-            <main class='hw-content'>
+
+    <header class='hw-bar'>
+        <div class="weui-search-bar" id="searchBar">
+            <i id="btn_search"></i>
+            <input type="search" id="searchInput" placeholder="搜索" />
+        </div>
+        <div class=" title" id="img_division">
+            图片
+            <span class="hw-icon hw-icon-arrowdown"></span>
+        </div>
+        <div class=" title" id="btn_division">
+            筛选
+            <span class="hw-icon hw-icon-arrowright"></span>
+        </div>
+    </header>
+    <main class='hw-content'>
+        <div id="minirefresh" class="minirefresh-wrap">
+            <div class="minirefresh-scroll">
                 <div id="content">
                     <template id='card-template'>
-
                         <div class='hw-content__card'>
                             <div class='content__title'>
                                 <div class="content__title__head"></div>
@@ -57,37 +57,40 @@
                         </div>
                     </template>
                 </div>
-
-            </main>
-            <footer>
-                <div class='hw-footer'>
-                    <iframe src="../menu-bar/menu-bar.html?page=barItem3" name="menuBar" class="fill-width fill-height"
-                        frameborder="0"></iframe>
-                </div>
-            </footer>
-            <div class='backdrop'></div>
-            <aside class='aside-content'>
-                <header class='aside-title'>
-                    居委
-                </header>
-                <main class='aside-main'>
-                    <template id='aside-template'>
-                        <div class='aside-item'>西江湾路居委会</div>
-                    </template>
-                </main>
-                <footer class='aside-footer'>
-                    <div class='footer-reset'>重置</div>
-                    <div class='footer-confirm'>确认</div>
-                </footer>
-            </aside>
-
-            <div class="swiper-container" id="origin-img">
-                <div class="swiper-wrapper"></div>
-                <div class="swiper-pagination"></div>
             </div>
-
         </div>
+
+    </main>
+
+
+
+    <footer>
+        <div class='hw-footer'>
+            <iframe src="../menu-bar/menu-bar.html?page=barItem3" name="menuBar" class="fill-width fill-height"
+                frameborder="0"></iframe>
+        </div>
+    </footer>
+    <div class='backdrop'></div>
+    <aside class='aside-content'>
+        <header class='aside-title'>
+            居委
+        </header>
+        <main class='aside-main'>
+            <template id='aside-template'>
+                <div class='aside-item'>西江湾路居委会</div>
+            </template>
+        </main>
+        <footer class='aside-footer'>
+            <div class='footer-reset'>重置</div>
+            <div class='footer-confirm'>确认</div>
+        </footer>
+    </aside>
+
+    <div class="swiper-container" id="origin-img">
+        <div class="swiper-wrapper"></div>
+        <div class="swiper-pagination"></div>
     </div>
+
 
 
 

@@ -496,7 +496,7 @@ client.login((http: HowellAuthHttp) => {
             callback: function () {
                 // 上拉事件
                 miniRefresh.endUpLoading(true);
-                console.log('up')
+                console.log('usssp')
 
             }
         }
