@@ -8,10 +8,8 @@ import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { ResourceMediumRequestService } from "../../data-core/repuest/resources.service";
 
 
-let Swiper = Reflect.get(window, 'Swiper')
-
-
-
+let Swiper = Reflect.get(window, 'Swiper');
+let $ = Reflect.get(window, '$');
 
 
 class GarbageStationClient {
@@ -38,6 +36,8 @@ class GarbageStationClient {
     zoomStatus: string = 'zoomIn';
     swiper: typeof Swiper;
     swiperStatus: boolean = false;
+    originStatus: boolean = false;
+
 
 
 
@@ -83,12 +83,13 @@ class GarbageStationClient {
             },
             on: {
                 click: () => {
-                    // console.log(this.swiper)
-                    this.originImg.classList.remove('fadeIn');
-                    this.originImg.classList.add('fadeOut');
 
-                    this.hwBar.classList.remove('fadeOut');
-                    this.hwBar.classList.add('fadeIn');
+                    $(this.originImg).fadeOut(() => {
+                        this.originStatus = false;
+                    })
+
+
+                    $(this.hwBar).fadeIn()
 
 
                     this.swiper.virtual.slides.length = 0;
@@ -169,6 +170,8 @@ class GarbageStationClient {
             this.showOrHideAside()
         })
         this.imgDivision.addEventListener('click', () => {
+            // 在蒙版消失之前，所有按钮不能点击
+            if(this.originStatus)return
             if (this.zoomStatus == 'zoomIn') {
                 this.zoomOut();
                 this.zoomStatus = 'zoomOut';
@@ -446,11 +449,11 @@ class GarbageStationClient {
         }
         this.swiper.slideTo(info.index);
 
-        this.originImg.classList.remove('fadeOut');
-        this.originImg.classList.add('fadeIn');
+        $(this.originImg).fadeIn(() => {
+            this.originStatus = true
+        })
+        $(this.hwBar).fadeOut()
 
-        this.hwBar.classList.remove('fadeIn');
-        this.hwBar.classList.add('fadeOut');
 
         this.swiperStatus = true;
 
@@ -492,7 +495,7 @@ client.login((http: HowellAuthHttp) => {
         },
         up: {
             isAuto: false,
-            isLock:true,
+            isLock: true,
             callback: function () {
                 // 上拉事件
                 miniRefresh.endUpLoading(true);
