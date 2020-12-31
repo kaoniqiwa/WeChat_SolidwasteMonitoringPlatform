@@ -262,15 +262,18 @@ namespace GarbageCondition {
 								new GarbageCondition
 									.IllegalDropOrder().init();
 								new GarbageCondition.DivisionGarbageSpecification().init();
-								miniRefresh.endDownLoading(true);
+								miniRefresh.endDownLoading();
 							}, 500);
 						}
 					},
 					up:{
-						isAuto:false
+						isLock:true,
+						callback:()=>{
+							miniRefresh.endUpLoading(true);
+						}
 					}
-				});				
-				miniRefresh.endDownLoading(true);
+				});
+				
 
 			} catch (error) {
 				console.error(error);

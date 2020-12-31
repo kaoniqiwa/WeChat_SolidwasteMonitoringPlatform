@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生活垃圾监管平台</title>
+    <link rel="stylesheet" href="../assets/howell.font/howell.font.css">
+    <link crossorigin="anonymous"
+        integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+        href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
+    <style>
+        .weui-cells__group_form .weui-vcode-btn {
+            color: #3a93ff;
+        }
+        .weui-cells__group_form .weui-vcode-btn:active {
+            color: #3a93ff;
+        }
+
+        .weui-btn_primary {
+            background-color: #3a93ff;
+            color: white;
+        }
+        button:disabled {
+            color: white !important;
+            background-color: #f2f2f2 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="weui-form">
+            <div class="weui-form__text-area">
+                <h2 class="weui-form__title">手机号注册</h2>
+            </div>
+            <div class="weui-form__control-area">
+                <div class="weui-cells__group weui-cells__group_form">
+                    <div class="weui-cells weui-cells_form">
+                        <div class="weui-cell weui-cell_active">
+                            <div class="weui-cell__hd"><label class="weui-label">手机号</label></div>
+                            <div class="weui-cell__bd">
+                                <input class="weui-input" id="phone" autocomplete="off" autofocus type="number"
+                                    pattern="[0-9]*" placeholder="手机号" value="" />
+                            </div>
+
+                        </div>
+                        <div class="weui-cell weui-cell_active weui-cell_vcode">
+                            <div class="weui-cell__hd"><label class="weui-label">验证码</label></div>
+                            <div class="weui-cell__bd">
+                                <input class="weui-input" autocomplete="off" type="number" pattern="[0-9]*" id="code"
+                                    placeholder="验证码" maxlength="4" />
+                            </div>
+                            <div class="weui-cell__ft">
+                                <button class="weui-btn weui-btn_default weui-vcode-btn"
+                                    id="get_code">发送验证码</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="weui-form__opr-area">
+                <button class="weui-btn weui-btn_primary" id="to_submit">确定</button>
+            </div>
+        </div>
+        <div id="js_toast" style="display: none;">
+            <div class="weui-mask_transparent"></div>
+            <div class="weui-toast">
+                <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+                <p class="weui-toast__content" id="alertMsg"></p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script src="./ts/Register.ts"></script>

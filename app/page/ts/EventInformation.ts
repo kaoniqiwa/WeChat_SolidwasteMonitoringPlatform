@@ -19,9 +19,11 @@ export namespace EventInformationPage {
 
         init() {
             let btn = document.getElementById("back__btn")
-            btn.addEventListener("click", () => {
-                location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
-            });
+            if (btn) {
+                btn.addEventListener("click", () => {
+                    location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
+                });
+            }
         }
 
 
@@ -33,24 +35,29 @@ export namespace EventInformationPage {
         }
 
         fillDetail(item: IllegalDropEventRecord) {
-            const police__type = document.getElementById('police__type'),
-                camera__name = document.getElementById('camera__name'),
-                station__name = document.getElementById('station__name'),
-                rc__name = document.getElementById('rc__name'),
-                police__time = document.getElementById('police__time'),
-                detail_img = document.getElementById('detail_img');
-            police__type.innerText = EventTypeEnum[item.EventType];
+            const police__type = document.getElementById('police__type')!,
+                camera__name = document.getElementById('camera__name')!,
+                station__name = document.getElementById('station__name')!,
+                rc__name = document.getElementById('rc__name')!,
+                police__time = document.getElementById('police__time')!,
+                detail_img = document.getElementById('detail_img') as HTMLImageElement;
+            if (police__type) {
+                police__type.innerText = EventTypeEnum[item.EventType];
+            }
             camera__name.innerText = item.ResourceName;
             station__name.innerText = item.Data.StationName;
             rc__name.innerText = item.Data.DivisionName;
             police__time.innerText = dateFormat(new Date(item.EventTime), 'yyyy-MM-dd HH:mm:ss');
-
-            detail_img?.setAttribute('src', this.service.medium.getData(item.ImageUrl));
+            let url = this.service.medium.getData(item.ImageUrl);
+            if (!url) {
+                url = "./img/black.png";
+            }
+            detail_img.src = url;
         }
     }
 
     new HowellHttpClient.HttpClient().login((http: HowellAuthHttp) => {
-        
+
         const user = new SessionUser();
 
         const record = new EventDetail({
