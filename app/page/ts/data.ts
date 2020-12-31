@@ -9,6 +9,7 @@ import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 
 
 declare var MiniRefresh: any;
+declare var weui:any;
 
 namespace GarbageCondition {
 
@@ -253,10 +254,10 @@ namespace GarbageCondition {
 		init() {
 			try {
 				var miniRefresh = new MiniRefresh({
-					container: '#refreshContainer',					
+					container: '#refreshContainer',
 					down: {
 						callback: function () {
-							setTimeout(() => {								
+							setTimeout(() => {
 								// 下拉事件
 								new GarbageCondition.IllegalDropHistory().init();
 								new GarbageCondition
@@ -266,14 +267,14 @@ namespace GarbageCondition {
 							}, 500);
 						}
 					},
-					up:{
-						isLock:true,
-						callback:()=>{
+					up: {
+						isLock: true,
+						callback: () => {
 							miniRefresh.endUpLoading(true);
 						}
 					}
 				});
-				
+
 
 			} catch (error) {
 				console.error(error);
@@ -326,10 +327,36 @@ namespace GarbageCondition {
 	}
 
 
+	class Page {
+		init() {
+			var showDatePicker = document.getElementById("showDatePicker")!;
 
+			showDatePicker.addEventListener('click', function () {
+				weui.datePicker({
+					start: 2020,
+					end: new Date().getFullYear(),
+					onChange: function (result) {
+						console.log(result);
+						console.log(1);
+					},
+					onConfirm: function (result) {
+						console.log(result);
+						console.log(2);
+					},
+					title: '请选择日期'
+				});
+			});
+		}
+	}
+	new Page().init();
 }
 
+
+
+
 new HowellHttpClient.HttpClient().login(async (http: HowellAuthHttp) => {
+
+
 
 	new GarbageCondition.IllegalDropHistory().init();
 	new GarbageCondition.Refresh().init();

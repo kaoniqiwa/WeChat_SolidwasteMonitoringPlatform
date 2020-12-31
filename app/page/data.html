@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>生活垃圾监管平台</title>
     <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
-
+    <link crossorigin="anonymous"
+    integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+    href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
     <link href="./css/index.css" rel="stylesheet" />
     <link href="./css/data.css" rel="stylesheet" />
 
@@ -18,12 +20,23 @@
     <style>
         .top5-list-wrap {
             height: 30px;
+            display: flow-root;
         }
     </style>
 </head>
 
 <body>
-    <div class="minirefresh-wrap" id="refreshContainer">
+    <div class="bar header">
+        <div class="content ">
+            <div class="left">
+                2020年12月31日
+            </div>
+            <div class="btn right filter" id="showDatePicker">
+                选择日期<i class="howell-icon-screen"></i>
+            </div>
+        </div>
+    </div>
+    <div class="minirefresh-wrap" id="refreshContainer" style="top: 40px;">
         <div class="minirefresh-scroll">
             <div class="page">
                 <div class="card count">
@@ -67,6 +80,7 @@
     </div>
 </body>
 <script src="../../minirefresh/minirefresh.js"></script>
+<script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
 <script src="./ts/data.ts"></script>
 
 </html>

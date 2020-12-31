@@ -24,6 +24,10 @@ export namespace EventInformationPage {
                     location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
                 });
             }
+            let max = document.getElementById("max")!;
+            max.addEventListener("click", () => {
+                max.style.display = '';
+            });
         }
 
 
@@ -53,6 +57,57 @@ export namespace EventInformationPage {
                 url = "./img/black.png";
             }
             detail_img.src = url;
+            detail_img.onload = () => {
+                const frame = document.getElementById("frame")! as HTMLDivElement;
+                this.drawFrame(frame, item, detail_img.offsetWidth, detail_img.offsetHeight);
+            };
+            detail_img.addEventListener("click", () => {
+                const max = document.getElementById("max")!;
+                max.innerHTML = detail_img.parentElement!.innerHTML;
+
+                max.style.display = "block";
+                const frame = max.getElementsByClassName("frame")[0] as HTMLDivElement;
+                const img = max.getElementsByTagName("img")[0] as HTMLImageElement;
+                this.drawFrame(frame, item, img.offsetWidth, img.offsetHeight);
+                img.style.marginTop = "50%";
+                frame.style.marginTop = "50%";
+            });
+        }
+
+        drawFrame(element: HTMLDivElement, item: IllegalDropEventRecord, width: number, height: number) {
+            if (item && item.Data && item.Data.Objects) {
+                const objects = item.Data.Objects;
+
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d")!;
+                ctx.strokeStyle = "red";
+                for (let i = 0; i < objects.length; i++) {
+                    const obj = objects[i];
+                    if (!obj.Polygon)
+                        continue;
+                    ctx.beginPath();
+                    const first = obj.Polygon[0];
+                    let x = first.X * width;
+                    let y = first.Y * height;
+
+                    ctx.moveTo(x, y);
+
+                    for (let j = obj.Polygon.length - 1; j >= 0; j--) {
+                        const point = obj.Polygon[j];
+                        x = point.X * width;
+                        y = point.Y * height;
+                        ctx.lineTo(x, y);
+                        ctx.stroke();
+                    }
+                    ctx.closePath();
+
+
+                    element.style.backgroundImage = "url('" + ctx.canvas.toDataURL() + "')";
+
+                }
+            }
         }
     }
 

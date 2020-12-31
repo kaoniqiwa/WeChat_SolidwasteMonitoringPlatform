@@ -1,4 +1,8 @@
 
+body{
+    touch-action: pan-y;
+}
+
 .page{
     width: calc(100% - 24px);
     padding: 12px;
