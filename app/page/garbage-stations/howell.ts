@@ -482,6 +482,7 @@ client.login((http: HowellAuthHttp) => {
     let MiniRefresh = Reflect.get(window, 'MiniRefresh')
     let miniRefresh = new MiniRefresh({
         container: '#minirefresh',
+        isLockX:false,
         down: {
             callback: function () {
                 // 下拉事件
