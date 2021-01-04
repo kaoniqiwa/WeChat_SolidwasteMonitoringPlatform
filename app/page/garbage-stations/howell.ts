@@ -33,7 +33,8 @@ class GarbageStationClient {
     originImg: HTMLDivElement;
     hwBar: HTMLDivElement
 
-    zoomStatus: string = 'zoomIn';
+    // 一开始是缩小状态
+    zoomStatus: string = 'zoomOut';
     swiper: typeof Swiper;
     swiperStatus: boolean = false;
     originStatus: boolean = false;
@@ -381,59 +382,64 @@ class GarbageStationClient {
             }
         }
     }
-    zoomOut() {
+    zoomIn() {
         for (let [k, v] of this.garbageElements) {
             let contentCard = v.Element;
             contentCard.querySelectorAll('.content__img').forEach((element: HTMLElement) => {
-                element.classList.add('zoomOut');
+                element.classList.add('zoomIn');
             });
 
             contentCard.querySelectorAll('.swiper-slide').forEach((element: HTMLElement) => {
-                element.classList.add('zoomOut');
+                element.classList.add('zoomIn');
             });
             contentCard.querySelectorAll('.content__title__badage').forEach((element: HTMLElement) => {
-                element.classList.add('zoomOut');
+                element.classList.add('zoomIn');
             });
             contentCard.querySelectorAll('.content__footer').forEach((element: HTMLElement) => {
-                element.classList.add('zoomOut');
+                element.classList.add('zoomIn');
             });
 
             let container = contentCard.querySelector('.swiper-container');
             container.scrollLeft = 0;
-            container.classList.add('zoomOut');
+            container.classList.add('zoomIn');
 
             let pagination = contentCard.querySelector('.swiper-pagination');
 
             v.swiper = new Swiper(container, { pagination: { el: pagination, type: 'fraction' } })
 
+            v.swiper.pagination.$el.addClass('zoomIn')
+
 
 
         }
     }
-    zoomIn() {
+    zoomOut() {
         for (let [k, v] of this.garbageElements) {
             let contentCard = v.Element;
             contentCard.querySelectorAll('.swiper-slide').forEach((element: HTMLElement) => {
-                element.classList.remove('zoomOut');
+                element.classList.remove('zoomIn');
             });
             contentCard.querySelectorAll('.content__title__badage').forEach((element: HTMLElement) => {
-                element.classList.remove('zoomOut');
+                element.classList.remove('zoomIn');
             });
             contentCard.querySelectorAll('.content__footer').forEach((element: HTMLElement) => {
-                element.classList.remove('zoomOut');
+                element.classList.remove('zoomIn');
             });
 
             contentCard.querySelectorAll('.content__img').forEach((element: HTMLElement) => {
-                element.classList.remove('zoomOut');
+                element.classList.remove('zoomIn');
             });
 
             let container = contentCard.querySelector('.swiper-container');
-            container.classList.remove('zoomOut');
+            container.classList.remove('zoomIn');
 
 
             let swiper = v.swiper;
-            if (swiper)
+            if (swiper){
+                swiper.pagination.$el.removeClass('zoomIn')
                 swiper.destroy();
+            }
+           
             v.swiper = null;
         }
     }
