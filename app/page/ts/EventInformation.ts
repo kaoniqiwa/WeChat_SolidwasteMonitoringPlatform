@@ -21,7 +21,8 @@ export namespace EventInformationPage {
             let btn = document.getElementById("back__btn")
             if (btn) {
                 btn.addEventListener("click", () => {
-                    location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
+                    window.parent.showOrHideAside();
+                    // location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
                 });
             }
             let max = document.getElementById("max")!;
@@ -113,6 +114,9 @@ export namespace EventInformationPage {
 
     new HowellHttpClient.HttpClient().login((http: HowellAuthHttp) => {
 
+
+
+
         const user = new SessionUser();
 
         const record = new EventDetail({
@@ -120,10 +124,16 @@ export namespace EventInformationPage {
             medium: new MediumPicture()
         }, user);
         record.init();
-        const data = record.getData();
-        data.then(x => {
-            record.fillDetail(x.data.Data);
-        });
+        if (window.parent.recordDetails) {
+            console.log("details",window.parent.recordDetails);
+            record.fillDetail(window.parent.recordDetails);
+        }
+        else {
+            const data = record.getData()!;
+            data.then(x => {
+                record.fillDetail(x.data.Data);
+            });
+        }
     });
 
 }

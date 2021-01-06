@@ -4,58 +4,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>生活垃圾监管平台</title>
     <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
     <link href="./css/index.css" rel="stylesheet" />
 
 </head>
 
 <body>
-    
-        <div class="main">
-            <iframe id="main"></iframe>
-        </div>
-        <div class="bar bottom">
-            <ul>
-                <li>
-                    <a class="bar-item" href="data.html">
-                        <div class="howell-icon-chart icon"> </div>
-                        <div>每日数据</div>
-                    </a>
-                </li>
-                <li>
-                    <a class="bar-item" href="./history.html">
-                        <div class="howell-icon-alarm2 icon"> </div>
-                        <div>报警记录</div>
-                    </a>
-                </li>
-                <li>
-                    <a class="bar-item" href="./garbage-stations/howell.html">
-                        <div class="howell-icon-garbage icon"> </div>
-                        <div>垃圾厢房</div>
-                    </a>
-                </li>
-                <li>
-                    <a class="bar-item" href="./map.html">
-                        <div class="howell-icon-map6 icon"> </div>
-                        <div>清运路线</div>
-                    </a>
-                </li>
-                <li>
-                    <a class="bar-item" href="./user.html">
-                        <div class="howell-icon-human icon"> </div>
-                        <div>个人中心</div>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    
+
+    <div class="main">
+        <iframe id="main"></iframe>
+    </div>
+    <div class="bar bottom">
+        <ul>
+            <li>
+                <a class="bar-item" href="data.html">
+                    <div class="howell-icon-chart icon"> </div>
+                    <div>每日数据</div>
+                </a>
+            </li>
+            <li>
+                <a class="bar-item" href="./history.html">
+                    <div class="howell-icon-alarm2 icon"> </div>
+                    <div>报警记录</div>
+                </a>
+            </li>
+            <li>
+                <a class="bar-item" href="./garbage-stations.html">
+                    <div class="howell-icon-garbage icon"> </div>
+                    <div>垃圾厢房</div>
+                </a>
+            </li>
+            <li>
+                <a class="bar-item" href="./map.html">
+                    <div class="howell-icon-map6 icon"> </div>
+                    <div>清运路线</div>
+                </a>
+            </li>
+            <li>
+                <a class="bar-item" href="./user.html">
+                    <div class="howell-icon-human icon"> </div>
+                    <div>个人中心</div>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class='backdrop'></div>
+    <aside class='aside-content details'>
+        <iframe id="aside-details"></iframe>
+    </aside>
 </body>
 
-<script src="./ts/index.ts"></script>
-<script>
-    function pageJump(url){
-        document.location.href = url;
+<script type="text/javascript">
+    var recordDetails = null;
+    function showOrHideAside(url) {
+
+
+
+        var asideContent = document.querySelector('.aside-content');
+        var backdrop = document.querySelector('.backdrop');
+        if (asideContent.classList.contains('active')) {
+            asideContent.classList.remove('active');
+            backdrop.style.display = 'none'
+        } else {
+            backdrop.style.display = 'block'
+            asideContent.classList.add('active');
+            console.log(url);
+            var details = document.getElementById("aside-details");
+            details.src = url;
+
+        }
     }
 </script>
+
+<script src="./ts/index.ts"></script>
+
 </html>

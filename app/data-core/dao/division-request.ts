@@ -26,8 +26,8 @@ export namespace DivisionRequestDao {
                         return this.divisionService.statisticNumber(divisionsId);
                 }
 
-                getDivisionEventNumbers(divisionsId: string, timeUnit: TimeUnitEnum) {
-                        const param = new GetDivisionEventNumbersParams(), dayTime = this.TheDayTime(new Date());
+                getDivisionEventNumbers(divisionsId: string, timeUnit: TimeUnitEnum, date:Date = new Date()) {
+                        const param = new GetDivisionEventNumbersParams(), dayTime = this.TheDayTime(date);
                         param.TimeUnit = timeUnit;
                         param.BeginTime = dayTime.begin.toISOString();
                         param.EndTime = dayTime.end.toISOString();

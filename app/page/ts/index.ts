@@ -3,6 +3,8 @@ import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 
 namespace Navigation {
+    
+
     const items = document.getElementsByClassName("bar-item");
     const iframe = document.getElementById("main") as HTMLIFrameElement;
     for (let i = 0; i < items.length; i++) {
@@ -17,6 +19,10 @@ namespace Navigation {
             return false;
         };
     }
+
+    
+
+
     var User = new SessionUser();
     let index = 0;
     var search = document.location.search.substr(1).toLocaleLowerCase();
@@ -44,11 +50,15 @@ namespace Navigation {
         location.href = "./register.html";
     }
     if (querys.eventid) {
-        location.href = "./event-details.html?openid=" + querys.openid + "&eventid=" + querys.eventid;
+        //location.href = "./event-details.html?openid=" + querys.openid + "&eventid=" + querys.eventid;
+        querys.index = "1";
+        window.showOrHideAside("./event-details.html?openid=" + querys.openid + "&eventid=" + querys.eventid);
+        
+        
     }
     if (querys.index) {
         index = parseInt(querys.index);
     }
-
+    console.log(index);
     (items[index] as HTMLLinkElement).click();
 }

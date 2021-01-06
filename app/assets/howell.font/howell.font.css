@@ -2304,3 +2304,18 @@ a .howell-icon-flip-vertical:before {
 .howell-icon-dustcart:before {
     content: "\f329";
 }
+.howell-icon-mixlittering:before {
+    content: "\f330";
+}
+.howell-icon-nolittering:before {
+    content: "\f331";
+}
+.howell-icon-fullgarbage:before {
+    content: "\f332";
+}
+.howell-icon-videodownload:before {
+    content: "\f333";
+}
+.howell-icon-picturedownload:before {
+    content: "\f334";
+}

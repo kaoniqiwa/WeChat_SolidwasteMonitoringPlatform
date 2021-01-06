@@ -1,4 +1,3 @@
-
 declare namespace Global {
     export type Dictionary<T> = { [key: string]: T; }
 
@@ -10,7 +9,10 @@ declare class Guid {
 }
 
 declare interface Window {
-    pageJump: (url: string) => void;
+    recordDetails?:any;
+    showOrHideAside(url: string);
 }
+
+
 
 declare function getAllPropertyNames<T>(t: T): string[];

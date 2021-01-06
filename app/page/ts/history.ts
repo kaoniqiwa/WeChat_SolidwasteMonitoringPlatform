@@ -18,17 +18,27 @@ import { DivisionRequestService } from "../../data-core/repuest/division.service
 
 
 declare var MiniRefresh: any;
+declare var weui: any;
 
 export namespace EventHistoryPage {
 
+    var date = new Date();
     var PageSize = 20;
     var element = {
+        date: document.getElementById("date")!,
+        datePicker: document.getElementById("showDatePicker")!,
+        aside: {
+            divisions: document.querySelector('.aside-content.divisions') as HTMLDivElement,
+            details: document.querySelector('.aside-content.details') as HTMLDivElement,
+            backdrop: document.querySelector('.backdrop') as HTMLDivElement,
+        },
+        filterBtn: document.querySelector('.btn.filter') as HTMLDivElement,
         IllegalDrop: {
-            list: document.getElementById("illegalDrop"),
-            totalRecordCount: document.getElementById("illegalDropTotalRecordCount"),
-            recordCount: document.getElementById("illegalDropRecordCount"),
-            date: document.getElementById("illegalDropDate")
-        }
+            list: document.getElementById("illegalDrop")!,
+            totalRecordCount: document.getElementById("illegalDropTotalRecordCount")!,
+            recordCount: document.getElementById("illegalDropRecordCount")!,
+            date: document.getElementById("date")!
+        },
 
     }
     var MiniRefreshId = {
@@ -58,15 +68,12 @@ export namespace EventHistoryPage {
 
         //记录所有的居委会
         divisions: Map<string, Division> = new Map();
-        filterBtn: HTMLDivElement;
-        asideContent: HTMLDivElement;
-        backdrop: HTMLDivElement;
         asideMain?: HTMLDivElement;
         asideTemplate: HTMLTemplateElement | null;
         selectedDivisions: Map<string, any> = new Map();
         garbageElements: Map<string, any> = new Map();
         footerReset: HTMLDivElement;
-    footerConfirm: HTMLDivElement;
+        footerConfirm: HTMLDivElement;
 
 
         /**
@@ -97,17 +104,12 @@ export namespace EventHistoryPage {
                 date: new Date()
             }
 
-            this.asideContent = document.querySelector('.aside-content') as HTMLDivElement;
 
-            this.backdrop = document.querySelector('.backdrop') as HTMLDivElement;
-
-            this.filterBtn = document.querySelector('.btn.filter') as HTMLDivElement;
-
-            this.filterBtn.addEventListener('click', () => {
-                this.showOrHideAside()
+            element.filterBtn.addEventListener('click', () => {
+                this.showOrHideDivisionsAside()
             })
-            this.backdrop.addEventListener('click', () => {
-                this.showOrHideAside()
+            element.aside.backdrop.addEventListener('click', () => {
+                this.showOrHideDivisionsAside()
             })
             this.asideTemplate = document.querySelector('#aside-template') as HTMLTemplateElement;
 
@@ -156,15 +158,20 @@ export namespace EventHistoryPage {
                 this.asideMain!.appendChild(info)
             }
         }
-        showOrHideAside() {
-            if (this.asideContent.classList.contains('active')) {
-                this.asideContent.classList.remove('active');
-                this.backdrop.style.display = 'none'
+        showOrHideDivisionsAside() {
+
+            if (element.aside.divisions.classList.contains('active')) {
+                element.aside.divisions.classList.remove('active');
+
+                element.aside.backdrop.style.display = 'none'
             } else {
-                this.backdrop.style.display = 'block'
-                this.asideContent.classList.add('active')
+                element.aside.backdrop.style.display = 'block'
+                element.aside.divisions.classList.add('active')
             }
         }
+
+
+
         resetSelected() {
             console.log('reset', this.selectedDivisions)
             for (let [k, v] of this.selectedDivisions) {
@@ -191,7 +198,7 @@ export namespace EventHistoryPage {
                     v.Element.style.display = 'none'
                 }
             }
-            this.showOrHideAside();
+            this.showOrHideDivisionsAside();
 
         }
         async loadData() {
@@ -240,7 +247,7 @@ export namespace EventHistoryPage {
             let template = new Template();
 
             template.img.src = this.service.medium.getData(record.ImageUrl) as string;
-            template.title.innerHTML = record.Data.DivisionId + record.Data.DivisionName;
+            template.title.innerHTML = record.Data.DivisionName;
             template.footer.innerHTML = '';//record.ResourceName;
             template.remark.innerHTML = dateFormat(new Date(record.EventTime), 'HH:mm:ss');
 
@@ -250,11 +257,23 @@ export namespace EventHistoryPage {
             item.setAttribute('divisionid', record.Data.DivisionId)
             item.innerHTML = template.element.innerHTML;
             item.getElementsByTagName("img")[0].addEventListener("error", function () {
-                this.src = "./img/black.png"
+                this.src = "../../img/black.png"
             });
+            
             item.addEventListener("click", () => {
-                if (window.parent.pageJump)
-                    window.parent.pageJump("./event-details.html?openid=" + this.user.WUser.OpenId + "&eventid=" + record.EventId);
+                
+                window.parent.recordDetails = record;
+                const url = "./event-details.html?openid=" + this.user.WUser.OpenId + "&eventid=" + record.EventId;
+                // console.log(window.parent);
+                window.parent.showOrHideAside(url);
+                // const aside_details = document.getElementById("aside-details") as HTMLIFrameElement;
+                // aside_details.src = url;
+                // this.showOrHideDetailsAside();
+                // if (window.parent.pageJump)
+                //     window.parent.pageJump(url);
+                // else {
+                //     window.parent.document.location.href = url;
+                // }
             });
             this.garbageElements.set(record.EventId, {
                 Element: item,
@@ -264,17 +283,17 @@ export namespace EventHistoryPage {
             return item;
         }
 
-
+        datas: Global.Dictionary<IllegalDropEventRecord> = {};
 
         view(date: Date, list: PagedList<IllegalDropEventRecord>) {
             for (let i = 0; i < list.Data.length; i++) {
                 const data = list.Data[i];
+                this.datas[data.EventId] = data;
                 let item = this.convert(data);
                 element.IllegalDrop.list.appendChild(item);
             }
             element.IllegalDrop.totalRecordCount.innerHTML = list.Page.TotalRecordCount.toString();
-            element.IllegalDrop.recordCount.innerHTML = (list.Page.RecordCount * list.Page.PageIndex).toString();
-            element.IllegalDrop.date.innerHTML = dateFormat(date, 'yyyy年MM月dd日');
+            element.IllegalDrop.recordCount.innerHTML = (list.Page.PageSize * (list.Page.PageIndex-1) + list.Page.RecordCount).toString();
 
         }
 
@@ -282,14 +301,14 @@ export namespace EventHistoryPage {
             element.IllegalDrop.list.innerHTML = "";
             this.pageIndex = 1;
 
-            const begin = new Date(this.filter.date.getTime());
+            const begin = new Date(date.getTime());
             begin.setHours(0, 0, 0);
-            const end = new Date(this.filter.date.getTime());
+            const end = new Date(date.getTime());
             end.setHours(23, 59, 59);
             let page = await this.getData(begin, end, this.pageIndex)
             console.log('page', page)
 
-            this.view(this.filter.date, page.Data);
+            this.view(date, page.Data);
         }
 
         init() {
@@ -308,13 +327,13 @@ export namespace EventHistoryPage {
                     up: {
                         isAuto: true,
                         callback: async () => {
-                            const begin = new Date(this.filter.date.getTime());
+                            const begin = new Date(date.getTime());
                             begin.setHours(0, 0, 0);
-                            const end = new Date(this.filter.date.getTime());
+                            const end = new Date(date.getTime());
                             end.setHours(23, 59, 59);
                             var data = await this.getData(begin, end, ++this.pageIndex)
                             console.log('data', data)
-                            this.view(this.filter.date, data.Data);
+                            this.view(date, data.Data);
 
                             miniRefresh.endUpLoading(data.Data.Page.PageIndex == data.Data.Page.PageCount);
                         }
@@ -330,10 +349,36 @@ export namespace EventHistoryPage {
 
 
     export class Page {
+        initDatePicker() {
+            try {
 
+                element.datePicker.addEventListener('click', () => {
+                    weui.datePicker({
+                        start: new Date(2020, 12 - 1, 1),
+                        end: new Date(),
+                        onChange: function (result: any) {
+
+                        },
+                        onConfirm: (result: any) => {
+                            console.log(result);
+
+                            date = new Date(result[0].value, result[1].value - 1, result[2].value);
+                            this.loadData();
+                            this.viewDatePicker(date);
+                        },
+                        title: '请选择日期'
+                    });
+                });
+            } catch (ex) {
+                console.error(ex);
+            }
+        }
+        viewDatePicker(date: Date) {
+            element.date.innerHTML = dateFormat(date, "yyyy年MM月dd日");
+        }
         loadNavigation() {
 
-            var navigation = document.getElementById("navigation");
+            var navigation = document.getElementById("navigation")!;
             var lis = navigation.getElementsByTagName("li");
             for (let i = 0; i < lis.length; i++) {
                 lis[i].addEventListener("click", function () {
@@ -348,31 +393,24 @@ export namespace EventHistoryPage {
                         (tabs[i] as HTMLElement).style.display = '';
                     }
 
-                    let tab = document.getElementById(this.getAttribute("tab"));
+                    let tab = document.getElementById(this.getAttribute("tab")!)!;
                     tab.style.display = "block";
                 });
             }
         }
 
+        loadData(){
+            if(this.record)
+            {
+                this.record.refresh();
+            }
+        }
+
+        record?:IllegalDropEvent;
+
         init() {
 
-            //         var showDatePicker = document.getElementById("showDatePicker");
-
-            // showDatePicker.addEventListener('click', function () {
-            //     weui.datePicker({
-            //         start: 2020,
-            //         end: new Date().getFullYear(),
-            //         onChange: function (result) {
-            //             console.log(result);
-            //             console.log(1);
-            //         },
-            //         onConfirm: function (result) {
-            //             console.log(result);
-            //             console.log(2);
-            //         },
-            //         title: '请选择日期'
-            //     });
-            // });
+            this.viewDatePicker(new Date());
 
             const eventId = getQueryVariable('eventid');
             // if (eventId) {
@@ -383,23 +421,26 @@ export namespace EventHistoryPage {
             // else {
 
             this.loadNavigation();
+            this.initDatePicker();
             new HowellHttpClient.HttpClient().login((http: HowellAuthHttp) => {
 
                 const user = new SessionUser();
 
-                const record = new IllegalDropEvent({
+                this.record = new IllegalDropEvent({
                     division: new DivisionRequestService(http),
                     event: new EventRequestService(http),
                     medium: new MediumPicture()
                 }, user);
-                record.init();
-                record.loadAside();
+                this.record.init();
+                this.record.loadAside();
             });
             // }
         }
     }
 }
-new EventHistoryPage.Page().init();
+const page = new EventHistoryPage.Page();
+page.viewDatePicker(new Date());
+page.init();
 
 
 

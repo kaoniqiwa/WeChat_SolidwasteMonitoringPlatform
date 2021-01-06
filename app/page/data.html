@@ -7,32 +7,32 @@
     <title>生活垃圾监管平台</title>
     <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
     <link crossorigin="anonymous"
-    integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
-    href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
+        integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+        href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
     <link href="./css/index.css" rel="stylesheet" />
     <link href="./css/data.css" rel="stylesheet" />
 
-    <link href="../../minirefresh/minirefresh.css" rel="stylesheet" />
-
+    <link href="../../minirefresh/minirefresh.css" rel="stylesheet" />    
     <script crossorigin="anonymous" integrity="sha384-xtrmUNWJ2tdS4FJyVhTG4xpPXkfHBFY36SOeegdD40rRPQOCNBfiaxPY1ji+RKS2"
         src="https://lib.baomitu.com/echarts/3.8.5/echarts.min.js"></script>
-    
+
     <style>
         .top5-list-wrap {
             height: 30px;
             display: flow-root;
+            width: calc(100% - 28px);
         }
     </style>
 </head>
 
-<body>
+<body ontouchstart>
     <div class="bar header">
         <div class="content ">
-            <div class="left">
+            <div class="left" id="date">
                 2020年12月31日
             </div>
             <div class="btn right filter" id="showDatePicker">
-                选择日期<i class="howell-icon-screen"></i>
+                <i class="howell-icon-calendar" style="font-weight: bold;"></i>
             </div>
         </div>
     </div>
@@ -41,7 +41,7 @@
             <div class="page">
                 <div class="card count">
                     <div class="text title">
-                        今日乱丢垃圾
+                        乱丢垃圾
                     </div>
                     <div class="content">
                         <span class="value" id="illegalDrop">0</span>
@@ -50,7 +50,7 @@
                 </div>
                 <div class="card count">
                     <div class="text title">
-                        今日混合投放
+                        混合投放
                     </div>
                     <div class="content">
                         <span class="value" id="hybridPush">0</span>
@@ -59,7 +59,7 @@
                 </div>
                 <div class="card top">
                     <div class="text title">
-                        今日乱丢垃圾行为排行
+                        乱丢垃圾行为排行
                     </div>
                     <div class="content top_content">
                         <div class="body" id="top">
@@ -69,7 +69,7 @@
                 </div>
                 <div class="card chart">
                     <div class="text title">
-                        今日乱丢垃圾图表
+                        乱丢垃圾图表
                     </div>
                     <div class="content" id="chart">
 

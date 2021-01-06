@@ -1,16 +1,99 @@
 <!DOCTYPE html>
-<html lang="zh-cmn-Hans">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-    <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
-    <link href="./css/index.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>生活垃圾监管平台</title>
+    <link rel="stylesheet" href="./css/swiper.min.css" type='text/css'>
+    <link rel="stylesheet" href="../assets/howell.font/howell.font.css" type='text/css'>
+    <link rel="stylesheet" href="../../minirefresh/minirefresh.css" type='text/css'>
+    <link rel="stylesheet" href="./css/garbagestations.css" type='text/css'>
+    
+    
+    <link rel="stylesheet" href="./css/index.css" type='text/css'>
+    <!-- <script src="https://unpkg.com/swiper/swiper-bundle.js"></script> -->
+    <script type="text/javascript" src="../assets/swiper-bundle.js?v=6.4.5"></script>
+    <script src="../../minirefresh/minirefresh.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 
 </head>
 
 <body>
-garbage-stations
+
+
+
+    <header class='hw-bar bar header'>
+        <div class="weui-search-bar" id="searchBar">
+            <i id="btn_search"></i>
+            <input type="search" id="searchInput" placeholder="搜索" />
+        </div>
+        <div class="title" id="img_division">            
+            <span class="howell-icon-list"></span>
+        </div>
+        <div class="title" id="btn_division">
+            居委
+            <span class="howell-icon-screen"></span>
+        </div>
+    </header>
+    <main class='hw-content'>
+        <div id="minirefresh" class="minirefresh-wrap">
+            <div class="minirefresh-scroll">
+                <div id="content">
+                    <template id='card-template'>
+                        <div class='hw-content__card'>
+                            <div class='content__title'>
+                                <div class="content__title__head"></div>
+                                <div class="content__title__badage">正常</div>
+                            </div>
+                            <div class='content__img'>
+                                <div class="swiper-container">
+                                    <div class="swiper-wrapper">
+                                        <div class='swiper-slide'>
+                                            <img src="../../img/black.png" alt="">
+                                        </div>
+                                    </div>
+                                    <div class="swiper-pagination"></div>
+                                </div>
+
+                            </div>
+                            <div class='content__footer'>
+                                <div class="division-name"></div>
+                                <div class="illegalDrop-number"><i class="howell-icon-nolittering"></i></div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div class='backdrop'></div>
+    <aside class='aside-content'>
+        <header class='aside-title'>
+            居委
+        </header>
+        <main class='aside-main'>
+            <template id='aside-template'>
+                <div class='aside-item'>西江湾路居委会</div>
+            </template>
+        </main>
+        <footer class='aside-footer'>
+            <div class='footer-reset'>重置</div>
+            <div class='footer-confirm'>确认</div>
+        </footer>
+    </aside>
+
+    <div class="swiper-container" id="origin-img">
+        <div class="swiper-wrapper"></div>
+        <div class="swiper-pagination"></div>
+    </div>
+
+
+
+
+    <script src="./ts/garbage-station.ts"></script>
 </body>
+
 </html>

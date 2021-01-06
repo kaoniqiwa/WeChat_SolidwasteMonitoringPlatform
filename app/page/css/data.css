@@ -4,16 +4,16 @@ body{
 }
 
 .page{
-    width: calc(100% - 24px);
-    padding: 12px;
+    width: calc(100%);
+    padding-top: 10px;
     
     position: absolute;
 }
 .page .card{
-    border-radius: 15px;
+    border-radius: 2px;
     padding: 16px;
     width: 100%;
-    width: calc(100% - 32px);
+    width: calc(100%);
 }
 
 .card:last-child{
@@ -47,8 +47,10 @@ body{
     color: #3a93ff;
 }
 
-
-.card.top, .card.chart{
+.card.top{
+    height: 335px;
+}
+.card.chart{
     height: 256px;
 }
 .card.top .content, .card.chart .content{
@@ -72,6 +74,7 @@ margin-top: 10px;
     text-align: center;
     margin-right: 10px;
     vertical-align: middle;
+    margin-top: 7px;
     
 }
 .sky-blue-text{
