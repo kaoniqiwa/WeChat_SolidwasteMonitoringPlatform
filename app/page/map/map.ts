@@ -43,7 +43,7 @@ wx.ready(function () {
     });
 
     confirmBtn.addEventListener('click', function () {
-        alert('confirm')
+        
 
         if (selectedData.size == 0) return
         // myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
@@ -56,7 +56,7 @@ wx.ready(function () {
                 var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
                 var speed = res.speed; // 速度，以米/每秒计
                 var accuracy = res.accuracy; // 位置精度
-                alert("获取设备位置latitude" + latitude + "longitude" + longitude + "speed" + speed + "accuracy" + accuracy);
+                
 
                 myLocation = new CesiumDataController.Position(longitude,latitude)
     
@@ -73,6 +73,24 @@ wx.ready(function () {
                 }
                 polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: '#007aff', alpha: 1 });
 
+                reset()
+            },
+            fail:function(){
+                 myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
+                selectPositions[0] = myLocation;    
+        
+                selectedData.forEach((v, k, m) => {
+                    let point: CesiumDataController.Point = dataController.Village.Point.Get(
+                        v.divisionId, v.id)
+                    selectPositions.push(point.position)
+                })
+                if (polyLine) {
+                    // console.log(mapClient.Draw.Routing.Remove)
+                    mapClient.Draw.Routing.Remove(polyLine.id);
+                }
+                polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: '#007aff', alpha: 1 });
+
+                reset()
             }
         });
 
@@ -82,7 +100,6 @@ wx.ready(function () {
         solidWaste.classList.add('slide-fade-leave-to');
         isShow = false;
     
-        reset()
     })
 
 
