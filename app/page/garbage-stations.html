@@ -8,12 +8,15 @@
     <link rel="stylesheet" href="./css/swiper.min.css" type='text/css'>
     <link rel="stylesheet" href="../assets/howell.font/howell.font.css" type='text/css'>
     <link rel="stylesheet" href="../../minirefresh/minirefresh.css" type='text/css'>
-    <link rel="stylesheet" href="./css/garbagestations.css" type='text/css'>
-    
     
     <link rel="stylesheet" href="./css/index.css" type='text/css'>
-    <!-- <script src="https://unpkg.com/swiper/swiper-bundle.js"></script> -->
-    <script type="text/javascript" src="../assets/swiper-bundle.js?v=6.4.5"></script>
+    <link rel="stylesheet" href="./css/garbagestations.css" type='text/css'>
+    <link rel="stylesheet" href="./css/aside.css" type='text/css'>
+    
+    
+    <!-- <script src="https://unpkg.com/swiper/swiper-bundle.js"></script> -->    
+    <script type="text/javascript" src="../assets/swiper.js"></script>
+    
     <script src="../../minirefresh/minirefresh.js"></script>
     <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 
@@ -23,19 +26,36 @@
 
 
 
-    <header class='hw-bar bar header'>
+    <!-- <header class='hw-bar bar header'>
+        <div class="content">
         <div class="weui-search-bar" id="searchBar">
             <i id="btn_search"></i>
             <input type="search" id="searchInput" placeholder="搜索" />
         </div>
-        <div class="title" id="img_division">            
+        <div class="title btn right filter" id="img_division">            
             <span class="howell-icon-list"></span>
         </div>
-        <div class="title" id="btn_division">
+        <div class="title btn right filter" id="btn_division">
             居委
             <span class="howell-icon-screen"></span>
         </div>
-    </header>
+    </div>
+    </header> -->
+    <div class="bar header">
+        <div class="content ">
+            <div class="left weui-search-bar" id="searchBar">
+                <i id="btn_search"></i>
+            <input type="search" id="searchInput" placeholder="搜索" />
+            </div>
+
+            <div class="btn right filter" id="btn_division">
+                居委<i class="howell-icon-screen"></i>
+            </div>
+            <div class="btn right filter" id="img_division">
+                <i class="howell-icon-list" style="font-weight: bold;"></i>
+            </div>
+        </div>
+    </div>
     <main class='hw-content'>
         <div id="minirefresh" class="minirefresh-wrap">
             <div class="minirefresh-scroll">

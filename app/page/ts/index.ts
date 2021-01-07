@@ -3,13 +3,17 @@ import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 
 namespace Navigation {
-    
+
 
     const items = document.getElementsByClassName("bar-item");
     const iframe = document.getElementById("main") as HTMLIFrameElement;
     for (let i = 0; i < items.length; i++) {
         const item = items[i] as HTMLLinkElement;
         item.onclick = function () {
+            const _this = (this as HTMLLinkElement);
+            if (_this.className == "selected") {
+                return false;
+            }
             const selecteds = document.getElementsByClassName("selected");
             for (let i = 0; i < selecteds.length; i++) {
                 selecteds[i].className = '';
@@ -20,7 +24,7 @@ namespace Navigation {
         };
     }
 
-    
+
 
 
     var User = new SessionUser();
@@ -53,8 +57,8 @@ namespace Navigation {
         //location.href = "./event-details.html?openid=" + querys.openid + "&eventid=" + querys.eventid;
         querys.index = "1";
         window.showOrHideAside("./event-details.html?openid=" + querys.openid + "&eventid=" + querys.eventid);
-        
-        
+
+
     }
     if (querys.index) {
         index = parseInt(querys.index);

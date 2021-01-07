@@ -28,11 +28,17 @@ iframe{
 a {
     color:#252525;
      text-decoration:none;
-     background-color: white;
+     background-color: transparent;
+     user-select:none;
+    -webkit-tap-highlight-color: transparent;
     }
+a div{
+    -webkit-tap-highlight-color:transparent
+}
 a:visited {
     text-decoration:none;
-    outline: none;
+    outline: none;    
+    -webkit-tap-highlight-color: transparent;
 }
 a:hover {
     text-decoration:none;
@@ -41,6 +47,7 @@ a:hover {
 a:active {
     color: #3a94ff;
     outline: none;
+    background-color: transparent;
 }
 a:focus{
     outline: none;
@@ -96,6 +103,7 @@ a:focus{
     text-align: center;
     cursor:pointer;
     font-size: 12px;
+    -webkit-tap-highlight-color:transparent;
 }
 .bar ul li a{    
     width: 100%;

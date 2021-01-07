@@ -1,7 +1,11 @@
-export interface Response<T> {
+export interface ResponseBase{
     FaultCode: number;
     FaultReason: string;
     InnerException: ExceptionData;
+    Id:string
+}
+
+export interface Response<T> extends ResponseBase {    
     Data: T;
 }
 

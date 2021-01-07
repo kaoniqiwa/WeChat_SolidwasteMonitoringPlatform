@@ -1,6 +1,9 @@
+import { DivisionRequestDao } from "../../data-core/dao/division-request";
+import { GarbageStationRequestDao } from "../../data-core/dao/garbage-station-request";
 import { Camera } from "../../data-core/model/waste-regulation/camera";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 import { GarbageStation, GetGarbageStationsParams, StationState } from "../../data-core/model/waste-regulation/garbage-station";
+import { IllegalDropEventRecord } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
 import { DivisionRequestService } from "../../data-core/repuest/division.service";
 import { CameraRequestService, GarbageStationRequestService } from "../../data-core/repuest/garbage-station.service";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
@@ -19,6 +22,7 @@ class GarbageStationClient {
     asideMain?: HTMLDivElement;
     divisions: Map<string, Division> = new Map();
     garbageStations: Map<string, GarbageStation> = new Map();
+    illegalDropEventRecords:Map<string, IllegalDropEventRecord> = new Map();
     garbageElements: Map<string, any> = new Map();
     garbageElementsDivision: Map<string, any> = new Map();
 
@@ -47,6 +51,7 @@ class GarbageStationClient {
 
     constructor(private service: {
         garbageStation: GarbageStationRequestService,
+        record:DivisionRequestDao.DivisionRequest,
         division: DivisionRequestService,
         camera: CameraRequestService,
         media: ResourceMediumRequestService
@@ -108,6 +113,12 @@ class GarbageStationClient {
         console.log('厢房', this.garbageStations)
         return 'success'
     }
+
+    LoadIllegalDropEventRecord(){
+        this.service.record.getDivisionStatisticNumber()
+    }
+
+
     LoadDivisionList() {
         var req = new GetDivisionsParams();
         // 将数组 map 化返回
@@ -132,9 +143,9 @@ class GarbageStationClient {
         const request = new GetGarbageStationsParams();
         let mapedStations = new Map()
         return this.service.garbageStation.list(request).then(x => {
-
+            
             x.Data.Data.forEach(data => {
-                mapedStations.set(data.Id, data)
+                mapedStations.set(data.Id, data)                
             })
 
             return mapedStations;
@@ -518,8 +529,8 @@ client.login((http: HowellAuthHttp) => {
             .then((res) => {
                 stationClient.init();
             })
-            .catch((e) => {
-                console.error(`出错了~ ${e}`)
-            })
+            // .catch((e) => {
+            //     console.error(`出错了~ ${e}`)
+            // })
     }
 });
