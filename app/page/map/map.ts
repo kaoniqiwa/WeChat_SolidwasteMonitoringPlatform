@@ -3,10 +3,91 @@ declare namespace mui {
 
     }): void
 }
+
+
+
+
 let showPath: HTMLDivElement = document.querySelector('#show_path') as HTMLDivElement;
 let solidWaste: HTMLDivElement = document.querySelector('#solid_waste') as HTMLDivElement;
 let resetBtn: HTMLElement = document.querySelector('#resetBtn') as HTMLElement;
 let confirmBtn: HTMLElement = document.querySelector('#confirmBtn') as HTMLElement;
+
+
+let $ = Reflect.get(window, '$');
+let wx = Reflect.get(window, 'wx');
+
+$.get(`http://51kongkong.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetJsSdkUiPackage?url=${document.location.toString()}&&appid=wx119358d61e31da01`, function (data: any) {
+
+    console.log(data)
+    wx.config({
+        // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        debug: true,
+        // 必填，公众号的唯一标识
+        appId: $(data).find("JsSdkUiPackage").find("AppId").text(),
+        // 必填，生成签名的时间戳
+        timestamp: $(data).find("JsSdkUiPackage").find("Timestamp").text(), //"" + jsondata.Timestamp,
+        // 必填，生成签名的随机串
+        nonceStr: $(data).find("JsSdkUiPackage").find("NonceStr").text(), // jsondata.NonceStr,
+        // 必填，签名
+        signature: $(data).find("JsSdkUiPackage").find("Signature").text(), // jsondata.Signature,
+        // 必填，需要使用的JS接口列表
+        jsApiList: ['checkJsApi', 'scanQRCode', 'getLocation', 'openLocation']
+    });
+});
+wx.ready(function () {
+    wx.checkJsApi({
+        jsApiList: ['scanQRCode', 'getLocation', 'getLocation', 'openLocation'],
+        success: function (res: any) {
+
+        }
+    });
+
+    confirmBtn.addEventListener('click', function () {
+        alert('confirm')
+
+        if (selectedData.size == 0) return
+        // myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
+        // selectPositions[0] = myLocation;
+
+        wx.getLocation({
+            type: 'gcj02', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+            success: function (res:any) {
+                var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+                var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+                var speed = res.speed; // 速度，以米/每秒计
+                var accuracy = res.accuracy; // 位置精度
+                alert("获取设备位置latitude" + latitude + "longitude" + longitude + "speed" + speed + "accuracy" + accuracy);
+
+                myLocation = new CesiumDataController.Position(longitude,latitude)
+    
+                selectPositions = [myLocation]
+        
+                selectedData.forEach((v, k, m) => {
+                    let point: CesiumDataController.Point = dataController.Village.Point.Get(
+                        v.divisionId, v.id)
+                    selectPositions.push(point.position)
+                })
+                if (polyLine) {
+                    // console.log(mapClient.Draw.Routing.Remove)
+                    mapClient.Draw.Routing.Remove(polyLine.id);
+                }
+                polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: '#007aff', alpha: 1 });
+
+            }
+        });
+
+    
+        solidWaste.className = '';
+        solidWaste.classList.add('slide-fade-leave-active');
+        solidWaste.classList.add('slide-fade-leave-to');
+        isShow = false;
+    
+        reset()
+    })
+
+
+})
+
 
 // 总共有几页
 let pageCount: number;
@@ -69,43 +150,12 @@ resetBtn.addEventListener('click', function () {
     console.log('reset')
     reset()
 })
-confirmBtn.addEventListener('click', function () {
-    console.log('confirm')
-    if(selectedData.size == 0)return
-    myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
-    selectPositions[0] = myLocation;
 
-
-    mapClient.Map?.GetLocation?.(function (res) {
-        console.log(res)
-        myLocation = res;
-        selectPositions[0] = myLocation;
-
-        selectPositions = [myLocation]
-       
-        selectedData.forEach((v, k, m) => {
-            let point: CesiumDataController.Point = dataController.Village.Point.Get(
-                v.divisionId, v.id)
-            selectPositions.push(point.position)
-        })
-        if (polyLine) {
-            // console.log(mapClient.Draw.Routing.Remove)
-            mapClient.Draw.Routing.Remove(polyLine.id);
-        }
-        polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: '#007aff', alpha: 1 });
-    })
-    solidWaste.className = '';
-    solidWaste.classList.add('slide-fade-leave-active');
-    solidWaste.classList.add('slide-fade-leave-to');
-    isShow = false;
-
-    // reset()
-})
 function reset() {
     // 清除所有选中的记录
 
     // 当前页按钮重置
-    document.querySelectorAll('.weui-cell.weui-check__label.active').forEach(div=>{
+    document.querySelectorAll('.weui-cell.weui-check__label.active').forEach(div => {
         div.classList.remove('active')
     })
 
