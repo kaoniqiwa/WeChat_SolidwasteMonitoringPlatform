@@ -43,25 +43,27 @@ wx.ready(function () {
     });
 
     confirmBtn.addEventListener('click', function () {
-        
+        let selectPositions: Array<CesiumDataController.Position> = [];
+        let myLocation: CesiumDataController.Position;
+
+        myLocation = new CesiumDataController.Position(121.45555234063192, 31.27953);
+        selectPositions[0] = myLocation;
 
         if (selectedData.size == 0) return
-        // myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
-        // selectPositions[0] = myLocation;
 
         wx.getLocation({
             type: 'gcj02', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
-            success: function (res:any) {
+            success: function (res: any) {
                 var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
                 var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
                 var speed = res.speed; // 速度，以米/每秒计
                 var accuracy = res.accuracy; // 位置精度
-                
 
-                myLocation = new CesiumDataController.Position(longitude,latitude)
-    
+
+                myLocation = new CesiumDataController.Position(longitude, latitude)
+
                 selectPositions = [myLocation]
-        
+
                 selectedData.forEach((v, k, m) => {
                     let point: CesiumDataController.Point = dataController.Village.Point.Get(
                         v.divisionId, v.id)
@@ -73,33 +75,15 @@ wx.ready(function () {
                 }
                 polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: '#007aff', alpha: 1 });
 
-                reset()
-            },
-            fail:function(){
-                 myLocation = new CesiumDataController.Position(121.45155234063192, 31.23953);
-                selectPositions[0] = myLocation;    
-        
-                selectedData.forEach((v, k, m) => {
-                    let point: CesiumDataController.Point = dataController.Village.Point.Get(
-                        v.divisionId, v.id)
-                    selectPositions.push(point.position)
-                })
-                if (polyLine) {
-                    // console.log(mapClient.Draw.Routing.Remove)
-                    mapClient.Draw.Routing.Remove(polyLine.id);
-                }
-                polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: '#007aff', alpha: 1 });
-
-                reset()
             }
         });
 
-    
+
         solidWaste.className = '';
         solidWaste.classList.add('slide-fade-leave-active');
         solidWaste.classList.add('slide-fade-leave-to');
         isShow = false;
-    
+
     })
 
 
@@ -133,10 +117,8 @@ let selectedData = new Map();
 // 所有操作请求到的数据,用于状态还原
 let storedData = new Map();
 
-let selectPositions = [];
 let polyLine: CesiumDataController.Polyline | null;
 
-let myLocation: CesiumDataController.Position;
 
 // 初始化侧面板显示状态
 isShow ? show() : hide();
@@ -169,9 +151,9 @@ resetBtn.addEventListener('click', function () {
 })
 
 function reset() {
-    // 清除所有选中的记录
+    console.log(selectedData)
 
-    // 当前页按钮重置
+    // 当前页按钮状态重置
     document.querySelectorAll('.weui-cell.weui-check__label.active').forEach(div => {
         div.classList.remove('active')
     })
@@ -312,7 +294,7 @@ client.login((http: HowellAuthHttp) => {
 
 
     let iframe = document.getElementById('iframe') as HTMLIFrameElement;
-    iframe.src = "http://" + window.location.hostname + ":" + window.location.port + "/Amap/map_ts.html?maptype=2D&v=" + (new Date()).toISOString();
+    iframe.src = "http://" + window.location.hostname + ":" + window.location.port + "/Amap/map_ts.html?style=none&maptype=2D&v=" + (new Date()).toISOString();
     mapClient = new CesiumMapClient("iframe");
 
 
@@ -359,3 +341,33 @@ document.addEventListener('touchmove', function () {
     passive: false,
     once: false
 })
+
+// confirmBtn.addEventListener('click', function () {
+
+//     console.log('confirm',selectedData)
+//     if (selectedData.size == 0) return
+//     let selectPositions:Array<CesiumDataController.Position> = [];
+//     let myLocation: CesiumDataController.Position;
+
+//     myLocation = new CesiumDataController.Position(121.45555234063192, 31.27953);
+//     selectPositions[0] = myLocation;
+
+//     selectedData.forEach((v, k, m) => {
+//         let point: CesiumDataController.Point = dataController.Village.Point.Get(
+//             v.divisionId, v.id)
+//         selectPositions.push(point.position)
+//     })
+//     if (polyLine) {
+//         // console.log(mapClient.Draw.Routing.Remove)
+//         mapClient.Draw.Routing.Remove(polyLine.id);
+//     }
+//     polyLine = mapClient.Draw.Routing.Drawing(selectPositions, CesiumDataController.RoutingType.Driving, { color: '#007aff', alpha: 1 });
+
+//     solidWaste.className = '';
+//     solidWaste.classList.add('slide-fade-leave-active');
+//     solidWaste.classList.add('slide-fade-leave-to');
+//     isShow = false;
+
+//     console.log(selectedData)
+
+// })
