@@ -3,7 +3,7 @@ import { DivisionRequestService } from "./division.service";
 import { CameraRequestService, GarbageStationRequestService } from "./garbage-station.service";
 import { HowellAuthHttp } from "./howell-auth-http";
 import { RoleRequestService } from "./role-service";
-import { UserRequestService } from "./user.service";
+import { WeChatRequestService } from "./we-chat.service";
 
 export class Service {
 
@@ -12,21 +12,13 @@ export class Service {
     }
 
 
-    private _user?: UserRequestService;
+    private _user?: WeChatRequestService;
     // 用户信息服务
-    get user(): UserRequestService {
+    get user(): WeChatRequestService {
         if (!this._user) {
-            this._user = new UserRequestService(this.requestService);
+            this._user = new WeChatRequestService(this.requestService);
         }
         return this._user;
-    }
-    private _role?: RoleRequestService;
-    // 角色信息服务
-    get role(): RoleRequestService {
-        if (!this._role) {
-            this._role = new RoleRequestService(this.requestService);
-        }
-        return this._role;
     }
     private _garbageStation?: GarbageStationRequestService;
     // 垃圾厢房服务
