@@ -4,6 +4,27 @@ import { HowellHttpClient } from "../../data-core/repuest/http-client";
 
 namespace Navigation {
 
+    window.recordDetails = null;
+    window.showOrHideAside = function(url) {
+
+
+
+        var asideContent = document.querySelector('.aside-content') as HTMLDivElement;
+        var backdrop = document.querySelector('.backdrop') as HTMLDivElement;
+        if (asideContent.classList.contains('active')) {
+            asideContent.classList.remove('active');
+            backdrop.style.display = 'none'
+        } else {
+            backdrop.style.display = 'block'
+            asideContent.classList.add('active');
+            console.log(url);
+            var details = document.getElementById("aside-details") as HTMLIFrameElement;
+            details.src = url;
+
+        }
+    }
+
+
 
     const items = document.getElementsByClassName("bar-item");
     const iframe = document.getElementById("main") as HTMLIFrameElement;

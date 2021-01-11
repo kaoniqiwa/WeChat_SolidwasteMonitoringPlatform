@@ -8,15 +8,15 @@
     <link rel="stylesheet" href="./css/swiper.min.css" type='text/css'>
     <link rel="stylesheet" href="../assets/howell.font/howell.font.css" type='text/css'>
     <link rel="stylesheet" href="../../minirefresh/minirefresh.css" type='text/css'>
-    
+
     <link rel="stylesheet" href="./css/index.css" type='text/css'>
     <link rel="stylesheet" href="./css/garbagestations.css" type='text/css'>
     <link rel="stylesheet" href="./css/aside.css" type='text/css'>
-    
-    
-    <!-- <script src="https://unpkg.com/swiper/swiper-bundle.js"></script> -->    
+
+
+    <!-- <script src="https://unpkg.com/swiper/swiper-bundle.js"></script> -->
     <script type="text/javascript" src="../assets/swiper.js"></script>
-    
+
     <script src="../../minirefresh/minirefresh.js"></script>
     <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 
@@ -45,7 +45,7 @@
         <div class="content ">
             <div class="left weui-search-bar" id="searchBar">
                 <i id="btn_search"></i>
-            <input type="search" id="searchInput" placeholder="搜索" />
+                <input type="search" id="searchInput" placeholder="搜索" />
             </div>
 
             <div class="btn right filter" id="btn_division">
@@ -79,7 +79,16 @@
                             </div>
                             <div class='content__footer'>
                                 <div class="division-name"></div>
-                                <div class="illegalDrop-number"><i class="howell-icon-nolittering"></i></div>
+                                <div class="static-number">
+                                    <div class="illegalDrop item" title="乱扔垃圾">
+                                        <i class="howell-icon-nolittering"></i>
+                                        <span class="illegalDrop-number">0</span>
+                                    </div>
+                                    <div class="MixedInto item" title="混合投放">
+                                        <i class="howell-icon-mixlittering"></i>
+                                        <span class="MixedInto-number">0</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </template>

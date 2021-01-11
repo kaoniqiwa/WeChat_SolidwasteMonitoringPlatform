@@ -3,7 +3,6 @@ import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { EventRequestService } from "../../data-core/repuest/Illegal-drop-event-record";
 import { SessionUser } from "../../common/session-user";
 import { TheDayTime, TableAttribute, unique, dateFormat, TheDay } from "../../common/tool";
-import { DivisionTypeEnum, EventTypeEnum } from "../../common/enum-helper";
 import { GetEventRecordsParams, IllegalDropEventRecord, IllegalDropEventData } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
 import { GarbageStationRequestDao } from "../../data-core/dao/garbage-station-request";
 import { DivisionRequestDao } from "../../data-core/dao/division-request";

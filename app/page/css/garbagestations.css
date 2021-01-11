@@ -165,6 +165,15 @@ body {
   margin-top: 12px;
   display: flex;
   justify-content: space-between;
+  
+}
+.hw-content .hw-content__card .content__footer .static-number{
+  width: 70px;
+  display: flex;
+  justify-content: space-between;
+}
+.hw-content .hw-content__card .content__footer .static-number{
+  margin-left: 20px;
 }
 .hw-content .hw-content__card .content__footer.zoomOut {
   position: absolute;

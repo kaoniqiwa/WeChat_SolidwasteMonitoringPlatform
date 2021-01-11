@@ -8,8 +8,9 @@ import { SessionUser } from "../../common/session-user";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { User } from "../../data-core/url/user-url";
 import { Division } from "../../data-core/model/waste-regulation/division";
-import { dateFormat } from "../../common/tool";
-
+import { dateFormat, getAllDay } from "../../common/tool";
+import { Service } from "../../data-core/repuest/service";
+import { TimeUnit } from "../../data-core/model/page";
 
 declare var MiniRefresh: any;
 declare var weui: any;
@@ -21,16 +22,26 @@ namespace GarbageCondition {
 
 
 	export class IllegalDropHistory {
+		constructor(private user: SessionUser, private service: Service) {
 
+		}
 
 
 		async getData() {
 			const model = new IllegalDropEventData()
 				, request = new DivisionRequestDao.DivisionRequest()
-				, user = new SessionUser();
+			dateFormat
 			model.datas = new Array();
-			if (user.WUser.Resources && user.WUser.Resources.length) {
-				const data = await request.getDivisionEventNumbers(user.WUser.Resources[0].Id, DivisionRequestDao.TimeUnitEnum.Hour, date);
+			if (this.user.WUser.Resources && this.user.WUser.Resources.length) {
+				const day = getAllDay(date);
+				const data = await this.service.division.eventNumbersHistory({
+
+					PageIndex: 1,
+					PageSize: 999,
+					BeginTime: day.begin.toISOString(),
+					EndTime: day.end.toISOString(),
+					TimeUnit: TimeUnit.Hour
+				}, this.user.WUser.Resources[0].Id)
 				for (var x of data.Data.Data) {
 					for (const y of x.EventNumbers)
 						if (y.EventType == EventTypeEnum.IllegalDrop)
@@ -86,34 +97,26 @@ namespace GarbageCondition {
 		constructor(
 			private page: Page,
 			private user: SessionUser,
-			private divisions: Division[],
-			private service: {
-				division: DivisionRequestDao.DivisionRequest,
-				garbageStation: GarbageStationRequestDao.GarbageStationRequest
-			}
+			private service: Service
 
 		) { }
 
 
-		async getData() {
+		async getData(divisions: Division[]) {
 			const model = new IllegalDropOrderInfo();
 			model.items = new Array();
 			if (this.user.WUser.Resources && this.user.WUser.Resources.length) {
 				if (this.user.WUser.Resources[0].ResourceType == ResourceRoleType.County) {
 
-
-
-
-
-					const divisionIds = this.divisions.filter(x => x.DivisionType == DivisionTypeEnum.Committees).map(x => x.Id);
-
+					const divisionIds = divisions.filter(x => x.DivisionType == DivisionTypeEnum.Committees).map(x => x.Id);
+					console.log("divisionIds", divisionIds);
 
 					const now = new Date();
 					const today = new Date(now.getHours(), now.getMonth() + 1, now.getDate());
 					const dataDate = new Date(date.getHours(), date.getMonth() + 1, date.getDate());
 
 					if (dataDate.getTime() - today.getTime() >= 0) {
-						const responseStatistic = await this.service.division.postDivisionStatisticNumbers(divisionIds);
+						const responseStatistic = await this.service.division.statisticNumberList({ Ids: divisionIds });
 						for (const x of responseStatistic.Data.Data) {
 							const info = new IllegalDropInfo();
 							model.items.push(info);
@@ -125,34 +128,40 @@ namespace GarbageCondition {
 						}
 					}
 					else {
-						for (let i = 0; i < this.divisions.length; i++) {
-							const division = this.divisions[i];
-							if(division.DivisionType == DivisionTypeEnum.County)
+						for (let i = 0; i < divisions.length; i++) {
+							const division = divisions[i];
+							if (division.DivisionType == DivisionTypeEnum.County)
 								continue;
-							const response = await this.service.division.getDivisionEventNumbers(division.Id, DivisionRequestDao.TimeUnitEnum.Day, date);
+							const day = getAllDay(date);
+							const response = await this.service.division.eventNumbersHistory({
+								TimeUnit: TimeUnit.Day,
+								BeginTime: day.begin.toISOString(),
+								EndTime: day.end.toISOString()
+							}, division.Id)
 							const info = new IllegalDropInfo();
 							info.division = division.Name;
 
-							let numbers = response.Data.Data[0].EventNumbers.filter(x=>x.EventType == EventTypeEnum.IllegalDrop);
-							if(numbers && numbers.length > 0)
-							{
+							let numbers = response.Data.Data[0].EventNumbers.filter(x => x.EventType == EventTypeEnum.IllegalDrop);
+							if (numbers && numbers.length > 0) {
 								info.dropNum = numbers[0].DayNumber;
 							}
 							info.unit = "起";
 							model.items.push(info);
 						}
-						
+
 					}
 				}
 				else if (this.user.WUser.Resources[0].ResourceType == ResourceRoleType.Committees) {
-					const responseStations = await this.service.garbageStation.getGarbageStations(this.user.WUser.Resources[0].Id)
-						, stationIds = new Array<string>();
+					const responseStations = await this.service.garbageStation.list({ DivisionId: this.user.WUser.Resources[0].Id })
+					const stationIds = new Array<string>();
+
+
 
 
 					for (const x of responseStations.Data.Data)
 						stationIds.push(x.Id);
 					if (stationIds.length) {
-						const responseStatistic = await this.service.garbageStation.postGarbageStationStatisticNumbers(stationIds);
+						const responseStatistic = await this.service.garbageStation.statisticNumberList({ Ids: stationIds });
 						for (const x of responseStatistic.Data.Data) {
 							const info = new IllegalDropInfo();
 							model.items.push(info);
@@ -202,14 +211,10 @@ namespace GarbageCondition {
 		constructor(
 			private page: Page,
 			private user: SessionUser,
-			private divisions: Division[],
-			private service: {
-				division: DivisionRequestDao.DivisionRequest,
-				garbageStation: GarbageStationRequestDao.GarbageStationRequest
-			}) {
+			private service: Service) {
 
 		}
-		async getData() {
+		async getData(divisions: Division[]) {
 			const model = new Specification();
 
 			model.illegalDropNumber = 0;
@@ -221,11 +226,10 @@ namespace GarbageCondition {
 				if (dataDate.getTime() - today.getTime() >= 0) {
 					// 今天
 
-					const divisionIds = this.divisions.map(y => {
+					const divisionIds = divisions.filter(x => x.DivisionType == DivisionTypeEnum.County).map(y => {
 						return y.Id;
 					});
-					const res = await this.service.division.postDivisionStatisticNumbers(divisionIds);
-
+					const res = await this.service.division.statisticNumberList({ Ids: divisionIds });
 
 					for (let i = 0; i < res.Data.Data.length; i++) {
 						const data = res.Data.Data[i];
@@ -240,21 +244,26 @@ namespace GarbageCondition {
 					}
 				}
 				else {
-					const response = await this.service.division.getDivisionEventNumbers(this.user.WUser.Resources[0].Id, DivisionRequestDao.TimeUnitEnum.Day, date);
+					const day = getAllDay(date);
+					const response = await this.service.division.eventNumbersHistory({
+						TimeUnit: TimeUnit.Day,
+						BeginTime: day.begin.toISOString(),
+						EndTime: day.end.toISOString(),
+					}, this.user.WUser.Resources[0].Id)
 					model.illegalDropNumber = response.Data.Data[0].EventNumbers.filter(x => x.EventType == EventTypeEnum.IllegalDrop)[0].DayNumber;
 					model.hybridPushNumber = response.Data.Data[0].EventNumbers.filter(x => x.EventType == EventTypeEnum.MixedInto)[0].DayNumber;
 				}
 
 			}
 			else if (this.user.WUser.Resources[0].ResourceType == ResourceRoleType.Committees) {
-				const responseStations = await this.service.garbageStation.getGarbageStations(this.user.WUser.Resources[0].Id)
-					, stationIds = new Array<string>();
+				const responseStations = await this.service.garbageStation.list({ DivisionId: this.user.WUser.Resources[0].Id });
+				const stationIds = new Array<string>();
 
 
 				for (const x of responseStations.Data.Data)
 					stationIds.push(x.Id);
 				if (stationIds.length) {
-					const responseData = await this.service.garbageStation.postGarbageStationStatisticNumbers(stationIds);
+					const responseData = await this.service.garbageStation.statisticNumberList({ Ids: stationIds });
 					for (const x of responseData.Data.Data) {
 						for (const v of x.TodayEventNumbers)
 							if (v.EventType == EventTypeEnum.IllegalDrop)
@@ -271,9 +280,9 @@ namespace GarbageCondition {
 			return [input.illegalDropNumber, 0];
 		}
 
-		async init() {
-			const datas = await this.getData(),
-				viewModel = this.Convert(datas);
+		async view(divisions: Division[]) {
+			const datas = await this.getData(divisions);
+			const viewModel = this.Convert(datas);
 			if (viewModel && viewModel.length) {
 				this.page.element.count.illegalDrop.innerHTML = viewModel[0].toString();
 				this.page.element.count.hybridPush.innerHTML = viewModel[1].toString();
@@ -328,6 +337,16 @@ namespace GarbageCondition {
 
 	class Page {
 
+
+		history: GarbageCondition.IllegalDropHistory;
+		order: GarbageCondition.IllegalDropOrder;
+		count: GarbageCondition.DivisionGarbageCount;
+		constructor(private user: SessionUser, private service: Service) {
+			this.history = new GarbageCondition.IllegalDropHistory(user, service);
+			this.order = new GarbageCondition.IllegalDropOrder(this, user, service);
+			this.count = new GarbageCondition.DivisionGarbageCount(this, user, service);
+		}
+
 		element = {
 			date: document.getElementById("date")!,
 			datePicker: document.getElementById("showDatePicker")!,
@@ -348,38 +367,28 @@ namespace GarbageCondition {
 				, responseDivisions = await request.getDivisions();
 			return responseDivisions.Data.Data;
 		}
-
-
-		division = new DivisionRequestDao.DivisionRequest();
-		garbageStation = new GarbageStationRequestDao.GarbageStationRequest();
-		user = new SessionUser();
-
-
+		
 		divisions?: Division[];
 
 		async getDivision(): Promise<Division[]> {
 			if (this.divisions) {
 				return this.divisions;
 			}
-			const promise = this.division.getDivisions();
+			const promise = this.service.division.list({});
 			return promise.then((response) => {
 				this.divisions = response.Data.Data;
 				return this.divisions;
 			});
 		}
 
+
+
 		loadData() {
 
-
-
-			new GarbageCondition.IllegalDropHistory().init();			
+			this.history.init();
 			const divisionsPromise = this.getDivisions();
 			divisionsPromise.then(divisions => {
-				const order = new GarbageCondition.IllegalDropOrder(this, this.user, divisions, {
-					division: this.division,
-					garbageStation: this.garbageStation
-				});
-				const promise = order.getData();
+				const promise = this.order.getData(divisions);
 				promise.then(data => {
 					if (data) {
 						const items = data.items.sort((a, b) => {
@@ -392,14 +401,12 @@ namespace GarbageCondition {
 								subNameAfter: '起'
 							}
 						})
-						order.view(viewModel);
+						this.order.view(viewModel);
+
 					}
 				})
-				const count = new GarbageCondition.DivisionGarbageCount(this, this.user, divisions, {
-					division: this.division,
-					garbageStation: this.garbageStation
-				});
-				count.init();
+				this.count.view(divisions);
+
 			});
 		}
 
@@ -407,7 +414,7 @@ namespace GarbageCondition {
 
 
 		init() {
-			
+
 			this.viewDatePicker(new Date());
 			this.initRefresh();
 			this.initDatePicker();
@@ -474,11 +481,13 @@ namespace GarbageCondition {
 	}
 
 
-	const page = new Page();
-	page.init();
+
 	new HowellHttpClient.HttpClient().login(async (http: HowellAuthHttp) => {
 
-
+		const user = new SessionUser();
+		const service = new Service(http);
+		const page = new Page(user, service);
+		page.init();
 		page.loadData();
 
 	});

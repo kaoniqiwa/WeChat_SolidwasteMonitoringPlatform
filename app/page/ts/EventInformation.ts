@@ -1,4 +1,3 @@
-import { EventTypeEnum } from "../../common/enum-helper";
 import { dateFormat, getQueryVariable } from "../../common/tool";
 import { Mediume as MediumPicture } from "../../data-core/url/medium";
 import { IllegalDropEventRecord } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
@@ -6,6 +5,7 @@ import { EventRequestService } from "../../data-core/repuest/Illegal-drop-event-
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { SessionUser } from "../../common/session-user";
+import { EventTypeEnum } from "../../data-core/model/waste-regulation/event-number";
 
 export namespace EventInformationPage {
     export class EventDetail {
@@ -47,7 +47,13 @@ export namespace EventInformationPage {
                 police__time = document.getElementById('police__time')!,
                 detail_img = document.getElementById('detail_img') as HTMLImageElement;
             if (police__type) {
-                police__type.innerText = EventTypeEnum[item.EventType];
+                let EventType = {
+                    '1': '乱扔垃圾事件',
+                    '2': '混合投放事件',
+                    '3': '垃圾容量事件',
+                    '4': '垃圾满溢事件'
+                };
+                police__type.innerText = EventType[item.EventType];
             }
             camera__name.innerText = item.ResourceName;
             station__name.innerText = item.Data.StationName;
@@ -125,7 +131,7 @@ export namespace EventInformationPage {
         }, user);
         record.init();
         if (window.parent.recordDetails) {
-            console.log("details",window.parent.recordDetails);
+            console.log("details", window.parent.recordDetails);
             record.fillDetail(window.parent.recordDetails);
         }
         else {

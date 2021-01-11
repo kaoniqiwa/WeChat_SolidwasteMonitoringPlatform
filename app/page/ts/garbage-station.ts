@@ -2,13 +2,16 @@ import { DivisionRequestDao } from "../../data-core/dao/division-request";
 import { GarbageStationRequestDao } from "../../data-core/dao/garbage-station-request";
 import { Camera } from "../../data-core/model/waste-regulation/camera";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
+import { EventTypeEnum } from "../../data-core/model/waste-regulation/event-number";
 import { GarbageStation, GetGarbageStationsParams, StationState } from "../../data-core/model/waste-regulation/garbage-station";
+import { GarbageStationNumberStatistic, GetGarbageStationStatisticNumbersParams } from "../../data-core/model/waste-regulation/garbage-station-number-statistic";
 import { IllegalDropEventRecord } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
 import { DivisionRequestService } from "../../data-core/repuest/division.service";
 import { CameraRequestService, GarbageStationRequestService } from "../../data-core/repuest/garbage-station.service";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { ResourceMediumRequestService } from "../../data-core/repuest/resources.service";
+import { Service } from "../../data-core/repuest/service";
 
 
 let Swiper = Reflect.get(window, 'Swiper');
@@ -22,7 +25,7 @@ class GarbageStationClient {
     asideMain?: HTMLDivElement;
     divisions: Map<string, Division> = new Map();
     garbageStations: Map<string, GarbageStation> = new Map();
-    illegalDropEventRecords:Map<string, IllegalDropEventRecord> = new Map();
+    GarbageStationNumberStatistic: Map<string, GarbageStationNumberStatistic> = new Map();
     garbageElements: Map<string, any> = new Map();
     garbageElementsDivision: Map<string, any> = new Map();
 
@@ -49,13 +52,14 @@ class GarbageStationClient {
 
     private customElement = document.createElement('div');
 
-    constructor(private service: {
-        garbageStation: GarbageStationRequestService,
-        record:DivisionRequestDao.DivisionRequest,
-        division: DivisionRequestService,
-        camera: CameraRequestService,
-        media: ResourceMediumRequestService
-    }) {
+    constructor(private service: Service
+        //     {
+        //     garbageStation: GarbageStationRequestService,        
+        //     division: DivisionRequestService,
+        //     camera: CameraRequestService,
+        //     media: ResourceMediumRequestService
+        // }
+    ) {
         this.content = document.querySelector('#content');
         this.template = document.querySelector('#card-template') as HTMLTemplateElement;
         this.asideTemplate = document.querySelector('#aside-template') as HTMLTemplateElement;
@@ -109,13 +113,24 @@ class GarbageStationClient {
     async loadData() {
         this.divisions = await this.LoadDivisionList();
         this.garbageStations = await this.LoadGarbageStation();
+        var ids = Array.from(this.garbageStations.keys());
+        await this.LoadIllegalDropEventRecord(ids);
         console.log('居委会', this.divisions)
         console.log('厢房', this.garbageStations)
         return 'success'
     }
 
-    LoadIllegalDropEventRecord(){
-        this.service.record.getDivisionStatisticNumber()
+    async LoadIllegalDropEventRecord(ids: Array<string>) {
+        const param = new GetGarbageStationStatisticNumbersParams();
+        param.Ids = ids;
+        const res = await this.service.garbageStation.statisticNumberList(param);
+
+        for (let i = 0; i < res.Data.Data.length; i++) {
+            const data = res.Data.Data[i];
+            this.GarbageStationNumberStatistic.set(data.Id, data);
+        }
+        console.log("statisticNumberList", res);
+
     }
 
 
@@ -143,9 +158,9 @@ class GarbageStationClient {
         const request = new GetGarbageStationsParams();
         let mapedStations = new Map()
         return this.service.garbageStation.list(request).then(x => {
-            
+
             x.Data.Data.forEach(data => {
-                mapedStations.set(data.Id, data)                
+                mapedStations.set(data.Id, data)
             })
 
             return mapedStations;
@@ -182,7 +197,7 @@ class GarbageStationClient {
         })
         this.imgDivision.addEventListener('click', () => {
             // 在蒙版消失之前，所有按钮不能点击
-            if(this.originStatus)return
+            if (this.originStatus) return
             if (this.zoomStatus == 'zoomIn') {
                 let icon = this.imgDivision.getElementsByClassName("howell-icon-list")[0]
                 icon.className = "howell-icon-list2";
@@ -218,6 +233,7 @@ class GarbageStationClient {
             let tempContent = this.template?.content as DocumentFragment;
             for (let [k, v] of this.garbageStations) {
                 let division = this.divisions.get(v.DivisionId);
+                let numberStatic = this.GarbageStationNumberStatistic.get(v.Id);
 
                 let info = tempContent.cloneNode(true) as DocumentFragment;
 
@@ -264,8 +280,19 @@ class GarbageStationClient {
                 let wrapper = info.querySelector('.content__img .swiper-wrapper') as HTMLDivElement;
                 let slide = wrapper.querySelector('.swiper-slide') as HTMLDivElement;
 
-
-
+                console.log("numberStatic", numberStatic)
+                if (numberStatic) {
+                    let illegalDrop = info.querySelector('.illegalDrop-number') as HTMLSpanElement;
+                    let illegalDropNumber = numberStatic.TodayEventNumbers.filter(x => x.EventType == EventTypeEnum.IllegalDrop);
+                    if (illegalDropNumber && illegalDropNumber.length > 0) {
+                        illegalDrop.innerHTML = illegalDropNumber[0].DayNumber.toString();
+                    }
+                    let mixedInto = info.querySelector('.MixedInto-number') as HTMLSpanElement;
+                    let mixedIntoNumber = numberStatic.TodayEventNumbers.filter(x => x.EventType == EventTypeEnum.MixedInto);
+                    if (mixedIntoNumber && mixedIntoNumber.length > 0) {
+                        mixedInto.innerHTML = mixedIntoNumber[0].DayNumber.toString();
+                    }
+                }
                 let imageUrls: Array<string> = [];
 
                 this.service.camera.list(v.Id).then(res => {
@@ -275,7 +302,7 @@ class GarbageStationClient {
                     cameras.forEach((camera, index) => {
                         let imageUrl = "";
                         if (camera.ImageUrl) {
-                            imageUrl = this.service.media.getData(camera.ImageUrl);
+                            imageUrl = this.service.media.getData(camera.ImageUrl)!;
                         }
                         else {
                             imageUrl = "./black.png"
@@ -485,19 +512,19 @@ let refreshed = false;
 
 const client = new HowellHttpClient.HttpClient();
 client.login((http: HowellAuthHttp) => {
-    const stationClient = new GarbageStationClient(
-        {
-            garbageStation: new GarbageStationRequestService(http),
-            division: new DivisionRequestService(http),
-            camera: new CameraRequestService(http),
-            media: new ResourceMediumRequestService(http)
-        }
+    const stationClient = new GarbageStationClient(new Service(http)
+        // {
+        //     garbageStation: new GarbageStationRequestService(http),
+        //     division: new DivisionRequestService(http),
+        //     camera: new CameraRequestService(http),
+        //     media: new ResourceMediumRequestService(http)
+        // }
     );
 
     let MiniRefresh = Reflect.get(window, 'MiniRefresh')
     let miniRefresh = new MiniRefresh({
         container: '#minirefresh',
-        isLockX:false,
+        isLockX: false,
         down: {
             callback: function () {
                 // 下拉事件
@@ -529,8 +556,8 @@ client.login((http: HowellAuthHttp) => {
             .then((res) => {
                 stationClient.init();
             })
-            // .catch((e) => {
-            //     console.error(`出错了~ ${e}`)
-            // })
+        // .catch((e) => {
+        //     console.error(`出错了~ ${e}`)
+        // })
     }
 });

@@ -36,7 +36,7 @@
                 </a>
             </li>
             <li>
-                <a class="bar-item" href="./map/map.html">
+                <a class="bar-item" href="./map.html">
                     <div class="howell-icon-map6 icon"> </div>
                     <div>清运路线</div>
                 </a>
@@ -51,30 +51,12 @@
     </div>
     <div class='backdrop'></div>
     <aside class='aside-content details'>
-        <iframe id="aside-details"></iframe>
+        <iframe id="aside-details" src="./event-details.html"></iframe>
     </aside>
 </body>
 
 <script type="text/javascript">
-    var recordDetails = null;
-    function showOrHideAside(url) {
-
-
-
-        var asideContent = document.querySelector('.aside-content');
-        var backdrop = document.querySelector('.backdrop');
-        if (asideContent.classList.contains('active')) {
-            asideContent.classList.remove('active');
-            backdrop.style.display = 'none'
-        } else {
-            backdrop.style.display = 'block'
-            asideContent.classList.add('active');
-            console.log(url);
-            var details = document.getElementById("aside-details");
-            details.src = url;
-
-        }
-    }
+    
 </script>
 
 <script src="./ts/index.ts"></script>
