@@ -1,4 +1,5 @@
 import { MediumPicture } from "../url/aiop/medium";
+import { Mediume } from "../url/medium";
 import { DivisionRequestService } from "./division.service";
 import { CameraRequestService, GarbageStationRequestService } from "./garbage-station.service";
 import { HowellAuthHttp } from "./howell-auth-http";
@@ -47,11 +48,11 @@ export class Service {
         return this._camera;
     }
 
-    private _media?: MediumPicture;
+    private _media?: Mediume;
     // 媒体服务
-    get media(): MediumPicture {
+    get media(): Mediume {
         if (!this._media) {
-            this._media = new MediumPicture();
+            this._media = new Mediume();
         }
         return this._media;
     }

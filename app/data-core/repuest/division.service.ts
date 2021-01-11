@@ -2,10 +2,10 @@ import { SaveModel } from "../model/save-model";
 import { Division,GetDivisionsParams } from "../model/waste-regulation/division"; 
 import { DivisionTree } from "../model/waste-regulation/division-tree"; 
 import { DivisionNumberStatistic ,GetDivisionStatisticNumbersParams} from "../model/waste-regulation/division-number-statistic"; 
-import { EventNumberStatistic,GetDivisionEventNumbersParams, } from "../model/waste-regulation/division-event-numbers"; 
-import { GarbageVolume,GetDivisionVolumesParams } from "../model/waste-regulation/garbage-volume"; 
+import { EventNumberStatistic } from "../model/waste-regulation/division-event-numbers"; 
+import { GarbageVolume  } from "../model/waste-regulation/garbage-volume"; 
 import * as url from "../url/waste-regulation/division";
-import { PagedList } from "../model/page";
+import { PagedList, PageTimeUnitParams } from "../model/page";
 import { BatchRequest,BatchResult } from "../model/batch";
 import { Response } from "../model/response"; 
 import { HowellAuthHttp } from "./howell-auth-http";
@@ -37,19 +37,19 @@ export class DivisionRequestService extends SaveModel{
     }
 
     list(item:GetDivisionsParams){
-        return this.requestService.post<GetDivisionsParams, Response<PagedList<Division>>>(this.url.list(), item);         
+        return this.requestService.post<GetDivisionsParams, Response<PagedList<Division>>>(this.url.list(), item);
     }
 
     tree(){
         return this.requestService.get<DivisionTree>(this.url.tree());
     }
 
-    volumesHistory(item:GetDivisionVolumesParams,divisionsId:string){
-        return this.requestService.post<GetDivisionVolumesParams, Response<PagedList<GarbageVolume>>>(this.url.volumesHistory(divisionsId), item);
+    volumesHistory(item:PageTimeUnitParams,divisionsId:string){
+        return this.requestService.post<PageTimeUnitParams, Response<PagedList<GarbageVolume>>>(this.url.volumesHistory(divisionsId), item);
     }
 
-    eventNumbersHistory(item:GetDivisionEventNumbersParams,divisionsId:string){
-        return this.requestService.post<GetDivisionEventNumbersParams, Response<PagedList<EventNumberStatistic>>>(this.url.eventNumbersHistory(divisionsId), item);
+    eventNumbersHistory(item:PageTimeUnitParams,divisionsId:string){
+        return this.requestService.post<PageTimeUnitParams, Response<PagedList<EventNumberStatistic>>>(this.url.eventNumbersHistory(divisionsId), item);
     }
 
     statisticNumber(divisionsId: string) {

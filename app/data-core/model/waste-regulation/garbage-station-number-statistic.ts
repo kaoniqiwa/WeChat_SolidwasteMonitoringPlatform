@@ -1,3 +1,4 @@
+import { IPageParams } from "../page";
 import { EventNumber } from "./event-number";
  /**垃圾房数量统计 */
     export interface GarbageStationNumberStatistic
@@ -28,14 +29,14 @@ import { EventNumber } from "./event-number";
     }
 
       /**获取垃圾房数量参数 */
-    export class GetGarbageStationStatisticNumbersParams
+    export class GetGarbageStationStatisticNumbersParams implements IPageParams
     {
         /**页码[1-n](可选) */
-        PageIndex: number | null;
+        PageIndex?: number;
         /**分页大小[1-100](可选) */
-        PageSize: number | null;
+        PageSize?: number;
         /**区划ID(可选) */
-        Ids: string[];
+        Ids?: string[];
         /**区划名称(可选)，支持LIKE */
-        Name: string;
+        Name?: string;
     }

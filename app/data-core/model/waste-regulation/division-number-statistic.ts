@@ -1,3 +1,4 @@
+import { IPageParams } from "../page";
 import { EventNumber } from "./event-number";
 /**区划数量统计 */
     export interface DivisionNumberStatistic
@@ -31,18 +32,17 @@ import { EventNumber } from "./event-number";
         /**当天湿垃圾容量，单位：L */
         DayWetVolume: number;
     }
-
       /// <summary>
     /**获取区划数量参数
      */
-    export class GetDivisionStatisticNumbersParams
+    export class GetDivisionStatisticNumbersParams implements IPageParams
     {
         /**页码[1-n](可选) */
-        PageIndex: number | null;
+        PageIndex?: number;
         /**分页大小[1-100](可选) */
-        PageSize: number | null;
+        PageSize?: number;
         /**区划ID(可选) */
-        Ids: string[];
+        Ids?: string[];
         /**区划名称(可选)，支持LIKE */
-        Name: string;
+        Name?: string;
     }

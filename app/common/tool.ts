@@ -1,4 +1,13 @@
-export function dateFormat(date:Date,fmt:string){
+
+export function getAllDay(date: Date) {
+    let y = date.getFullYear(), m = date.getMonth(), d = date.getDate();
+    return {
+        begin: new Date(y, m, d, 0, 0, 0)
+        , end: new Date(y, m, d, 23, 59, 59)
+    }
+}
+
+export function dateFormat(date: Date, fmt: string) {
     var o = {
         "M+": date.getMonth() + 1, //月份          
         "d+": date.getDate(), //日          
@@ -32,16 +41,16 @@ export function dateFormat(date:Date,fmt:string){
     return fmt;
 }
 
-export function getQueryVariable(variable:string)
-{
-       var query = window.location.search.toLocaleLowerCase().substring(1);
-       var vars = query.split("&");
-       for (var i=0;i<vars.length;i++) {
-               var pair = vars[i].split("=");
-               if(pair[0].toLowerCase() == variable){ 
-                   return pair[1];}
-       }
-       return(false);
+export function getQueryVariable(variable: string) {
+    var query = window.location.search.toLocaleLowerCase().substring(1);
+    var vars = query.split("&");
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split("=");
+        if (pair[0].toLowerCase() == variable) {
+            return pair[1];
+        }
+    }
+    return (false);
 }
 export class TableAttribute {
     pageSize = 20;
@@ -58,21 +67,21 @@ export function TheDayTime(date: Date) {
 export function TheDay(day = 0) {
     const date = new Date();
     let y = date.getFullYear(), m = date.getMonth(), d = date.getDate();
-   return {
-    begin: new Date(y, m, d+day, 0, 0, 0)
-    , end:new Date(y, m, d+day,23, 59, 59)
-   }
+    return {
+        begin: new Date(y, m, d + day, 0, 0, 0)
+        , end: new Date(y, m, d + day, 23, 59, 59)
+    }
 }
 
-export function unique(arr:any[]){
-    var hash=[];
-  for (var i = 0; i < arr.length; i++) {
-     if(arr.indexOf(arr[i])==i){
-      hash.push(arr[i]);
-     }
-  }
-  return hash;
-  }
+export function unique(arr: any[]) {
+    var hash = [];
+    for (var i = 0; i < arr.length; i++) {
+        if (arr.indexOf(arr[i]) == i) {
+            hash.push(arr[i]);
+        }
+    }
+    return hash;
+}
 
 export function TimeInterval(dateString: string, seconds = 0, minutes = 0, hours = 0, date = 0) {
     const start = new Date(dateString), end = new Date(dateString);
@@ -86,7 +95,7 @@ export function TimeInterval(dateString: string, seconds = 0, minutes = 0, hours
     }
 }
 
-export function MonthLastDay(year:number, month:number) {
+export function MonthLastDay(year: number, month: number) {
     var new_year = year; //取当前的年份
     var new_month = month++;//取下一个月的第一天，方便计算（最后一天不固定）
     if (month > 12) {
@@ -98,7 +107,7 @@ export function MonthLastDay(year:number, month:number) {
 }
 
 //获取周1 - 周7
-export  function OneWeekDate(now:Date) {
+export function OneWeekDate(now: Date) {
     var nowTime = now.getTime();
     var day = now.getDay();
     var oneDayLong = 24 * 60 * 60 * 1000;

@@ -2,7 +2,7 @@
 import { DivisionRequestService } from "../repuest/division.service";
 import { GetDivisionsParams } from "../model/waste-regulation/division";
 import { HowellHttpClient } from "../repuest/http-client";
-import { GetDivisionEventNumbersParams } from "../model/waste-regulation/division-event-numbers";
+import { GetDivisionEventNumbersParams, TimeUnit } from "../model/waste-regulation/division-event-numbers";
 import { GetDivisionStatisticNumbersParams } from "../model/waste-regulation/division-number-statistic";
 
 export namespace DivisionRequestDao {
@@ -26,7 +26,7 @@ export namespace DivisionRequestDao {
                         return this.divisionService.statisticNumber(divisionsId);
                 }
 
-                getDivisionEventNumbers(divisionsId: string, timeUnit: TimeUnitEnum, date:Date = new Date()) {
+                getDivisionEventNumbers(divisionsId: string, timeUnit:TimeUnit = TimeUnit.Day, date:Date = new Date()) {
                         const param = new GetDivisionEventNumbersParams(), dayTime = this.TheDayTime(date);
                         param.TimeUnit = timeUnit;
                         param.BeginTime = dayTime.begin.toISOString();

@@ -2,13 +2,13 @@
 import { SaveModel } from '../model/save-model';
 import { GarbageStation, GetGarbageStationsParams } from '../model/waste-regulation/garbage-station';
 import { Camera, GetGarbageStationCamerasParams } from '../model/waste-regulation/camera';
-import { GetGarbageStationVolumesParams, GarbageVolume } from '../model/waste-regulation/garbage-volume';
+import { GarbageVolume } from '../model/waste-regulation/garbage-volume';
 import { TrashCan, GetGarbageStationTrashCansParams } from '../model/waste-regulation/trashCan';
 import * as url from '../url/waste-regulation/garbage-station';
-import { PagedList } from '../model/page'; 
+import { PagedList, PageTimeUnitParams } from '../model/page'; 
 import { Response } from '../model/response';
 import { HowellAuthHttp } from './howell-auth-http';
-import { GetGarbageStationnEventNumbersParams, EventNumberStatistic } from '../model/waste-regulation/division-event-numbers';
+import { EventNumberStatistic } from '../model/waste-regulation/division-event-numbers';
 import {
     GarbageStationNumberStatistic, GetGarbageStationStatisticNumbersParams
 } from '../model/waste-regulation/garbage-station-number-statistic';
@@ -42,18 +42,18 @@ export class GarbageStationRequestService extends SaveModel {
         return this.requestService.post<GetGarbageStationsParams, Response<PagedList<GarbageStation>>>(this.url.list(), item);
     }
 
-    volumesHistory(item: GetGarbageStationVolumesParams, divisionsId: string) {
-        return this.requestService.post<GetGarbageStationVolumesParams,
-            Response<PagedList<GarbageVolume>>>(this.url.volumesHistory(divisionsId), item);
+    volumesHistory(item: PageTimeUnitParams, id: string) {
+        return this.requestService.post<PageTimeUnitParams,
+            Response<PagedList<GarbageVolume>>>(this.url.volumesHistory(id), item);
     }
 
-    eventNumbersHistory(item: GetGarbageStationnEventNumbersParams, divisionsId: string) {
-        return this.requestService.post<GetGarbageStationnEventNumbersParams,
-            Response<PagedList<EventNumberStatistic>>>(this.url.eventNumbersHistory(divisionsId), item);
+    eventNumbersHistory(item: PageTimeUnitParams, id: string) {
+        return this.requestService.post<PageTimeUnitParams,
+            Response<PagedList<EventNumberStatistic>>>(this.url.eventNumbersHistory(id), item);
     }
 
-    statisticNumber(divisionsId: string) {
-        return this.requestService.get<GarbageStationNumberStatistic>(this.url.statisticNumber(divisionsId));
+    statisticNumber(id: string) {
+        return this.requestService.get<GarbageStationNumberStatistic>(this.url.statisticNumber(id));
     }
 
     statisticNumberList(item: GetGarbageStationStatisticNumbersParams) {
@@ -102,6 +102,10 @@ export class CameraTrashCanRequestService extends SaveModel {
         this.url = new url.CameraTrashCans();
     }
     create(item: TrashCan) {
+        if(!item.CameraId)
+        {
+            throw new Error("cameraId is undefined");
+        }
         return this.requestService.post<TrashCan, Response<TrashCan>>(this.url.create(item.GarbageStationId, item.CameraId), item);
     }
 
@@ -110,6 +114,10 @@ export class CameraTrashCanRequestService extends SaveModel {
     }
 
     set(item: TrashCan) {
+        if(!item.CameraId)
+        {
+            throw new Error("cameraId is undefined");
+        }
         return this.requestService.put<TrashCan, Response<TrashCan>>(this.url.edit(item.GarbageStationId, item.CameraId, item.Id), item);
     }
 

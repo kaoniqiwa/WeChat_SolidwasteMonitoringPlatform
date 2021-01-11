@@ -1,5 +1,6 @@
 import { TrashCan } from "./trashCan";
 import { Camera } from "./camera";
+import { IPageParams } from "../page";
 
 export enum StationState {
     // 正常
@@ -14,70 +15,71 @@ export enum StationState {
 /**投放点信息 */
 export class GarbageStation {
     /**垃圾房ID */
-    Id: string;
+    Id!: string;
     /**垃圾房名称 */
-    Name: string;
+    Name!: string;
     /**
      * 垃圾房类型(可选)，默认：0
      * 暂时无效，之后会用于高度，形状，室内、室外等区分
      */
-    StationType: number | null;
+    StationType!: number;
 
     /**描述信息(可选) */
-    Description: string;
+    Description?: string;
     /**创建时间 */
-    CreateTime: Date | string;
+    CreateTime!: Date | string;
     /**更新事件 */
-    UpdateTime: Date | string;
+    UpdateTime!: Date | string;
     /**GIS点位(可选) */
-    GisPoint: any;
+    GisPoint?: any;
     /**所属区划ID(可选) */
-    DivisionId: string;
+    DivisionId?: string;
     /**垃圾桶列表(可选) */
-    TrashCans: TrashCan[];
+    TrashCans?: TrashCan[];
     /**摄像机列表(可选) */
-    Cameras: Camera[];
+    Cameras?: Camera[];
     /**干垃圾满溢(可选) */
-    DryFull: boolean | null;
+    DryFull?: boolean;
     /**干垃圾满溢时间(可选) */
-    DryFullTime: Date | string | null;
+    DryFullTime?: Date | string;
     /**干垃圾容积(可选)，单位：L */
-    DryVolume: number | null;
+    DryVolume?: number;
     /**最大干垃圾容积，单位：L */
-    MaxDryVolume: number;
+    MaxDryVolume!: number;
     /**湿垃圾满溢(可选) */
-    WetFull: boolean | null;
+    WetFull?: boolean;
     /**湿垃圾满溢时间(可选) */
-    WetFullTime: Date | string | null;
+    WetFullTime?: Date | string;
     /**湿垃圾容积(可选)，单位：L */
-    WetVolume: number | null;
+    WetVolume?: number;
     /**最大湿垃圾容积，单位：L */
-    MaxWetVolume: number;
+    MaxWetVolume!: number;
 
     // 垃圾厢房状态
-    StationState: number;
+    StationState!: number;
 }
 
 
+
 /**获取垃圾房列表参数 */
-export class GetGarbageStationsParams {
+export class GetGarbageStationsParams implements IPageParams {
     /**页码[1-n](可选) */
-    PageIndex: number | null;
+    PageIndex?: number;
     /**分页大小[1-100](可选) */
-    PageSize: number | null;
+    PageSize?: number;
     /**垃圾房ID(可选) */
-    Ids: string[];
+    Ids?: string[];
     /**垃圾房名称(可选)，支持LIKE */
-    Name: string;
+    Name?: string;
     /**垃圾房类型(可选) */
-    StationType: number | null;
+    StationType?: number;
     /**区划ID(可选) */
-    DivisionId: string;
+    DivisionId?: string;
     /**干垃圾是否满溢(可选) */
-    DryFull: boolean | null;
+    DryFull?: boolean;
     /**湿垃圾是否满溢(可选) */
-    WetFull: boolean | null;
+    WetFull?: boolean;
     /**祖辈ID(可选)，返回该ID下的所有子孙区划及其本身的垃圾房 */
-    AncestorId: string;
+    AncestorId?: string;
 
 }

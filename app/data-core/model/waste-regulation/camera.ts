@@ -1,17 +1,24 @@
+// 在线状态
+export enum OnlineStatus{
+  // 在线
+  ON = 0,
+  // 离线
+  OFF = 1
+}
 /**摄像机信息 */
 export class Camera {
   /**摄像机ID */
-  Id: string;
+  Id!: string;
   /**摄像机名称 */
-  Name: string;
+  Name!: string;
   /**摄像机用途 */
-  CameraUsage: number;
+  CameraUsage!: number;
   /**创建时间 */
-  CreateTime: Date | string;
+  CreateTime!: Date | string;
   /**更新事件 */
-  UpdateTime: Date | string;
+  UpdateTime!: Date | string;
   /**垃圾桶房ID */
-  GarbageStationId: string;
+  GarbageStationId!: string;
   /**位置编号，
 箱外：1-9
 箱内：11-19
@@ -19,30 +26,30 @@ export class Camera {
 12：湿垃圾
 13：可回收垃圾
 14：有害垃圾 */
-  PositionNo: number;
+  PositionNo?: number;
 
-  OnlineStatus: number;
+  OnlineStatus?: OnlineStatus;
 
-  ImageUrl: string;
-  ImageTime: Date | string;
+  ImageUrl?: string;
+  ImageTime?: Date | string;
 }
 
 /**获取摄像机列表参数 */
 export class GetGarbageStationCamerasParams {
   /**页码[1-n](可选) */
-  PageIndex: number | null;
+  PageIndex?: number;
   /**分页大小[1-100](可选) */
-  PageSize: number | null;
+  PageSize?: number;
   /**摄像机ID(可选) */
-  Ids: string[];
+  Ids?: string[];
   /**垃圾房ID(可选) */
-  GarbageStationIds: string[];
+  GarbageStationIds?: string[];
   /**摄像机名称(可选) */
-  Name: string;
+  Name?: string;
   /**摄像机用途(可选) */
-  CameraUsage: number | null;
+  CameraUsage?: number;
 
-  OnlineStatus: number;
+  OnlineStatus?: OnlineStatus;
 
-  DivisionIds: string[];
+  DivisionIds?: string[];
 }
