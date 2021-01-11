@@ -215,6 +215,9 @@ namespace GarbageCondition {
 
 		}
 		async getData(divisions: Division[]) {
+			if (!this.user.WUser.Resources) {
+				return;
+			}
 			const model = new Specification();
 
 			model.illegalDropNumber = 0;
@@ -282,10 +285,12 @@ namespace GarbageCondition {
 
 		async view(divisions: Division[]) {
 			const datas = await this.getData(divisions);
-			const viewModel = this.Convert(datas);
-			if (viewModel && viewModel.length) {
-				this.page.element.count.illegalDrop.innerHTML = viewModel[0].toString();
-				this.page.element.count.hybridPush.innerHTML = viewModel[1].toString();
+			if (datas) {
+				const viewModel = this.Convert(datas);
+				if (viewModel && viewModel.length) {
+					this.page.element.count.illegalDrop.innerHTML = viewModel[0].toString();
+					this.page.element.count.hybridPush.innerHTML = viewModel[1].toString();
+				}
 			}
 		}
 	}
@@ -367,7 +372,7 @@ namespace GarbageCondition {
 				, responseDivisions = await request.getDivisions();
 			return responseDivisions.Data.Data;
 		}
-		
+
 		divisions?: Division[];
 
 		async getDivision(): Promise<Division[]> {
