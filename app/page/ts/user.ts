@@ -23,3 +23,5 @@ namespace UserPage {
 
 
 }
+
+let adsame = '0000'
