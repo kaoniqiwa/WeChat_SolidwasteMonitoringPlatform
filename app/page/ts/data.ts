@@ -2,15 +2,15 @@ import { EventNumber } from "../../data-core/model/waste-regulation/event-number
 import { DivisionRequestDao } from "../../data-core/dao/division-request";
 import { GarbageStationRequestDao } from "../../data-core/dao/garbage-station-request";
 import { AppEChart } from "../../common/echart-line";
-import { DivisionTypeEnum, ResourceRoleType } from "../../common/enum-helper";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { SessionUser } from "../../common/session-user";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { User } from "../../data-core/url/user-url";
-import { Division } from "../../data-core/model/waste-regulation/division";
+import { Division, DivisionType } from "../../data-core/model/waste-regulation/division";
 import { dateFormat, getAllDay } from "../../common/tool";
 import { Service } from "../../data-core/repuest/service";
 import { TimeUnit } from "../../data-core/model/page";
+import { ResourceRole, ResourceRoleType } from "../../data-core/model/we-chat";
 
 declare var MiniRefresh: any;
 declare var weui: any;
@@ -20,56 +20,111 @@ namespace GarbageCondition {
 	var date = new Date();
 	const bgColor = ['red-bg', 'red-bg', 'red-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg'];
 
+	interface IIllegalDropHistory {
+		getData(dat: { begin: Date, end: Date }): Promise<IllegalDropEventData>;
+	}
+	interface IllegalDropHistoryPage {
+		convert(input: IllegalDropEventData): AppEChart.LineOption;
+		view(data: AppEChart.LineOption): void;
+	}
 
-	export class IllegalDropHistory {
-		constructor(private user: SessionUser, private service: Service) {
+	class DivisionIllegalDropHistory implements IIllegalDropHistory {
+		constructor(private service: Service, private roles: ResourceRole[]) {
 
 		}
-
-
-		async getData() {
-			const model = new IllegalDropEventData()
-				, request = new DivisionRequestDao.DivisionRequest()
-			dateFormat
-			model.datas = new Array();
-			if (this.user.WUser.Resources && this.user.WUser.Resources.length) {
-				const day = getAllDay(date);
+		async getData(day: { begin: Date, end: Date }): Promise<IllegalDropEventData> {
+			const model = new IllegalDropEventData();
+			for (let i = 0; i < this.roles.length; i++) {
+				const role = this.roles[i];
 				const data = await this.service.division.eventNumbersHistory({
-
-					PageIndex: 1,
-					PageSize: 999,
 					BeginTime: day.begin.toISOString(),
 					EndTime: day.end.toISOString(),
 					TimeUnit: TimeUnit.Hour
-				}, this.user.WUser.Resources[0].Id)
+				}, role.Id)
+
 				for (var x of data.Data.Data) {
 					for (const y of x.EventNumbers)
 						if (y.EventType == EventTypeEnum.IllegalDrop)
 							model.datas.push(y);
 				}
-				return model;
+			}
+			return model;
+		}
+	}
+	class GarbageStationIllegalDropHistory implements IIllegalDropHistory {
+		constructor(private service: Service, private roles: ResourceRole[]) {
+
+		}
+		async getData(day: { begin: Date, end: Date }): Promise<IllegalDropEventData> {
+			const model = new IllegalDropEventData();
+			for (let i = 0; i < this.roles.length; i++) {
+				const role = this.roles[i];
+				const data = await this.service.garbageStation.eventNumbersHistory({
+					BeginTime: day.begin.toISOString(),
+					EndTime: day.end.toISOString(),
+					TimeUnit: TimeUnit.Hour
+				}, role.Id)
+
+				for (var x of data.Data.Data) {
+					for (const y of x.EventNumbers)
+						if (y.EventType == EventTypeEnum.IllegalDrop)
+							model.datas.push(y);
+				}
+			}
+			return model;
+		}
+	}
+
+
+	export class IllegalDropHistory implements IllegalDropHistoryPage {
+		constructor(private page: Page, private user: SessionUser, private service: Service) {
+
+		}
+
+		async getData() {
+
+			var base!: IIllegalDropHistory;
+			const model = new IllegalDropEventData()
+			model.datas = new Array();
+			if (this.user.WUser.Resources && this.user.WUser.Resources.length) {
+				switch (this.user.WUser.Resources[0].ResourceType) {
+					case ResourceRoleType.County:
+					case ResourceRoleType.Committees:
+						base = new DivisionIllegalDropHistory(this.service, this.user.WUser.Resources)
+						break;
+					case ResourceRoleType.GarbageStations:
+						base = new GarbageStationIllegalDropHistory(this.service, this.user.WUser.Resources);
+						break;
+					default:
+						break;
+				}
+				const day = getAllDay(date);
+				return base.getData(day);
+
 			}
 		}
 
-		Convert(input: IllegalDropEventData): AppEChart.LineOption {
+		convert(input: IllegalDropEventData): AppEChart.LineOption {
 			const lc = this.joinPart(new AppEChart.LineOption());
-			var enters1 = new Array<EventNumber>();
-			for (let i = 0; i < input.datas.length; i++) {
-				enters1.push(input.datas[i]);
-			}
 			lc.seriesData = new Array();
-			for (const x of enters1)
-				lc.seriesData.push(x.DeltaNumber);
+
+			for (let i = 0; i < input.datas.length; i++) {
+				const data = input.datas[i];
+				lc.seriesData.push(data.DeltaNumber);
+			}
 			return lc;
 		}
 
-		async init() {
+		// async init() {
 
-			const datas = await this.getData();
-			if (datas) {
-				const chartOptions = this.Convert(datas);
-				new AppEChart.EChartLine().init(document.getElementById('chart'), chartOptions);
-			}
+		// 	const datas = await this.getData();
+		// 	if (datas) {
+		// 		const chartOptions = this.convert(datas);
+		// 		new AppEChart.EChartLine().init(this.page.element.chart, chartOptions);
+		// 	}
+		// }
+		async view(opts: AppEChart.LineOption) {
+			new AppEChart.EChartLine().init(this.page.element.chart.illegalDrop, opts);
 		}
 
 		private joinPart(t1: AppEChart.LineOption) {
@@ -108,7 +163,7 @@ namespace GarbageCondition {
 			if (this.user.WUser.Resources && this.user.WUser.Resources.length) {
 				if (this.user.WUser.Resources[0].ResourceType == ResourceRoleType.County) {
 
-					const divisionIds = divisions.filter(x => x.DivisionType == DivisionTypeEnum.Committees).map(x => x.Id);
+					const divisionIds = divisions.filter(x => x.DivisionType == DivisionType.Committees).map(x => x.Id);
 					console.log("divisionIds", divisionIds);
 
 					const now = new Date();
@@ -130,7 +185,7 @@ namespace GarbageCondition {
 					else {
 						for (let i = 0; i < divisions.length; i++) {
 							const division = divisions[i];
-							if (division.DivisionType == DivisionTypeEnum.County)
+							if (division.DivisionType == DivisionType.County)
 								continue;
 							const day = getAllDay(date);
 							const response = await this.service.division.eventNumbersHistory({
@@ -229,7 +284,7 @@ namespace GarbageCondition {
 				if (dataDate.getTime() - today.getTime() >= 0) {
 					// 今天
 
-					const divisionIds = divisions.filter(x => x.DivisionType == DivisionTypeEnum.County).map(y => {
+					const divisionIds = divisions.filter(x => x.DivisionType == DivisionType.County).map(y => {
 						return y.Id;
 					});
 					const res = await this.service.division.statisticNumberList({ Ids: divisionIds });
@@ -297,7 +352,7 @@ namespace GarbageCondition {
 
 
 	class IllegalDropEventData {
-		datas!: EventNumber[];
+		datas: EventNumber[] = [];
 	}
 
 	class IllegalDropOrderInfo {
@@ -347,12 +402,13 @@ namespace GarbageCondition {
 		order: GarbageCondition.IllegalDropOrder;
 		count: GarbageCondition.DivisionGarbageCount;
 		constructor(private user: SessionUser, private service: Service) {
-			this.history = new GarbageCondition.IllegalDropHistory(user, service);
+			this.history = new GarbageCondition.IllegalDropHistory(this, user, service);
 			this.order = new GarbageCondition.IllegalDropOrder(this, user, service);
 			this.count = new GarbageCondition.DivisionGarbageCount(this, user, service);
 		}
 
 		element = {
+			orderPanel: document.getElementById("top-div") as HTMLDivElement,
 			date: document.getElementById("date")!,
 			datePicker: document.getElementById("showDatePicker")!,
 			count: {
@@ -390,7 +446,13 @@ namespace GarbageCondition {
 
 		loadData() {
 
-			this.history.init();
+			var historyData = this.history.getData();
+			historyData.then(x => {
+				if (x) {
+					let opts = this.history.convert(x)
+					this.history.view(opts);
+				}
+			});
 			const divisionsPromise = this.getDivisions();
 			divisionsPromise.then(divisions => {
 				const promise = this.order.getData(divisions);

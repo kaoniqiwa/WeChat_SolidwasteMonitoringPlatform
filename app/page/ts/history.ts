@@ -1,18 +1,12 @@
-import { Mediume as MediumPicture } from "../../data-core/url/medium";
+
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
-import { EventRequestService } from "../../data-core/repuest/Illegal-drop-event-record";
 import { SessionUser } from "../../common/session-user";
-import { TheDayTime, TableAttribute, unique, dateFormat, TheDay } from "../../common/tool";
-import { GetEventRecordsParams, IllegalDropEventRecord, IllegalDropEventData } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
-import { GarbageStationRequestDao } from "../../data-core/dao/garbage-station-request";
-import { DivisionRequestDao } from "../../data-core/dao/division-request";
-import { ResourceRoleType } from "../../common/enum-helper";
-import { getQueryVariable } from "../../common/tool";
-import { FilterAside } from "../component/aside";
+import { getQueryVariable, dateFormat } from "../../common/tool";
+import { GetEventRecordsParams, IllegalDropEventRecord } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { PagedList } from "../../data-core/model/page";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
-import { DivisionRequestService } from "../../data-core/repuest/division.service";
+import { Service } from "../../data-core/repuest/service";
 
 
 
@@ -93,11 +87,7 @@ export namespace EventHistoryPage {
         }
 
         defaultDivisionId = '';
-        constructor(private service: {
-            event: EventRequestService,
-            medium: MediumPicture,
-            division: DivisionRequestService,
-        }, private user: SessionUser) {
+        constructor(private service: Service, private user: SessionUser) {
 
             this.filter = {
                 date: new Date()
@@ -425,11 +415,7 @@ export namespace EventHistoryPage {
 
                 const user = new SessionUser();
 
-                this.record = new IllegalDropEvent({
-                    division: new DivisionRequestService(http),
-                    event: new EventRequestService(http),
-                    medium: new MediumPicture()
-                }, user);
+                this.record = new IllegalDropEvent(new Service(http), user);
                 this.record.init();
                 this.record.loadAside();
             });

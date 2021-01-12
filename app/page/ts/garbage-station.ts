@@ -1,16 +1,9 @@
-import { DivisionRequestDao } from "../../data-core/dao/division-request";
-import { GarbageStationRequestDao } from "../../data-core/dao/garbage-station-request";
-import { Camera } from "../../data-core/model/waste-regulation/camera";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 import { EventTypeEnum } from "../../data-core/model/waste-regulation/event-number";
 import { GarbageStation, GetGarbageStationsParams, StationState } from "../../data-core/model/waste-regulation/garbage-station";
 import { GarbageStationNumberStatistic, GetGarbageStationStatisticNumbersParams } from "../../data-core/model/waste-regulation/garbage-station-number-statistic";
-import { IllegalDropEventRecord } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
-import { DivisionRequestService } from "../../data-core/repuest/division.service";
-import { CameraRequestService, GarbageStationRequestService } from "../../data-core/repuest/garbage-station.service";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
-import { ResourceMediumRequestService } from "../../data-core/repuest/resources.service";
 import { Service } from "../../data-core/repuest/service";
 
 
@@ -232,6 +225,8 @@ class GarbageStationClient {
             this.content.innerHTML = '';
             let tempContent = this.template?.content as DocumentFragment;
             for (let [k, v] of this.garbageStations) {
+                if (!v.DivisionId)
+                    continue;
                 let division = this.divisions.get(v.DivisionId);
                 let numberStatic = this.GarbageStationNumberStatistic.get(v.Id);
 
@@ -302,7 +297,7 @@ class GarbageStationClient {
                     cameras.forEach((camera, index) => {
                         let imageUrl = "";
                         if (camera.ImageUrl) {
-                            imageUrl = this.service.media.getData(camera.ImageUrl)!;
+                            imageUrl = this.service.medium.getData(camera.ImageUrl)!;
                         }
                         else {
                             imageUrl = "./black.png"
