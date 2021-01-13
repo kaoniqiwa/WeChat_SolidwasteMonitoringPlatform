@@ -1,5 +1,22 @@
 import { IPageParams } from "../page";
 
+/** 区划类型 */
+export enum DivisionType {
+    /** 无 */
+    None = 0,
+    /** 省、直辖市 */
+    Province = 1,
+    /** 市、区 */
+    City = 2,
+    /** 县、街道 */
+    County = 3,
+    /** 居委会 */
+    Committees = 4,
+    /** 小区 */
+    Village = 5
+}
+
+
 /**区划信息 */
 export class Division {
     /**区划ID */
@@ -19,7 +36,7 @@ export class Division {
     /**人口(可选) */
     Population?: number | null;
     /**区划类型，用于图标区分 */
-    DivisionType!: number;
+    DivisionType!: DivisionType;
     /**创建时间 */
     CreateTime!: Date | string;
     /**更新事件 */

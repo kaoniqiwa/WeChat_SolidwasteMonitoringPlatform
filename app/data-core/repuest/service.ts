@@ -3,6 +3,7 @@ import { Mediume } from "../url/medium";
 import { DivisionRequestService } from "./division.service";
 import { CameraRequestService, GarbageStationRequestService } from "./garbage-station.service";
 import { HowellAuthHttp } from "./howell-auth-http";
+import { EventRequestService } from "./Illegal-drop-event-record";
 import { RoleRequestService } from "./role-service";
 import { WeChatRequestService } from "./we-chat.service";
 
@@ -58,13 +59,20 @@ export class Service {
         return this._camera;
     }
 
-    private _media?: Mediume;
+    private _medium?: Mediume;
     /** 媒体服务 */
-    get media(): Mediume {
-        if (!this._media) {
-            this._media = new Mediume();
+    get medium(): Mediume {
+        if (!this._medium) {
+            this._medium = new Mediume();
         }
-        return this._media;
+        return this._medium;
+    }
+    private _event?: EventRequestService;
+    get event(): EventRequestService {
+        if (!this._event) {
+            this._event = new EventRequestService(this.requestService);
+        }
+        return this._event;
     }
 
 }

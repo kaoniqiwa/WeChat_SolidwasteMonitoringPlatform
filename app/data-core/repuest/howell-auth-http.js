@@ -108,7 +108,8 @@ class HowellAuthHttp {
     getHttpHeaders(method, uri) {
         if (window['DIGEST']) {  
             var challenge = window['DIGEST'].parseServerChallenge(null); 
-            this.nc += 1;
+            this.nc += 1;            
+            
             return window['DIGEST'].generateRequestHeader(this.nc, challenge, this.username, '123456', method, uri);
         }
 

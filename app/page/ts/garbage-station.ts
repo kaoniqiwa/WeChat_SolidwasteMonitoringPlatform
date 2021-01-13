@@ -1,16 +1,11 @@
-import { DivisionRequestDao } from "../../data-core/dao/division-request";
-import { GarbageStationRequestDao } from "../../data-core/dao/garbage-station-request";
-import { Camera } from "../../data-core/model/waste-regulation/camera";
+import { SessionUser } from "../../common/session-user";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 import { EventTypeEnum } from "../../data-core/model/waste-regulation/event-number";
 import { GarbageStation, GetGarbageStationsParams, StationState } from "../../data-core/model/waste-regulation/garbage-station";
 import { GarbageStationNumberStatistic, GetGarbageStationStatisticNumbersParams } from "../../data-core/model/waste-regulation/garbage-station-number-statistic";
-import { IllegalDropEventRecord } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
-import { DivisionRequestService } from "../../data-core/repuest/division.service";
-import { CameraRequestService, GarbageStationRequestService } from "../../data-core/repuest/garbage-station.service";
+import { ResourceType } from "../../data-core/model/we-chat";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
-import { ResourceMediumRequestService } from "../../data-core/repuest/resources.service";
 import { Service } from "../../data-core/repuest/service";
 
 
@@ -52,7 +47,7 @@ class GarbageStationClient {
 
     private customElement = document.createElement('div');
 
-    constructor(private service: Service
+    constructor(private user: SessionUser, private service: Service
         //     {
         //     garbageStation: GarbageStationRequestService,        
         //     division: DivisionRequestService,
@@ -111,8 +106,39 @@ class GarbageStationClient {
 
     }
     async loadData() {
-        this.divisions = await this.LoadDivisionList();
-        this.garbageStations = await this.LoadGarbageStation();
+        if (!this.user.WUser.Resources)
+            return;
+let divisionIds:string[];
+        let stationIds = this.user.WUser.Resources.filter(x => x.ResourceType == ResourceType.GarbageStations).map(x => {
+            return x.Id
+        })
+        divisionIds = this.user.WUser.Resources.filter(x =>            
+            x.ResourceType == ResourceType.Committees
+        ).map(x => {
+            return x.Id
+        })
+
+        if(divisionIds.length < 2)
+        {
+            this.btnDivision.style.display = "none";
+        }
+        divisionIds = divisionIds.concat(this.user.WUser.Resources.filter(x =>{                                
+            return x.ResourceType == ResourceType.County;
+        }                                
+        ).map(x => {
+            this.btnDivision.style.display = "";
+            return x.Id
+        }));
+
+        this.divisions = await this.LoadDivisionList(divisionIds);
+        let divisionId;
+        if (divisionIds.length > 0) {
+            divisionId = divisionIds[0];
+        }
+        this.garbageStations = await this.LoadGarbageStation({
+            divisionId: divisionId,
+            stationIds: stationIds
+        });
         var ids = Array.from(this.garbageStations.keys());
         await this.LoadIllegalDropEventRecord(ids);
         console.log('居委会', this.divisions)
@@ -134,10 +160,12 @@ class GarbageStationClient {
     }
 
 
-    LoadDivisionList() {
-        var req = new GetDivisionsParams();
+    LoadDivisionList(divisionIds: string[]) {
+
         // 将数组 map 化返回
         let mapedDivisions = new Map();
+        var req = new GetDivisionsParams();
+        req.Ids = divisionIds;
 
         return this.service.division.list(req).then(x => {
 
@@ -154,8 +182,10 @@ class GarbageStationClient {
 
         });
     }
-    LoadGarbageStation() {
+    LoadGarbageStation(opts: { divisionId?: string, stationIds: string[] }) {
         const request = new GetGarbageStationsParams();
+        request.Ids = opts.stationIds;
+        request.DivisionId = opts.divisionId;
         let mapedStations = new Map()
         return this.service.garbageStation.list(request).then(x => {
 
@@ -232,6 +262,8 @@ class GarbageStationClient {
             this.content.innerHTML = '';
             let tempContent = this.template?.content as DocumentFragment;
             for (let [k, v] of this.garbageStations) {
+                if (!v.DivisionId)
+                    continue;
                 let division = this.divisions.get(v.DivisionId);
                 let numberStatic = this.GarbageStationNumberStatistic.get(v.Id);
 
@@ -302,7 +334,7 @@ class GarbageStationClient {
                     cameras.forEach((camera, index) => {
                         let imageUrl = "";
                         if (camera.ImageUrl) {
-                            imageUrl = this.service.media.getData(camera.ImageUrl)!;
+                            imageUrl = this.service.medium.getData(camera.ImageUrl)!;
                         }
                         else {
                             imageUrl = "./black.png"
@@ -512,14 +544,14 @@ let refreshed = false;
 
 const client = new HowellHttpClient.HttpClient();
 client.login((http: HowellAuthHttp) => {
-    const stationClient = new GarbageStationClient(new Service(http)
-        // {
-        //     garbageStation: new GarbageStationRequestService(http),
-        //     division: new DivisionRequestService(http),
-        //     camera: new CameraRequestService(http),
-        //     media: new ResourceMediumRequestService(http)
-        // }
+    const user = new SessionUser();
+    const service = new Service(http);
+    const stationClient = new GarbageStationClient(
+        user,
+        service
     );
+
+
 
     let MiniRefresh = Reflect.get(window, 'MiniRefresh')
     let miniRefresh = new MiniRefresh({

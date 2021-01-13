@@ -178,10 +178,9 @@ import { GarbageStationRequestService } from "../../data-core/repuest/garbage-st
 import { GetGarbageStationsParams } from "../../data-core/model/waste-regulation/garbage-station";
 import { Page } from "../../data-core/model/page";
 import { DivisionRequestService } from "../../data-core/repuest/division.service";
-import { GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
+import { DivisionType, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 import { SessionUser } from "../../common/session-user";
-import { ResourceRoleType } from "../../data-core/model/we-chat";
-import { DivisionTypeEnum } from "../../common/enum-helper";
+import { ResourceType } from "../../data-core/model/we-chat";
 
 
 
@@ -198,21 +197,24 @@ class StationList {
         this.myTemplate = document.querySelector('#myTemplate') as HTMLTemplateElement;
     }
 
-    async GetLocalDivision() {        
+    async GetLocalDivision() {
+        if (!this.user.WUser.Resources) {
+            return;
+        }
         const params = new GetDivisionsParams();
         switch (this.user.WUser.Resources[0].ResourceType) {
-            case ResourceRoleType.County:
-                params.DivisionType = DivisionTypeEnum.County;
+            case ResourceType.County:
+                params.DivisionType = DivisionType.County;
                 break;
-            case ResourceRoleType.Committees:
-                params.DivisionType = DivisionTypeEnum.Committees;
+            case ResourceType.Committees:
+                params.DivisionType = DivisionType.Committees;
                 break;
-            case ResourceRoleType.GarbageStations:
+            case ResourceType.GarbageStations:
                 break;
             default:
                 break;
         }
-        
+
         const res = await this.service.division.list(params);
         if (res && res.Data && res.Data.Data && res.Data.Data.length > 0) {
             return res.Data.Data[0];
@@ -228,8 +230,8 @@ class StationList {
         request.PageIndex = pageIndex;
         request.DivisionId = division!?.Id;
 
-        return this.service.garbageStation.list(request).then(x => {                        
-            console.log('garbageStation data',x);
+        return this.service.garbageStation.list(request).then(x => {
+            console.log('garbageStation data', x);
 
             page = x.Data.Page;
             if (this.myList && this.myTemplate) {
@@ -250,8 +252,9 @@ class StationList {
                     // 模板最外层元素
                     let infoContainer = info.querySelector('.weui-cell.weui-check__label') as HTMLDivElement;
                     infoContainer.setAttribute('id', item.Id);
-                    infoContainer.setAttribute('divisionId', item.DivisionId)
-
+                    if (item.DivisionId) {
+                        infoContainer.setAttribute('divisionId', item.DivisionId)
+                    }
 
                     let p = info.querySelector('div.weui-cell__bd > p') as HTMLParagraphElement;
                     p.textContent = item.Name;
