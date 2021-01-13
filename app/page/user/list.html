@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
+    <link href="./css/index.css" rel="stylesheet" />
+    <link href="../../minirefresh/minirefresh.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/user.css">
+
+</head>
+
+<body>
+    <div class='container'>
+        <div class='page' id="getPage">
+            <header>
+                <div class='content'>
+                    <div class="left weui-search-bar" id="searchBar">
+                        <i id="btn_search"></i>
+                        <input type="search" id="searchInput" placeholder="搜索" />
+                    </div>
+                </div>
+            </header>
+            <main>
+                <div class="minirefresh-wrap" id="minirefresh">
+                    <div class="minirefresh-scroll">
+                        <div class='info-list' id='content'>
+                            <template id='infoTemplate'>
+                                <div class='info-item'>
+                                    <aside>
+                                        <img
+                                            src="http://192.168.21.241:9000/api/howell/ver10/aiop_service/garbage_gateway/Pictures/5fe428ce00000004bc000e74.jpg?pictureId=5fe428ce00000004bc000e74&ServerId=1" />
+                                    </aside>
+                                    <main>
+                                        <div class='title'>张三sss</div>
+                                        <div class='footer'>
+                                            <div class='footer-item uphone'>18221002912</div>
+                                            <div class='footer-item uresource'>纪委会</div>
+                                        </div>
+                                    </main>
+                                </div>
+                            </template>
+                            <div class='info-item'>
+                                <aside>
+                                    <img
+                                        src="http://192.168.21.241:9000/api/howell/ver10/aiop_service/garbage_gateway/Pictures/5fe428ce00000004bc000e74.jpg?pictureId=5fe428ce00000004bc000e74&ServerId=1" />
+                                </aside>
+                                <main>
+                                    <div class='title'>张三sss</div>
+                                    <div class='footer'>
+                                        <div class='footer-item uphone'>18221002912</div>
+                                        <div class='footer-item uresource'>纪委会</div>
+                                    </div>
+                                </main>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <footer></footer>
+        </div>
+        <div class='page' id='setPage'>
+            <form action="#">
+                <div>
+                    <span>姓名:</span>
+                    <input type="text">
+                </div>
+                <div>
+                    <span>性别:</span>
+                    <input type="checkbox">男
+                    <input type="checkbox">女
+                </div>
+                <div>
+                    <span>手机号:</span>
+                    <input type="text" value='112121212'>
+                </div>
+                <div>
+                    <span>权限:</span>
+                    <input type="text">
+                </div>
+               
+            </form>
+        </div>
+    </div>
+
+
+    <script src="../../minirefresh/minirefresh.js"></script>
+
+    <script src="./ts/user.ts"></script>
+</body>
+
+</html>

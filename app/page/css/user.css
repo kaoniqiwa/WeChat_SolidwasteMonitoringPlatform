@@ -3,69 +3,88 @@
   height: 100%;
   position: relative;
 }
-.container #getInfo {
+.container #getPage {
   position: absolute;
   top: 0;
   left: 0;
   display: flex;
   flex-direction: column;
 }
-.container #getInfo header {
-  min-height: 50px;
-  background-color: red;
+.container #getPage header {
+  background-color: white;
+  height: 40px;
+  flex-shrink: 0;
+}
+.container #getPage header .content {
+  height: 100%;
+  padding: 0 12px;
+  color: #b2b2b2;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   align-content: center;
 }
-.container #getInfo main {
-  background-color: green;
+.container #getPage header .content .btn {
+  margin-left: 10px;
+}
+.container #getPage main {
   flex-grow: 1;
   overflow: auto;
 }
-.container #getInfo main .info-list .info-item {
-  height: 50px;
+.container #getPage main .info-list .info-item {
+  height: 80px;
+  width: calc(100% - 24px);
+  padding: 12px;
   display: flex;
 }
-.container #getInfo main .info-list .info-item aside {
-  flex-basis: 25%;
+.container #getPage main .info-list .info-item aside img {
+  width: 140px;
+  height: 80px;
+  border-radius: 10px;
 }
-.container #getInfo main .info-list .info-item aside .user-icon {
-  width: 100%;
+.container #getPage main .info-list .info-item main {
+  width: calc(100% - 156px);
   height: 100%;
-  background-color: yellow;
-  background-image: url(http://192.168.21.241:9000/api/howell/ver10/aiop_service/garbage_gateway/Pictures/5fe428ce00000004bc000e74.jpg?pictureId=5fe428ce00000004bc000e74&ServerId=1);
-  background-size: 100% auto;
-  background-repeat: no-repeat;
-  background-position: center;
+  margin-left: 16px;
+  padding-bottom: 12px;
+  margin-bottom: -12px;
+  border-bottom: 2px solid #eaeaea;
 }
-.container #getInfo main .info-list .info-item main {
-  margin-left: 10px;
-  background: cyan;
+.container #getPage main .info-list .info-item main .title {
+  font-size: 19px;
+  height: 50%;
+  line-height: 40px;
+}
+.container #getPage main .info-list .info-item main .footer {
+  height: 40px;
+  line-height: 40px;
   display: flex;
-  justify-content: space-between;
-  flex-direction: column;
+  justify-content: space-around;
 }
-.container #getInfo main .info-list .info-item main .uname {
-  margin: 0 10px;
+.container #getPage main .info-list .info-item main .footer .uphone {
+  font-size: 14.4px;
+  color: #888;
 }
-.container #getInfo main .info-list .info-item main .footer {
-  display: flex;
+.container #getPage main .info-list .info-item main .footer .uresource {
+  font-size: 12px;
+  color: #b2b2b2;
 }
-.container #getInfo main .info-list .info-item main .footer .footer-item {
-  margin: 0 10px;
-}
-.container #getInfo footer {
+.container #getPage footer {
   min-height: 50px;
   background-color: blue;
+  display: none;
 }
-.container #setInfo {
+.container #setPage {
   position: absolute;
+  z-index: 100;
   top: 0;
   left: 0;
   transform: translate(100%, 0px);
   transition: transform 0.5s;
 }
-.container #setInfo.fadeIn {
+.container #setPage.fadeIn {
   transform: translate(0, 0px);
+}
+.minirefresh-wrap {
+  margin-top: 41px;
 }
