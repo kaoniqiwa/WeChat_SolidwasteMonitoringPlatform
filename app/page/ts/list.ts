@@ -15,31 +15,56 @@ namespace UserPage {
         content: HTMLDivElement;
         template: HTMLTemplateElement;
 
-        addUser: HTMLDivElement;
         setPage: HTMLDivElement;
 
 
-        uerInfo = new Map()
+        userInfos: Map<string, WeChatUser> = new Map()
 
 
         constructor(private user: SessionUser, private service: Service) {
             this.content = document.querySelector('#content') as HTMLDivElement;
             this.template = document.querySelector('#infoTemplate') as HTMLTemplateElement;
 
-            this.addUser = document.querySelector('#addUser') as HTMLDivElement;
-
             this.setPage = document.querySelector('#setPage') as HTMLDivElement;
 
-            this.bindEvents();
         }
-
         async loadData() {
             let a = await this.loadWechatUser();
             return 'success';
         }
         loadWechatUser() {
             return this.service.user.list().then((res) => {
-                console.log(res)
+                let fake = {
+                    "Id":'1212',
+                    "OpenId": "12121",
+                    "MobileNo": "18221772092",
+                    "FirstName": "zhang",
+                    "LastName": "san",
+                    "Gender": 1,
+                    "Resources": [
+                        {
+                            "Id": "12",
+                            "Name": "街道",
+                            "ResourceType": 1,
+                            "RoleFlags": 0,
+                            "AllSubResources": true,
+                            "Resources": [
+
+                            ]
+                        }
+                    ],
+                    "ServerId": "1212",
+                    "Note": "3333",
+                    "CanCreateWeChatUser": true
+                } as WeChatUser;
+
+                res.data = Array(20).fill(fake);
+                console.log('res', res)
+
+                res.data.forEach((v) => {
+                    this.userInfos.set('info'+v.Id+Math.random()*999,v)
+                })
+
             }).catch((er) => {
                 console.warn(er)
             })
@@ -47,7 +72,7 @@ namespace UserPage {
         init() {
 
             // 创建主页面
-            // this.createContent();
+            this.createContent();
 
             // 创建侧边
             // this.createAside();
@@ -58,21 +83,20 @@ namespace UserPage {
             }
 
         }
-        createContent(){
+        createContent() {
             let _this = this;
+            console.log(this.userInfos)
             if (this.content && this.template) {
                 this.content.innerHTML = '';
                 let tempContent = this.template?.content as DocumentFragment;
-                for (let [k, v] of this.uerInfo) {
+                for (let [k, v] of this.userInfos) {
                     let info = tempContent.cloneNode(true) as DocumentFragment;
                     this.content?.appendChild(info)
                 }
             }
         }
         bindEvents() {
-            this.addUser.addEventListener('click', () => {
-                // this.showOrHideAside();
-            })
+
         }
         showOrHideAside() {
             if (this.setPage.classList.contains('fadeIn')) {
@@ -111,7 +135,7 @@ namespace UserPage {
             },
             up: {
                 isAuto: true,
-                isLock: true,
+                // isLock: true,
                 callback: function () {
                     // 上拉事件
                     miniRefresh.endUpLoading(true);
@@ -134,7 +158,4 @@ namespace UserPage {
 
     });
 
-
-
-    // new UserPage()
 }
