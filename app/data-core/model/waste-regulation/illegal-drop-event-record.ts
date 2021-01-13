@@ -26,24 +26,25 @@ import { EventDataObject } from "./event-data-object";
     export class GetEventRecordsParams
     {
         /**页码[1-n](可选) */
-        PageIndex: number | null;
+        PageIndex?: number | null;
         /**分页大小[1-100](可选) */
-        PageSize: number | null;
+        PageSize?: number | null;
         /**开始时间 */
-        BeginTime: Date | string;
+        BeginTime!: Date | string;
         /**结束时间 */
-        EndTime: Date | string;
+        EndTime!: Date | string;
         /**所属区划ID列表(可选) */
-        DivisionIds: string[];
+        DivisionIds?: string[];
         /**垃圾房ID列表(可选) */
-        StationIds: string[];
+        StationIds?: string[];
         /**资源ID列表(可选) */
-        ResourceIds: string[];
+        ResourceIds?: string[];
         /**区划名称(可选)，支持LIKE */
-        DivisionName: string;
+        DivisionName?: string;
         /**垃圾房名称(可选)，支持LIKE */
-        StationName: string;
+        StationName?: string;
         /**资源名称(可选)，支持LIKE */
-        ResourceName: string;
-        Desc:boolean;
+        ResourceName?: string;
+        /** 是否倒序时间排列 */
+        Desc?:boolean;
     }

@@ -48,7 +48,7 @@ namespace Navigation {
 
 
 
-    var User = new SessionUser();
+    window.User = new SessionUser();
     let index = 0;
     var search = document.location.search.substr(1).toLocaleLowerCase();
     var query = search.split('&');
@@ -64,11 +64,12 @@ namespace Navigation {
     if (querys.openid) {
         new HowellHttpClient.HttpClient().login(
             async (http: HowellAuthHttp) => {
+                window.hwAuth = http;
                 console.log("login seccess");
             },
             () => {
                 console.log("login faild");
-                location.href = "./register.html";
+                location.href = "./register.html?openid=" + querys.openid;
             });
     }
     else {

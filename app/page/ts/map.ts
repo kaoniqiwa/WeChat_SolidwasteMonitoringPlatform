@@ -180,7 +180,7 @@ import { Page } from "../../data-core/model/page";
 import { DivisionRequestService } from "../../data-core/repuest/division.service";
 import { DivisionType, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 import { SessionUser } from "../../common/session-user";
-import { ResourceRoleType } from "../../data-core/model/we-chat";
+import { ResourceType } from "../../data-core/model/we-chat";
 
 
 
@@ -203,13 +203,13 @@ class StationList {
         }
         const params = new GetDivisionsParams();
         switch (this.user.WUser.Resources[0].ResourceType) {
-            case ResourceRoleType.County:
+            case ResourceType.County:
                 params.DivisionType = DivisionType.County;
                 break;
-            case ResourceRoleType.Committees:
+            case ResourceType.Committees:
                 params.DivisionType = DivisionType.Committees;
                 break;
-            case ResourceRoleType.GarbageStations:
+            case ResourceType.GarbageStations:
                 break;
             default:
                 break;

@@ -36,7 +36,7 @@ export class ResourceRole {
     /**资源名称 */
     Name?: string;
     /** 资源类型，1-街道，2-居委，3-厢房*/
-    ResourceType!: ResourceRoleType;
+    ResourceType!: ResourceType;
     /** 资源标签，权限级别 */
     RoleFlags!: number;
     /** 开放全部的子节点资源 */
@@ -46,7 +46,7 @@ export class ResourceRole {
 }
 /** 资源类型，
  1-街道，2-居委，3-厢房 */
-export enum ResourceRoleType {
+export enum ResourceType {
     /** 1-街道，2-居委，3-厢房
     /** 县、街道 */
     County = 1,

@@ -1,12 +1,13 @@
 
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { SessionUser } from "../../common/session-user";
-import { getQueryVariable, dateFormat } from "../../common/tool";
+import { getQueryVariable, dateFormat, getAllDay } from "../../common/tool";
 import { GetEventRecordsParams, IllegalDropEventRecord } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { PagedList } from "../../data-core/model/page";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 import { Service } from "../../data-core/repuest/service";
+import { ResourceType } from "../../data-core/model/we-chat";
 
 
 
@@ -22,8 +23,13 @@ export namespace EventHistoryPage {
         datePicker: document.getElementById("showDatePicker")!,
         aside: {
             divisions: document.querySelector('.aside-content.divisions') as HTMLDivElement,
-            details: document.querySelector('.aside-content.details') as HTMLDivElement,
             backdrop: document.querySelector('.backdrop') as HTMLDivElement,
+            template: document.querySelector('#aside-template') as HTMLTemplateElement,
+            main: document.querySelector('.aside-main') as HTMLDivElement,
+            btn: {
+                reset: document.querySelector('.footer-reset') as HTMLDivElement,
+                confirm: document.querySelector('.footer-confirm') as HTMLDivElement
+            }
         },
         filterBtn: document.querySelector('.btn.filter') as HTMLDivElement,
         IllegalDrop: {
@@ -31,8 +37,7 @@ export namespace EventHistoryPage {
             totalRecordCount: document.getElementById("illegalDropTotalRecordCount")!,
             recordCount: document.getElementById("illegalDropRecordCount")!,
             date: document.getElementById("date")!
-        },
-
+        }
     }
     var MiniRefreshId = {
         IllegalDrop: "illegalDropRefreshContainer"
@@ -61,12 +66,8 @@ export namespace EventHistoryPage {
 
         //记录所有的居委会
         divisions: Map<string, Division> = new Map();
-        asideMain?: HTMLDivElement;
-        asideTemplate: HTMLTemplateElement | null;
         selectedDivisions: Map<string, any> = new Map();
         garbageElements: Map<string, any> = new Map();
-        footerReset: HTMLDivElement;
-        footerConfirm: HTMLDivElement;
 
 
         /**
@@ -100,15 +101,14 @@ export namespace EventHistoryPage {
             element.aside.backdrop.addEventListener('click', () => {
                 this.showOrHideDivisionsAside()
             })
-            this.asideTemplate = document.querySelector('#aside-template') as HTMLTemplateElement;
 
-            this.asideMain = document.querySelector('.aside-main') as HTMLDivElement;
-            this.footerReset = document.querySelector('.footer-reset') as HTMLDivElement;
-            this.footerConfirm = document.querySelector('.footer-confirm') as HTMLDivElement;
-            this.footerReset.addEventListener('click', () => {
+
+
+
+            element.aside.btn.reset.addEventListener('click', () => {
                 this.resetSelected()
             })
-            this.footerConfirm.addEventListener('click', () => {
+            element.aside.btn.confirm.addEventListener('click', () => {
                 this.confirmSelect()
             })
 
@@ -121,13 +121,13 @@ export namespace EventHistoryPage {
         }
         createAside() {
             let _this = this;
-            this.asideMain!.innerHTML = '';
-            let tempContent = this.asideTemplate?.content as DocumentFragment;
+            element.aside.main.innerHTML = '';
+            let tempContent = element.aside.template.content as DocumentFragment;
 
             for (let [k, v] of this.divisions) {
                 let info = tempContent.cloneNode(true) as DocumentFragment;
                 let div = info.querySelector('div.aside-item') as HTMLDivElement;
-                div!.textContent = v.Name;
+                div.textContent = v.Name;
                 div.setAttribute('id', v.Id);
                 div.addEventListener('click', function () {
                     if (this.classList.contains('selected')) {
@@ -144,7 +144,7 @@ export namespace EventHistoryPage {
                         })
                     }
                 })
-                this.asideMain!.appendChild(info)
+                element.aside.main.appendChild(info)
             }
         }
         showOrHideDivisionsAside() {
@@ -219,15 +219,20 @@ export namespace EventHistoryPage {
 
 
 
-        getData(begin: Date, end: Date, index: number, divisionId?: string) {
+        getData(begin: Date, end: Date, index: number, opts?: {
+            divisionIds?: string[],
+            stationIds?: string[]
+        }
+        ) {
             const params = new GetEventRecordsParams();
             params.BeginTime = begin;
             params.EndTime = end;
             params.PageSize = PageSize;
             params.PageIndex = index;
             params.Desc = true;
-            if (divisionId) {
-                params.DivisionIds = [divisionId];
+            if (opts) {
+                params.DivisionIds = opts.divisionIds;
+                params.StationIds = opts.stationIds;
             }
             return this.service.event.list(params);
         }
@@ -237,7 +242,7 @@ export namespace EventHistoryPage {
 
             template.img.src = this.service.medium.getData(record.ImageUrl) as string;
             template.title.innerHTML = record.Data.DivisionName;
-            template.footer.innerHTML = '';//record.ResourceName;
+            template.footer.innerHTML = record.ResourceName;
             template.remark.innerHTML = dateFormat(new Date(record.EventTime), 'HH:mm:ss');
 
 
@@ -248,9 +253,9 @@ export namespace EventHistoryPage {
             item.getElementsByTagName("img")[0].addEventListener("error", function () {
                 this.src = "../../img/black.png"
             });
-            
+
             item.addEventListener("click", () => {
-                
+
                 window.parent.recordDetails = record;
                 const url = "./event-details.html?openid=" + this.user.WUser.OpenId + "&eventid=" + record.EventId;
                 // console.log(window.parent);
@@ -282,19 +287,33 @@ export namespace EventHistoryPage {
                 element.IllegalDrop.list.appendChild(item);
             }
             element.IllegalDrop.totalRecordCount.innerHTML = list.Page.TotalRecordCount.toString();
-            element.IllegalDrop.recordCount.innerHTML = (list.Page.PageSize * (list.Page.PageIndex-1) + list.Page.RecordCount).toString();
+            element.IllegalDrop.recordCount.innerHTML = (list.Page.PageSize * (list.Page.PageIndex - 1) + list.Page.RecordCount).toString();
 
         }
 
         async refresh() {
+
+            if (!this.user.WUser.Resources)
+                return;
+
+
             element.IllegalDrop.list.innerHTML = "";
             this.pageIndex = 1;
 
-            const begin = new Date(date.getTime());
-            begin.setHours(0, 0, 0);
-            const end = new Date(date.getTime());
-            end.setHours(23, 59, 59);
-            let page = await this.getData(begin, end, this.pageIndex)
+
+            let stationIds = this.user.WUser.Resources.filter(x => x.ResourceType == ResourceType.GarbageStations).map(x => {
+                return x.Id
+            })
+            let divisionIds = this.user.WUser.Resources.filter(x => {
+                return x.ResourceType == ResourceType.County ||
+                    x.ResourceType == ResourceType.Committees
+            }
+            ).map(x => {
+                return x.Id
+            })
+
+            const day = getAllDay(date);
+            let page = await this.getData(day.begin, day.end, this.pageIndex, { divisionIds: divisionIds, stationIds: stationIds });
             console.log('page', page)
 
             this.view(date, page.Data);
@@ -316,11 +335,33 @@ export namespace EventHistoryPage {
                     up: {
                         isAuto: true,
                         callback: async () => {
-                            const begin = new Date(date.getTime());
-                            begin.setHours(0, 0, 0);
-                            const end = new Date(date.getTime());
-                            end.setHours(23, 59, 59);
-                            var data = await this.getData(begin, end, ++this.pageIndex)
+                            if (!this.user.WUser.Resources)
+                                return;
+                            const day = getAllDay(date);
+                            let divisionIds: string[];
+                            let stationIds = this.user.WUser.Resources.filter(x => x.ResourceType == ResourceType.GarbageStations).map(x => {
+                                return x.Id
+                            })
+                            divisionIds = this.user.WUser.Resources.filter(x =>
+                                x.ResourceType == ResourceType.Committees
+                            ).map(x => {
+                                return x.Id
+                            });
+                            
+                            if (divisionIds.length < 2) {
+                                element.filterBtn.style.display = "none";
+                            }
+                            divisionIds = divisionIds.concat(this.user.WUser.Resources.filter(x =>{                                
+                                return x.ResourceType == ResourceType.County;
+                            }                                
+                            ).map(x => {
+                                element.filterBtn.style.display = "";
+                                return x.Id
+                            }));
+                            var data = await this.getData(day.begin, day.end, ++this.pageIndex, {
+                                divisionIds: divisionIds,
+                                stationIds: stationIds
+                            });
                             console.log('data', data)
                             this.view(date, data.Data);
 
@@ -388,14 +429,13 @@ export namespace EventHistoryPage {
             }
         }
 
-        loadData(){
-            if(this.record)
-            {
+        loadData() {
+            if (this.record) {
                 this.record.refresh();
             }
         }
 
-        record?:IllegalDropEvent;
+        record?: IllegalDropEvent;
 
         init() {
 
@@ -423,6 +463,8 @@ export namespace EventHistoryPage {
         }
     }
 }
+console.log("User",window.parent.User);
+console.log("Auth",window.parent.hwAuth);
 const page = new EventHistoryPage.Page();
 page.viewDatePicker(new Date());
 page.init();

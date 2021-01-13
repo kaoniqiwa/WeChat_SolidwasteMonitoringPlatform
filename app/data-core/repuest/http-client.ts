@@ -16,6 +16,7 @@ export namespace HowellHttpClient {
         async login(seccess?: (http: HowellAuthHttp) => void, faild?: () => void) {
             const openid = getQueryVariable('openid');
             if (window['DIGEST'] == null && openid) {
+                
                 this.user.user = {
                     name: openid.trim(),
                     pwd: '123456'
@@ -52,7 +53,7 @@ export namespace HowellHttpClient {
                 if (window['DIGEST'] == null) {
                     this.user.user = {
                         name: openid,
-                        pwd: '123456'
+                        pwd: ''
                     }
 
                     const a = await this.userService.login(() => {

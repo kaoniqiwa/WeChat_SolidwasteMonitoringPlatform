@@ -10,7 +10,7 @@ import { Division, DivisionType } from "../../data-core/model/waste-regulation/d
 import { dateFormat, getAllDay } from "../../common/tool";
 import { Service } from "../../data-core/repuest/service";
 import { TimeUnit } from "../../data-core/model/page";
-import { ResourceRole, ResourceRoleType } from "../../data-core/model/we-chat";
+import { ResourceRole, ResourceType } from "../../data-core/model/we-chat";
 
 declare var MiniRefresh: any;
 declare var weui: any;
@@ -88,11 +88,11 @@ namespace GarbageCondition {
 			model.datas = new Array();
 			if (this.user.WUser.Resources && this.user.WUser.Resources.length) {
 				switch (this.user.WUser.Resources[0].ResourceType) {
-					case ResourceRoleType.County:
-					case ResourceRoleType.Committees:
+					case ResourceType.County:
+					case ResourceType.Committees:
 						base = new DivisionIllegalDropHistory(this.service, this.user.WUser.Resources)
 						break;
-					case ResourceRoleType.GarbageStations:
+					case ResourceType.GarbageStations:
 						base = new GarbageStationIllegalDropHistory(this.service, this.user.WUser.Resources);
 						break;
 					default:
@@ -161,7 +161,7 @@ namespace GarbageCondition {
 			const model = new IllegalDropOrderInfo();
 			model.items = new Array();
 			if (this.user.WUser.Resources && this.user.WUser.Resources.length) {
-				if (this.user.WUser.Resources[0].ResourceType == ResourceRoleType.County) {
+				if (this.user.WUser.Resources[0].ResourceType == ResourceType.County) {
 
 					const divisionIds = divisions.filter(x => x.DivisionType == DivisionType.Committees).map(x => x.Id);
 					console.log("divisionIds", divisionIds);
@@ -206,7 +206,7 @@ namespace GarbageCondition {
 
 					}
 				}
-				else if (this.user.WUser.Resources[0].ResourceType == ResourceRoleType.Committees) {
+				else if (this.user.WUser.Resources[0].ResourceType == ResourceType.Committees) {
 					const responseStations = await this.service.garbageStation.list({ DivisionId: this.user.WUser.Resources[0].Id })
 					const stationIds = new Array<string>();
 
@@ -276,7 +276,7 @@ namespace GarbageCondition {
 			const model = new Specification();
 
 			model.illegalDropNumber = 0;
-			if (this.user.WUser.Resources[0].ResourceType == ResourceRoleType.County) {
+			if (this.user.WUser.Resources[0].ResourceType == ResourceType.County) {
 				const now = new Date();
 				const today = new Date(now.getHours(), now.getMonth() + 1, now.getDate());
 				const dataDate = new Date(date.getHours(), date.getMonth() + 1, date.getDate());
@@ -313,7 +313,7 @@ namespace GarbageCondition {
 				}
 
 			}
-			else if (this.user.WUser.Resources[0].ResourceType == ResourceRoleType.Committees) {
+			else if (this.user.WUser.Resources[0].ResourceType == ResourceType.Committees) {
 				const responseStations = await this.service.garbageStation.list({ DivisionId: this.user.WUser.Resources[0].Id });
 				const stationIds = new Array<string>();
 

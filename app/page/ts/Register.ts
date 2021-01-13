@@ -7,7 +7,7 @@ export namespace RegisterPage {
     class Message {
         constructor(private page: Page) { }
         isShow = false;
-        show = (message) => {
+        show = (message:string) => {
             this.page.element.message.message.innerText = message;
             this.page.element.message.window.style.display = '';
             this.isShow = true;
@@ -35,8 +35,8 @@ export namespace RegisterPage {
                 submit: document.getElementById('to_submit') as HTMLButtonElement
             },
             message: {
-                window: document.getElementById('js_toast'),
-                message: document.getElementById('alertMsg')
+                window: document.getElementById('js_toast') as HTMLDivElement,
+                message: document.getElementById('alertMsg')!
             }
         }
 
@@ -68,7 +68,7 @@ export namespace RegisterPage {
 
         number = 60;
 
-        countdownHandle: number;
+        countdownHandle!: number;
 
         countdown() {
             this.countdownHandle = setInterval(() => {
@@ -117,7 +117,7 @@ export namespace RegisterPage {
 
         }
 
-        phoneNumber: string;
+        phoneNumber?: string;
 
         eventRegist() {
             this.page.element.button.code.addEventListener("click", () => {
@@ -125,32 +125,36 @@ export namespace RegisterPage {
                 this.service.code.getCode(page.element.input.phone.value);
             });
             this.page.element.button.submit.addEventListener("click", async () => {
-                const result = await this.service.code.checkCode(this.phoneNumber, this.page.element.input.code.value);
+                if (this.phoneNumber) {
+                    const result = await this.service.code.checkCode(this.phoneNumber, this.page.element.input.code.value);
 
-                if (result.success) {
+                    if (result.success) {
 
-                    const buser = await this.regist();
-                    this.page.Message.show("注册成功");
-                    setTimeout(() => {
-                        location.href = "./index.html?openid=" + buser.OpenId + "&index=4";
-                    }, 1500);
-                }
-                else{
-                    this.page.Message.show("验证失败");
-                    this.page.Message.autoHide();
+                        const buser = await this.regist();
+                        this.page.Message.show("注册成功");
+                        setTimeout(() => {
+                            location.href = "./index.html?openid=" + buser.OpenId + "&index=4";
+                        }, 1500);
+                    }
+                    else {
+                        this.page.Message.show("验证失败");
+                        this.page.Message.autoHide();
+                    }
                 }
             });
         }
 
         async regist() {
-            const user = new SessionUser();
-            const buser = await this.service.user.bingingUser(this.phoneNumber, user.name);
-            // console.log(buser);
-            if (buser.OpenId) {
-                user.name = buser.OpenId;
+            if (this.phoneNumber) {
+                const user = new SessionUser();
+                const buser = await this.service.user.bingingUser(this.phoneNumber, user.name);
+                // console.log(buser);
+                if (buser.OpenId) {
+                    user.name = buser.OpenId;
+                }
+                user.WUser = buser;
+                return buser;
             }
-            user.WUser = buser;
-            return buser;
         }
     }
     //#endregion
