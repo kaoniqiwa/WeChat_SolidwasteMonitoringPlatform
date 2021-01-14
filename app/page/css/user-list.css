@@ -122,3 +122,19 @@
 .minirefresh-wrap {
   margin-top: 41px;
 }
+
+
+
+.bar.header .content .weui-search-bar{
+  width: calc(100% - 100px);
+}
+
+
+.info-item .img{
+  text-align: center;
+    vertical-align: middle;
+    background-color: #ccc;
+    width: 72px;
+    height: 72px;
+    line-height: 72px;
+}

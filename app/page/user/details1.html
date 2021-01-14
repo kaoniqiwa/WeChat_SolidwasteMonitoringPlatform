@@ -7,6 +7,7 @@
     <title></title>
     <link rel="stylesheet" href="../../assets/howell.font/howell.font.css" />
     <link href="../css/index.css" rel="stylesheet" />
+    <link href="../css/aside.css" rel="stylesheet" />
     <link href="../css/user-details.css" rel="stylesheet" />
 </head>
 
@@ -22,14 +23,45 @@
     </div>
     <div class="main">
         <div class="line-item">
-            <div>用户名</div>
-            <div id="user-name"></div>
+            <div>姓名</div>
+            <div class="value">
+                <div id="user-name"></div>
+                <i class="howell-icon-arrow2right"></i>
+            </div>
+        </div>
+        <div class="line-item">
+            <div>性别</div>
+            <div class="value">
+                <div id="user-gender"></div>
+                <i class="howell-icon-arrow2right"></i>
+            </div>
         </div>
         <div class="line-item">
             <div>手机号</div>
-            <div id="user-mobileNo"></div>
+            <div class="value">
+                <div id="user-mobileNo"></div>
+                <i class="howell-icon-arrow2right"></i>
+            </div>
+        </div>
+        <div class="line-item own">
+            <div>管理权限</div>
+            <div class="value">
+                <div id="user-resource-type"></div>
+                <i class="howell-icon-arrow2right"></i>
+            </div>
+        </div>
+        <div class="line-item own">
+            <div>管辖范围</div>
+            <div class="value">
+                <div id="user-resources-count">0</div>
+                <i class="howell-icon-arrow2right"></i>
+            </div>
         </div>
     </div>
+
+    <aside class="aside-content"></aside>
+    <aside class="aside-content"></aside>
+
 </body>
 <script src="../ts/user-details.ts"></script>
 

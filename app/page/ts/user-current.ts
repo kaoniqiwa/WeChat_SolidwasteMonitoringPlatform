@@ -27,7 +27,9 @@ namespace UserPage {
                 }
             },
             iframe: {
-                details: document.getElementById('user-details-iframe') as HTMLIFrameElement
+                details: document.getElementById('user-details-iframe') as HTMLIFrameElement,
+                add:document.getElementById('add-user-iframe') as HTMLIFrameElement,
+                list:document.getElementById('user-list-iframe') as HTMLIFrameElement
             }
         }
 
@@ -38,7 +40,15 @@ namespace UserPage {
             this.element.btn.details.addEventListener('click', () => {
                 this.showDetailsAside();
             })
-            this.element.iframe.details.src = "./user/details.html?openid=" + this.user.WUser.OpenId;
+            this.element.btn.list.addEventListener('click', () => {
+                this.showListAside();
+            })
+            this.element.btn.add.addEventListener('click', () => {
+                this.showAddAside();
+            })
+            this.element.iframe.details.src = "../user/details1.html?openid=" + this.user.WUser.OpenId;
+            this.element.iframe.list.src = "../user/list.html?openid=" + this.user.WUser.OpenId;
+            this.element.iframe.add.src = "../user/add.html?openid=" + this.user.WUser.OpenId;
         }
 
         loadUser() {
@@ -56,6 +66,15 @@ namespace UserPage {
         showDetailsAside() {
             this.element.aside.details.classList.add('active');
         }
+
+        showListAside() {
+            this.element.aside.list.classList.add('active');
+        }
+
+        showAddAside() {
+            this.element.aside.add.classList.add('active');
+        }
+
 
         hideAside() {            
             this.element.aside.add.classList.remove('active');

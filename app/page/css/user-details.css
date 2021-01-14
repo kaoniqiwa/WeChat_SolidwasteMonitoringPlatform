@@ -6,3 +6,13 @@
 .line-item:first-child{
     margin-top: 8px;
 }
+.line-item.own{
+    margin-top: 8px;
+}
+.line-item .value{
+    display: flex;
+    color: #b2b2b2;
+}
+.howell-icon-arrow2right{
+    margin-left: 10px;
+}

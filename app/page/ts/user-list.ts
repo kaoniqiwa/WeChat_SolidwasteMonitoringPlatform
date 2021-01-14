@@ -10,8 +10,8 @@ import { WeChatUser } from "../../data-core/model/we-chat";
 declare var MiniRefresh: any;
 
 
-namespace UserPage {
-    class UserPage {
+namespace UserListPage {
+    class Page {
         content: HTMLDivElement;
         template: HTMLTemplateElement;
 
@@ -35,7 +35,7 @@ namespace UserPage {
         loadWechatUser() {
             return this.service.user.list().then((res) => {
                 let fake = {
-                    "Id":'1212',
+                    "Id": '1212',
                     "OpenId": "12121",
                     "MobileNo": "18221772092",
                     "FirstName": "zhang",
@@ -62,7 +62,7 @@ namespace UserPage {
                 console.log('res', res)
 
                 res.data.forEach((v) => {
-                    this.userInfos.set('info'+v.Id+Math.random()*999,v)
+                    this.userInfos.set('info' + v.Id + Math.random() * 999, v)
                 })
 
             }).catch((er) => {
@@ -109,53 +109,53 @@ namespace UserPage {
 
 
     let refreshed = false;
+    if (location.search) {
+        const client = new HowellHttpClient.HttpClient();
+        client.login((http: HowellAuthHttp) => {
 
+            const service = new Service(http);            
+            const stationClient = new Page(
+                client.user,
+                service
+            );
 
-    const client = new HowellHttpClient.HttpClient();
-    client.login((http: HowellAuthHttp) => {
-        const user = new SessionUser();
-        const service = new Service(http);
-        const stationClient = new UserPage(
-            user,
-            service
-        );
+            let miniRefresh = new MiniRefresh({
+                container: '#minirefresh',
+                isLockX: false,
+                down: {
+                    callback: function () {
+                        // 下拉事件
+                        refreshed = true;
+                        console.log('down')
+                        render().then(() => {
+                            miniRefresh.endDownLoading();
+                        })
+                    }
+                },
+                up: {
+                    isAuto: true,
+                    // isLock: true,
+                    callback: function () {
+                        // 上拉事件
+                        miniRefresh.endUpLoading(true);
+                        console.log('up')
 
-        let miniRefresh = new MiniRefresh({
-            container: '#minirefresh',
-            isLockX: false,
-            down: {
-                callback: function () {
-                    // 下拉事件
-                    refreshed = true;
-                    console.log('down')
-                    render().then(() => {
-                        miniRefresh.endDownLoading();
+                    }
+                }
+            });
+            render()
+
+            function render() {
+                return stationClient.loadData()
+                    .then((res) => {
+                        stationClient.init();
                     })
-                }
-            },
-            up: {
-                isAuto: true,
-                // isLock: true,
-                callback: function () {
-                    // 上拉事件
-                    miniRefresh.endUpLoading(true);
-                    console.log('up')
-
-                }
+                    .catch((e) => {
+                        console.error(`出错了~ ${e}`)
+                    })
             }
+
         });
-        render()
 
-        function render() {
-            return stationClient.loadData()
-                .then((res) => {
-                    stationClient.init();
-                })
-                .catch((e) => {
-                    console.error(`出错了~ ${e}`)
-                })
-        }
-
-    });
-
+    }
 }
