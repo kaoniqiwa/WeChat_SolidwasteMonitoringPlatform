@@ -8,40 +8,44 @@
     <link rel="stylesheet" href="../../assets/howell.font/howell.font.css" />
     <link href="../css/index.css" rel="stylesheet" />
     <link href="../../../minirefresh/minirefresh.css" rel="stylesheet" />
-    <link rel="stylesheet" href="../css/list.css">
+    <link rel="stylesheet" href="../css/user-list.css">
 
 </head>
 
 <body>
     <div class='container'>
         <div class='page' id="getPage">
-            <header>
+            <header class="bar header">
                 <div class='content'>
+                    <div class="left" id="back">
+                        <i class="howell-icon-arrow2left"></i>
+                        返回
+                    </div>
                     <div class="left weui-search-bar" id="searchBar">
                         <i id="btn_search"></i>
                         <input type="search" id="searchInput" placeholder="搜索" />
                     </div>
                 </div>
             </header>
+            
             <main>
                 <div class="minirefresh-wrap" id="minirefresh">
                     <div class="minirefresh-scroll">
                         <div class='info-list' id='content'>
                             <template id='infoTemplate'>
                                 <div class='info-item'>
-                                    <aside>
-                                        <img
-                                            src="http://192.168.21.241:9000/api/howell/ver10/aiop_service/garbage_gateway/Pictures/5fe428ce00000004bc000e74.jpg?pictureId=5fe428ce00000004bc000e74&ServerId=1" />
+                                    <aside class="img">
+                                        <i class="howell-icon-user-anonymous" style="font-size: xx-large;color: gray;"></i>
                                     </aside>
                                     <main>
                                         <div class='detail'>
-                                            <div class='uname'>张三sss</div>
+                                            <div class='uname'>张三</div>
                                             <div class='uresource'>
                                                 居委会管理员
                                             </div>
                                         </div>
                                         <div class='arrow'>
-                                            <span class='howell-icon-arrowright'></span>
+                                            <span class='howell-icon-arrow2right'></span>
                                         </div>
                                     </main>
                                 </div>
@@ -79,7 +83,7 @@
 
     <script src="../../../minirefresh/minirefresh.js"></script>
 
-    <script src="../ts/list.ts"></script>
+    <script src="../ts/user-list.ts"></script>
 </body>
 
 </html>
