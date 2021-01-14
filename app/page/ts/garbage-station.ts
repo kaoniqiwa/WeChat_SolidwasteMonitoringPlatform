@@ -1,4 +1,5 @@
 import { SessionUser } from "../../common/session-user";
+import { OnlineStatus } from "../../data-core/model/waste-regulation/camera";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 import { EventTypeEnum } from "../../data-core/model/waste-regulation/event-number";
 import { GarbageStation, GetGarbageStationsParams, StationState } from "../../data-core/model/waste-regulation/garbage-station";
@@ -332,6 +333,7 @@ let divisionIds:string[];
                         return a.CameraUsage - b.CameraUsage || a.Name.localeCompare(b.Name);
                     });
                     cameras.forEach((camera, index) => {
+                        camera.OnlineStatus = OnlineStatus.Offline;
                         let imageUrl = "";
                         if (camera.ImageUrl) {
                             imageUrl = this.service.medium.getData(camera.ImageUrl)!;

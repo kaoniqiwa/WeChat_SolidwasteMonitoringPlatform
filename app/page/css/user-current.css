@@ -1,0 +1,73 @@
+
+.current{
+    margin-top: 12px;
+    height: 72px;
+    width: calc(100%);
+    padding: 32px ;
+    background-color: #fff;
+    clear: both;
+    margin-bottom: 8px;
+    padding-right: 16px;
+}
+.current .left{
+    float: left;
+}
+.current .img{
+    text-align: center;
+    vertical-align: middle;
+    background-color: #ccc;
+    width: 72px;
+    height: 72px;
+    line-height: 72px;
+}
+.current .rig
+{
+    float: right;
+}
+.current img{
+    width: 140px;
+    height: 80px;
+    border-radius: 10px;
+}
+.current .content{
+    width: calc(100% - 136px);
+    height: 100%;
+    margin-left: 16px;
+    padding-bottom: 12px;
+    margin-bottom: -12px;
+}
+.current .content > .title{
+    font-size: 19px;
+    height: 50%;
+    line-height: 40px;
+    vertical-align: middle;
+    font-weight: bold;
+}
+.current .content .footer{    
+    height: 40px;
+    line-height: 40px;
+    vertical-align: middle;
+    display: flex;
+    justify-content: space-between;
+}
+.current .content .footer > .footer-title{
+    font-size: 14.4px;
+    color: #888;
+}
+.current .content .footer > .remark{
+    
+    color: #b2b2b2;
+    float: right;
+}
+
+
+.line-item{
+    margin-bottom: 8px;
+}
+.howell-icon-arrow2right{
+    color: #b2b2b2;
+}
+.aside-content{
+    width: 100%;
+    top:0;
+}

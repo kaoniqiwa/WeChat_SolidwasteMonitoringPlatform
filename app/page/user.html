@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="../assets/howell.font/howell.font.css">
+    <link href="./css/index.css" rel="stylesheet">
+
+    <link href="./css/aside.css" rel="stylesheet">
+    <link href="./css/user-current.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="current" id="btn-user-details">
+        <div class="left img">
+            <i class="howell-icon-user-anonymous" style="font-size: xx-large;color: gray;"></i>
+        </div>
+        <div class="left content">
+            <div class="title" id="name">title</div>
+            <div class="footer">
+                <div class="left footer-title" id="resource-name">footer</div>
+                <div class="remark"><i class="howell-icon-arrow2right"></i></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="btn-add-user" class="line-item">
+        <div>添加用户</div>
+        <div><i class="howell-icon-arrow2right"></i></div>
+    </div>
+    <div id="btn-user-list" class="line-item">
+        <div>用户列表</div>
+        <div><i class="howell-icon-arrow2right"></i></div>
+         
+    </div>
+    <aside id="user-details" class="aside-content">
+        <iframe id="user-details-iframe" src="/user\details1.html"></iframe>
+    </aside>
+    <aside id="add-user" class="aside-content">
+        <iframe src="/user\add-user.html"></iframe>
+    </aside>
+    <aside id="user-list" class="aside-content">
+        <iframe src="/user\list.html"></iframe>
+    </aside>
+    <script src="./ts/user-current.ts"></script>
+</body>
+</html>

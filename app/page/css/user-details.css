@@ -1,0 +1,8 @@
+.main{
+    top:40px;
+    position: relative;
+}
+
+.line-item:first-child{
+    margin-top: 8px;
+}

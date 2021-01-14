@@ -235,7 +235,15 @@ body{
 
 
 
-
+.line-item{
+    background-color: white;
+    margin-bottom: 1px;
+    height: 60px;
+    display: flex;
+    line-height: 60px;
+    justify-content: space-between;
+    padding:0 16px;
+}
 
 
 

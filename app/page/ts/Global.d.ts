@@ -11,6 +11,7 @@ declare class Guid {
 declare interface Window {
     recordDetails?:any;
     showOrHideAside(url: string);
+    HideUserAside();
 }
 
 
