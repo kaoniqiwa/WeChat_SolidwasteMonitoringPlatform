@@ -10,3 +10,9 @@ declare class Guid {
 }
 
 declare function getAllPropertyNames<T>(t: T): string[];
+
+declare interface Window {
+    recordDetails?:any;
+    showOrHideAside(url: string);
+    HideUserAside();
+}

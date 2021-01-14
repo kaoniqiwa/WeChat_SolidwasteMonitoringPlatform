@@ -1,0 +1,9 @@
+#addUser header {
+  background: red;
+}
+#addUser main {
+  background: green;
+}
+#addUser footer {
+  background: blue;
+}
