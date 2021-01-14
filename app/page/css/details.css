@@ -2,23 +2,36 @@
   display: flex;
   flex-direction: column;
 }
-#details .list {
+#details header {
+  height: 40px;
+  background-color: white;
+}
+#details header .content {
+  height: 100%;
+  padding: 0 12px;
+  color: #b2b2b2;
+  display: flex;
+  align-items: center;
+}
+#details main {
+  margin-top: 5px;
   flex-grow: 1;
   overflow: auto;
+  border-radius: 0 0 10px 10px;
 }
-#details .list .list-item {
+#details main .list .list-item {
   display: flex;
   height: 50px;
   justify-content: space-between;
   background-color: white;
   margin-bottom: 5px;
 }
-#details .list .list-item .item-key {
+#details main .list .list-item .item-key {
   padding: 0 20px;
   display: flex;
   align-items: center;
 }
-#details .list .list-item .item-content {
+#details main .list .list-item .item-content {
   padding: 0 20px;
   display: flex;
   align-items: center;
