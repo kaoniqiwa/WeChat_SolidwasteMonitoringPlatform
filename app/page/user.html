@@ -32,17 +32,18 @@
     </div>
     <div id="btn-user-list" class="line-item">
         <div>用户列表</div>
-        <div><i class="howell-icon-arrow2right"></i></div>
-         
+        <div><i class="howell-icon-arrow2right"></i></div>         
     </div>
-    <aside id="user-details" class="aside-content">
-        <iframe id="user-details-iframe" src="./user/details1.html"></iframe>
-    </aside>
-    <aside id="add-user" class="aside-content">
-        <iframe id="add-user-iframe" src="./user/add-user.html"></iframe>
-    </aside>
-    <aside id="user-list" class="aside-content">
-        <iframe id="user-list-iframe" src="./user/list.html"></iframe>
+
+    <div style="display: none;">
+        <a href="./user/details1.html"></a>
+        <a href="./user/list.html"></a>
+        <a href="./user/add-user.html"></a>
+    </div>
+
+
+    <aside id="aside" class="aside-content">
+        <iframe id="user-child-iframe" src=""></iframe>
     </aside>
     <script src="./ts/user-current.ts"></script>
 </body>

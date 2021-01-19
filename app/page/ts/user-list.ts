@@ -12,20 +12,20 @@ declare var MiniRefresh: any;
 
 namespace UserListPage {
     class Page {
-        content: HTMLDivElement;
-        template: HTMLTemplateElement;
 
-        setPage: HTMLDivElement;
+        element = {
+            back: document.querySelector('#back') as HTMLTemplateElement,
+            content: document.querySelector('#content') as HTMLDivElement,
+            template: document.querySelector('#infoTemplate') as HTMLTemplateElement,
+            setPage: document.querySelector('#setPage') as HTMLDivElement
+        }
+
 
 
         userInfos: Map<string, WeChatUser> = new Map()
 
 
         constructor(private user: SessionUser, private service: Service) {
-            this.content = document.querySelector('#content') as HTMLDivElement;
-            this.template = document.querySelector('#infoTemplate') as HTMLTemplateElement;
-
-            this.setPage = document.querySelector('#setPage') as HTMLDivElement;
 
         }
         async loadData() {
@@ -86,23 +86,40 @@ namespace UserListPage {
         createContent() {
             let _this = this;
             console.log(this.userInfos)
-            if (this.content && this.template) {
-                this.content.innerHTML = '';
-                let tempContent = this.template?.content as DocumentFragment;
+            if (this.element.content && this.element.template) {
+                this.element.content.innerHTML = '';
+                let tempContent = this.element.template.content as DocumentFragment;
                 for (let [k, v] of this.userInfos) {
                     let info = tempContent.cloneNode(true) as DocumentFragment;
-                    this.content?.appendChild(info)
+                    let name = info.querySelector('.user-name') as HTMLDivElement;
+                    name.innerHTML = '';
+                    if (v.LastName) {
+                        name.innerHTML += v.LastName;
+                    }
+                    if (v.FirstName) {
+                        name.innerHTML += v.FirstName;
+                    }
+                    if (v.Resources && v.Resources.length > 0) {
+                        let source = info.querySelector('.user-source') as HTMLDivElement;
+                        if (v.Resources[0].Name) {
+                            source.innerHTML = v.Resources[0].Name;
+                        }
+                    }
+
+                    this.element.content.appendChild(info)
                 }
             }
         }
         bindEvents() {
-
+            this.element.back.addEventListener('click', () => {
+                window.parent.HideUserAside();
+            })
         }
         showOrHideAside() {
-            if (this.setPage.classList.contains('fadeIn')) {
-                this.setPage.classList.remove('fadeIn');
+            if (this.element.setPage.classList.contains('fadeIn')) {
+                this.element.setPage.classList.remove('fadeIn');
             } else {
-                this.setPage.classList.add('fadeIn');
+                this.element.setPage.classList.add('fadeIn');
             }
         }
     }
@@ -113,7 +130,7 @@ namespace UserListPage {
         const client = new HowellHttpClient.HttpClient();
         client.login((http: HowellAuthHttp) => {
 
-            const service = new Service(http);            
+            const service = new Service(http);
             const stationClient = new Page(
                 client.user,
                 service
@@ -149,9 +166,6 @@ namespace UserListPage {
                 return stationClient.loadData()
                     .then((res) => {
                         stationClient.init();
-                    })
-                    .catch((e) => {
-                        console.error(`出错了~ ${e}`)
                     })
             }
 

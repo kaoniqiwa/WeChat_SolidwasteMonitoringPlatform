@@ -34,7 +34,7 @@
   .aside-content.active {
     transform: translateX(0);
   }
-  .aside-content .aside-title {
+  .aside-title {
     height: 30px;
     flex-shrink: 0;
     margin-left: 20px;
@@ -42,14 +42,14 @@
     color: #b2b2b2;
     line-height: 44px;
   }
-  .aside-content .aside-main {
+  .aside-main {
     margin: 15px;
     flex-grow: 1;
     display: flex;
     flex-wrap: wrap;
     overflow: auto;
   }
-  .aside-content .aside-main .aside-item {
+  .aside-main .aside-item {
     box-sizing: border-box;
     width: 48%;
     border-radius: 50px;
@@ -64,16 +64,16 @@
     /* cursor: pointer; */
     /* -webkit-tap-highlight-color:transparent; */
   }
-  .aside-content .aside-main .aside-item.selected {
+  .aside-main .aside-item.selected {
     background-color: #c5dfff;
     color: #4097ff;
   }
-  .aside-content .aside-footer {
+  .aside-footer {
     height: 50px;
     flex-shrink: 0;
     display: flex;
   }
-  .aside-content .aside-footer div {
+  .aside-footer div {
     border-radius: 50px;
     height: 30px;
     width: calc(50% - 25px);
@@ -83,12 +83,12 @@
     line-height: 30px;
     text-align: center;
   }
-  .aside-content .aside-footer div.footer-reset {
+  .aside-footer div.footer-reset {
     border: 1px solid #007aff;
     color: #007aff;
     background-color: transparent;
   }
-  .aside-content .aside-footer div.footer-confirm {
+  .aside-footer div.footer-confirm {
     color: #fff;
     border: 1px solid #007aff;
     background-color: #007aff;

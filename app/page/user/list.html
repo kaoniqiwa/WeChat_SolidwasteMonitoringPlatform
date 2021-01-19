@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../../assets/howell.font/howell.font.css" />
     <link href="../css/index.css" rel="stylesheet" />
     <link href="../../../minirefresh/minirefresh.css" rel="stylesheet" />
+    <link href="../css/aside.css" rel="stylesheet" />
     <link rel="stylesheet" href="../css/user-list.css">
 
 </head>
@@ -27,7 +28,7 @@
                     </div>
                 </div>
             </header>
-            
+
             <main>
                 <div class="minirefresh-wrap" id="minirefresh">
                     <div class="minirefresh-scroll">
@@ -35,14 +36,16 @@
                             <template id='infoTemplate'>
                                 <div class='info-item'>
                                     <aside class="img">
-                                        <i class="howell-icon-user-anonymous" style="font-size: xx-large;color: gray;"></i>
+                                        <i class="howell-icon-user-anonymous"
+                                            style="font-size: xx-large;color: gray;"></i>
                                     </aside>
                                     <main>
                                         <div class='detail'>
-                                            <div class='uname'>张三</div>
-                                            <div class='uresource'>
-                                                居委会管理员
+                                            <div class='user-name'>张三</div>
+                                            <div class="user-source">
+                                                广中路居委
                                             </div>
+
                                         </div>
                                         <div class='arrow'>
                                             <span class='howell-icon-arrow2right'></span>
@@ -56,31 +59,11 @@
             </main>
             <footer></footer>
         </div>
-        <div class='page' id='setPage'>
-            <form action="#">
-                <div>
-                    <span>姓名:</span>
-                    <input type="text">
-                </div>
-                <div>
-                    <span>性别:</span>
-                    <input type="checkbox">男
-                    <input type="checkbox">女
-                </div>
-                <div>
-                    <span>手机号:</span>
-                    <input type="text" value='112121212'>
-                </div>
-                <div>
-                    <span>权限:</span>
-                    <input type="text">
-                </div>
-
-            </form>
-        </div>
     </div>
 
-
+    <aside id="aside" class="aside-content">
+        <iframe id="user-child-iframe" src=""></iframe>
+    </aside>
     <script src="../../../minirefresh/minirefresh.js"></script>
 
     <script src="../ts/user-list.ts"></script>

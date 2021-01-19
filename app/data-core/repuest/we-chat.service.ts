@@ -27,7 +27,7 @@ export class WeChatRequestService extends SaveModel{
     }
 
     bingingUser(phoneNumber:string,openId:string){
-        return this.requestService.post<any,any>(this.url.binding(phoneNumber,openId));
+        return this.requestService.post<undefined,WeChatUser>(this.url.binding(phoneNumber,openId));
     }
 
    

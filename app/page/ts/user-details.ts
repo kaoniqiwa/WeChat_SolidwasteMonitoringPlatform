@@ -1,8 +1,11 @@
 import { SessionUser } from "../../common/session-user";
-import { GenderType, ResourceType } from "../../data-core/model/we-chat";
+import { DivisionType } from "../../data-core/model/waste-regulation/division";
+import { GenderType, ResourceRole, ResourceType } from "../../data-core/model/we-chat";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { Service } from "../../data-core/repuest/service";
+import { AsideControl } from "./aside";
+import { AsideListPage, AsideListPageWindow } from "./aside-list";
 
 namespace UserDetailsPage {
 
@@ -34,13 +37,77 @@ namespace UserDetailsPage {
 
 
     class Page {
+
+        asideDivision: AsideControl;
+        asidePage?: AsideListPage.Page;
         constructor(
             private user: SessionUser,
             private service: Service
         ) {
+            this.asideDivision = new AsideControl("aside-divisions", true);
+            this.asideDivision.backdrop = document.querySelector(".backdrop") as HTMLDivElement;
 
         }
 
+        loadDivision(type: ResourceType, resources: ResourceRole[]) {
+
+            let promise = this.service.division.list({
+                Ids: resources.map(x => x.Id)
+            });
+            promise.then(res => {
+                let data = res.Data.Data.map(x => {
+                    return {
+                        id: x.Id,
+                        name: x.Name
+                    }
+                });
+                if (this.element.iframe.contentWindow) {
+                    let currentWindow = this.element.iframe.contentWindow as AsideListPageWindow;
+                    this.asidePage = currentWindow.Page;
+                    this.asidePage.canSelected = false;
+                    this.asidePage.view({
+                        title: Language.ResourceType(type),
+                        items: data,
+                        footer_display: false
+                    });
+                    this.asidePage.confirmclicked = (selecteds) => {
+                        this.dividionsPageConfirm(selecteds);
+                    }
+                }
+            })
+        }
+
+        loadGarbageStations(resources: ResourceRole[]) {
+            let promise = this.service.garbageStation.list({Ids:resources.map(x=>x.Id)});
+            promise.then(res=>{
+                let data = res.Data.Data.map(x => {
+                    return {
+                        id: x.Id,
+                        name: x.Name
+                    }
+                });
+                if (this.element.iframe.contentWindow) {
+                    let currentWindow = this.element.iframe.contentWindow as AsideListPageWindow;
+                    this.asidePage = currentWindow.Page;
+                    this.asidePage.canSelected = false;
+                    this.asidePage.view({
+                        title: Language.ResourceType(ResourceType.GarbageStations),
+                        items: data,
+                        footer_display: false
+                    });
+                    this.asidePage.confirmclicked = (selecteds) => {
+                        this.dividionsPageConfirm(selecteds);
+                    }
+                }
+            });
+        }
+
+
+
+        dividionsPageConfirm(selecteds: Global.Dictionary<AsideListPage.AsideListItem>) {
+            console.warn(this);
+            this.asideDivision.Hide();
+        }
 
 
 
@@ -54,7 +121,8 @@ namespace UserDetailsPage {
                 gender: document.getElementById('user-gender') as HTMLDivElement,
                 count: document.getElementById('user-resources-count') as HTMLDivElement,
                 type: document.getElementById('user-resource-type') as HTMLDivElement
-            }
+            },
+            iframe: document.getElementById("iframe-divisions") as HTMLIFrameElement
         }
 
 
@@ -86,12 +154,34 @@ namespace UserDetailsPage {
             this.element.btn.back.addEventListener('click', () => {
                 window.parent.HideUserAside();
             });
+
+            this.element.info.count.addEventListener('click', () => {
+                this.asideDivision.Show();
+                if (this.user.WUser.Resources && this.user.WUser.Resources.length > 0) {
+                    let resource = this.user.WUser.Resources[0];
+                    if (!this.asidePage) {
+                        switch (resource.ResourceType) {
+                            case ResourceType.County:
+                            case ResourceType.Committees:
+
+                                this.loadDivision(this.user.WUser.Resources[0].ResourceType, this.user.WUser.Resources);
+
+                                break;
+                            case ResourceType.GarbageStations:
+                                this.loadGarbageStations(this.user.WUser.Resources);
+                                    break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            })
         }
     }
 
     if (location.search) {
         const client = new HowellHttpClient.HttpClient();
-        client.login((http: HowellAuthHttp) => {            
+        client.login((http: HowellAuthHttp) => {
             const service = new Service(http);
             const page = new Page(client.user, service);
             page.init();

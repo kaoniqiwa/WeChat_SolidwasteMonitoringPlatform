@@ -11,7 +11,11 @@ declare class Guid {
 declare interface Window {
     recordDetails?:any;
     showOrHideAside(url: string);
-    HideUserAside();
+    HideUserAside():void;
+}
+
+declare interface HTMLDivElement{
+    data?:any
 }
 
 

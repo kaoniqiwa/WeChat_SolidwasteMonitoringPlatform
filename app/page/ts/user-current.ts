@@ -3,18 +3,22 @@ import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { SRServer } from "../../data-core/model/aiop/sr-server";
 import { SessionUser } from "../../common/session-user";
+import { AsideControl } from "./aside";
 
 
 namespace UserPage {
     class Page {
-        constructor(private user: SessionUser, private service: Service) { }
+
+        aside:AsideControl;
+
+
+        constructor(private user: SessionUser, private service: Service) { 
+            this.aside = new AsideControl("aside");  
+            this.UserAside = this.aside;          
+        }
 
         element = {
-            aside: {
-                details: document.getElementById('user-details')!,
-                add: document.getElementById('add-user')!,
-                list: document.getElementById('user-list')!
-            },
+            aside: document.getElementById('aside')!,
             btn: {
                 details: document.getElementById('btn-user-details')!,
                 add: document.getElementById('btn-add-user')!,
@@ -26,11 +30,7 @@ namespace UserPage {
                     name: document.getElementById('resource-name')!
                 }
             },
-            iframe: {
-                details: document.getElementById('user-details-iframe') as HTMLIFrameElement,
-                add:document.getElementById('add-user-iframe') as HTMLIFrameElement,
-                list:document.getElementById('user-list-iframe') as HTMLIFrameElement
-            }
+            iframe: document.getElementById('user-child-iframe') as HTMLIFrameElement
         }
 
         init() {
@@ -38,17 +38,17 @@ namespace UserPage {
             window.element = this.element;
             window.HideUserAside = this.hideAside;
             this.element.btn.details.addEventListener('click', () => {
-                this.showDetailsAside();
+                const url = "../user/details1.html?openid=" + this.user.WUser.OpenId;
+                this.showAside(url)
             })
             this.element.btn.list.addEventListener('click', () => {
-                this.showListAside();
+                const url = "../user/list.html?openid=" + this.user.WUser.OpenId;
+                this.showAside(url)
             })
             this.element.btn.add.addEventListener('click', () => {
-                this.showAddAside();
+                const url = "../user/add.html?openid=" + this.user.WUser.OpenId;
+                this.showAside(url)
             })
-            this.element.iframe.details.src = "../user/details1.html?openid=" + this.user.WUser.OpenId;
-            this.element.iframe.list.src = "../user/list.html?openid=" + this.user.WUser.OpenId;
-            this.element.iframe.add.src = "../user/add.html?openid=" + this.user.WUser.OpenId;
         }
 
         loadUser() {
@@ -60,40 +60,17 @@ namespace UserPage {
             }
 
         }
-
-
-
-        showDetailsAside() {
-            this.element.aside.details.classList.add('active');
+        showAside(url:string)
+        {
+            this.element.iframe.src = url;
+            this.element.aside.classList.add('active');
         }
 
-        showListAside() {
-            this.element.aside.list.classList.add('active');
-        }
-
-        showAddAside() {
-            this.element.aside.add.classList.add('active');
-        }
 
 
         hideAside() {            
-            this.element.aside.add.classList.remove('active');
-            this.element.aside.details.classList.remove('active');
-            this.element.aside.list.classList.remove('active');
+            this.element.aside.classList.remove('active');
         }
-
-
-        /* showOrHideDivisionsAside() {
-
-            if (element.aside.divisions.classList.contains('active')) {
-                element.aside.divisions.classList.remove('active');
-
-                element.aside.backdrop.style.display = 'none'
-            } else {
-                element.aside.backdrop.style.display = 'block'
-                element.aside.divisions.classList.add('active')
-            }
-        } */
     }
 
     const client = new HowellHttpClient.HttpClient();

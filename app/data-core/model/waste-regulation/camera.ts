@@ -1,9 +1,9 @@
  /** 在线状态 */
 export enum OnlineStatus{
   /** 在线 */
-  ON = 0,
+  Online = 0,
   /** 离线 */
-  OFF = 1
+  Offline = 1
 }
 /**摄像机信息 */
 export class Camera {

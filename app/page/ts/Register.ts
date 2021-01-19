@@ -7,7 +7,7 @@ export namespace RegisterPage {
     class Message {
         constructor(private page: Page) { }
         isShow = false;
-        show = (message:string) => {
+        show = (message: string) => {
             this.page.element.message.message.innerText = message;
             this.page.element.message.window.style.display = '';
             this.isShow = true;
@@ -126,15 +126,22 @@ export namespace RegisterPage {
             });
             this.page.element.button.submit.addEventListener("click", async () => {
                 if (this.phoneNumber) {
-                    const result = await this.service.code.checkCode(this.phoneNumber, this.page.element.input.code.value);
+                    const response = await this.service.code.checkCode(this.phoneNumber, this.page.element.input.code.value);
 
-                    if (result.success) {
+                    if (response.success) {
 
                         const buser = await this.regist();
-                        this.page.Message.show("注册成功");
-                        setTimeout(() => {
-                            location.href = "./index.html?openid=" + buser.OpenId + "&index=4";
-                        }, 1500);
+                        if (buser && buser.Resources && buser.Resources.length > 0) {
+                            this.page.Message.show("注册成功");
+                            setTimeout(() => {
+
+                                location.href = "./index.html?openid=" + buser.OpenId;
+                            }, 1500);
+                        }
+                        else {
+                            this.page.Message.show("您还未被分配权限，请联系管理员");
+                            this.page.Message.autoHide();
+                        }
                     }
                     else {
                         this.page.Message.show("验证失败");
