@@ -1,9 +1,122 @@
+#addUser {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+}
 #addUser header {
-  background: red;
+  height: 60px;
+}
+#addUser header .content {
+  height: 100%;
+  padding: 0 12px;
+  color: #b2b2b2;
+  display: flex;
+  align-items: center;
 }
 #addUser main {
-  background: green;
+  margin-top: 1px;
+  flex-grow: 1;
+  overflow: auto;
+}
+#addUser main .form {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+#addUser main .form .form__title {
+  height: 104px;
+  margin-bottom: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  border-bottom: 1px solid #efeff4;
+}
+#addUser main .form .form__title div {
+  height: 24px;
+  line-height: 24px;
+  font-size: 24px;
+  font-weight: 370;
+}
+#addUser main .form .form__content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+#addUser main .form .form__content .form__item {
+  box-sizing: border-box;
+  border-bottom: 1px solid #efeff4;
+  height: 68px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+#addUser main .form .form__content .form__item:last-child {
+  border-style: none;
+  justify-content: center;
+  margin: auto 0;
+}
+#addUser main .form .form__content .form__item .item__key {
+  margin-left: 15px;
+  display: flex;
+  align-items: center;
+  height: 16.8px;
+  line-height: 16.8px;
+  font-size: 16.8px;
+  width: 100px;
+  flex-shrink: 0;
+  height: 100%;
+}
+#addUser main .form .form__content .form__item .item__value {
+  display: flex;
+  align-items: center;
+  margin-left: 2px;
+  margin-right: 25px;
+  flex-grow: 1;
+  height: 100%;
+  font-size: 16.8px;
+}
+#addUser main .form .form__content .form__item .item__value input,
+#addUser main .form .form__content .form__item .item__value select {
+  border: none;
+  outline: none;
+  height: 30px;
+  width: 100%;
+  font-size: 1em;
+}
+#addUser main .form .form__content .form__item .btn {
+  background-color: blue;
+  width: 45%;
+  height: 60%;
+  border-radius: 10px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4.8px;
+}
+#addUser main .form .form__content .form__item .btn.none-click {
+  background-color: gray;
+  pointer-events: none;
 }
 #addUser footer {
-  background: blue;
+  height: 20vh;
+  text-align: center;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+}
+#area {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+.backdrop.active {
+  display: block;
+  top: 0;
+}
+.aside-content.active {
+  height: 100%;
+  top: 0;
 }

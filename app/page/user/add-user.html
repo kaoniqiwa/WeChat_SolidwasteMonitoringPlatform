@@ -8,20 +8,92 @@
     <link rel="stylesheet" href="../../assets/howell.font/howell.font.css" />
     <link href="../css/index.css" rel="stylesheet" />
     <link rel="stylesheet" href="../css/add-user.css">
+    <link rel="stylesheet" href="../css/aside.css" type='text/css'>
+
 
 </head>
 
 <body>
     <div class="page" id='addUser'>
         <header>
-
+            <header>
+                <div class="content">
+                    <div id="back">
+                        <i class="howell-icon-arrow2left"></i>
+                        返回
+                    </div>
+                </div>
+            </header>
         </header>
         <main>
-            
-        </main>
-        <footer>
+            <div class='form'>
+                <div class="form__title">
+                    <div>添加用户</div>
+                </div>
+                <div class='form__content'>
+                    <div class='form__item'>
+                        <div class='item__key'>
+                            用户名
+                        </div>
+                        <div class='item__value'>
+                            <input type="text" placeholder="填写姓名" id='uname'>
+                        </div>
+                    </div>
+                    <div class='form__item'>
+                        <div class='item__key'>手机号</div>
+                        <div class='item__value'>
+                            <input type="text" placeholder="填写手机号" id='uphone' maxlength="11">
+                        </div>
+                    </div>
+                    <div class='form__item'>
+                        <div class='item__key'>性别</div>
+                        <div class='item__value'>
+                            <select name="" id="ugender">
+                                <option value="1">男</option>
+                                <option value="2">女</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class='form__item'>
+                        <div class='item__key'>管理权限</div>
+                        <div class='item__value'>
+                            <div id='type'></div>
+                        </div>
+                    </div>
+                    <div class='form__item' id='divisionArea'>
+                        <div class='item__key'>管辖范围</div>
+                        <div class='item__value' id='area'>
+                            <span>添加</span>
+                            <i class='howell-icon-arrow2right'></i>
+                        </div>
+                    </div>
 
-        </footer>
+                    <div class='form__item'>
+                        <div class='btn' id='addBtn'>
+                            添加用户
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+
+
+        <div class='backdrop'></div>
+        <aside class='aside-content'>
+            <header class='aside-title'>
+                居委
+            </header>
+            <main class='aside-main'>
+                <template id='aside-template'>
+                    <div class='aside-item'>西江湾路居委会</div>
+                </template>
+            </main>
+            <footer class='aside-footer'>
+                <div class='footer-reset'>重置</div>
+                <div class='footer-confirm'>确认</div>
+            </footer>
+        </aside>
     </div>
 
     <script src="../ts/add-user.ts"></script>
