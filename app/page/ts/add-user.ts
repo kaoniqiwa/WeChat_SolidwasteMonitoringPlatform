@@ -292,7 +292,7 @@ class AddUser {
         }
         let reg = /(1[3|4|5|6|7|8])[\d]{9}/
         if (!reg.test(this.myUser.MobileNo)) {
-            this.showTextToast('请填写正确的手机号'); return false;
+            this.showTextToast('请填写正确手机号'); return false;
         }
         if (!this.myUser.Resources || this.myUser.Resources.length == 0) {
             this.showTextToast('请选择管辖范围');
