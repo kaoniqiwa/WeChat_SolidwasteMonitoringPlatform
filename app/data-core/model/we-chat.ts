@@ -1,5 +1,7 @@
 /** 性别 */
 export enum GenderType {
+    /** 未知 */
+    unknow = 0,
     /** 男 */
     male = 1,
     /** 女 */
