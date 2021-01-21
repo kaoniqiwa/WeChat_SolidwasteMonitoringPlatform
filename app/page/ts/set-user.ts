@@ -104,7 +104,7 @@ class AddUser {
 
         this.service.wechat.set(this.myUser).then((res: any) => {
             console.log('updated', res)
-            if (res.FaultCode == 0) {
+            if (res.data.FaultCode == 0) {
                 this.showToast();
                 window.parent?.HideUserAside();
             } else {
