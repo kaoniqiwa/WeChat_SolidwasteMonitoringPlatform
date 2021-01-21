@@ -1,0 +1,139 @@
+#setUser {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+}
+#setUser header {
+  height: 60px;
+}
+#setUser header .content {
+  height: 100%;
+  padding: 0 12px;
+  color: #b2b2b2;
+  display: flex;
+  align-items: center;
+}
+#setUser main {
+  margin-top: 1px;
+  height: 100%;
+  overflow: auto;
+  padding: 0 20px;
+}
+#setUser main .form {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+#setUser main .form .form__title {
+  height: 68px;
+  margin-bottom: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  border-bottom: 1px solid #efeff4;
+}
+#setUser main .form .form__title div {
+  height: 24px;
+  line-height: 24px;
+  font-size: 24px;
+  font-weight: 370;
+}
+#setUser main .form .form__content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+#setUser main .form .form__content .form__item {
+  box-sizing: border-box;
+  border-bottom: 1px solid #efeff4;
+  height: 68px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+#setUser main .form .form__content .form__item:last-child {
+  border-style: none;
+  justify-content: center;
+  margin: auto 0;
+}
+#setUser main .form .form__content .form__item .item__key {
+  margin-left: 15px;
+  display: flex;
+  align-items: center;
+  height: 16.8px;
+  line-height: 16.8px;
+  font-size: 16.8px;
+  width: 100px;
+  flex-shrink: 0;
+  height: 100%;
+}
+#setUser main .form .form__content .form__item .item__value {
+  display: flex;
+  align-items: center;
+  margin-left: 2px;
+  flex-grow: 1;
+  height: 100%;
+  font-size: 16.8px;
+  color: #b2b2b2;
+}
+#setUser main .form .form__content .form__item .item__value input {
+  border: 0;
+  outline: 0;
+  height: 30px;
+  width: 100%;
+  font-size: 1em;
+  color: inherit;
+}
+#setUser main .form .form__content .form__item .item__value select {
+  -webkit-appearance: none;
+  border: 0;
+  outline: 0;
+  background-color: transparent;
+  width: 100%;
+  font-size: inherit;
+  height: 30px;
+  line-height: 30px;
+  position: relative;
+  z-index: 1;
+  padding-left: 0;
+  color: inherit;
+}
+#setUser main .form .form__content .form__item .btn {
+  background-color: #3a94ff;
+  width: 45%;
+  height: 40px;
+  border-radius: 10px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4.8px;
+}
+#setUser main .form .form__content .form__item .btn.none-click {
+  background-color: gray;
+  pointer-events: none;
+}
+#setUser footer {
+  height: 20vh;
+  text-align: center;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+}
+#area {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+.backdrop.active {
+  display: block;
+  top: 0;
+}
+.aside-content.active {
+  height: 100%;
+  top: 0;
+}

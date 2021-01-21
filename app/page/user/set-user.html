@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="../../assets/howell.font/howell.font.css" />
+    <link href="../css/index.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/set-user.css">
+    <link rel="stylesheet" href="../css/aside.css" type='text/css'>
+    <link rel="stylesheet" href="../css/weui.css" />
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+
+</head>
+
+<body>
+    <div class="page" id='setUser'>
+        <header>
+            <header>
+                <div class="content">
+                    <div id="back">
+                        <i class="howell-icon-arrow2left"></i>
+                        返回
+                    </div>
+                </div>
+            </header>
+        </header>
+        <main>
+            <div class='form'>
+                <div class="form__title">
+                    <div>更改信息</div>
+                </div>
+                <div class='form__content'>
+                    <div class='form__item'>
+                        <div class='item__key'>
+                            用户名
+                        </div>
+                        <div class='item__value'>
+                            <input type="text" placeholder="填写姓名" id='uname'>
+                        </div>
+                    </div>
+                    <div class='form__item'>
+                        <div class='item__key'>性别</div>
+                        <div class='item__value'>
+                            <select name="" id="ugender" class="weui-select">
+                                <option value="0">未知</option>
+                                <option value="1">男</option>
+                                <option value="2">女</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class='form__item foo'>
+                        <div class='btn' id='setBtn'>
+                            更新
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+
+
+        <div id="toast" style="display: none;">
+            <div class="weui-mask_transparent"></div>
+            <div class="weui-toast">
+                <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+                <p class="weui-toast__content">提交成功</p>
+            </div>
+        </div>
+
+
+        <div id="warnToast" style="display: none;">
+            <div class="weui-mask_transparent"></div>
+            <div class="weui-toast">
+                <i class="weui-icon-warn weui-icon_toast"></i>
+                <p class="weui-toast__content">提交失败</p>
+            </div>
+        </div>
+
+        <div id="textToast" style="display: none;">
+            <div class="weui-mask_transparent"></div>
+            <div class="weui-toast weui-toast_text">
+                <p class="weui-toast__content">皓维</p>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script src="../ts/set-user.ts"></script>
+</body>
+
+</html>
