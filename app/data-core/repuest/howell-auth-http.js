@@ -78,7 +78,7 @@ class HowellAuthHttp {
             headers: myHeaders
         };
         return this.axios
-            .delete(path, config)
+            .delete(path, httpOptions)
             .catch(this.httpOptions)
             .then(wwwAuth => {
 
