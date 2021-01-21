@@ -7,6 +7,12 @@ import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { Service } from "../../data-core/repuest/service";
 
+// declare var  $:any;
+
+// console.log($)
+
+let $ = Reflect.get(window, '$');
+
 
 class Language {
     static ResourceType(type: ResourceType) {
@@ -35,10 +41,11 @@ class Language {
 }
 
 
-
 class AddUser {
     myData: Map<string, Division> = new Map();
     garbageStations: Map<string, GarbageStation> = new Map();
+
+    language: string = '';
     resourceType: ResourceType = ResourceType.GarbageStations;
 
     selectedData: Map<string, any> = new Map();
@@ -46,7 +53,6 @@ class AddUser {
 
 
     constructor(private user: SessionUser, private service: Service) {
-        this.myUser.Gender = GenderType.male;
     }
     element = {
         info: {
@@ -54,7 +60,12 @@ class AddUser {
             uphone: document.querySelector('#uphone') as HTMLInputElement,
             ugender: document.querySelector('#ugender') as HTMLSelectElement,
             type: document.querySelector('#type')!,
-            ruleArea: document.querySelector('#area > span') as HTMLSpanElement
+            ruleArea: document.querySelector('#area > span') as HTMLSpanElement,
+
+            $toast:$('#toast'),
+            $warnToast:$('#warnToast'),
+            $textToast: $('#textToast'),
+            $toastContent: $('#textToast .weui-toast__content'),
         },
         btn: {
             area: document.querySelector('#area')!,
@@ -77,30 +88,55 @@ class AddUser {
                 let resourceType = this.user.WUser.Resources[0].ResourceType;
                 let resourceId = this.user.WUser.Resources[0].Id;
 
+                this.resourceType = resourceType;
+                this.language = Language.ResourceType(this.resourceType + 1);
+
                 if (resourceType == ResourceType.County) {
-                    // 当前是街道权限,拉取下级居委会
+                    // 当前是街道权限,拉取下级居委会列表
                     this.myData = await this.loadDivisionList(resourceId);
                     console.log('居委会', this.myData)
                 } else if (resourceType == ResourceType.Committees) {
-                    // 当前是居委会权限,拉取下级厢房
+                    // 当前是居委会权限,拉取下级厢房列表
                     this.myData = await this.LoadGarbageStation(resourceId);
                     console.log('厢房', this.myData)
                 }
-                this.resourceType = resourceType;
-                const language = Language.ResourceType(resourceType + 1);
-                this.element.info.type.innerHTML = language;
-                this.element.aside.asideTitle.innerHTML = language;
 
-                this.myUser.CanCreateWeChatUser = (this.resourceType + 1 == 2);
             }
         }
     }
     init() {
+
+        this.createMain();
+
         this.createAside();
+
         this.bindEvents();
 
+    }
+    createMain() {
 
+        this.element.info.type.innerHTML = this.language;
 
+        // 性别默认未知
+        this.myUser.Gender = Number(this.element.info.ugender.value);
+        this.myUser.CanCreateWeChatUser = (this.resourceType + 1 == 2);
+    }
+    createAside() {
+        let self = this;
+
+        this.element.aside.asideTitle.innerHTML = this.language;
+        this.element.aside.asideMain!.innerHTML = '';
+
+        let tempContent = this.element.aside.asideTemplate?.content as DocumentFragment;
+
+        for (let [k, v] of this.myData) {
+            // 不能在 documentFragment 上添加任何事件
+            let info = tempContent.cloneNode(true) as DocumentFragment;
+            let div = info.querySelector('div.aside-item') as HTMLDivElement;
+            div!.textContent = v.Name;
+            div.setAttribute('id', v.Id);
+            this.element.aside.asideMain!.appendChild(info)
+        }
     }
     bindEvents() {
         let self = this;
@@ -140,7 +176,6 @@ class AddUser {
                     self.selectedData.delete(this.id)
 
                 } else {
-
                     // 街道下面的居委会只能选择一个
                     if (self.resourceType == ResourceType.County) {
                         for (let [k, v] of self.selectedData) {
@@ -205,19 +240,7 @@ class AddUser {
             this.element.aside.backdrop.classList.add('active')
         }
     }
-    createAside() {
-        let _this = this;
-        this.element.aside.asideMain!.innerHTML = '';
-        let tempContent = this.element.aside.asideTemplate?.content as DocumentFragment;
 
-        for (let [k, v] of this.myData) {
-            let info = tempContent.cloneNode(true) as DocumentFragment;
-            let div = info.querySelector('div.aside-item') as HTMLDivElement;
-            div!.textContent = v.Name;
-            div.setAttribute('id', v.Id);
-            this.element.aside.asideMain!.appendChild(info)
-        }
-    }
     resetSelected() {
         console.log('reset', this.selectedData)
         for (let [k, v] of this.selectedData) {
@@ -260,33 +283,67 @@ class AddUser {
     }
     createUser() {
         if (!this.myUser.LastName) {
-            alert('请填写姓名')
+            this.showTextToast('请填写姓名')
             return;
         }
         if (!this.myUser.MobileNo) {
-            alert('请填写手机号');
+            this.showTextToast('请填写手机号');
             return;
         }
         let reg = /(1[3|4|5|6|7|8])[\d]{9}/
         if (!reg.test(this.myUser.MobileNo)) {
-            alert('请填写正确的手机号码'); return false;
+            this.showTextToast('请填写正确的手机号'); return false;
         }
         if (!this.myUser.Resources || this.myUser.Resources.length == 0) {
-            alert('请选择管辖范围');
+            this.showTextToast('请选择管辖范围');
             return
         }
+        console.log(this.myUser);
 
         this.service.user.create(this.myUser).then((res:any)=>{
             console.log('create',res)
             if(res.FaultCode == 0){
-                alert('添加成功');
+                this.showToast();
                 window.parent?.HideUserAside();
             }else{
-                alert('添加失败')
+                this.showWarnToast()
             }
         })
     }
+    showToast(){
+        let $toast = this.element.info.$toast;
+
+        if ($toast.css('display') != 'none') return;
+        $toast.fadeIn(100);
+        setTimeout(function () {
+            $toast.fadeOut(100);
+        }, 1000);
+    }
+    showWarnToast(){
+        let $warnToast = this.element.info.$warnToast;
+
+        if ($warnToast.css('display') != 'none') return;
+        $warnToast.fadeIn(100);
+        setTimeout(function () {
+            $warnToast.fadeOut(100);
+        }, 1000);
+    }
+    showTextToast(msg: string) {
+        let $textToast = this.element.info.$textToast;
+        let $toastContent = this.element.info.$toastContent;
+        $toastContent.html(msg);
+
+        if ($textToast.css('display') != 'none') return;
+        $textToast.fadeIn(100);
+        setTimeout(function () {
+            $textToast.fadeOut(100,function(){
+                $toastContent.html('howell');
+            });
+        }, 1000);
+    }
+
 }
+
 
 if (location.search) {
     const client = new HowellHttpClient.HttpClient();
@@ -294,6 +351,8 @@ if (location.search) {
         const user = new SessionUser();
         const service = new Service(http);
         const page = new AddUser(client.user, service);
+
+        // 数据请求完成，初始化页面
         page.loadData().then(() => {
             page.init()
         });
