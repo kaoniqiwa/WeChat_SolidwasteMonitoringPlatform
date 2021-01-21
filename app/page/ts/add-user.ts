@@ -276,7 +276,15 @@ class AddUser {
             return
         }
 
-        this.service.user.create(this.myUser)
+        this.service.user.create(this.myUser).then((res:any)=>{
+            console.log('create',res)
+            if(res.FaultCode == 0){
+                alert('添加成功');
+                window.parent?.HideUserAside();
+            }else{
+                alert('添加失败')
+            }
+        })
     }
 }
 
