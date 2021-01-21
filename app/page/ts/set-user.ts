@@ -50,6 +50,7 @@ class AddUser {
 
 
     constructor(private user: SessionUser, private service: Service) {
+        this.myUser = user.WUser;
     }
     element = {
         info: {
@@ -78,7 +79,7 @@ class AddUser {
         // 性别默认未知
         this.myUser.Gender = Number(this.element.info.ugender.value);
         this.myUser.CanCreateWeChatUser = (this.resourceType + 1 == 2);
-        this.myUser.Id =this.user.WUser.Id;
+        // this.myUser.Id =this.user.WUser.Id;
     }
     bindEvents() {
         let self = this;
