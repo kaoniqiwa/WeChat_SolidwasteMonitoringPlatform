@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
     <link rel="stylesheet" href="../../assets/howell.font/howell.font.css" />
+    <link crossorigin="anonymous"
+    integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+    href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
+
     <link href="../css/index.css" rel="stylesheet" />
     <link href="../css/aside.css" rel="stylesheet" />
     <link href="../css/user-details.css" rel="stylesheet" />
@@ -53,14 +57,17 @@
         <div class="line-item own">
             <div>管辖范围</div>
             <div class="value">
-                <div id="user-resources-count">0</div>
+                <div id="user-resource">0</div>
                 <i class="howell-icon-arrow2right"></i>
             </div>
+        </div>
+        <div class="the-left">
+            <a class="weui-btn weui-btn_warn" style="display: none;" id="delete">删除用户</a>
         </div>
     </div>
     <div class='backdrop'></div>
     <aside class="aside-content" id="aside-divisions">
-        <iframe id="iframe-divisions" src="../aside-list.html"></iframe>
+        <iframe id="iframe" src="../aside-list.html"></iframe>
     </aside>
 
     <aside class="aside-content"></aside>

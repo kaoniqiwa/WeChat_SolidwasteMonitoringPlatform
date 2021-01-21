@@ -5,6 +5,7 @@ import { CameraRequestService, GarbageStationRequestService } from "./garbage-st
 import { HowellAuthHttp } from "./howell-auth-http";
 import { EventRequestService } from "./Illegal-drop-event-record";
 import { RoleRequestService } from "./role-service";
+import { UserRequestService } from "./user.service";
 import { WeChatRequestService } from "./we-chat.service";
 
 export class Service {
@@ -13,14 +14,21 @@ export class Service {
 
     }
 
-
-    private _user?: WeChatRequestService;
-    /** 用户信息服务 */
-    get user(): WeChatRequestService {
+    private _user?: UserRequestService;
+    get user(): UserRequestService {
         if (!this._user) {
-            this._user = new WeChatRequestService(this.requestService);
+            this._user = new UserRequestService(this.requestService);
         }
         return this._user;
+    }
+
+    private _wechat?: WeChatRequestService;
+    /** 用户信息服务 */
+    get wechat(): WeChatRequestService {
+        if (!this._wechat) {
+            this._wechat = new WeChatRequestService(this.requestService);
+        }
+        return this._wechat;
     }
     /** 角色信息服务 */
     private _role?: RoleRequestService;

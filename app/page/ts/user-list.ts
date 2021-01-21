@@ -4,6 +4,7 @@ import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { SRServer } from "../../data-core/model/aiop/sr-server";
 import { SessionUser } from "../../common/session-user";
 import { WeChatUser } from "../../data-core/model/we-chat";
+import { AsideControl } from "./aside";
 
 
 
@@ -13,11 +14,15 @@ declare var MiniRefresh: any;
 namespace UserListPage {
     class Page {
 
+        asideControl: AsideControl;
+
+
         element = {
             back: document.querySelector('#back') as HTMLTemplateElement,
             content: document.querySelector('#content') as HTMLDivElement,
             template: document.querySelector('#infoTemplate') as HTMLTemplateElement,
-            setPage: document.querySelector('#setPage') as HTMLDivElement
+            setPage: document.querySelector('#setPage') as HTMLDivElement,
+            iframe: document.querySelector('#user-child-iframe') as HTMLIFrameElement
         }
 
 
@@ -26,45 +31,30 @@ namespace UserListPage {
 
 
         constructor(private user: SessionUser, private service: Service) {
-
+            this.asideControl = new AsideControl('aside', true);
+            window.HideUserAside = (userId?) => {                
+                this.asideControl.Hide();
+                if(userId)
+                {
+                    let e = document.getElementById(userId);
+                    if(e)
+                    {
+                        e.parentElement!.removeChild(e);
+                    }
+                    this.userInfos.delete(userId);
+                }
+            }
         }
+
         async loadData() {
             let a = await this.loadWechatUser();
             return 'success';
         }
         loadWechatUser() {
-            return this.service.user.list().then((res) => {
-                let fake = {
-                    "Id": '1212',
-                    "OpenId": "12121",
-                    "MobileNo": "18221772092",
-                    "FirstName": "zhang",
-                    "LastName": "san",
-                    "Gender": 1,
-                    "Resources": [
-                        {
-                            "Id": "12",
-                            "Name": "街道",
-                            "ResourceType": 1,
-                            "RoleFlags": 0,
-                            "AllSubResources": true,
-                            "Resources": [
-
-                            ]
-                        }
-                    ],
-                    "ServerId": "1212",
-                    "Note": "3333",
-                    "CanCreateWeChatUser": true
-                } as WeChatUser;
-
-                res.data = Array(20).fill(fake);
-                console.log('res', res)
-
+            return this.service.wechat.list().then((res) => {
                 res.data.forEach((v) => {
-                    this.userInfos.set('info' + v.Id + Math.random() * 999, v)
+                    this.userInfos.set(v.Id!, v)
                 })
-
             }).catch((er) => {
                 console.warn(er)
             })
@@ -84,13 +74,15 @@ namespace UserListPage {
 
         }
         createContent() {
-            let _this = this;
+            let that = this;            
             console.log(this.userInfos)
             if (this.element.content && this.element.template) {
                 this.element.content.innerHTML = '';
                 let tempContent = this.element.template.content as DocumentFragment;
                 for (let [k, v] of this.userInfos) {
-                    let info = tempContent.cloneNode(true) as DocumentFragment;
+
+                    let info = tempContent.cloneNode(true) as HTMLDivElement;
+
                     let name = info.querySelector('.user-name') as HTMLDivElement;
                     name.innerHTML = '';
                     if (v.LastName) {
@@ -105,6 +97,19 @@ namespace UserListPage {
                             source.innerHTML = v.Resources[0].Name;
                         }
                     }
+
+                    var main = info.querySelector(".info-item") as HTMLDivElement;
+                    main.id = v.Id!;
+                    main.data = v;
+                    main.addEventListener('click', function () {                        
+                        if (this.data) {
+                            console.log('info click');
+                            that.element.iframe.src = "../user/details1.html?openid=" + that.user.WUser.OpenId + "&childId=" + (this.data as WeChatUser).Id;
+                            that.asideControl.Show();
+                        }
+                    });
+
+
 
                     this.element.content.appendChild(info)
                 }

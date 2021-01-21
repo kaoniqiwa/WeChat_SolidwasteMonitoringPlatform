@@ -49,7 +49,7 @@
             </div>
 
             <div class="btn right filter" id="btn_division">
-                居委<i class="howell-icon-screen"></i>
+                筛选<i class="howell-icon-screen"></i>
             </div>
             <div class="btn right filter" id="img_division">
                 <i class="howell-icon-list" style="font-weight: bold;"></i>
@@ -100,19 +100,8 @@
     </main>
 
     <div class='backdrop'></div>
-    <aside class='aside-content'>
-        <header class='aside-title'>
-            居委
-        </header>
-        <main class='aside-main'>
-            <template id='aside-template'>
-                <div class='aside-item'>西江湾路居委会</div>
-            </template>
-        </main>
-        <footer class='aside-footer'>
-            <div class='footer-reset'>重置</div>
-            <div class='footer-confirm'>确认</div>
-        </footer>
+    <aside class='aside-content' id="aside-control">
+        <iframe id="aside-iframe" src="./aside-list.html"></iframe>
     </aside>
 
     <div class="swiper-container" id="origin-img">
@@ -123,7 +112,7 @@
 
 
 
-    <script src="./ts/garbage-station.ts"></script>
+    <script src="./ts/garbage-station copy.ts"></script>
 </body>
 
 </html>

@@ -9,12 +9,12 @@ import { AsideControl } from "./aside";
 namespace UserPage {
     class Page {
 
-        aside:AsideControl;
+        aside: AsideControl;
 
 
-        constructor(private user: SessionUser, private service: Service) { 
-            this.aside = new AsideControl("aside");  
-            this.UserAside = this.aside;          
+        constructor(private user: SessionUser, private service: Service) {
+            this.aside = new AsideControl("aside");
+
         }
 
         element = {
@@ -46,12 +46,18 @@ namespace UserPage {
                 this.showAside(url)
             })
             this.element.btn.add.addEventListener('click', () => {
-                const url = "../user/add.html?openid=" + this.user.WUser.OpenId;
+                const url = "../user/add-user.html?openid=" + this.user.WUser.OpenId;
                 this.showAside(url)
             })
         }
 
         loadUser() {
+
+            if (this.user.WUser.CanCreateWeChatUser) {
+                this.element.btn.add.style.display = "";
+                this.element.btn.list.style.display = "";
+            }
+
             this.element.info.name.innerHTML = '';
             this.element.info.name.innerHTML += this.user.WUser.MobileNo;
             // this.element.info.name.innerHTML += this.user.WUser.FirstName;
@@ -60,15 +66,14 @@ namespace UserPage {
             }
 
         }
-        showAside(url:string)
-        {
+        showAside(url: string) {
             this.element.iframe.src = url;
             this.element.aside.classList.add('active');
         }
 
 
 
-        hideAside() {            
+        hideAside() {
             this.element.aside.classList.remove('active');
         }
     }

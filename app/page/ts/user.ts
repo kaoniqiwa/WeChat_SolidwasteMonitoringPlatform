@@ -13,7 +13,7 @@ namespace UserPage {
         console.log(http)
         var service = new Service(http)
         console.log(service)
-        service.user.list().then((res)=>{
+        service.wechat.list().then((res)=>{
             console.log(res)
         }).catch((er)=>{
             console.warn(er)

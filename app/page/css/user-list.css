@@ -84,6 +84,8 @@
   border-bottom: 2px solid #eaeaea;
   display: flex;
   justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: -12px;
 }
 .container #getPage main .info-list .info-item main .detail {
   display: flex;
@@ -99,6 +101,8 @@
 .container #getPage main .info-list .info-item main .detail .user-source {
   font-size: 14px;
   color: #b2b2b2;
+  height: 50%;
+  line-height: 40px;
   width: 100%;
 }
 .container #getPage main .info-list .info-item main .arrow {
@@ -134,7 +138,15 @@
   text-align: center;
     vertical-align: middle;
     background-color: #ccc;
-    width: 72px;
-    height: 72px;
-    line-height: 72px;
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
 }
+
+.aside-content
+{
+  top: 0;
+  height: 100%;
+  width: 100%;
+}
+

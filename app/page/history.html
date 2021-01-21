@@ -41,7 +41,7 @@
             </div>
 
             <div class="btn right filter">
-                居委<i class="howell-icon-screen"></i>
+                筛选<i class="howell-icon-screen"></i>
             </div>
             <div class="btn right filter" id="showDatePicker">
                 <i class="howell-icon-calendar" style="font-weight: bold;"></i>
@@ -92,19 +92,8 @@
 
     </div>
     <div class='backdrop'></div>
-    <aside class='aside-content divisions'>
-        <header class='aside-title'>
-            居委
-        </header>
-        <main class='aside-main'>
-            <template id='aside-template'>
-                <div class='aside-item'>西江湾路居委会</div>
-            </template>
-        </main>
-        <footer class='aside-footer'>
-            <div class='footer-reset'>重置</div>
-            <div class='footer-confirm'>确认</div>
-        </footer>
+    <aside class='aside-content divisions' id="aside-content">
+        <iframe src="./aside-list.html" id="aside-iframe"></iframe>
     </aside>
 </body>
 <script src="../../minirefresh/minirefresh.js"></script>

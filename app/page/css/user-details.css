@@ -16,3 +16,15 @@
 .howell-icon-arrow2right{
     margin-left: 10px;
 }
+
+.the-left{
+    height: calc(100% - 350px);
+  }
+  .the-left > a{
+    top:50%;
+  }
+  .weui-btn_warn
+  {
+      color: white;
+      background-color:#fd2f2d;
+  }

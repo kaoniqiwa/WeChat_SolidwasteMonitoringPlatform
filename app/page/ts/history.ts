@@ -8,6 +8,9 @@ import { PagedList } from "../../data-core/model/page";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 import { Service } from "../../data-core/repuest/service";
 import { ResourceType } from "../../data-core/model/we-chat";
+import { AsideControl } from "./aside";
+import { AsideListPage, AsideListPageWindow, SelectionMode } from "./aside-list";
+import { Language } from "./language";
 
 
 
@@ -22,14 +25,8 @@ export namespace EventHistoryPage {
         date: document.getElementById("date")!,
         datePicker: document.getElementById("showDatePicker")!,
         aside: {
-            divisions: document.querySelector('.aside-content.divisions') as HTMLDivElement,
             backdrop: document.querySelector('.backdrop') as HTMLDivElement,
-            template: document.querySelector('#aside-template') as HTMLTemplateElement,
-            main: document.querySelector('.aside-main') as HTMLDivElement,
-            btn: {
-                reset: document.querySelector('.footer-reset') as HTMLDivElement,
-                confirm: document.querySelector('.footer-confirm') as HTMLDivElement
-            }
+            iframe: document.getElementById('aside-iframe') as HTMLIFrameElement
         },
         filterBtn: document.querySelector('.btn.filter') as HTMLDivElement,
         IllegalDrop: {
@@ -39,6 +36,8 @@ export namespace EventHistoryPage {
             date: document.getElementById("date")!
         }
     }
+
+
     var MiniRefreshId = {
         IllegalDrop: "illegalDropRefreshContainer"
     }
@@ -70,6 +69,9 @@ export namespace EventHistoryPage {
         garbageElements: Map<string, any> = new Map();
 
 
+        asideControl: AsideControl;
+        asidePage?: AsideListPage;
+
         /**
          * author:zha
          */
@@ -94,100 +96,64 @@ export namespace EventHistoryPage {
                 date: new Date()
             }
 
-
+            this.asideControl = new AsideControl("aside-content");
+            this.asideControl.backdrop = element.aside.backdrop;
             element.filterBtn.addEventListener('click', () => {
-                this.showOrHideDivisionsAside()
+                this.asideControl.Show();
             })
-            element.aside.backdrop.addEventListener('click', () => {
-                this.showOrHideDivisionsAside()
-            })
-
-
-
-
-            element.aside.btn.reset.addEventListener('click', () => {
-                this.resetSelected()
-            })
-            element.aside.btn.confirm.addEventListener('click', () => {
-                this.confirmSelect()
-            })
-
 
         }
         loadAside() {
             this.loadData().then(() => {
-                this.createAside()
+                if (this.user.WUser.Resources && this.user.WUser.Resources.length > 0) {
+                    this.createAside(this.user.WUser.Resources[0].ResourceType)
+                }
             })
         }
-        createAside() {
-            let _this = this;
-            element.aside.main.innerHTML = '';
-            let tempContent = element.aside.template.content as DocumentFragment;
-
-            for (let [k, v] of this.divisions) {
-                let info = tempContent.cloneNode(true) as DocumentFragment;
-                let div = info.querySelector('div.aside-item') as HTMLDivElement;
-                div.textContent = v.Name;
-                div.setAttribute('id', v.Id);
-                div.addEventListener('click', function () {
-                    if (this.classList.contains('selected')) {
-                        this.classList.remove('selected')
-                        _this.selectedDivisions.delete(v.Id)
-
-                    } else {
-                        this.classList.add('selected');
-
-
-                        _this.selectedDivisions.set(v.Id, {
-                            Element: this,
-                            id: v.Id
-                        })
-                    }
+        createAside(type: ResourceType) {
+            let items = [];
+            for (const [key, value] of this.divisions) {
+                items.push(value);
+            }
+            if (element.aside.iframe.contentWindow) {
+                let currentWindow = element.aside.iframe.contentWindow as AsideListPageWindow;
+                this.asidePage = currentWindow.Page;
+                this.asidePage.canSelected = true;
+                this.asidePage.selectionMode = SelectionMode.single;
+                this.asidePage.view({
+                    title: Language.ResourceType(type),
+                    items: items.map(x => {
+                        return {
+                            id: x.Id,
+                            name: x.Name
+                        };
+                    }),
+                    footer_display: true
                 })
-                element.aside.main.appendChild(info)
-            }
-        }
-        showOrHideDivisionsAside() {
-
-            if (element.aside.divisions.classList.contains('active')) {
-                element.aside.divisions.classList.remove('active');
-
-                element.aside.backdrop.style.display = 'none'
-            } else {
-                element.aside.backdrop.style.display = 'block'
-                element.aside.divisions.classList.add('active')
-            }
-        }
-
-
-
-        resetSelected() {
-            console.log('reset', this.selectedDivisions)
-            for (let [k, v] of this.selectedDivisions) {
-                v.Element.classList.remove('selected')
-            }
-            this.selectedDivisions.clear();
-
-
-        }
-        confirmSelect() {
-            console.log('selectedDivisions', this.selectedDivisions)
-
-            let selectedIds = [];
-
-            for (let v of this.selectedDivisions.values()) {
-                selectedIds.push(v.id)
-            }
-            console.log(this.garbageElements)
-
-            for (let [k, v] of this.garbageElements) {
-                if (selectedIds.length == 0 || selectedIds.includes(v.divisionId)) {
-                    v.Element.style.display = 'block'
-                } else {
-                    v.Element.style.display = 'none'
+                this.asidePage.confirmclicked = (selecteds) => {
+                    let selectedIds = [];
+                    for (let id in selecteds) {
+                        selectedIds.push(id)
+                    }
+                    this.confirmSelect(selectedIds)
                 }
             }
-            this.showOrHideDivisionsAside();
+        }
+
+
+
+
+        confirmSelect(selectedIds: string[]) {
+            this.filter.divisionId = selectedIds[0];
+            // for (let [k, v] of this.garbageElements) {
+            //     if (selectedIds.length == 0 || selectedIds.includes(v.divisionId)) {
+            //         v.Element.style.display = 'block'
+            //     } else {
+            //         v.Element.style.display = 'none'
+            //     }
+            // }
+            this.refresh();
+            this.asideControl.Hide();
 
         }
         async loadData() {
@@ -250,8 +216,9 @@ export namespace EventHistoryPage {
             item.id = record.EventId;
             item.setAttribute('divisionid', record.Data.DivisionId)
             item.innerHTML = template.element.innerHTML;
-            item.getElementsByTagName("img")[0].addEventListener("error", function () {
-                this.src = "../../img/black.png"
+            item.getElementsByTagName("img")[0].addEventListener("error", function () {                
+                this.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII=";
+                this.style.background = "black";                
             });
 
             item.addEventListener("click", () => {
@@ -313,6 +280,9 @@ export namespace EventHistoryPage {
             })
 
             const day = getAllDay(date);
+            if (this.filter.divisionId) {
+                divisionIds = [this.filter.divisionId];
+            }
             let page = await this.getData(day.begin, day.end, this.pageIndex, { divisionIds: divisionIds, stationIds: stationIds });
             console.log('page', page)
 
@@ -347,17 +317,20 @@ export namespace EventHistoryPage {
                             ).map(x => {
                                 return x.Id
                             });
-                            
+
                             if (divisionIds.length < 2) {
                                 element.filterBtn.style.display = "none";
                             }
-                            divisionIds = divisionIds.concat(this.user.WUser.Resources.filter(x =>{                                
+                            divisionIds = divisionIds.concat(this.user.WUser.Resources.filter(x => {
                                 return x.ResourceType == ResourceType.County;
-                            }                                
+                            }
                             ).map(x => {
                                 element.filterBtn.style.display = "";
                                 return x.Id
                             }));
+                            if (this.filter.divisionId) {
+                                divisionIds = [this.filter.divisionId];
+                            }
                             var data = await this.getData(day.begin, day.end, ++this.pageIndex, {
                                 divisionIds: divisionIds,
                                 stationIds: stationIds
@@ -463,8 +436,8 @@ export namespace EventHistoryPage {
         }
     }
 }
-console.log("User",window.parent.User);
-console.log("Auth",window.parent.hwAuth);
+console.log("User", window.parent.User);
+console.log("Auth", window.parent.hwAuth);
 const page = new EventHistoryPage.Page();
 page.viewDatePicker(new Date());
 page.init();
