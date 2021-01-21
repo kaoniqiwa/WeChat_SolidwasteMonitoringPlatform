@@ -37,7 +37,7 @@ export class WeChatRequestService extends SaveModel{
     }
 
     set(item: WeChatUser){
-        return this.requestService.put<WeChatUser, WeChatUser>(this.url.edit(item.Id),item);
+        return this.requestService.put<WeChatUser, WeChatUser>(this.url.edit(item.OpenId),item);
     }
 
     del(id: string) {
