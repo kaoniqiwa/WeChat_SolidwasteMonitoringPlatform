@@ -93,6 +93,9 @@ class AddUser {
         this.element.btn.setBtn.addEventListener('click', () => {
             this.updateUser();
         })
+        this.element.btn.back.addEventListener('click', () => {
+            window.parent?.HideUserAside();
+        });
     }
 
     updateUser() {
