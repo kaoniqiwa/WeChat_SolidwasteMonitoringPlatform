@@ -47,8 +47,10 @@ class AddUser {
 
     }
     createMain() {
+        let firstName = this.user.WUser.FirstName ? this.user.WUser.FirstName : '';
+        let lastName = this.user.WUser.LastName ? this.user.WUser.LastName : '';
 
-        this.element.info.uname.value = this.user.WUser.LastName!;
+        this.element.info.uname.value = lastName + firstName;
         this.element.info.ugender.value = this.user.WUser.Gender!.toString();
 
         // 性别默认未知
