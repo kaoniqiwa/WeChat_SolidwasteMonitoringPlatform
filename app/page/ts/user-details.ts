@@ -131,10 +131,10 @@ namespace UserDetailsPage {
                 this.element.info.name.innerHTML += this.user.FirstName;
             }
             if (this.isCurrent) {
-                this.element.info.name.addEventListener("click", () => {
+                this.element.info.name.parentElement?.parentElement?.addEventListener("click", () => {
                     this.asideSetUser.Show();
                 });
-                this.element.info.gender.addEventListener("click", () => {
+                this.element.info.gender.parentElement?.parentElement?.addEventListener("click", () => {
                     this.asideSetUser.Show();
                 });
             }
