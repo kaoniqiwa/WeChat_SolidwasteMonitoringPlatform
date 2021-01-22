@@ -130,9 +130,14 @@ namespace UserDetailsPage {
             if (this.user.FirstName) {
                 this.element.info.name.innerHTML += this.user.FirstName;
             }
-            this.element.info.name.addEventListener("click", () => {
-                this.asideSetUser.Show();
-            });
+            if (this.isCurrent) {
+                this.element.info.name.addEventListener("click", () => {
+                    this.asideSetUser.Show();
+                });
+                this.element.info.gender.addEventListener("click", () => {
+                    this.asideSetUser.Show();
+                });
+            }
 
             if (this.user.MobileNo) {
                 this.element.info.mobileNo.innerHTML = this.user.MobileNo;
@@ -206,7 +211,7 @@ namespace UserDetailsPage {
                 }
             }
 
-            const page = new Page(user, service);
+            const page = new Page(user, service, !childId);
 
             if (childId) {
                 page.element.btn.delete.style.display = "";
