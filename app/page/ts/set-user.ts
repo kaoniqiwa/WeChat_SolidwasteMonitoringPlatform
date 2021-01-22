@@ -10,34 +10,6 @@ import { Service } from "../../data-core/repuest/service";
 
 let $ = Reflect.get(window, '$');
 
-
-class Language {
-    static ResourceType(type: ResourceType) {
-        switch (type) {
-            case ResourceType.County:
-                return '街道';
-            case ResourceType.Committees:
-                return '居委会';
-            case ResourceType.GarbageStations:
-                return '厢房';
-            default:
-                return ''
-        }
-    }
-
-    static Gender(gender: GenderType) {
-        switch (gender) {
-            case GenderType.male:
-                return '男';
-            case GenderType.female:
-                return '女'
-            default:
-                return '';
-        }
-    }
-}
-
-
 class AddUser {
     myData: Map<string, Division> = new Map();
     garbageStations: Map<string, GarbageStation> = new Map();
@@ -112,7 +84,7 @@ class AddUser {
             console.log('updated', res)
             if (res.data.FaultCode == 0) {
                 this.showToast();
-                window.parent?.HideUserAside();
+                window.parent?.HideUserAside(res.data.Data);
             } else {
                 this.showWarnToast()
             }
