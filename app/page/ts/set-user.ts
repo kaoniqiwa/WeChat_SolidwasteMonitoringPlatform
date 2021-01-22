@@ -76,6 +76,9 @@ class AddUser {
     }
     createMain() {
 
+        this.element.info.uname.value = this.user.WUser.LastName!;
+        this.element.info.ugender.value = this.user.WUser.Gender!.toString();
+
         // 性别默认未知
         this.myUser.Gender = Number(this.element.info.ugender.value);
         this.myUser.CanCreateWeChatUser = (this.resourceType + 1 == 2);
