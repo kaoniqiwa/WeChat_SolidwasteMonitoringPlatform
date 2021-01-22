@@ -24,7 +24,7 @@ export class Language {
             case GenderType.female:
                 return '女'
             default:
-                return '';
+                return '  ';
         }
     }
 
