@@ -16,14 +16,21 @@ namespace UserDetailsPage {
     class Page {
 
         asideDivision: AsideControl;
+        asideSetUser: AsideControl;
         asidePage?: AsideListPage;
         constructor(
             private user: WeChatUser,
-            private service: Service
+            private service: Service,
+            private isCurrent = false
         ) {
             this.asideDivision = new AsideControl("aside-divisions");
             this.asideDivision.backdrop = document.querySelector(".backdrop") as HTMLDivElement;
-
+            this.asideSetUser = new AsideControl("aside-set-user");
+            window.HideUserAside = (user) => {
+                this.asideSetUser.Hide();
+                this.element.info.name.innerHTML = user.Name;
+                this.element.info.gender.innerHTML = Language.Gender(user.Gender);
+            }
         }
 
         loadDivision(type: ResourceType, resources: ResourceRole[]) {
@@ -41,8 +48,8 @@ namespace UserDetailsPage {
                     return a.name.localeCompare(b.name)
                 });
 
-                if (this.element.iframe.contentWindow) {
-                    let currentWindow = this.element.iframe.contentWindow as AsideListPageWindow;
+                if (this.element.iframe.divisions.contentWindow) {
+                    let currentWindow = this.element.iframe.divisions.contentWindow as AsideListPageWindow;
                     this.asidePage = currentWindow.Page;
                     this.asidePage.canSelected = false;
                     this.asidePage.view({
@@ -66,8 +73,8 @@ namespace UserDetailsPage {
                         name: x.Name
                     }
                 });
-                if (this.element.iframe.contentWindow) {
-                    let currentWindow = this.element.iframe.contentWindow as AsideListPageWindow;
+                if (this.element.iframe.divisions.contentWindow) {
+                    let currentWindow = this.element.iframe.divisions.contentWindow as AsideListPageWindow;
                     this.asidePage = currentWindow.Page;
                     this.asidePage.canSelected = false;
                     this.asidePage.view({
@@ -103,18 +110,30 @@ namespace UserDetailsPage {
                 count: document.getElementById('user-resource') as HTMLDivElement,
                 type: document.getElementById('user-resource-type') as HTMLDivElement
             },
-            iframe: document.getElementById("iframe") as HTMLIFrameElement
+            iframe: {
+                divisions: document.getElementById("iframe") as HTMLIFrameElement,
+                setUser: document.getElementById("iframe-set-user") as HTMLIFrameElement
+            },
+            icons: document.querySelectorAll(".howell-icon-arrow2right")
         }
 
 
         init() {
             this.element.info.name.innerHTML = '';
+            this.element.iframe.setUser.src = "./set-user.html?openid=" + this.user.OpenId;
+
+
+
             if (this.user.LastName) {
                 this.element.info.name.innerHTML += this.user.LastName;
             }
             if (this.user.FirstName) {
                 this.element.info.name.innerHTML += this.user.FirstName;
             }
+            this.element.info.name.addEventListener("click", () => {
+                this.asideSetUser.Show();
+            });
+
             if (this.user.MobileNo) {
                 this.element.info.mobileNo.innerHTML = this.user.MobileNo;
             }
@@ -122,10 +141,7 @@ namespace UserDetailsPage {
                 const language = Language.Gender(this.user.Gender);
                 this.element.info.gender.innerHTML = language;
             }
-
             if (this.user.Resources) {
-
-
                 if (this.user.Resources.length > 0) {
                     this.element.info.count.innerHTML = this.user.Resources[0].Name || "";
                     const language = Language.ResourceType(this.user.Resources[0].ResourceType);
@@ -173,7 +189,7 @@ namespace UserDetailsPage {
     }
 
     if (location.search) {
-debugger;
+
         const client = new HowellHttpClient.HttpClient();
         client.login(async (http: HowellAuthHttp) => {
 
@@ -194,6 +210,9 @@ debugger;
 
             if (childId) {
                 page.element.btn.delete.style.display = "";
+                page.element.icons.forEach((val, key) => {
+                    (val as HTMLElement).style.visibility = "hidden";
+                });
             }
 
 

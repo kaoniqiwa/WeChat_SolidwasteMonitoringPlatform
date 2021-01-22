@@ -15,6 +15,7 @@
 }
 .howell-icon-arrow2right{
     margin-left: 10px;
+    visibility: hidden;
 }
 
 .the-left{
@@ -27,4 +28,10 @@
   {
       color: white;
       background-color:#fd2f2d;
+  }
+  .aside-content.set-user
+  {
+      width: 100%;   
+      top:0;   
+      height: 100%;
   }

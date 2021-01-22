@@ -51,7 +51,19 @@ class AddUser {
         let lastName = this.user.WUser.LastName ? this.user.WUser.LastName : '';
 
         this.element.info.uname.value = lastName + firstName;
-        this.element.info.ugender.value = this.user.WUser.Gender!.toString();
+        if (this.user.WUser.Gender) {
+            if (this.user.WUser.Gender < 0) {
+                this.element.info.ugender.selectedIndex = -1;
+            } else {
+                this.element.info.ugender.value = this.user.WUser.Gender!.toString();
+            }
+        }
+        else
+        {
+            this.element.info.ugender.selectedIndex = -1;
+        }
+
+
 
         // 性别默认未知
         this.myUser.Gender = Number(this.element.info.ugender.value);

@@ -18,7 +18,7 @@ export class Language {
     static Gender(gender: GenderType) {
         switch (gender) {
             case GenderType.unknow:                
-                return '未知';
+                return '';
             case GenderType.male:
                 return '男';
             case GenderType.female:

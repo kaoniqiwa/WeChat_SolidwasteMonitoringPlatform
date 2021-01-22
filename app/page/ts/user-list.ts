@@ -22,7 +22,8 @@ namespace UserListPage {
             content: document.querySelector('#content') as HTMLDivElement,
             template: document.querySelector('#infoTemplate') as HTMLTemplateElement,
             setPage: document.querySelector('#setPage') as HTMLDivElement,
-            iframe: document.querySelector('#user-child-iframe') as HTMLIFrameElement
+            iframe: document.querySelector('#user-child-iframe') as HTMLIFrameElement,
+            search: document.querySelector('#searchInput') as HTMLInputElement
         }
 
 
@@ -32,13 +33,11 @@ namespace UserListPage {
 
         constructor(private user: SessionUser, private service: Service) {
             this.asideControl = new AsideControl('aside', true);
-            window.HideUserAside = (userId?) => {                
+            window.HideUserAside = (userId?) => {
                 this.asideControl.Hide();
-                if(userId)
-                {
+                if (userId) {
                     let e = document.getElementById(userId);
-                    if(e)
-                    {
+                    if (e) {
                         e.parentElement!.removeChild(e);
                     }
                     this.userInfos.delete(userId);
@@ -67,14 +66,53 @@ namespace UserListPage {
             // 创建侧边
             // this.createAside();
 
+
+            this.element.search.value = '';
+
             if (!refreshed) {
                 console.log('bind event')
                 this.bindEvents();
             }
 
         }
+
+        private filter(source?: string, value?: string) {
+            if (!value) {
+                return true;
+            }
+            let index = -1;
+            if (source) {
+                index = source.toLowerCase().indexOf(value);
+            }
+            return index >= 0;
+        }
+
+        search() {            
+            let filter = this.element.search.value.toLowerCase();
+            this.userInfos.forEach((value: WeChatUser, key: string) => {
+                if (value.Id) {
+                    let id = value.Id;
+                    let element = document.getElementById(id);
+                    if (element) {
+                        if (this.filter(value.LastName, filter) ||
+                            this.filter(value.FirstName, filter) ||
+                            this.filter(value.MobileNo, filter)) {
+                            element.style.display = '';
+                        }
+                        else {
+                            element.style.display = 'none';
+                        }
+                    }
+
+                }
+
+            });
+
+        }
+
+
         createContent() {
-            let that = this;            
+            let that = this;
             console.log(this.userInfos)
             if (this.element.content && this.element.template) {
                 this.element.content.innerHTML = '';
@@ -101,7 +139,7 @@ namespace UserListPage {
                     var main = info.querySelector(".info-item") as HTMLDivElement;
                     main.id = v.Id!;
                     main.data = v;
-                    main.addEventListener('click', function () {                        
+                    main.addEventListener('click', function () {
                         if (this.data) {
                             console.log('info click');
                             that.element.iframe.src = "../user/details1.html?openid=" + that.user.WUser.OpenId + "&childId=" + (this.data as WeChatUser).Id;
@@ -118,6 +156,9 @@ namespace UserListPage {
         bindEvents() {
             this.element.back.addEventListener('click', () => {
                 window.parent.HideUserAside();
+            })
+            this.element.search.addEventListener("search", () => {
+                this.search();
             })
         }
         showOrHideAside() {

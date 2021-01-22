@@ -216,9 +216,9 @@ export namespace EventHistoryPage {
             item.id = record.EventId;
             item.setAttribute('divisionid', record.Data.DivisionId)
             item.innerHTML = template.element.innerHTML;
-            item.getElementsByTagName("img")[0].addEventListener("error", function () {                
+            item.getElementsByTagName("img")[0].addEventListener("error", function () {
                 this.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII=";
-                this.style.background = "black";                
+                this.style.background = "black";
             });
 
             item.addEventListener("click", () => {
@@ -305,40 +305,48 @@ export namespace EventHistoryPage {
                     up: {
                         isAuto: true,
                         callback: async () => {
-                            if (!this.user.WUser.Resources)
-                                return;
-                            const day = getAllDay(date);
-                            let divisionIds: string[];
-                            let stationIds = this.user.WUser.Resources.filter(x => x.ResourceType == ResourceType.GarbageStations).map(x => {
-                                return x.Id
-                            })
-                            divisionIds = this.user.WUser.Resources.filter(x =>
-                                x.ResourceType == ResourceType.Committees
-                            ).map(x => {
-                                return x.Id
-                            });
+                            let stop = true;
+                            try {
+                                debugger;
+                                if (!this.user.WUser.Resources)
+                                    return;
+                                    debugger;
+                                const day = getAllDay(date);
+                                let divisionIds: string[];
+                                let stationIds = this.user.WUser.Resources.filter(x => x.ResourceType == ResourceType.GarbageStations).map(x => {
+                                    return x.Id
+                                })
+                                divisionIds = this.user.WUser.Resources.filter(x =>
+                                    x.ResourceType == ResourceType.Committees
+                                ).map(x => {
+                                    return x.Id
+                                });
 
-                            if (divisionIds.length < 2) {
-                                element.filterBtn.style.display = "none";
-                            }
-                            divisionIds = divisionIds.concat(this.user.WUser.Resources.filter(x => {
-                                return x.ResourceType == ResourceType.County;
-                            }
-                            ).map(x => {
-                                element.filterBtn.style.display = "";
-                                return x.Id
-                            }));
-                            if (this.filter.divisionId) {
-                                divisionIds = [this.filter.divisionId];
-                            }
-                            var data = await this.getData(day.begin, day.end, ++this.pageIndex, {
-                                divisionIds: divisionIds,
-                                stationIds: stationIds
-                            });
-                            console.log('data', data)
-                            this.view(date, data.Data);
+                                if (divisionIds.length < 2) {
+                                    element.filterBtn.style.display = "none";
+                                }
+                                divisionIds = divisionIds.concat(this.user.WUser.Resources.filter(x => {
+                                    return x.ResourceType == ResourceType.County;
+                                }
+                                ).map(x => {
+                                    element.filterBtn.style.display = "";
+                                    return x.Id
+                                }));
+                                if (this.filter.divisionId) {
+                                    divisionIds = [this.filter.divisionId];
+                                }
+                                var data = await this.getData(day.begin, day.end, ++this.pageIndex, {
+                                    divisionIds: divisionIds,
+                                    stationIds: stationIds
+                                });
+                                console.log('data', data)
+                                this.view(date, data.Data);
+                                
+                                stop = data.Data.Page.PageCount == 0 || data.Data.Page.PageIndex == data.Data.Page.PageCount;
+                            } finally {
 
-                            miniRefresh.endUpLoading(data.Data.Page.PageIndex == data.Data.Page.PageCount);
+                                miniRefresh.endUpLoading(stop);
+                            }
                         }
                     }
                 });

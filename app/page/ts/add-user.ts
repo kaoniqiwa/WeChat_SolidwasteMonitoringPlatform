@@ -6,40 +6,13 @@ import { GenderType, ResourceRole, ResourceType, WeChatUser } from "../../data-c
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { Service } from "../../data-core/repuest/service";
+import { Language } from "./language";
 
 // declare var  $:any;
 
 // console.log($)
 
 let $ = Reflect.get(window, '$');
-
-
-class Language {
-    static ResourceType(type: ResourceType) {
-        switch (type) {
-            case ResourceType.County:
-                return '街道';
-            case ResourceType.Committees:
-                return '居委会';
-            case ResourceType.GarbageStations:
-                return '厢房';
-            default:
-                return ''
-        }
-    }
-
-    static Gender(gender: GenderType) {
-        switch (gender) {
-            case GenderType.male:
-                return '男';
-            case GenderType.female:
-                return '女'
-            default:
-                return '';
-        }
-    }
-}
-
 
 class AddUser {
     myData: Map<string, Division> = new Map();
@@ -53,6 +26,7 @@ class AddUser {
 
 
     constructor(private user: SessionUser, private service: Service) {
+        this.element.info.ugender.selectedIndex = -1;
     }
     element = {
         info: {
@@ -118,7 +92,7 @@ class AddUser {
         this.element.info.type.innerHTML = this.language;
 
         // 性别默认未知
-        this.myUser.Gender = Number(this.element.info.ugender.value);
+        //this.myUser.Gender = Number(this.element.info.ugender.value);
         this.myUser.CanCreateWeChatUser = (this.resourceType + 1 == 2);
     }
     createAside() {
@@ -298,6 +272,7 @@ class AddUser {
             this.showTextToast('请选择管辖范围');
             return
         }
+
         console.log(this.myUser);
 
         this.service.wechat.create(this.myUser).then((res:any)=>{
