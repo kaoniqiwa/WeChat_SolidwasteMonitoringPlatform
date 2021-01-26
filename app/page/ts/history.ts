@@ -77,7 +77,7 @@ export namespace EventHistoryPage {
          */
 
         pageIndex = 0;
-        pageTotal = 0;
+        pageTotal = 1;
         totalRecordCount = 0;
 
         dataSource = new Array<IllegalDropEventRecord>();
@@ -162,8 +162,7 @@ export namespace EventHistoryPage {
 
         }
         async loadData() {
-            this.divisions = await this.LoadDivisionList();
-            console.log('居委会', this.divisions)
+            this.divisions = await this.LoadDivisionList();            
             return 'success'
         }
         LoadDivisionList() {
@@ -258,7 +257,7 @@ export namespace EventHistoryPage {
                 let item = this.convert(data);
                 element.IllegalDrop.list.appendChild(item);
             }
-            element.IllegalDrop.totalRecordCount.innerHTML = list.Page.TotalRecordCount.toString();
+            element.IllegalDrop.totalRecordCount.innerHTML = list.Page.TotalRecordCount.toString();            
             if (list.Page.TotalRecordCount == 0)
                 element.IllegalDrop.recordCount.innerHTML = "0";
             else
@@ -292,10 +291,16 @@ export namespace EventHistoryPage {
                 divisionIds = [this.filter.divisionId];
             }
             let page = await this.getData(day.begin, day.end, this.pageIndex, { divisionIds: divisionIds, stationIds: stationIds });
-            console.log('page', page)
-
+            
             this.view(date, page.Data);
+            
 
+
+            this.pageTotal = page.Data.Page.PageCount;
+
+            if (this.pageIndex < this.pageTotal) {
+                this.miniRefresh.resetUpLoading();
+            }
         }
         miniRefresh: any;
         init() {
@@ -318,10 +323,13 @@ export namespace EventHistoryPage {
                         callback: async () => {
                             let stop = true;
                             try {
-                                debugger;
+
+                                
                                 if (!this.user.WUser.Resources)
                                     return;
-                                debugger;
+                                if (this.pageIndex >= this.pageTotal)
+                                    return;
+                                
                                 const day = getAllDay(date);
                                 let divisionIds: string[];
                                 let stationIds = this.user.WUser.Resources.filter(x => x.ResourceType == ResourceType.GarbageStations).map(x => {
@@ -350,14 +358,11 @@ export namespace EventHistoryPage {
                                     divisionIds: divisionIds,
                                     stationIds: stationIds
                                 });
-                                console.log('data', data)
+                                
                                 this.view(date, data.Data);
+                                
                                 stop = data.Data.Page.PageIndex >= data.Data.Page.PageCount;
-                            } finally {
-                                if (stop) {
-                                    console.log("stop", stop)
-
-                                }
+                            } finally {                                
                                 this.miniRefresh.endUpLoading(stop);
                             }
                         }
@@ -384,8 +389,6 @@ export namespace EventHistoryPage {
 
                         },
                         onConfirm: (result: any) => {
-                            console.log(result);
-
                             date = new Date(result[0].value, result[1].value - 1, result[2].value);
                             this.loadData();
                             this.viewDatePicker(date);

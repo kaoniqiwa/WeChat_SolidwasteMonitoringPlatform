@@ -26,8 +26,6 @@ export namespace HowellHttpClient {
 
                 });
 
-                console.log(a);
-
                 if (a && a['data']) {
                     this.user.WUser = a['data'];
                     if (seccess) seccess(this.http);

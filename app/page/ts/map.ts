@@ -18,7 +18,6 @@ let wx = Reflect.get(window, 'wx');
 
 $.get(`http://51kongkong.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetJsSdkUiPackage?url=${document.location.toString()}&&appid=wx119358d61e31da01`, function (data: any) {
 
-    console.log(data)
     wx.config({
         // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
         debug: false,
@@ -146,12 +145,10 @@ function hide() {
 }
 
 resetBtn.addEventListener('click', function () {
-    console.log('reset')
     reset()
 })
 
 function reset() {
-    console.log(selectedData)
 
     // 当前页按钮状态重置
     document.querySelectorAll('.weui-cell.weui-check__label.active').forEach(div => {
@@ -224,14 +221,12 @@ class StationList {
     async LoadGarbageStation(pageIndex: number) {
 
         const division = await this.GetLocalDivision();
-        console.log(division);
         const request = new GetGarbageStationsParams();
         request.PageSize = pageSize;
         request.PageIndex = pageIndex;
         request.DivisionId = division!?.Id;
 
         return this.service.garbageStation.list(request).then(x => {
-            console.log('garbageStation data', x);
 
             page = x.Data.Page;
             if (this.myList && this.myTemplate) {
@@ -342,13 +337,11 @@ client.login((http: HowellAuthHttp) => {
         var li = this.parentNode as HTMLLIElement;
         var classList = li.classList;
         if (classList.contains('mui-previous')) {
-            console.log(page, pageIndex, page.PageCount)
-            if (pageIndex > 1) {
+           if (pageIndex > 1) {
                 list.LoadGarbageStation(--pageIndex);
             }
         } else if (classList.contains('mui-next')) {
-            console.log(page, pageIndex, page.PageCount)
-            if (pageIndex < page.PageCount) {
+           if (pageIndex < page.PageCount) {
                 list.LoadGarbageStation(++pageIndex);
             }
         }

@@ -41,13 +41,13 @@ namespace GarbageCondition {
 					EndTime: day.end.toISOString(),
 					TimeUnit: TimeUnit.Hour
 				}, role.Id)
-
 				for (var x of data.Data.Data) {
 					for (const y of x.EventNumbers)
 						if (y.EventType == EventType.IllegalDrop)
 							model.datas.push(y);
 				}
 			}
+			
 			return model;
 		}
 	}
@@ -64,7 +64,6 @@ namespace GarbageCondition {
 					EndTime: day.end.toISOString(),
 					TimeUnit: TimeUnit.Hour
 				}, role.Id)
-
 				for (var x of data.Data.Data) {
 					for (const y of x.EventNumbers)
 						if (y.EventType == EventType.IllegalDrop)
@@ -124,6 +123,7 @@ namespace GarbageCondition {
 		// 	}
 		// }
 		async view(opts: AppEChart.LineOption) {
+			
 			new AppEChart.EChartLine().init(this.page.element.chart.illegalDrop, opts);
 		}
 
@@ -164,11 +164,11 @@ namespace GarbageCondition {
 				if (this.user.WUser.Resources[0].ResourceType == ResourceType.County) {
 
 					const divisionIds = divisions.filter(x => x.DivisionType == DivisionType.Committees).map(x => x.Id);
-					console.log("divisionIds", divisionIds);
+					
 
 					const now = new Date();
-					const today = new Date(now.getHours(), now.getMonth() + 1, now.getDate());
-					const dataDate = new Date(date.getHours(), date.getMonth() + 1, date.getDate());
+					const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+					const dataDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
 					if (dataDate.getTime() - today.getTime() >= 0) {
 						const responseStatistic = await this.service.division.statisticNumberList({ Ids: divisionIds });
@@ -234,7 +234,7 @@ namespace GarbageCondition {
 		}
 
 		async view(viewModel: Array<{ name: string, subName: number, subNameAfter: string }>) {
-
+			
 			var html = '';
 			this.page.element.list.illegalDrop.innerHTML = '';
 			for (let i = 0; i < viewModel.length; i++) {
@@ -274,17 +274,18 @@ namespace GarbageCondition {
 			if (!this.user.WUser.Resources) {
 				return;
 			}
+			
 			const model = new Specification();
 
 			model.illegalDropNumber = 0;
 			if (this.user.WUser.Resources[0].ResourceType == ResourceType.County) {
 				const now = new Date();
-				const today = new Date(now.getHours(), now.getMonth() + 1, now.getDate());
-				const dataDate = new Date(date.getHours(), date.getMonth() + 1, date.getDate());
+				const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+				const dataDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
 				if (dataDate.getTime() - today.getTime() >= 0) {
 					// 今天
-
+					debugger;
 					const divisionIds = divisions.filter(x => x.DivisionType == DivisionType.County).map(y => {
 						return y.Id;
 					});
@@ -342,7 +343,10 @@ namespace GarbageCondition {
 		}
 
 		async view(divisions: Division[]) {
+			
 			const datas = await this.getData(divisions);
+			
+			
 			if (datas) {
 				const viewModel = this.Convert(datas);
 				if (viewModel && viewModel.length) {
@@ -450,9 +454,11 @@ namespace GarbageCondition {
 		loadData() {
 
 			var historyData = this.history.getData();
+			
 			historyData.then(x => {
 				if (x) {
 					let opts = this.history.convert(x)
+					
 					this.history.view(opts);
 				}
 			});
@@ -464,6 +470,7 @@ namespace GarbageCondition {
 						const items = data.items.sort((a, b) => {
 							return b.dropNum - a.dropNum;
 						}).splice(0, 10);
+						
 						const viewModel = items.map(x => {
 							return {
 								name: x.division,
@@ -475,6 +482,7 @@ namespace GarbageCondition {
 
 					}
 				})
+				
 				this.count.view(divisions);
 
 			});
@@ -529,9 +537,8 @@ namespace GarbageCondition {
 
 						},
 						onConfirm: (result: any) => {
-							console.log(result);
-
 							date = new Date(result[0].value, result[1].value - 1, result[2].value);
+							
 							this.loadData();
 							this.viewDatePicker(date);
 						},

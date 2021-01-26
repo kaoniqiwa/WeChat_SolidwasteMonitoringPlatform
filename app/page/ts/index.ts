@@ -17,7 +17,7 @@ namespace Navigation {
         } else {
             backdrop.style.display = 'block'
             asideContent.classList.add('active');
-            console.log(url);
+
             var details = document.getElementById("aside-details") as HTMLIFrameElement;
             details.src = url;
 
@@ -65,10 +65,8 @@ namespace Navigation {
         new HowellHttpClient.HttpClient().login(
             async (http: HowellAuthHttp) => {
                 window.hwAuth = http;
-                console.log("login seccess");
             },
             () => {
-                console.log("login faild");
                 location.href = "./register.html?openid=" + querys.openid;
             });
     }

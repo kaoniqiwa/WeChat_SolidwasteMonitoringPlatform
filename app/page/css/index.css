@@ -228,7 +228,9 @@ body{
    transition: transform 0.3s ease-in;
 } */
 .aside-content.details{
-   width: 100%;
+   width: 100%;   
+   top: 0;
+   height: calc(100%);
 }
 
 /* .aside-content.active {

@@ -128,7 +128,7 @@ export namespace EventInformationPage {
         }, user);
         record.init();
         if (window.parent.recordDetails) {
-            console.log("details", window.parent.recordDetails);
+            
             record.fillDetail(window.parent.recordDetails);
         }
         else {

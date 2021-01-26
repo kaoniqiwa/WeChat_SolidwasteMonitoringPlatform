@@ -67,11 +67,11 @@ class AddUser {
                 if (resourceType == ResourceType.County) {
                     // 当前是街道权限,拉取下级居委会列表
                     this.myData = await this.loadDivisionList(resourceId);
-                    console.log('居委会', this.myData)
+                    
                 } else if (resourceType == ResourceType.Committees) {
                     // 当前是居委会权限,拉取下级厢房列表
                     this.myData = await this.LoadGarbageStation(resourceId);
-                    console.log('厢房', this.myData)
+                    
                 }
 
             }
@@ -215,7 +215,6 @@ class AddUser {
     }
 
     resetSelected() {
-        console.log('reset', this.selectedData)
         for (let [k, v] of this.selectedData) {
             v.Element.classList.remove('selected')
         }
@@ -224,7 +223,6 @@ class AddUser {
 
     }
     confirmSelect() {
-        console.log('selectedData', this.selectedData)
 
         this.element.info.ruleArea.textContent = '添加'
 
@@ -272,10 +270,9 @@ class AddUser {
             return
         }
 
-        console.log(this.myUser);
 
         this.service.wechat.create(this.myUser).then((res:any)=>{
-            console.log('create',res)
+            
             if(res.FaultCode == 0){
                 this.showToast();
                 window.parent?.HideUserAside();

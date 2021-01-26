@@ -144,8 +144,6 @@ class GarbageStationClient {
         });
         var ids = Array.from(this.garbageStations.keys());
         await this.LoadIllegalDropEventRecord(ids);
-        console.log('居委会', this.divisions)
-        console.log('厢房', this.garbageStations)
         return 'success'
     }
 
@@ -158,7 +156,6 @@ class GarbageStationClient {
             const data = res.Data.Data[i];
             this.GarbageStationNumberStatistic.set(data.Id, data);
         }
-        console.log("statisticNumberList", res);
 
     }
 
@@ -224,7 +221,7 @@ class GarbageStationClient {
             }
         }
         if (!refreshed) {
-            console.log('bind event')
+            
             this.bindEvents();
         }
 
@@ -319,7 +316,6 @@ class GarbageStationClient {
                 let wrapper = info.querySelector('.content__img .swiper-wrapper') as HTMLDivElement;
                 let slide = wrapper.querySelector('.swiper-slide') as HTMLDivElement;
 
-                console.log("numberStatic", numberStatic)
                 if (numberStatic) {
                     let illegalDrop = info.querySelector('.illegalDrop-number') as HTMLSpanElement;
                     let illegalDropNumber = numberStatic.TodayEventNumbers.filter(x => x.EventType == EventType.IllegalDrop);
@@ -418,7 +414,6 @@ class GarbageStationClient {
         }
     }
     resetSelected() {
-        console.log('reset', this.selectedDivisions)
         for (let [k, v] of this.selectedDivisions) {
             v.Element.classList.remove('selected')
         }
@@ -507,7 +502,7 @@ class GarbageStationClient {
         }
     }
     showDetail(info: { id: string, index: number }) {
-        console.log(info)
+        
         let element = this.garbageElements.get(info.id)
         let imgs = element.imageUrls
 
@@ -528,7 +523,7 @@ class GarbageStationClient {
 
     }
     hideDetail() {
-        console.log(this)
+        
 
     }
 
@@ -555,7 +550,7 @@ client.login((http: HowellAuthHttp) => {
         down: {
             callback: () => {
                 // 下拉事件
-                console.log('down');
+                
                 refreshed = true;
                 if (stationClient.asidePage) {
                     stationClient.asidePage.resetSelected();
@@ -572,7 +567,7 @@ client.login((http: HowellAuthHttp) => {
             callback: function () {
                 // 上拉事件
                 miniRefresh.endUpLoading(true);
-                console.log('usssp')
+                
 
             }
         }
