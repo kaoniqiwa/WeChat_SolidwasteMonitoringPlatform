@@ -18,9 +18,16 @@ export class AsideControl {
     set backdrop(val: HTMLElement | undefined) {
         this._backdrop = val;
         if (this._backdrop) {
+            // 会重复添加监听器
             this._backdrop.addEventListener('click', () => {
                 this.Hide();
             })
+            // pmx:
+            // this._backdrop.addEventListener('click', () => {
+            //     this.Hide();
+            // },{
+            //     once:true
+            // })
         }
     }
 
@@ -46,5 +53,10 @@ export class AsideControl {
 
     RegistToWindow() {
         window[this.id] = this;
+
+        //pmx 
+        //   Reflect.defineProperty(window,`${this.id}`,{
+        //       value:this
+        //   })
     }
 }

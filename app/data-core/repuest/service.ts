@@ -74,6 +74,9 @@ export class Service {
             this._medium = new Mediume();
         }
         return this._medium;
+
+        // this._medium为 null或者undefined，则返回new Medium(),否则返回 this._medium;
+        // return this._medium ?? new Mediume()
     }
     private _event?: EventRequestService;
     get event(): EventRequestService {
