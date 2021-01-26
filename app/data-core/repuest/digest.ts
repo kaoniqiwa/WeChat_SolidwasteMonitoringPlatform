@@ -1,5 +1,5 @@
 
-import { Md5 } from 'ts-md5/dist/md5'; 
+import { Md5 } from 'ts-md5/dist/md5';
 
 export class Digest {
 
@@ -9,8 +9,8 @@ export class Digest {
         if (header) {
             // var realm = SystemUrl.replace('http://', '');
             this.header = 'WWW-Authenticate: ' + header['www-authenticate'].replace('realm=""', `realm="${realm}"`);
-        
-            
+
+
             sessionStorage.setItem('WWW-Authenticate', this.header);
         }
         else {
@@ -49,7 +49,14 @@ export class Digest {
         var cnonce = ("00000000" + Math.random().toString(36).slice(2)).slice(-8);
 
         /* Calculate response MD5 */
-        var ha1 = Md5.hashStr([username, challenge.realm, password].join(":"));
+        var ha1 = "";
+        if (password === null || password === undefined) {
+            ha1 = Md5.hashStr([username, challenge.realm].join(":")) as string;
+        }
+        else {
+            ha1 = Md5.hashStr([username, challenge.realm, password].join(":")) as string;
+        }
+
         var ha2 = Md5.hashStr([method, uri].join(":"));
         var response = Md5.hashStr([ha1, challenge.nonce, nc, cnonce, challenge.qop, ha2].join(":"));
 
@@ -63,9 +70,9 @@ export class Digest {
             this.buildField("opaque", challenge.opaque) +
             this.buildField("qop", challenge.qop) +
             this.buildField("nc", nc) +
-            this.buildField("cnonce", cnonce)).slice(0, -2); 
-            
-        return  { 'Authorization': authHeader, 'X-WebBrowser-Authentication': 'Forbidden' };
+            this.buildField("cnonce", cnonce)).slice(0, -2);
+
+        return { 'Authorization': authHeader, 'X-WebBrowser-Authentication': 'Forbidden' };
     }
 }
 

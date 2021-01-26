@@ -20,7 +20,7 @@ export class SessionUser {
         const val = localStorage.getItem('WUser');
         return JSON.parse(val);
     }
-    set user(val: { name: string, pwd: string }) {
+    set user(val: { name: string, pwd: string|null }) {
         this.pwd = val.pwd;
         this.name = val.name;
     }
@@ -48,7 +48,7 @@ export class SessionUser {
         return localStorage.getItem('name');  
     }
 
-    set pwd(val: string) { 
+    set pwd(val: string|null) { 
           localStorage.setItem('pwd', val);
     }
 

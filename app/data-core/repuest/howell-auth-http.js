@@ -109,8 +109,8 @@ class HowellAuthHttp {
         if (window['DIGEST']) {  
             var challenge = window['DIGEST'].parseServerChallenge(null); 
             this.nc += 1;            
-            
-            return window['DIGEST'].generateRequestHeader(this.nc, challenge, this.username, '123456', method, uri);
+            // 123456
+            return window['DIGEST'].generateRequestHeader(this.nc, challenge, this.username, '', method, uri);
         }
 
     }
