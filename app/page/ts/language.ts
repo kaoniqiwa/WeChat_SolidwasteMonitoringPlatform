@@ -1,3 +1,4 @@
+import { EventType } from "../../data-core/model/waste-regulation/event-number";
 import { StationState } from "../../data-core/model/waste-regulation/garbage-station";
 import { GenderType, ResourceType } from "../../data-core/model/we-chat";
 
@@ -14,10 +15,24 @@ export class Language {
                 return ''
         }
     }
+    static EventType(type: EventType) {
+        switch (type) {
+            case EventType.IllegalDrop:
+                return '乱扔垃圾事件';
+            case EventType.MixedInto:
+                return '混合投放事件';
+            case EventType.GarbageVolume:
+                return '垃圾容量事件';
+            case EventType.GarbageFull:
+                return '垃圾满溢事件';
+            default:
+                return '';
+        }
+    }
 
     static Gender(gender: GenderType) {
         switch (gender) {
-            case GenderType.unknow:                
+            case GenderType.unknow:
                 return '';
             case GenderType.male:
                 return '男';
@@ -42,7 +57,7 @@ export class Language {
     }
 }
 
-export class ClassNameHelper{
+export class ClassNameHelper {
     static StationState(state: StationState) {
         switch (state) {
             case StationState.Normal:
@@ -52,7 +67,7 @@ export class ClassNameHelper{
             case StationState.Error:
                 return 'red';
             default:
-                return '';
+                return 'unknow';
         }
     }
 }

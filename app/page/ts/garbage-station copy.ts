@@ -1,8 +1,10 @@
 import { SessionUser } from "../../common/session-user";
+import { dateFormat } from "../../common/tool";
+import { ResponseData } from "../../data-core/model/response-data";
 import { OnlineStatus } from "../../data-core/model/waste-regulation/camera";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
-import { EventTypeEnum } from "../../data-core/model/waste-regulation/event-number";
-import { GarbageStation, GetGarbageStationsParams, StationState } from "../../data-core/model/waste-regulation/garbage-station";
+import { EventType } from "../../data-core/model/waste-regulation/event-number";
+import { Flags, GarbageStation, GetGarbageStationsParams, StationState } from "../../data-core/model/waste-regulation/garbage-station";
 import { GarbageStationNumberStatistic, GetGarbageStationStatisticNumbersParams } from "../../data-core/model/waste-regulation/garbage-station-number-statistic";
 import { ResourceType } from "../../data-core/model/we-chat";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
@@ -129,7 +131,7 @@ class GarbageStationClient {
             this.btnDivision.style.display = "";
             return x.Id
         }));
-        
+
         this.divisions = await this.LoadDivisionList(type, divisionIds);
         let divisionId;
         if (divisionIds.length > 0) {
@@ -217,7 +219,9 @@ class GarbageStationClient {
             for (const [key, value] of this.divisions) {
                 ds.push(value);
             }
-            this.createAside(this.user.WUser.Resources[0].ResourceType, ds);
+            if (!refreshed) {
+                this.createAside(this.user.WUser.Resources[0].ResourceType, ds);
+            }
         }
         if (!refreshed) {
             console.log('bind event')
@@ -266,6 +270,9 @@ class GarbageStationClient {
             this.content.innerHTML = '';
             let tempContent = this.template?.content as DocumentFragment;
             for (let [k, v] of this.garbageStations) {
+                if (typeof v.StationState == "number") {
+                    v.StationState = new Flags<StationState>(v.StationState);
+                }
                 if (!v.DivisionId)
                     continue;
                 let division = this.divisions.get(v.DivisionId);
@@ -289,8 +296,19 @@ class GarbageStationClient {
                 title_bandage.classList.remove('red');
                 title_bandage.classList.remove('green');
                 title_bandage.classList.remove('orange');
-                title_bandage.textContent = Language.StationState(v.StationState);
-                title_bandage.classList.add(ClassNameHelper.StationState(v.StationState));
+                let states = v.StationState as Flags<StationState>;
+                if (states.contains(StationState.Error)) {
+                    title_bandage.textContent = Language.StationState(StationState.Error);
+                    title_bandage.classList.add('red');
+                }
+                else if (states.contains(StationState.Full)) {
+                    title_bandage.textContent = Language.StationState(StationState.Full);
+                    title_bandage.classList.add('orange');
+                }
+                else {
+                    title_bandage.textContent = Language.StationState(StationState.Normal);
+                    title_bandage.classList.add('green');
+                }
 
                 //所在居委会
                 let content_footer = info.querySelector('.content__footer .division-name') as HTMLDivElement;
@@ -304,12 +322,12 @@ class GarbageStationClient {
                 console.log("numberStatic", numberStatic)
                 if (numberStatic) {
                     let illegalDrop = info.querySelector('.illegalDrop-number') as HTMLSpanElement;
-                    let illegalDropNumber = numberStatic.TodayEventNumbers.filter(x => x.EventType == EventTypeEnum.IllegalDrop);
+                    let illegalDropNumber = numberStatic.TodayEventNumbers.filter(x => x.EventType == EventType.IllegalDrop);
                     if (illegalDropNumber && illegalDropNumber.length > 0) {
                         illegalDrop.innerHTML = illegalDropNumber[0].DayNumber.toString();
                     }
                     let mixedInto = info.querySelector('.MixedInto-number') as HTMLSpanElement;
-                    let mixedIntoNumber = numberStatic.TodayEventNumbers.filter(x => x.EventType == EventTypeEnum.MixedInto);
+                    let mixedIntoNumber = numberStatic.TodayEventNumbers.filter(x => x.EventType == EventType.MixedInto);
                     if (mixedIntoNumber && mixedIntoNumber.length > 0) {
                         mixedInto.innerHTML = mixedIntoNumber[0].DayNumber.toString();
                     }
@@ -321,13 +339,12 @@ class GarbageStationClient {
                         return a.CameraUsage - b.CameraUsage || a.Name.localeCompare(b.Name);
                     });
                     cameras.forEach((camera, index) => {
-                        camera.OnlineStatus = OnlineStatus.Offline;
                         let imageUrl = "";
                         if (camera.ImageUrl) {
                             imageUrl = this.service.medium.getData(camera.ImageUrl)!;
                         }
                         else {
-                            imageUrl = "./black.png"
+                            imageUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII="
                         }
                         imageUrls.push(imageUrl)
                         let div: HTMLDivElement;
@@ -337,6 +354,12 @@ class GarbageStationClient {
                         let img = div!.querySelector('img') as HTMLImageElement;
                         img.setAttribute('index', index + '')
                         img!.src = imageUrl;
+
+                        if (!camera.OnlineStatus == undefined || camera.OnlineStatus == OnlineStatus.Offline) {
+                            let nosignal = div.querySelector('.nosignal') as HTMLDivElement;
+                            nosignal.style.display = "block";
+                        }
+
 
                         wrapper!.appendChild(div);
                     })
@@ -530,10 +553,13 @@ client.login((http: HowellAuthHttp) => {
         container: '#minirefresh',
         isLockX: false,
         down: {
-            callback: function () {
+            callback: () => {
                 // 下拉事件
                 console.log('down');
                 refreshed = true;
+                if (stationClient.asidePage) {
+                    stationClient.asidePage.resetSelected();
+                }
                 render().then(() => {
                     miniRefresh.endDownLoading();
                 })

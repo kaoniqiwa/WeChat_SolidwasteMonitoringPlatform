@@ -30,7 +30,12 @@ namespace UserPage {
                     name: document.getElementById('resource-name')!
                 }
             },
-            iframe: document.getElementById('user-child-iframe') as HTMLIFrameElement
+            iframe: document.getElementById('user-child-iframe') as HTMLIFrameElement,
+            link:{
+                details:document.getElementById("link-details") as HTMLLinkElement,
+                list:document.getElementById("link-list") as HTMLLinkElement,
+                add:document.getElementById("link-add") as HTMLLinkElement
+            }
         }
 
         init() {
@@ -38,15 +43,15 @@ namespace UserPage {
             window.element = this.element;
             window.HideUserAside = this.hideAside;
             this.element.btn.details.addEventListener('click', () => {
-                const url = "../user/details1.html?openid=" + this.user.WUser.OpenId;
+                const url = this.element.link.details.href +"?openid=" + this.user.WUser.OpenId;
                 this.showAside(url)
             })
             this.element.btn.list.addEventListener('click', () => {
-                const url = "../user/list.html?openid=" + this.user.WUser.OpenId;
+                const url = this.element.link.list.href +"?openid=" + this.user.WUser.OpenId;
                 this.showAside(url)
             })
             this.element.btn.add.addEventListener('click', () => {
-                const url = "../user/add-user.html?openid=" + this.user.WUser.OpenId;
+                const url = this.element.link.add.href +"?openid=" + this.user.WUser.OpenId;
                 this.showAside(url)
             })
         }

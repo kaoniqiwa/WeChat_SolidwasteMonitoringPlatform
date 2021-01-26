@@ -44,7 +44,7 @@ namespace GarbageCondition {
 
 				for (var x of data.Data.Data) {
 					for (const y of x.EventNumbers)
-						if (y.EventType == EventTypeEnum.IllegalDrop)
+						if (y.EventType == EventType.IllegalDrop)
 							model.datas.push(y);
 				}
 			}
@@ -67,7 +67,7 @@ namespace GarbageCondition {
 
 				for (var x of data.Data.Data) {
 					for (const y of x.EventNumbers)
-						if (y.EventType == EventTypeEnum.IllegalDrop)
+						if (y.EventType == EventType.IllegalDrop)
 							model.datas.push(y);
 				}
 			}
@@ -178,7 +178,7 @@ namespace GarbageCondition {
 							info.division = x.Name;
 							info.dropNum = 0;
 							for (const v of x.TodayEventNumbers)
-								if (v.EventType == EventTypeEnum.IllegalDrop)
+								if (v.EventType == EventType.IllegalDrop)
 									info.dropNum += v.DayNumber;
 						}
 					}
@@ -195,13 +195,14 @@ namespace GarbageCondition {
 							}, division.Id)
 							const info = new IllegalDropInfo();
 							info.division = division.Name;
-
-							let numbers = response.Data.Data[0].EventNumbers.filter(x => x.EventType == EventTypeEnum.IllegalDrop);
-							if (numbers && numbers.length > 0) {
-								info.dropNum = numbers[0].DayNumber;
+							if (response.Data.Data && response.Data.Data.length > 0) {
+								let numbers = response.Data.Data[0].EventNumbers.filter(x => x.EventType == EventType.IllegalDrop);
+								if (numbers && numbers.length > 0) {
+									info.dropNum = numbers[0].DayNumber;
+								}
+								info.unit = "起";
+								model.items.push(info);
 							}
-							info.unit = "起";
-							model.items.push(info);
 						}
 
 					}
@@ -223,7 +224,7 @@ namespace GarbageCondition {
 							info.division = x.Name;
 							info.dropNum = 0;
 							for (const v of x.TodayEventNumbers)
-								if (v.EventType == EventTypeEnum.IllegalDrop)
+								if (v.EventType == EventType.IllegalDrop)
 									info.dropNum += v.DayNumber;
 						}
 					}
@@ -291,11 +292,11 @@ namespace GarbageCondition {
 
 					for (let i = 0; i < res.Data.Data.length; i++) {
 						const data = res.Data.Data[i];
-						let filter = data.TodayEventNumbers.filter(x => { return x.EventType == EventTypeEnum.IllegalDrop });
+						let filter = data.TodayEventNumbers.filter(x => { return x.EventType == EventType.IllegalDrop });
 						if (filter && filter.length > 0) {
 							model.illegalDropNumber += filter[0].DayNumber;
 						}
-						filter = data.TodayEventNumbers.filter(x => { return x.EventType == EventTypeEnum.MixedInto });
+						filter = data.TodayEventNumbers.filter(x => { return x.EventType == EventType.MixedInto });
 						if (filter && filter.length > 0) {
 							model.hybridPushNumber += filter[0].DayNumber;
 						}
@@ -308,8 +309,10 @@ namespace GarbageCondition {
 						BeginTime: day.begin.toISOString(),
 						EndTime: day.end.toISOString(),
 					}, this.user.WUser.Resources[0].Id)
-					model.illegalDropNumber = response.Data.Data[0].EventNumbers.filter(x => x.EventType == EventTypeEnum.IllegalDrop)[0].DayNumber;
-					model.hybridPushNumber = response.Data.Data[0].EventNumbers.filter(x => x.EventType == EventTypeEnum.MixedInto)[0].DayNumber;
+					if (response.Data.Data && response.Data.Data.length > 0) {
+						model.illegalDropNumber = response.Data.Data[0].EventNumbers.filter(x => x.EventType == EventType.IllegalDrop)[0].DayNumber;
+						model.hybridPushNumber = response.Data.Data[0].EventNumbers.filter(x => x.EventType == EventType.MixedInto)[0].DayNumber;
+					}
 				}
 
 			}
@@ -324,9 +327,9 @@ namespace GarbageCondition {
 					const responseData = await this.service.garbageStation.statisticNumberList({ Ids: stationIds });
 					for (const x of responseData.Data.Data) {
 						for (const v of x.TodayEventNumbers)
-							if (v.EventType == EventTypeEnum.IllegalDrop)
+							if (v.EventType == EventType.IllegalDrop)
 								model.illegalDropNumber += v.DayNumber;
-							else if (v.EventType == EventTypeEnum.MixedInto)
+							else if (v.EventType == EventType.MixedInto)
 								model.hybridPushNumber += v.DayNumber;
 					}
 				}
@@ -387,7 +390,7 @@ namespace GarbageCondition {
 	}
 
 
-	enum EventTypeEnum {
+	enum EventType {
 		IllegalDrop = 1,
 		MixedInto,
 		GarbageVolume,

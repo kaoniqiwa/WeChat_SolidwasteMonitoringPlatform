@@ -1,7 +1,7 @@
 import { SessionUser } from "../../common/session-user";
 import { OnlineStatus } from "../../data-core/model/waste-regulation/camera";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
-import { EventTypeEnum } from "../../data-core/model/waste-regulation/event-number";
+import { EventType } from "../../data-core/model/waste-regulation/event-number";
 import { GarbageStation, GetGarbageStationsParams, StationState } from "../../data-core/model/waste-regulation/garbage-station";
 import { GarbageStationNumberStatistic, GetGarbageStationStatisticNumbersParams } from "../../data-core/model/waste-regulation/garbage-station-number-statistic";
 import { ResourceType } from "../../data-core/model/we-chat";
@@ -109,23 +109,22 @@ class GarbageStationClient {
     async loadData() {
         if (!this.user.WUser.Resources)
             return;
-let divisionIds:string[];
+        let divisionIds: string[];
         let stationIds = this.user.WUser.Resources.filter(x => x.ResourceType == ResourceType.GarbageStations).map(x => {
             return x.Id
         })
-        divisionIds = this.user.WUser.Resources.filter(x =>            
+        divisionIds = this.user.WUser.Resources.filter(x =>
             x.ResourceType == ResourceType.Committees
         ).map(x => {
             return x.Id
         })
 
-        if(divisionIds.length < 2)
-        {
+        if (divisionIds.length < 2) {
             this.btnDivision.style.display = "none";
         }
-        divisionIds = divisionIds.concat(this.user.WUser.Resources.filter(x =>{                                
+        divisionIds = divisionIds.concat(this.user.WUser.Resources.filter(x => {
             return x.ResourceType == ResourceType.County;
-        }                                
+        }
         ).map(x => {
             this.btnDivision.style.display = "";
             return x.Id
@@ -316,12 +315,12 @@ let divisionIds:string[];
                 console.log("numberStatic", numberStatic)
                 if (numberStatic) {
                     let illegalDrop = info.querySelector('.illegalDrop-number') as HTMLSpanElement;
-                    let illegalDropNumber = numberStatic.TodayEventNumbers.filter(x => x.EventType == EventTypeEnum.IllegalDrop);
+                    let illegalDropNumber = numberStatic.TodayEventNumbers.filter(x => x.EventType == EventType.IllegalDrop);
                     if (illegalDropNumber && illegalDropNumber.length > 0) {
                         illegalDrop.innerHTML = illegalDropNumber[0].DayNumber.toString();
                     }
                     let mixedInto = info.querySelector('.MixedInto-number') as HTMLSpanElement;
-                    let mixedIntoNumber = numberStatic.TodayEventNumbers.filter(x => x.EventType == EventTypeEnum.MixedInto);
+                    let mixedIntoNumber = numberStatic.TodayEventNumbers.filter(x => x.EventType == EventType.MixedInto);
                     if (mixedIntoNumber && mixedIntoNumber.length > 0) {
                         mixedInto.innerHTML = mixedIntoNumber[0].DayNumber.toString();
                     }
@@ -339,7 +338,7 @@ let divisionIds:string[];
                             imageUrl = this.service.medium.getData(camera.ImageUrl)!;
                         }
                         else {
-                            imageUrl = "./black.png"
+                            imageUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII="
                         }
                         imageUrls.push(imageUrl)
                         let div: HTMLDivElement;
@@ -349,6 +348,7 @@ let divisionIds:string[];
                         let img = div!.querySelector('img') as HTMLImageElement;
                         img.setAttribute('index', index + '')
                         img!.src = imageUrl;
+                       
 
                         wrapper!.appendChild(div);
                     })

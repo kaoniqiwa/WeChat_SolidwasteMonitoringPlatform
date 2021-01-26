@@ -216,7 +216,7 @@ body{
 
 .aside-content {
    z-index: 999;
-   width: 80vw;
+   width: 0;
    height: calc(100%);
    background-color: white;
    position: absolute;
@@ -232,6 +232,7 @@ body{
 }
 
 .aside-content.active {
+    width: 100%;
    transform: translateX(0);
 }
 

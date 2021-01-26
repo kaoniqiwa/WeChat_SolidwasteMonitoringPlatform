@@ -72,16 +72,25 @@ namespace Navigation {
                 location.href = "./register.html?openid=" + querys.openid;
             });
     }
-    else {
-        location.href = "./register.html";
+    else {        
+        if (querys.eventid) {            
+                window.location.href = "http://51kongkong.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetUserOpenId?appid=wx119358d61e31da01&returnUrl="
+                    + window.location.href;
+        }
+        else {
+            location.href = "./register.html";
+        }
     }
+
     if (querys.eventid) {
         //location.href = "./event-details.html?openid=" + querys.openid + "&eventid=" + querys.eventid;
         querys.index = "1";
         window.showOrHideAside("./event-details.html?openid=" + querys.openid + "&eventid=" + querys.eventid);
-
-
     }
+
+
+
+
     if (querys.index) {
         index = parseInt(querys.index);
     }

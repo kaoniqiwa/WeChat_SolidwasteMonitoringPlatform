@@ -20,7 +20,7 @@
   }
   .aside-content {
     z-index: 1001;
-    width: 80vw;
+    width: 0;
     height: calc(100% - 41px);
     background-color: white;
     position: absolute;
@@ -29,9 +29,10 @@
     display: flex;
     flex-direction: column;
     transform: translateX(110%);
-    transition: transform 0.3s ease-in;
+    transition: transform 0.3s ease-in;    
   }
   .aside-content.active {
+    width: 80%;
     transform: translateX(0);
   }
   .aside-title {
@@ -48,6 +49,7 @@
     display: flex;
     flex-wrap: wrap;
     overflow: auto;
+    height: calc(100% - 115px);
   }
   .aside-main .aside-item {
     box-sizing: border-box;

@@ -192,7 +192,7 @@ export namespace GarbageStationList {
         createImgByCamera(camera: Camera) {
             let img = document.createElement("img");
             img.addEventListener("error", function () {
-                this.src = "./img/black.png";
+                this.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII=";
             });
             img.id = camera.Id;
             img.className = 'mui-zoom';
@@ -201,7 +201,7 @@ export namespace GarbageStationList {
                 img.src = this.service.media.getData(camera.ImageUrl);
             }
             else {
-                img.src = "./img/black.png"
+                img.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII="
             }
 
             return img;

@@ -23,7 +23,10 @@ namespace UserListPage {
             template: document.querySelector('#infoTemplate') as HTMLTemplateElement,
             setPage: document.querySelector('#setPage') as HTMLDivElement,
             iframe: document.querySelector('#user-child-iframe') as HTMLIFrameElement,
-            search: document.querySelector('#searchInput') as HTMLInputElement
+            search: document.querySelector('#searchInput') as HTMLInputElement,
+            link: {
+                details: document.getElementById("link-user-details") as HTMLLinkElement
+            }
         }
 
 
@@ -87,7 +90,7 @@ namespace UserListPage {
             return index >= 0;
         }
 
-        search() {            
+        search() {
             let filter = this.element.search.value.toLowerCase();
             this.userInfos.forEach((value: WeChatUser, key: string) => {
                 if (value.Id) {
@@ -142,7 +145,7 @@ namespace UserListPage {
                     main.addEventListener('click', function () {
                         if (this.data) {
                             console.log('info click');
-                            that.element.iframe.src = "../user/details1.html?openid=" + that.user.WUser.OpenId + "&childId=" + (this.data as WeChatUser).Id;
+                            that.element.iframe.src = that.element.link.details.href + "?openid=" + that.user.WUser.OpenId + "&childId=" + (this.data as WeChatUser).Id;
                             that.asideControl.Show();
                         }
                     });

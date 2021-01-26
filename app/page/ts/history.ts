@@ -151,9 +151,14 @@ export namespace EventHistoryPage {
             //     } else {
             //         v.Element.style.display = 'none'
             //     }
-            // }
-            this.refresh();
+            // }            
+            //this.refresh()
+            element.IllegalDrop.list.innerHTML = "";
+            this.pageIndex = 0;
+            this.miniRefresh.triggerUpLoading();
+            this.miniRefresh.resetUpLoading();
             this.asideControl.Hide();
+
 
         }
         async loadData() {
@@ -254,7 +259,10 @@ export namespace EventHistoryPage {
                 element.IllegalDrop.list.appendChild(item);
             }
             element.IllegalDrop.totalRecordCount.innerHTML = list.Page.TotalRecordCount.toString();
-            element.IllegalDrop.recordCount.innerHTML = (list.Page.PageSize * (list.Page.PageIndex - 1) + list.Page.RecordCount).toString();
+            if (list.Page.TotalRecordCount == 0)
+                element.IllegalDrop.recordCount.innerHTML = "0";
+            else
+                element.IllegalDrop.recordCount.innerHTML = (list.Page.PageSize * (list.Page.PageIndex - 1) + list.Page.RecordCount).toString();
 
         }
 
@@ -287,18 +295,21 @@ export namespace EventHistoryPage {
             console.log('page', page)
 
             this.view(date, page.Data);
-        }
 
+        }
+        miniRefresh: any;
         init() {
+            element.IllegalDrop.list.innerHTML = "";
+            this.pageIndex = 0;
             try {
-                var miniRefresh = new MiniRefresh({
+                this.miniRefresh = new MiniRefresh({
                     container: "#" + MiniRefreshId.IllegalDrop,
                     down: {
                         callback: () => {
                             setTimeout(() => {
                                 // 下拉事件
                                 this.refresh();
-                                miniRefresh.endDownLoading();
+                                this.miniRefresh.endDownLoading();
                             }, 500);
                         }
                     },
@@ -310,7 +321,7 @@ export namespace EventHistoryPage {
                                 debugger;
                                 if (!this.user.WUser.Resources)
                                     return;
-                                    debugger;
+                                debugger;
                                 const day = getAllDay(date);
                                 let divisionIds: string[];
                                 let stationIds = this.user.WUser.Resources.filter(x => x.ResourceType == ResourceType.GarbageStations).map(x => {
@@ -341,11 +352,13 @@ export namespace EventHistoryPage {
                                 });
                                 console.log('data', data)
                                 this.view(date, data.Data);
-                                
-                                stop = data.Data.Page.PageCount == 0 || data.Data.Page.PageIndex == data.Data.Page.PageCount;
+                                stop = data.Data.Page.PageIndex >= data.Data.Page.PageCount;
                             } finally {
+                                if (stop) {
+                                    console.log("stop", stop)
 
-                                miniRefresh.endUpLoading(stop);
+                                }
+                                this.miniRefresh.endUpLoading(stop);
                             }
                         }
                     }

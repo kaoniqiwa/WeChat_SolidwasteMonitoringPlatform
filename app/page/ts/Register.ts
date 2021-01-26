@@ -154,7 +154,7 @@ export namespace RegisterPage {
         async regist() {
             if (this.phoneNumber) {
                 const user = new SessionUser();
-                const buser = await this.service.wechat.bingingUser(this.phoneNumber, user.name);
+                const buser = await this.service.user.bingingUser(this.phoneNumber, user.name);
                 // console.log(buser);
                 if (buser.OpenId) {
                     user.name = buser.OpenId;

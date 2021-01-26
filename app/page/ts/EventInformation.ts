@@ -5,7 +5,7 @@ import { EventRequestService } from "../../data-core/repuest/Illegal-drop-event-
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { SessionUser } from "../../common/session-user";
-import { EventTypeEnum } from "../../data-core/model/waste-regulation/event-number";
+import { Language } from "./language";
 
 export namespace EventInformationPage {
     export class EventDetail {
@@ -47,13 +47,7 @@ export namespace EventInformationPage {
                 police__time = document.getElementById('police__time')!,
                 detail_img = document.getElementById('detail_img') as HTMLImageElement;
             if (police__type) {
-                let EventType = {
-                    '1': '乱扔垃圾事件',
-                    '2': '混合投放事件',
-                    '3': '垃圾容量事件',
-                    '4': '垃圾满溢事件'
-                };
-                police__type.innerText = EventType[item.EventType];
+                police__type.innerText = Language.EventType(item.EventType);
             }
             camera__name.innerText = item.ResourceName;
             station__name.innerText = item.Data.StationName;
@@ -61,7 +55,7 @@ export namespace EventInformationPage {
             police__time.innerText = dateFormat(new Date(item.EventTime), 'yyyy-MM-dd HH:mm:ss');
             let url = this.service.medium.getData(item.ImageUrl);
             if (!url) {
-                url = "./img/black.png";
+                url = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII=";
             }
             detail_img.src = url;
             detail_img.onload = () => {
@@ -72,12 +66,15 @@ export namespace EventInformationPage {
                 const max = document.getElementById("max")!;
                 max.innerHTML = detail_img.parentElement!.innerHTML;
 
-                max.style.display = "block";
+
                 const frame = max.getElementsByClassName("frame")[0] as HTMLDivElement;
                 const img = max.getElementsByTagName("img")[0] as HTMLImageElement;
-                this.drawFrame(frame, item, img.offsetWidth, img.offsetHeight);
-                img.style.marginTop = "50%";
-                frame.style.marginTop = "50%";
+                img.onload = () => {
+                    this.drawFrame(frame, item, img.offsetWidth, img.offsetHeight);
+                    frame.style.marginTop = "50%";
+                }
+                img.style.marginTop = "50%";                
+                max.style.display = "block";
             });
         }
 

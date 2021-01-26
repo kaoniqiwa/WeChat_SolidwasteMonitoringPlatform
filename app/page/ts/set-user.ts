@@ -50,7 +50,7 @@ class AddUser {
         let firstName = this.user.WUser.FirstName ? this.user.WUser.FirstName : '';
         let lastName = this.user.WUser.LastName ? this.user.WUser.LastName : '';
 
-        this.element.info.uname.value = lastName + firstName;
+        this.element.info.uname.value = firstName + lastName;
         if (this.user.WUser.Gender) {
             if (this.user.WUser.Gender < 0) {
                 this.element.info.ugender.selectedIndex = -1;
@@ -97,8 +97,8 @@ class AddUser {
         this.service.wechat.set(this.myUser).then((res: any) => {
             console.log('updated', res)
             if (res.data.FaultCode == 0) {
-                this.showToast();
-                window.parent?.HideUserAside(res.data.Data);
+                //this.showToast();                
+                window.parent?.HideUserAside(this.myUser);
             } else {
                 this.showWarnToast()
             }

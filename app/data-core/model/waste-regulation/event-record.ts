@@ -1,3 +1,5 @@
+import { EventType } from "./event-number";
+
 /**事件记录接口 */
     export interface IEventRecord
     {
@@ -26,7 +28,7 @@
         /**事件时间 */
         EventTime: Date | string;
         /**事件类型 */
-        EventType: number;
+        EventType: EventType;
         /**事件描述信息(可选) */
         EventDescription: string;
         /**资源ID(可选) */

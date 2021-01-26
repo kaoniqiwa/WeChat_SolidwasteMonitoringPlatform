@@ -1,6 +1,8 @@
 import { TrashCan } from "./trashCan";
 import { Camera } from "./camera";
 import { IPageParams } from "../page";
+import { __values } from "tslib";
+import { ResponseData } from "../response-data";
 
 export enum StationState {
     // 正常
@@ -11,9 +13,34 @@ export enum StationState {
     Error = 2
 }
 
+export interface IFlags extends NumberConstructor {
+    Value: number[]
+}
+
+export class Flags<T extends number | string>{
+    value:number;
+    constructor(val: number) {        
+        debugger;
+        this.value = val;
+    }
+
+    getValues(): T[] {        
+        let str = this.value.toString(2);
+        let result = new Array<T>()
+        for (let i = 0; i < str.length; i++) {
+            result.push(parseInt(str[i]) as T);
+        }
+        return result;
+    }
+    contains(t: T) {
+        return this.getValues().indexOf(t) >= 0;
+    }
+}
+
+
 
 /**投放点信息 */
-export class GarbageStation {
+export class GarbageStation extends ResponseData {
     /**垃圾房ID */
     Id!: string;
     /**垃圾房名称 */
@@ -54,9 +81,21 @@ export class GarbageStation {
     WetVolume?: number;
     /**最大湿垃圾容积，单位：L */
     MaxWetVolume!: number;
+    private _StationState!: Flags<StationState>;
+    set StationState(val: number | Flags<StationState>) {
+        if (typeof (val) == "number") {
+            debugger;
+            this._StationState = new Flags(val);
+        }
+        else {
+            this._StationState = val;
+        }
 
+    }
     // 垃圾厢房状态
-    StationState!: number;
+    get StationState(): number | Flags<StationState> {
+        return this._StationState;
+    }    
 }
 
 

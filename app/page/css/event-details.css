@@ -3,6 +3,7 @@ html,body{
     padding: 0;
     height: 100%;
     width: 100%;
+    overflow: auto;
 }
 .mui-page
 {
@@ -27,13 +28,17 @@ html,body{
 }
 .item-content-center
 {
-    position: absolute;    
-    bottom: 20%;
+    min-height: 100px;
+    padding-top: 20px;
+    padding-bottom: 20px;
     left: calc(50% - 91px);
+    min-height: 60px;
+    height: calc(100% - 500px);    
 }
 
 .weui-btn{
-    top: 50%;
+    position: relative;
+    top: calc(50% - 20px);
     background-color: #68aeff;
     width: 192px;
     height: 40px;

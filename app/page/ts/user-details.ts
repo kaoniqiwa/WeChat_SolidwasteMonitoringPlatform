@@ -28,8 +28,17 @@ namespace UserDetailsPage {
             this.asideSetUser = new AsideControl("aside-set-user");
             window.HideUserAside = (user) => {
                 this.asideSetUser.Hide();
-                this.element.info.name.innerHTML = user.Name;
-                this.element.info.gender.innerHTML = Language.Gender(user.Gender);
+                if (user) {
+                    console.log(user);
+                    this.element.info.name.innerHTML = '';
+                    if (user.FirstName) {
+                        this.element.info.name.innerHTML = user.FirstName
+                    }
+                    if (user.LastName) {
+                        this.element.info.name.innerHTML += user.LastName;
+                    }
+                    this.element.info.gender.innerHTML = Language.Gender(user.Gender);
+                }
             }
         }
 
@@ -114,21 +123,24 @@ namespace UserDetailsPage {
                 divisions: document.getElementById("iframe") as HTMLIFrameElement,
                 setUser: document.getElementById("iframe-set-user") as HTMLIFrameElement
             },
-            icons: document.querySelectorAll(".howell-icon-arrow2right")
+            icons: document.querySelectorAll(".howell-icon-arrow2right"),
+            link:{
+                setUser:document.getElementById("link-set-user") as HTMLLinkElement
+            }
         }
 
 
         init() {
             this.element.info.name.innerHTML = '';
-            this.element.iframe.setUser.src = "./set-user.html?openid=" + this.user.OpenId;
+            this.element.iframe.setUser.src = this.element.link.setUser.href + "?openid=" + this.user.OpenId;
 
 
 
-            if (this.user.LastName) {
-                this.element.info.name.innerHTML += this.user.LastName;
-            }
             if (this.user.FirstName) {
                 this.element.info.name.innerHTML += this.user.FirstName;
+            }
+            if (this.user.LastName) {
+                this.element.info.name.innerHTML += this.user.LastName;
             }
             if (this.isCurrent) {
                 this.element.info.name.parentElement?.parentElement?.addEventListener("click", () => {

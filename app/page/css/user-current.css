@@ -68,7 +68,10 @@
     color: #b2b2b2;
 }
 .aside-content{
-    width: 100%;
+    
     top:0;
     height: 100%;
+}
+.aside-content.active{
+    width: 100%;
 }

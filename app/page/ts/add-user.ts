@@ -24,7 +24,6 @@ class AddUser {
     selectedData: Map<string, any> = new Map();
     myUser = new WeChatUser();
 
-
     constructor(private user: SessionUser, private service: Service) {
         this.element.info.ugender.selectedIndex = -1;
     }
