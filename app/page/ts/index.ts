@@ -67,6 +67,7 @@ namespace Navigation {
                 window.hwAuth = http;
             },
             () => {
+                alert("e");
                 location.href = "./register.html?openid=" + querys.openid;
             });
     }

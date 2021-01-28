@@ -18,6 +18,4 @@ declare interface HTMLDivElement{
     data?:any
 }
 
-
-
 declare function getAllPropertyNames<T>(t: T): string[];

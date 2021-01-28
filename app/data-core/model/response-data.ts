@@ -51,7 +51,7 @@ export class ResponseData{
 	            }
 	            else
 	            {
-                    debugger;
+                    
 	                newObject[key] = source[key];
 	            }
 	        }

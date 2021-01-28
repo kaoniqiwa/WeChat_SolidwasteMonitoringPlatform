@@ -8,8 +8,6 @@ import { AsideControl } from "./aside";
 
 
 
-declare var MiniRefresh: any;
-
 
 namespace UserListPage {
     class Page {
@@ -73,7 +71,6 @@ namespace UserListPage {
             this.element.search.value = '';
 
             if (!refreshed) {
-                console.log('bind event')
                 this.bindEvents();
             }
 

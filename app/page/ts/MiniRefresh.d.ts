@@ -48,11 +48,11 @@ declare interface MiniRefreshLoadFull {
 
 declare interface MiniRefreshPullUpEvent {
     /* 是否锁定上，如果锁定了，则无法上拉	FALSE	 */
-    isLock?: number;
+    isLock?: boolean;
     /* 是否初始化时自动执行一次上拉加载（会同时有动画和回调），当下拉的down的isAuto生效时，这个不会生效	TRUE	 */
     isAuto?: boolean;
     /* 上拉加载的过程中是否显示动画，如果为false，代表静默加载，没有动画	TRUE	 */
-    isShowUpLoading?: number;
+    isShowUpLoading?: boolean;
     /* 触发上拉的阈值，当滑动到距离底部距离小于这个阈值时，会触发上拉加载	75	 */
     offset?: number;
     /* 自动加载满屏相关配置	默认配置	 */

@@ -20,10 +20,9 @@ export interface IFlags extends NumberConstructor {
 export class Flags<T extends number | string>{
     value:number;
     constructor(val: number) {        
-        debugger;
+        
         this.value = val;
     }
-
     getValues(): T[] {        
         let str = this.value.toString(2);
         let result = new Array<T>()
@@ -84,7 +83,7 @@ export class GarbageStation extends ResponseData {
     private _StationState!: Flags<StationState>;
     set StationState(val: number | Flags<StationState>) {
         if (typeof (val) == "number") {
-            debugger;
+            
             this._StationState = new Flags(val);
         }
         else {

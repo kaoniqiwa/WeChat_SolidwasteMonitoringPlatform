@@ -25,7 +25,7 @@ export class DivisionRequestService extends SaveModel{
     }
 
     get(id: string) {
-        return this.requestService.get<Division>(this.url.get(id));
+        return this.requestService.get<Response<Division>>(this.url.get(id));
     }
 
     set(item: Division){

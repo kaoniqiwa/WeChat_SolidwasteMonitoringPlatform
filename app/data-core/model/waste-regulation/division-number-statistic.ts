@@ -1,36 +1,36 @@
 import { IPageParams } from "../page";
 import { EventNumber } from "./event-number";
 /**区划数量统计 */
-    export interface DivisionNumberStatistic
+    export class DivisionNumberStatistic
     {
         /**区划ID */
-        Id: string;
+        Id!: string;
         /**区划名称 */
-        Name: string;
+        Name!: string;
         /**垃圾房数量 */
-        StationNumber: number;
+        StationNumber!: number;
         /**摄像机数量 */
-        CameraNumber: number;
+        CameraNumber!: number;
         /**离线摄像机数量 */
-        OfflineCameraNumber: number;
+        OfflineCameraNumber!: number;
         /**垃圾桶数量 */
-        TrashCanNumber: number;
+        TrashCanNumber!: number;
         /**下一层区划数量 */
-        ChildDivisionNumber: number;
+        ChildDivisionNumber!: number;
         /**叶区划数量 */
-        LeafDivisionNumber: number;
+        LeafDivisionNumber!: number;
         /**干垃圾满溢垃圾房数量 */
-        DryFullStationNumber: number;
+        DryFullStationNumber!: number;
         /**湿垃圾满溢垃圾房数量 */
-        WetFullStationNumber: number;
+        WetFullStationNumber!: number;
         /**当日事件数量(可选) */
-        TodayEventNumbers: EventNumber[];
+        TodayEventNumbers?: EventNumber[];
         /**当天总数量，单位：L */
-        DayVolume: number;
+        DayVolume!: number;
         /**当天干垃圾容量，单位：L */
-        DayDryVolume: number;
+        DayDryVolume!: number;
         /**当天湿垃圾容量，单位：L */
-        DayWetVolume: number;
+        DayWetVolume!: number;
     }
       /// <summary>
     /**获取区划数量参数

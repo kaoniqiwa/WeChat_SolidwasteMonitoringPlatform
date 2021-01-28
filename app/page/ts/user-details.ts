@@ -195,7 +195,7 @@ namespace UserDetailsPage {
                 window.parent.HideUserAside();
             });
             this.element.btn.delete.addEventListener('click', () => {
-                debugger;
+                
                 if (this.user.Id) {
                     this.service.wechat.del(this.user.Id)
                 }

@@ -1,12 +1,25 @@
+import { EventNumberStatistic } from "./division-event-numbers";
+
     /**事件数量 */
-    export interface EventNumber
+    export class EventNumber
     {
         /**事件类型 */
-        EventType: EventType;
+        EventType!: EventType;
         /**当日事件数量 */
-        DayNumber: number;
+        DayNumber!: number;
         /**当日时间段内事件数量(可选) */
-        DeltaNumber: number | null;
+        DeltaNumber?: number;
+
+        static Plus(a:EventNumber, b:EventNumber){
+            let result = new EventNumber();
+            result.EventType = a.EventType;
+            result.DayNumber = a.DayNumber+b.DayNumber;
+            if(a.DeltaNumber !== undefined && b.DeltaNumber !== undefined)
+            {
+                result.DeltaNumber = a.DeltaNumber + b.DeltaNumber;
+            }
+            return result;
+        }
     }
 
     export enum EventType {
