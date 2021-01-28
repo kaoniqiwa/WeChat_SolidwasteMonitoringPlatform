@@ -4,10 +4,21 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "parcel ./app/page/index.html --open --port 4200",
-    "build": "NODE_ENV=production rm -rf dist && tsc --noEmit && parcel build app/index.html",
-    "clean": "rm -rf dist",
-    "test": "parcel ./app/index.html"
+    "start": "parcel ./app/page/index.html --port 4200 --no-cache true",
+    "old": "parcel ./app/page/map/map.html --port 4200 --no-cache true",
+    "user": "parcel ./app/page/user.html --port 4200 --no-cache true",
+    "data": "parcel ./app/page/data.html --port 4200",
+    "register": "parcel ./app/page/register.html --port 4200",
+    "details": "parcel ./app/page/event-details.html --port 4200",
+    "history": "parcel ./app/page/history.html --port 4200",
+    "garbage": "parcel ./app/page/garbage-stations.html --port 4200",
+    "map": "parcel ./app/page/map.html --port 4200",
+
+    "debug": "parcel build ./app/page/index.html --out-dir dist --public-url /",
+    "build": "parcel build ./app/page/index.html --out-dir dist/WeChat --public-url /WeChat/",
+    "test": "parcel build ./app/page/index.html --out-dir dist/wechat/test --public-url /WeChat/test/",
+
+    "clean": "rm -rf ./dist"
   },
   "keywords": [],
   "author": "",
