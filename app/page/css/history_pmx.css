@@ -1,0 +1,163 @@
+.container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /**
+        header固定高度 40px
+    **/
+  /* 
+        main 占用除 header 外的剩余高度 calc(100% - 40px) 
+        且设置 box-sizing 为 border-box,不影响父元素的宽高
+    */
+}
+.container header {
+  display: flex;
+  height: 40px;
+  flex-shrink: 0;
+  background-color: hsl(0, 0%, 100%);
+  color: #b2b2b2;
+  padding: 0 12px;
+  justify-content: space-between;
+  align-items: center;
+}
+.container header .header-item {
+  display: flex;
+}
+.container header .header-item .header-item__btn {
+  margin-left: 10px;
+}
+.container header .header-item .header-item__btn:nth-child(1) {
+  font-size: 0;
+}
+.container header .header-item .header-item__btn:nth-child(1) span,
+.container header .header-item .header-item__btn:nth-child(1) i {
+  font-size: 16px;
+}
+.container header .header-item .header-item__btn:last-child {
+  order: -1;
+}
+.container main {
+  box-sizing: border-box;
+  color: #b2b2b2;
+  padding-top: 12px;
+  /* 自适应高度*/
+  flex-grow: 1;
+  /* 为实现overflow:auto效果，必须设置为0*/
+  height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.container main .main-bar {
+  flex-shrink: 0;
+  height: 40px;
+  background-color: hsl(0, 0%, 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.container main .main-bar .main-bar__item:last-child {
+  /* 宽度随内容自适应，不会遮盖左边的按钮层*/
+  width: auto;
+  text-align: right;
+  margin-left: 10px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.container main .main-content {
+  height: 0;
+  flex-grow: 1;
+  margin-top: 1px;
+  background-color: hsl(0, 0%, 100%);
+  overflow: auto;
+  /* 受swiper.css margin影响，需要设置 width*/
+  width: 100%;
+}
+.container main .main-content .inner-content {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  /* 受swiper.css影响，需要设置 shrink:0*/
+  flex-shrink: 0;
+}
+.container main .main-content #illegalDropTab {
+  background-color: red;
+}
+.container main .main-content #illegalDropTab .record-item {
+  height: 104px;
+  box-sizing: border-box;
+  padding: 12px;
+  display: flex;
+}
+.container main .main-content #illegalDropTab .record-item .item-content:first-child img {
+  width: 140px;
+  height: 80px;
+  border-radius: 10px;
+}
+.container main .main-content #illegalDropTab .record-item .item-content:last-child {
+  flex-grow: 1;
+  margin-left: 16px;
+  border-bottom: 1px solid;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.container main .main-content #illegalDropTab .record-item .item-content__header {
+  font-size: 19px;
+  color: black;
+}
+.container main .main-content #illegalDropTab .record-item .item-content__footer {
+  display: flex;
+  height: 40px;
+  align-items: center;
+  justify-content: space-between;
+}
+.container main .main-content #illegalDropTab .record-item .item-content__footer .content-footer--start {
+  font-size: 14.4px;
+  color: #888;
+}
+.container main .main-content #illegalDropTab .record-item .item-content__footer .content-footer--end {
+  font-size: 12px;
+  color: #b2b2b2;
+}
+.container main .main-content #overflowTab {
+  background-color: green;
+}
+.container main .main-content #hybridPushTab {
+  background-color: cyan;
+}
+.container footer {
+  height: 40px;
+  flex-shrink: 0;
+  text-align: center;
+  line-height: 40px;
+}
+.swiper-pagination {
+  width: 100%;
+  position: static;
+  height: 100%;
+  text-align: left;
+  display: flex;
+  overflow: auto;
+}
+.swiper-pagination-bullet {
+  flex-shrink: 0;
+  width: 100px;
+  height: 100%;
+  border-radius: 0;
+  background: white;
+  text-align: center;
+  line-height: 40px;
+  opacity: 1;
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  user-select: none;
+  outline: none;
+}
+.swiper-pagination-bullet-active {
+  color: #4097ff;
+  outline: none;
+  border-bottom: 1px solid #4097ff;
+  -webkit-tap-highlight-color: transparent;
+}
