@@ -215,8 +215,8 @@ namespace UserDetailsPage {
             let childId = getQueryVariable("childId")
             if (childId) {
                 try {
-                    let res = await service.wechat.get(childId)
-                    user = res.data;
+                    
+                    user = await service.wechat.get(childId);
 
                 } catch (ex) {
                     console.error(ex);

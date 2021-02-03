@@ -1,3 +1,4 @@
+import { NavigationWindow } from ".";
 import { SessionUser } from "../../common/session-user";
 import { OnlineStatus } from "../../data-core/model/waste-regulation/camera";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
@@ -8,6 +9,7 @@ import { ResourceType } from "../../data-core/model/we-chat";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { Service } from "../../data-core/repuest/service";
+import { DataController } from "./data-controllers/DataController";
 
 
 let Swiper = Reflect.get(window, 'Swiper');
@@ -323,7 +325,7 @@ class GarbageStationClient {
                 let imageUrls: Array<string> = [];
 
                 this.service.camera.list(v.Id).then(res => {
-                    let cameras = res.data.Data.sort((a, b) => {
+                    let cameras = res.Data.sort((a, b) => {
                         return a.CameraUsage - b.CameraUsage || a.Name.localeCompare(b.Name);
                     });
                     cameras.forEach((camera, index) => {
@@ -333,7 +335,7 @@ class GarbageStationClient {
                             imageUrl = this.service.medium.getData(camera.ImageUrl)!;
                         }
                         else {
-                            imageUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII="
+                            imageUrl = DataController.defaultImageUrl;
                         }
                         imageUrls.push(imageUrl)
                         let div: HTMLDivElement;
@@ -343,7 +345,7 @@ class GarbageStationClient {
                         let img = div!.querySelector('img') as HTMLImageElement;
                         img.setAttribute('index', index + '')
                         img!.src = imageUrl;
-                       
+
 
                         wrapper!.appendChild(div);
                     })
@@ -535,52 +537,53 @@ class GarbageStationClient {
 
 let refreshed = false;
 
-const client = new HowellHttpClient.HttpClient();
-client.login((http: HowellAuthHttp) => {
-    const user = new SessionUser();
-    const service = new Service(http);
-    const stationClient = new GarbageStationClient(
-        user,
-        service
-    );
+
+const user = (window.parent as NavigationWindow).User;
+const http = (window.parent as NavigationWindow).Authentication;
+
+const service = new Service(http);
+const stationClient = new GarbageStationClient(
+    user,
+    service
+);
 
 
 
-    let MiniRefresh = Reflect.get(window, 'MiniRefresh')
-    let miniRefresh = new MiniRefresh({
-        container: '#minirefresh',
-        isLockX: false,
-        down: {
-            callback: function () {
-                // 下拉事件
-                refreshed = true;
-                render().then(() => {
-                    miniRefresh.endDownLoading();
-                })
-
-            }
-        },
-        up: {
-            isAuto: false,
-            isLock: true,
-            callback: function () {
-                // 上拉事件
-                miniRefresh.endUpLoading(true);
-
-            }
-        }
-    });
-
-    // 加载数据，数据加载完成，创建页面内容
-    render()
-
-    function render() {
-        return stationClient.loadData()
-            .then((res) => {
-                stationClient.init();
+let MiniRefresh = Reflect.get(window, 'MiniRefresh')
+let miniRefresh = new MiniRefresh({
+    container: '#minirefresh',
+    isLockX: false,
+    down: {
+        callback: function () {
+            // 下拉事件
+            refreshed = true;
+            render().then(() => {
+                miniRefresh.endDownLoading();
             })
-        // .catch((e) => {
-        //     console.error(`出错了~ ${e}`)
-        // })
+
+        }
+    },
+    up: {
+        isAuto: false,
+        isLock: true,
+        callback: function () {
+            // 上拉事件
+            miniRefresh.endUpLoading(true);
+
+        }
     }
 });
+
+// 加载数据，数据加载完成，创建页面内容
+render()
+
+function render() {
+    return stationClient.loadData()
+        .then((res) => {
+            stationClient.init();
+        })
+    // .catch((e) => {
+    //     console.error(`出错了~ ${e}`)
+    // })
+}
+

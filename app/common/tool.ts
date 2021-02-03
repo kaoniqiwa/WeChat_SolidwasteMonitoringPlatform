@@ -7,6 +7,20 @@ export function getAllDay(date: Date) {
     }
 }
 
+
+
+export function enumForeach<T>(type:ThisType<T>, callback: (value: T) => void) {    
+    for (var key in type) {
+        var keyToAny: any = key;
+        if (!isNaN(keyToAny)) {
+            var t: any = type[key];
+            var e: T = t;
+            callback(e)
+        }
+    }
+}
+
+
 export function dateFormat(date: Date, fmt: string) {
     var o = {
         "M+": date.getMonth() + 1, //月份          
@@ -41,7 +55,7 @@ export function dateFormat(date: Date, fmt: string) {
     return fmt;
 }
 
-export function getQueryVariable(variable: string) {    
+export function getQueryVariable(variable: string) {
     var query = window.location.search.substring(1);
     var vars = query.split("&");
     for (var i = 0; i < vars.length; i++) {

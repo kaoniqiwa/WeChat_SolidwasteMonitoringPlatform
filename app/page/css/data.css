@@ -56,6 +56,9 @@ body{
     height: calc(100% - 31px);
 }
 
+
+
+
 .card.top .content{
     font-size: 20px;
 text-overflow: ellipsis;

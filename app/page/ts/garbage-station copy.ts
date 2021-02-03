@@ -1,3 +1,4 @@
+import { NavigationWindow } from ".";
 import { SessionUser } from "../../common/session-user";
 import { dateFormat } from "../../common/tool";
 import { ResponseData } from "../../data-core/model/response-data";
@@ -13,8 +14,6 @@ import { Service } from "../../data-core/repuest/service";
 import { AsideControl } from "./aside";
 import { AsideListPage, AsideListPageWindow, SelectionMode } from "./aside-list";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
-import { CountDivisionController } from "./data-controllers/CountyController";
-import { DivisionController } from "./data-controllers/DivisionController";
 import { IGarbageStationController } from "./data-controllers/IController";
 import { ClassNameHelper, Language } from "./language";
 
@@ -56,7 +55,7 @@ class GarbageStationClient {
     dataController: IGarbageStationController;
     type: ResourceType;
 
-    constructor(type:ResourceType, dataController: IGarbageStationController
+    constructor(type: ResourceType, dataController: IGarbageStationController
         //     {
         //     garbageStation: GarbageStationRequestService,        
         //     division: DivisionRequestService,
@@ -175,22 +174,30 @@ class GarbageStationClient {
         let p = this.dataController.getDivision(divisionId);
         p.then(division => {
             let info = document.getElementById(id) as HTMLDivElement;
-            debugger;
+
             let content_footer = info.querySelector('.content__footer .division-name') as HTMLDivElement;
             content_footer.innerHTML = division.Name;
         });
     }
     setNumberStatic(ids: string[]) {
-        let promise = this.dataController.getGarbageStationEventCount(ids);
+        let roles = ids.map(x=>{
+            let role = new ResourceRole();
+            role.Id = x;
+            role.ResourceType = type;
+            return role;
+        })
+        let promise = this.dataController.getGarbageStationStatisticNumberListInToday(roles);
         promise.then(array => {
             for (let i = 0; i < array.length; i++) {
                 const numberStatic = array[i];
                 if (numberStatic) {
                     let info = document.getElementById(numberStatic.id) as HTMLDivElement;
-                    let illegalDrop = info.querySelector('.illegalDrop-number') as HTMLSpanElement;
-                    illegalDrop.innerHTML = numberStatic.illegalDropNumber.toString();
-                    let mixedInto = info.querySelector('.MixedInto-number') as HTMLSpanElement;
-                    mixedInto.innerHTML = numberStatic.hybridPushNumber.toString();
+                    if (info) {
+                        let illegalDrop = info.querySelector('.illegalDrop-number') as HTMLSpanElement;
+                        illegalDrop.innerHTML = numberStatic.illegalDropNumber.toString();
+                        let mixedInto = info.querySelector('.MixedInto-number') as HTMLSpanElement;
+                        mixedInto.innerHTML = numberStatic.mixedIntoNumber.toString();
+                    }
                 }
             }
         }
@@ -236,7 +243,9 @@ class GarbageStationClient {
                     title_bandage.classList.remove('green');
                     title_bandage.classList.remove('orange');
                     let states = v.StationState as Flags<StationState>;
+                    
                     if (states.contains(StationState.Error)) {
+
                         title_bandage.textContent = Language.StationState(StationState.Error);
                         title_bandage.classList.add('red');
                     }
@@ -251,7 +260,7 @@ class GarbageStationClient {
 
 
                     //所在居委会         
-                    debugger;
+
                     this.setFooter(v.Id, v.DivisionId);
                     // 加载图片
                     let container = info.querySelector('.content__img .swiper-container');
@@ -262,7 +271,11 @@ class GarbageStationClient {
                     let imageUrls: Array<string> = [];
 
 
-                    this.dataController.getCameraList(v.Id).then(cameras => {
+                    this.dataController.getCameraList(v.Id, (cameraId: string, url?: string) => {
+                        let img = document.getElementById(cameraId) as HTMLImageElement;
+                        // img.setAttribute('index', index + '')
+                        img.src = url!;
+                    }).then(cameras => {
                         cameras.forEach((camera, index) => {
 
                             imageUrls.push(camera.ImageUrl!)
@@ -271,8 +284,9 @@ class GarbageStationClient {
                             index != 0 ? div = slide?.cloneNode(true) as HTMLDivElement : div = slide;
 
                             let img = div!.querySelector('img') as HTMLImageElement;
+                            img.id = camera.Id;
                             img.setAttribute('index', index + '')
-                            img!.src = camera.ImageUrl!;
+                            // img!.src = camera.ImageUrl!;
 
                             if (!camera.OnlineStatus == undefined || camera.OnlineStatus == OnlineStatus.Offline) {
                                 let nosignal = div.querySelector('.nosignal') as HTMLDivElement;
@@ -353,8 +367,9 @@ class GarbageStationClient {
     confirmSelect(selectedIds: string[]) {
 
 
+
         for (let [k, v] of this.garbageElements) {
-            if (selectedIds.length == 0 || selectedIds.includes(v.divisionId)) {
+            if (selectedIds.length == 0 || selectedIds.includes(v.divisionId) || selectedIds.includes(v.id)) {
                 v.Element.style.display = 'block'
             } else {
                 v.Element.style.display = 'none'
@@ -433,11 +448,13 @@ class GarbageStationClient {
     showDetail(info: { id: string, index: number }) {
 
         let element = this.garbageElements.get(info.id)
+
         let imgs = element.imageUrls
 
 
         for (let i = 0; i < imgs.length; i++) {
-            this.swiper.virtual.appendSlide('<div class="swiper-zoom-container"><img src="' + imgs[i] +
+            let url = this.dataController.getImageUrl(imgs[i]);
+            this.swiper.virtual.appendSlide('<div class="swiper-zoom-container"><img src="' + url +
                 '" /></div>');
         }
         this.swiper.slideTo(info.index);
@@ -461,61 +478,61 @@ class GarbageStationClient {
 
 let refreshed = false;
 
-const client = new HowellHttpClient.HttpClient();
-client.login((http: HowellAuthHttp) => {
-    const user = new SessionUser();
-    const service = new Service(http);
-    const type = user.WUser.Resources![0].ResourceType;
-    const dataController = ControllerFactory.Create(service, type, user.WUser.Resources!);
-    const stationClient = new GarbageStationClient(type, dataController);
+const user = (window.parent as NavigationWindow).User;
+const http = (window.parent as NavigationWindow).Authentication;
+
+const service = new Service(http);
+const type = user.WUser.Resources![0].ResourceType;
+const dataController = ControllerFactory.Create(service, type, user.WUser.Resources!);
+const stationClient = new GarbageStationClient(type, dataController);
 
 
 
-    let MiniRefresh = Reflect.get(window, 'MiniRefresh')
-    let miniRefresh = new MiniRefresh({
-        container: '#minirefresh',
-        isLockX: false,
-        down: {
-            callback: () => {
-                // 下拉事件
+let MiniRefresh = Reflect.get(window, 'MiniRefresh')
+let miniRefresh = new MiniRefresh({
+    container: '#minirefresh',
+    isLockX: false,
+    down: {
+        callback: () => {
+            // 下拉事件
 
-                refreshed = true;
-                if (stationClient.asidePage) {
-                    stationClient.asidePage.resetSelected();
-                }
-                // render().then(() => {
-                //     miniRefresh.endDownLoading();
-                // })
-                render();
-                miniRefresh.endDownLoading();
+            refreshed = true;
+            if (stationClient.asidePage) {
+                stationClient.asidePage.resetSelected();
             }
-        },
-        up: {
-            isAuto: false,
-            isLock: true,
-            callback: function () {
-                // 上拉事件
-                miniRefresh.endUpLoading(true);
-
-
-            }
+            // render().then(() => {
+            //     miniRefresh.endDownLoading();
+            // })
+            render();
+            miniRefresh.endDownLoading();
         }
-    });
+    },
+    up: {
+        isAuto: false,
+        isLock: true,
+        callback: function () {
+            // 上拉事件
+            miniRefresh.endUpLoading(true);
 
-    // 加载数据，数据加载完成，创建页面内容
-    render()
 
-    function render() {
-
-        stationClient.init();
-
-
-        // return stationClient.loadData()
-        //     .then((res) => {
-        //         stationClient.init();
-        //     })
-        // .catch((e) => {
-        //     console.error(`出错了~ ${e}`)
-        // })
+        }
     }
 });
+
+// 加载数据，数据加载完成，创建页面内容
+render()
+
+function render() {
+
+    stationClient.init();
+
+
+    // return stationClient.loadData()
+    //     .then((res) => {
+    //         stationClient.init();
+    //     })
+    // .catch((e) => {
+    //     console.error(`出错了~ ${e}`)
+    // })
+}
+

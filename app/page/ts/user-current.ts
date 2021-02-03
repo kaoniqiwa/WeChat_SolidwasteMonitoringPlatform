@@ -1,9 +1,9 @@
 import { Service } from "../../data-core/repuest/service";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
-import { SRServer } from "../../data-core/model/aiop/sr-server";
 import { SessionUser } from "../../common/session-user";
 import { AsideControl } from "./aside";
+import { NavigationWindow } from ".";
 
 
 namespace UserPage {
@@ -83,14 +83,10 @@ namespace UserPage {
         }
     }
 
-    const client = new HowellHttpClient.HttpClient();
-    client.login((http: HowellAuthHttp) => {
-
-        const user = new SessionUser();
-        const service = new Service(http);
-        const page = new Page(user, service);
-        page.init();
-    });
-
+    const user = (window.parent as NavigationWindow).User;            
+            const http = (window.parent as NavigationWindow).Authentication;
+            const service = new Service(http);
+            const page = new Page(user, service);
+            page.init();
 
 }

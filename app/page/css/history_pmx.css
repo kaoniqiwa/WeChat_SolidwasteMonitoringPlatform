@@ -82,7 +82,7 @@
   flex-shrink: 0;
 }
 .container main .main-content #illegalDropTab {
-  background-color: red;
+  
 }
 .container main .main-content #illegalDropTab .record-item {
   height: 104px;
@@ -121,11 +121,11 @@
   font-size: 12px;
   color: #b2b2b2;
 }
-.container main .main-content #overflowTab {
-  background-color: green;
+.container main .main-content #garbageFullTab {
+  
 }
-.container main .main-content #hybridPushTab {
-  background-color: cyan;
+.container main .main-content #mixedIntoTab {
+  
 }
 .container footer {
   height: 40px;

@@ -10,7 +10,7 @@ export declare class HowellAuthHttp {
      get clientCredentials(): ClientCredentials;
      set digest(digest:Digest);
      
-    get<TResult = any>(path: string, config?: AxiosRequestConfig): Promise<AxiosResponse<TResult>>;
+    get<TResult = any>(path: string, config?: AxiosRequestConfig): Promise<TResult>;
     post<TRequest = any, TResult = any>(path: string, data?: TRequest, config?: AxiosRequestConfig): Promise<TResult>;
     put<TRequest = any, TResult = any>(path: string, data?: TRequest, config?: AxiosRequestConfig): Promise<TResult>;
     delete<TResult = any>(path: string, config?: AxiosRequestConfig): Promise<TResult>;

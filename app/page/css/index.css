@@ -3,7 +3,9 @@ html, body{
     padding: 0;
     height: 100%;
     width: 100%;
-    border: none;   
+    border: none; 
+    -webkit-user-select: none;
+    user-select: none;  
     
 }
 body{
@@ -196,9 +198,12 @@ a:focus{
 
 html,body{
     overflow: hidden;
+    
+    
 }
 body{
     position: relative;
+
 }
 .backdrop {
    display: none;

@@ -61,6 +61,7 @@
     color: #a5a3a2;
     text-decoration: none;
     font-size: 12px;
+    user-select: none;
     /* cursor: pointer; */
     /* -webkit-tap-highlight-color:transparent; */
   }

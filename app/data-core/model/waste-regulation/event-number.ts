@@ -1,5 +1,3 @@
-import { EventNumberStatistic } from "./division-event-numbers";
-
     /**事件数量 */
     export class EventNumber
     {

@@ -177,6 +177,7 @@ export namespace AppEChart{
 
      export class LineOption{
         xAxisData: Array<any>; 
+        boundaryGap:boolean = true;
         seriesData: Array<any>;   
         legendData :{data:string[],right:number,color:string
             ,fontSize:number,orient:string,} = {

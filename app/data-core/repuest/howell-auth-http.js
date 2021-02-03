@@ -39,7 +39,7 @@ class HowellAuthHttp {
             .get(path, httpOptions)
             .catch(error)
             .then(wwwAuth => {
-                return wwwAuth;
+                return wwwAuth.data;
             });
     }
 

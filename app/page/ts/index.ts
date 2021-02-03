@@ -1,14 +1,24 @@
 import { SessionUser } from "../../common/session-user";
+import { EventType } from "../../data-core/model/waste-regulation/event-number";
+import { WeChatUser } from "../../data-core/model/we-chat";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
+
+export interface NavigationWindow extends Window {
+    User: SessionUser;
+    Authentication: HowellAuthHttp;
+}
+
 
 namespace Navigation {
 
     window.recordDetails = null;
     window.showOrHideAside = function (url) {
+        if (index < 0) {
+            index = 1;
+            (items[index] as HTMLLinkElement).click();
 
-
-
+        }
         var asideContent = document.querySelector('.aside-content') as HTMLDivElement;
         var backdrop = document.querySelector('.backdrop') as HTMLDivElement;
         if (asideContent.classList.contains('active')) {
@@ -19,7 +29,9 @@ namespace Navigation {
             asideContent.classList.add('active');
 
             var details = document.getElementById("aside-details") as HTMLIFrameElement;
-            details.src = url;
+            if (url) {
+                details.src = url;
+            }
 
         }
     }
@@ -48,7 +60,7 @@ namespace Navigation {
 
 
 
-    window.User = new SessionUser();
+    (window as unknown as NavigationWindow).User = new SessionUser();
     let index = 0;
     var search = document.location.search.substr(1).toLocaleLowerCase();
     var query = search.split('&');
@@ -62,37 +74,44 @@ namespace Navigation {
         querys[keyvalue[0]] = keyvalue[1];
     }
     if (querys.openid) {
+
         new HowellHttpClient.HttpClient().login(
             async (http: HowellAuthHttp) => {
-                window.hwAuth = http;
+                (window as unknown as NavigationWindow).Authentication = http;
+
+                if (querys.eventid) {
+                    //location.href = "./event-details.html?openid=" + querys.openid + "&eventid=" + querys.eventid;
+                    querys.index = "-1";
+                    let eventType = EventType.IllegalDrop;
+                    if (querys.eventtype) {
+                        eventType = parseInt(querys.eventtype);
+                    }
+                    window.showOrHideAside("./event-details.html?openid=" + querys.openid + "&eventid=" + querys.eventid + "&eventtype=" + eventType);
+                }
+
+
+
+
+                if (querys.index) {
+                    index = parseInt(querys.index);
+                }
+                console.log(index);
+                if (index >= 0) {
+                    (items[index] as HTMLLinkElement).click();
+                }
             },
             () => {
-                alert("e");
                 location.href = "./register.html?openid=" + querys.openid;
             });
     }
-    else {        
-        if (querys.eventid) {            
-                window.location.href = "http://51kongkong.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetUserOpenId?appid=wx119358d61e31da01&returnUrl="
-                    + window.location.href;
+    else {
+        if (querys.eventid) {
+            window.location.href = "http://51kongkong.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetUserOpenId?appid=wx119358d61e31da01&returnUrl="
+                + window.location.href;
         }
         else {
             location.href = "./register.html";
         }
     }
 
-    if (querys.eventid) {
-        //location.href = "./event-details.html?openid=" + querys.openid + "&eventid=" + querys.eventid;
-        querys.index = "1";
-        window.showOrHideAside("./event-details.html?openid=" + querys.openid + "&eventid=" + querys.eventid);
-    }
-
-
-
-
-    if (querys.index) {
-        index = parseInt(querys.index);
-    }
-    console.log(index);
-    (items[index] as HTMLLinkElement).click();
 }

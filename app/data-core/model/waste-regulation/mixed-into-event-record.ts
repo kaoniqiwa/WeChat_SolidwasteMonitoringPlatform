@@ -1,25 +1,23 @@
-import { EventRecord } from "./event-record";
+import { EventData, EventRecordData } from "./event-record";
 import { EventDataObject } from "./event-data-object";
 /**混合投放事件记录 */
-    export interface MixedIntoEventRecord extends EventRecord
+    export class MixedIntoEventRecord extends EventRecordData<MixedIntoEventData>
     {
-        /**事件数据 */
-        Data: MixedIntoEventData;
     }
     /**///  */
-    export interface MixedIntoEventData
+    export class MixedIntoEventData extends EventData
     {
         /**垃圾房ID */
-        StationId: string;
+        StationId!: string;
         /**垃圾房名称 */
-        StationName: string;
+        StationName!: string;
         /**区划ID(可选) */
-        DivisionId: string;
+        DivisionId?: string;
         /**区划名称(可选) */
-        DivisionName: string;
+        DivisionName?: string;
         /**垃圾的目标(可选) */
-        Objects: EventDataObject[];
+        Objects?: EventDataObject[];
         /**图片ID、图片地址列表(可选) */
-        PersonImageUrls: string[];
+        PersonImageUrls?: string[];
 
     }

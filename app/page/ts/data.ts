@@ -27,6 +27,7 @@ namespace GarbageCondition {
 		convert(datas: Array<EventNumber>): AppEChart.LineOption {
 			const lc = this.joinPart(new AppEChart.LineOption());
 			lc.seriesData = new Array();
+lc.boundaryGap = true;
 
 			for (let i = 0; i < datas.length; i++) {
 				const data = datas[i];
@@ -41,7 +42,7 @@ namespace GarbageCondition {
 
 		private joinPart(t1: AppEChart.LineOption) {
 			t1.xAxisData = [];
-			for (let i = 1; i <= 12; i++) {
+			for (let i = 0; i <= 12; i++) {
 				if (i < 10)
 					t1.xAxisData.push('0' + i + ':00');
 				else
@@ -100,7 +101,7 @@ namespace GarbageCondition {
 
 		async view(data: StatisticNumber) {
 			this.page.element.count.illegalDrop.innerHTML = data.illegalDropNumber.toString();
-			this.page.element.count.hybridPush.innerHTML = data.hybridPushNumber.toString();
+			this.page.element.count.hybridPush.innerHTML = data.mixedIntoNumber.toString();
 		}
 	}
 
@@ -159,17 +160,17 @@ namespace GarbageCondition {
 			});
 
 
-			const promise = this.dataController.getIllegalDropList(day);
+			const promise = this.dataController.getStatisticNumberList(day);
 			promise.then(data => {
 				if (data) {
 					const items = data.sort((a, b) => {
-						return b.count - a.count;
+						return b.illegalDropNumber - a.illegalDropNumber;
 					}).splice(0, 10);
 
 					const viewModel = items.map(x => {
 						return {
 							name: x.name,
-							subName: x.count,
+							subName: x.illegalDropNumber,
 							subNameAfter: '起'
 						}
 					})

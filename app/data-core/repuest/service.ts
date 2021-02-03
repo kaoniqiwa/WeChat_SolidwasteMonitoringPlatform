@@ -3,7 +3,7 @@ import { Mediume } from "../url/medium";
 import { DivisionRequestService } from "./division.service";
 import { CameraRequestService, GarbageStationRequestService } from "./garbage-station.service";
 import { HowellAuthHttp } from "./howell-auth-http";
-import { EventRequestService } from "./Illegal-drop-event-record";
+import { EventRequestService } from "./event-record";
 import { RoleRequestService } from "./role-service";
 import { UserRequestService } from "./user.service";
 import { WeChatRequestService } from "./we-chat.service";

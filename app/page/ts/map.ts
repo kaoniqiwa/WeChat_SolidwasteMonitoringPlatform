@@ -178,6 +178,7 @@ import { DivisionRequestService } from "../../data-core/repuest/division.service
 import { DivisionType, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 import { SessionUser } from "../../common/session-user";
 import { ResourceType } from "../../data-core/model/we-chat";
+import { NavigationWindow } from ".";
 
 
 
@@ -299,49 +300,51 @@ class StationList {
 const client = new HowellHttpClient.HttpClient();
 let dataController: CesiumDataController.Controller;
 let mapClient: CesiumMapClient;
-client.login((http: HowellAuthHttp) => {
-    const user = new SessionUser();
-    list = new StationList(
-        user,
-        {
-            division: new DivisionRequestService(http),
-            garbageStation: new GarbageStationRequestService(http),
-        });
-    list.LoadGarbageStation(pageIndex);
+
+const user = (window.parent as NavigationWindow).User;
+const http = (window.parent as NavigationWindow).Authentication;
+
+list = new StationList(
+    user,
+    {
+        division: new DivisionRequestService(http),
+        garbageStation: new GarbageStationRequestService(http),
+    });
+list.LoadGarbageStation(pageIndex);
 
 
-    let iframe = document.getElementById('iframe') as HTMLIFrameElement;
-    iframe.src = "http://" + window.location.hostname + ":" + window.location.port + "/Amap/map_ts.html?style=none&maptype=2D&v=" + (new Date()).toISOString();
-    mapClient = new CesiumMapClient("iframe");
+let iframe = document.getElementById('iframe') as HTMLIFrameElement;
+iframe.src = "http://" + window.location.hostname + ":" + window.location.port + "/Amap/map_ts.html?style=none&maptype=2D&v=" + (new Date()).toISOString();
+mapClient = new CesiumMapClient("iframe");
 
 
-    // console.log(mapClient.Events)
-    mapClient.Events.OnLoading = function () {
-        // console.log("client.Events.OnLoading");
-        dataController = new CesiumDataController.Controller(window.location.hostname, Number(window.location.port), function () {
+// console.log(mapClient.Events)
+mapClient.Events.OnLoading = function () {
+    // console.log("client.Events.OnLoading");
+    dataController = new CesiumDataController.Controller(window.location.hostname, Number(window.location.port), function () {
 
-        })
+    })
 
-    }
-    mapClient.Events.OnLoaded = async () => {
-        const division = await list.GetLocalDivision();
-        // console.log('divi', division)
-        mapClient.Village.Select(division!.Id);
-        const village = dataController.Village.Get(division!.Id);
-        mapClient.Viewer.MoveTo(village.position);
-    }
-});
+}
+mapClient.Events.OnLoaded = async () => {
+    const division = await list.GetLocalDivision();
+    // console.log('divi', division)
+    mapClient.Village.Select(division!.Id);
+    const village = dataController.Village.Get(division!.Id);
+    mapClient.Viewer.MoveTo(village.position);
+}
+
 
 (function ($: any) {
     $('.mui-pagination').on('tap', 'a', function (this: HTMLAnchorElement) {
         var li = this.parentNode as HTMLLIElement;
         var classList = li.classList;
         if (classList.contains('mui-previous')) {
-           if (pageIndex > 1) {
+            if (pageIndex > 1) {
                 list.LoadGarbageStation(--pageIndex);
             }
         } else if (classList.contains('mui-next')) {
-           if (pageIndex < page.PageCount) {
+            if (pageIndex < page.PageCount) {
                 list.LoadGarbageStation(++pageIndex);
             }
         }

@@ -8,6 +8,7 @@ import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { ResourceMediumRequestService } from "../../data-core/repuest/resources.service";
 import { FilterAside } from "../component/aside";
+import { DataController } from "./data-controllers/DataController";
 
 declare var mui: any;
 
@@ -167,7 +168,7 @@ export namespace GarbageStationList {
 
             return response.then(res => {
 
-                let cameras = res.data.Data.sort((a, b) => {
+                let cameras = res.Data.sort((a, b) => {
                     return a.CameraUsage - b.CameraUsage || a.Name.localeCompare(b.Name);
                 });
 
@@ -192,7 +193,7 @@ export namespace GarbageStationList {
         createImgByCamera(camera: Camera) {
             let img = document.createElement("img");
             img.addEventListener("error", function () {
-                this.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII=";
+                this.src = DataController.defaultImageUrl;
             });
             img.id = camera.Id;
             img.className = 'mui-zoom';
@@ -201,7 +202,7 @@ export namespace GarbageStationList {
                 img.src = this.service.media.getData(camera.ImageUrl);
             }
             else {
-                img.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII="
+                img.src = DataController.defaultImageUrl;
             }
 
             return img;

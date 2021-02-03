@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>生活垃圾监管平台</title>
     <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
+    <link rel="stylesheet" href="./css/swiper.min.css" type='text/css'>
     <link crossorigin="anonymous"
         integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
         href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
@@ -13,7 +14,8 @@
     <link href="../../minirefresh/minirefresh.css" rel="stylesheet" />
     <link href="./css/event-details.css" rel="stylesheet" />
 
-    </style>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="../assets/swiper.js"></script>
 </head>
 
 <body>
@@ -27,8 +29,8 @@
                             style="height: 0; padding-bottom: 58.25%;">
                             <img class="weui-media-box__thumb"
                                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII="
-                                width="100%" id="detail_img" alt="">
-                            <div class="frame" id="frame"></div>
+                                width="100%" id="detail_img" alt="">   
+                                <div class="frame" id="frame"></div>                         
                         </div>
                     </div>
                     <div class="weui-form-preview__bd">
@@ -61,6 +63,13 @@
         </div>
 
     </div>
+
+    <div class="swiper-container" id="origin-img">
+        <div class="swiper-wrapper"></div>
+        <div class="swiper-pagination"></div>
+    </div>
+
+
 </body>
 <script src="./ts/EventInformation.ts"></script>
 

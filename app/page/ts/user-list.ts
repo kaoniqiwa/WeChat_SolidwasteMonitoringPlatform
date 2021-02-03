@@ -1,7 +1,6 @@
 import { Service } from "../../data-core/repuest/service";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
-import { SRServer } from "../../data-core/model/aiop/sr-server";
 import { SessionUser } from "../../common/session-user";
 import { WeChatUser } from "../../data-core/model/we-chat";
 import { AsideControl } from "./aside";
@@ -52,7 +51,7 @@ namespace UserListPage {
         }
         loadWechatUser() {
             return this.service.wechat.list().then((res) => {
-                res.data.forEach((v) => {
+                res.forEach((v) => {
                     this.userInfos.set(v.Id!, v)
                 })
             }).catch((er) => {
@@ -141,6 +140,7 @@ namespace UserListPage {
                     main.data = v;
                     main.addEventListener('click', function () {
                         if (this.data) {
+                            
                             console.log('info click');
                             that.element.iframe.src = that.element.link.details.href + "?openid=" + that.user.WUser.OpenId + "&childId=" + (this.data as WeChatUser).Id;
                             that.asideControl.Show();

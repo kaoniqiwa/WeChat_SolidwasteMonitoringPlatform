@@ -2,19 +2,27 @@
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { SessionUser } from "../../common/session-user";
 import { getQueryVariable, dateFormat, getAllDay } from "../../common/tool";
-import { GetEventRecordsParams, IllegalDropEventRecord } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
+import { IllegalDropEventData, IllegalDropEventRecord } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { PagedList } from "../../data-core/model/page";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 import { Service } from "../../data-core/repuest/service";
-import { ResourceType } from "../../data-core/model/we-chat";
+import { ResourceRole, ResourceType } from "../../data-core/model/we-chat";
 import { AsideControl } from "./aside";
 import { AsideListPage, AsideListPageWindow, SelectionMode } from "./aside-list";
 import { Language } from "./language";
+import { IEventHistory, Paged } from "./data-controllers/IController";
+import { ControllerFactory } from "./data-controllers/ControllerFactory";
+import { MixedIntoEventData, MixedIntoEventRecord } from "../../data-core/model/waste-regulation/mixed-into-event-record";
+import { EventType } from "../../data-core/model/waste-regulation/event-number";
+import { SwiperControl } from "./data-controllers/modules/SwiperControl";
+import { EventRecord, EventRecordData } from "../../data-core/model/waste-regulation/event-record";
+import { GarbageFullEventData } from "../../data-core/model/waste-regulation/garbage-full-event-record";
+import { NavigationWindow } from ".";
+import { DataController } from "./data-controllers/DataController";
 
 
 
-declare var MiniRefresh: any;
 declare var weui: any;
 
 export namespace EventHistoryPage {
@@ -28,18 +36,25 @@ export namespace EventHistoryPage {
             backdrop: document.querySelector('.backdrop') as HTMLDivElement,
             iframe: document.getElementById('aside-iframe') as HTMLIFrameElement
         },
-        filterBtn: document.querySelector('.btn.filter') as HTMLDivElement,
+        filterBtn: document.querySelector('#filter') as HTMLDivElement,
+        totalRecordCount: document.getElementById("illegalDropTotalRecordCount")!,
+        recordCount: document.getElementById("illegalDropRecordCount")!,
         IllegalDrop: {
-            list: document.getElementById("illegalDrop")!,
-            totalRecordCount: document.getElementById("illegalDropTotalRecordCount")!,
-            recordCount: document.getElementById("illegalDropRecordCount")!,
-            date: document.getElementById("date")!
+            list: document.getElementById("illegalDrop") as HTMLDivElement,
+        },
+        MixedInto: {
+            list: document.getElementById("mixedInto") as HTMLDivElement
+        },
+        GarbageFull: {
+            list: document.getElementById("garbageFull") as HTMLDivElement
         }
     }
 
 
     var MiniRefreshId = {
-        IllegalDrop: "illegalDropRefreshContainer"
+        IllegalDrop: "illegalDropRefreshContainer",
+        MixedInto: "mixedIntoRefreshContainer",
+        GarbageFull: "garbageFullRefreshContainer"
     }
 
     class Template {
@@ -54,6 +69,13 @@ export namespace EventHistoryPage {
             this.title = this.element.getElementsByClassName('title')[0] as HTMLDivElement;
             this.footer = this.element.getElementsByClassName('footer-title')[0] as HTMLDivElement;
             this.remark = this.element.getElementsByClassName('remark')[0] as HTMLDivElement;
+            this.clear();
+        }
+        clear(){
+            this.img.src = DataController.defaultImageUrl;
+            this.title.innerHTML = "";
+            this.footer.innerHTML = "";
+            this.remark.innerHTML = "";
         }
     }
 
@@ -64,33 +86,26 @@ export namespace EventHistoryPage {
          */
 
         //记录所有的居委会
-        divisions: Map<string, Division> = new Map();
-        selectedDivisions: Map<string, any> = new Map();
-        garbageElements: Map<string, any> = new Map();
-
-
         asideControl: AsideControl;
         asidePage?: AsideListPage;
 
-        /**
-         * author:zha
-         */
-
-        pageIndex = 0;
-        pageTotal = 1;
-        totalRecordCount = 0;
-
-        dataSource = new Array<IllegalDropEventRecord>();
-
-
+        parentElement: { [key: number]: HTMLDivElement } = {};
+        miniRefresh: { [key: number]: MiniRefresh } = {};
 
         filter: {
             date: Date,
-            divisionId?: string
+            sourceId?: string
         }
 
         defaultDivisionId = '';
-        constructor(private service: Service, private user: SessionUser) {
+        constructor(private type: ResourceType, private dataController: IEventHistory, private openId: string) {
+
+
+            this.parentElement[EventType.IllegalDrop] = element.IllegalDrop.list;
+            this.parentElement[EventType.MixedInto] = element.MixedInto.list;
+            this.parentElement[EventType.GarbageFull] = element.GarbageFull.list;
+
+
 
             this.filter = {
                 date: new Date()
@@ -104,17 +119,13 @@ export namespace EventHistoryPage {
 
         }
         loadAside() {
-            this.loadData().then(() => {
-                if (this.user.WUser.Resources && this.user.WUser.Resources.length > 0) {
-                    this.createAside(this.user.WUser.Resources[0].ResourceType)
-                }
-            })
+            this.createAside(this.type);
         }
-        createAside(type: ResourceType) {
-            let items = [];
-            for (const [key, value] of this.divisions) {
-                items.push(value);
-            }
+        async createAside(type: ResourceType) {
+
+            let items = await this.dataController.getResourceRoleList();
+
+
             if (element.aside.iframe.contentWindow) {
                 let currentWindow = element.aside.iframe.contentWindow as AsideListPageWindow;
                 this.asidePage = currentWindow.Page;
@@ -125,17 +136,19 @@ export namespace EventHistoryPage {
                     items: items.map(x => {
                         return {
                             id: x.Id,
-                            name: x.Name
+                            name: x.Name!
                         };
                     }),
                     footer_display: true
                 })
                 this.asidePage.confirmclicked = (selecteds) => {
+
                     let selectedIds = [];
                     for (let id in selecteds) {
                         selectedIds.push(id)
                     }
-                    this.confirmSelect(selectedIds)
+                    this.confirmSelect(selectedIds);
+                    this.asideControl.Hide();
                 }
             }
         }
@@ -143,92 +156,48 @@ export namespace EventHistoryPage {
 
 
 
-        confirmSelect(selectedIds: string[]) {
-            this.filter.divisionId = selectedIds[0];
-            // for (let [k, v] of this.garbageElements) {
-            //     if (selectedIds.length == 0 || selectedIds.includes(v.divisionId)) {
-            //         v.Element.style.display = 'block'
-            //     } else {
-            //         v.Element.style.display = 'none'
-            //     }
-            // }            
-            //this.refresh()
-            element.IllegalDrop.list.innerHTML = "";
-            this.pageIndex = 0;
-            this.miniRefresh.triggerUpLoading();
-            this.miniRefresh.resetUpLoading();
-            this.asideControl.Hide();
-
-
-        }
-        async loadData() {
-            this.divisions = await this.LoadDivisionList();            
-            return 'success'
-        }
-        LoadDivisionList() {
-            var req = new GetDivisionsParams();
-            // 将数组 map 化返回
-            let mapedDivisions = new Map();
-
-            return this.service.division.list(req).then(x => {
-
-                let divisions = x.Data.Data.sort((a, b) => {
-                    return a.Name.localeCompare(b.Name);
-                });
-
-                divisions = divisions.filter(division => !['3'].includes(division.DivisionType.toString()));
-
-                divisions.forEach(division => {
-                    mapedDivisions.set(division.Id, division)
-                })
-                return mapedDivisions
-
-            });
+        confirmSelect(selectedIds?: string[]) {
+            this.selectedIds = selectedIds;
+            console.log("confirmSelect");
+            this.clean();
+            this.miniRefresh[this.eventType].resetUpLoading();
         }
 
 
-
-
-        getData(begin: Date, end: Date, index: number, opts?: {
-            divisionIds?: string[],
-            stationIds?: string[]
-        }
-        ) {
-            const params = new GetEventRecordsParams();
-            params.BeginTime = begin;
-            params.EndTime = end;
-            params.PageSize = PageSize;
-            params.PageIndex = index;
-            params.Desc = true;
-            if (opts) {
-                params.DivisionIds = opts.divisionIds;
-                params.StationIds = opts.stationIds;
-            }
-            return this.service.event.list(params);
-        }
-
-        convert(record: IllegalDropEventRecord) {
+        convert<T extends
+            IllegalDropEventData |
+            MixedIntoEventData |
+            GarbageFullEventData
+        >(record: EventRecordData<T>) {
             let template = new Template();
 
-            template.img.src = this.service.medium.getData(record.ImageUrl) as string;
-            template.title.innerHTML = record.Data.DivisionName;
-            template.footer.innerHTML = record.ResourceName;
+            
+            if (record.ImageUrl) {
+                
+                template.img.src = record.ImageUrl;
+            }
+            if (record.Data.StationName) {
+                template.title.innerHTML = record.Data.StationName;
+            }
+            if (record.Data.DivisionName) {
+                template.footer.innerHTML = record.Data.DivisionName;
+            }
             template.remark.innerHTML = dateFormat(new Date(record.EventTime), 'HH:mm:ss');
 
 
             let item = document.createElement("div");
-            item.id = record.EventId;
-            item.setAttribute('divisionid', record.Data.DivisionId)
+            item.id = record.EventId!;
+            item.setAttribute('divisionid', record.Data.DivisionId!)
             item.innerHTML = template.element.innerHTML;
             item.getElementsByTagName("img")[0].addEventListener("error", function () {
-                this.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII=";
+                this.src = DataController.defaultImageUrl;
                 this.style.background = "black";
             });
 
             item.addEventListener("click", () => {
 
                 window.parent.recordDetails = record;
-                const url = "./event-details.html?openid=" + this.user.WUser.OpenId + "&eventid=" + record.EventId;
+                const url = "./event-details.html?openid=" + this.openId + "&eventid=" + record.EventId + "&eventtype=" + record.EventType;
                 // console.log(window.parent);
                 window.parent.showOrHideAside(url);
                 // const aside_details = document.getElementById("aside-details") as HTMLIFrameElement;
@@ -240,134 +209,169 @@ export namespace EventHistoryPage {
                 //     window.parent.document.location.href = url;
                 // }
             });
-            this.garbageElements.set(record.EventId, {
-                Element: item,
-                id: record.EventId,
-                divisionId: record.Data.DivisionId,
-            })
+            // this.garbageElements.set(record.EventId, {
+            //     Element: item,
+            //     id: record.EventId,
+            //     divisionId: record.Data.DivisionId,
+            // })
             return item;
         }
 
-        datas: Global.Dictionary<IllegalDropEventRecord> = {};
+        datas: Global.Dictionary<EventRecord> = {};
 
-        view(date: Date, list: PagedList<IllegalDropEventRecord>) {
+        getElementByDataType(type: EventType) {
+            switch (type) {
+                case EventType.IllegalDrop:
+                    return element.IllegalDrop.list;
+                case EventType.MixedInto:
+                    return element.MixedInto.list;
+                case EventType.GarbageFull:
+                    return element.GarbageFull.list;
+                default:
+                    return undefined;
+            }
+        }
+
+
+        view<T extends
+            IllegalDropEventData |
+            MixedIntoEventData |
+            GarbageFullEventData
+        >(list: PagedList<EventRecordData<T>>) {
+
             for (let i = 0; i < list.Data.length; i++) {
                 const data = list.Data[i];
-                this.datas[data.EventId] = data;
+                this.datas[data.EventId!] = data;
                 let item = this.convert(data);
-                element.IllegalDrop.list.appendChild(item);
+                
+                this.parentElement[data.EventType].appendChild(item);
             }
-            element.IllegalDrop.totalRecordCount.innerHTML = list.Page.TotalRecordCount.toString();            
-            if (list.Page.TotalRecordCount == 0)
-                element.IllegalDrop.recordCount.innerHTML = "0";
-            else
-                element.IllegalDrop.recordCount.innerHTML = (list.Page.PageSize * (list.Page.PageIndex - 1) + list.Page.RecordCount).toString();
+            element.totalRecordCount.innerHTML = list.Page.TotalRecordCount.toString();
+            if (list.Page.TotalRecordCount == 0){
+                element.recordCount.innerHTML = "0";
+            }
+            else{
+                
+                console.log("Page", list.Page);
+                element.recordCount.innerHTML = (list.Page.PageSize * (list.Page.PageIndex - 1) + list.Page.RecordCount).toString();
+            }
 
         }
-
-        async refresh() {
-
-            if (!this.user.WUser.Resources)
-                return;
-
-
-            element.IllegalDrop.list.innerHTML = "";
-            this.pageIndex = 1;
-
-
-            let stationIds = this.user.WUser.Resources.filter(x => x.ResourceType == ResourceType.GarbageStations).map(x => {
-                return x.Id
-            })
-            let divisionIds = this.user.WUser.Resources.filter(x => {
-                return x.ResourceType == ResourceType.County ||
-                    x.ResourceType == ResourceType.Committees
-            }
-            ).map(x => {
-                return x.Id
-            })
-
+        page: { [key:number]:Paged } = {};
+        eventType: EventType = EventType.IllegalDrop;
+        selectedIds?: string[]
+        async refresh(page: Paged, eventType: EventType) {
+            console.log("current page", page);
             const day = getAllDay(date);
-            if (this.filter.divisionId) {
-                divisionIds = [this.filter.divisionId];
-            }
-            let page = await this.getData(day.begin, day.end, this.pageIndex, { divisionIds: divisionIds, stationIds: stationIds });
             
-            this.view(date, page.Data);
-            
+            let data = await this.dataController.getEventList(day, page, eventType, this.selectedIds);
 
-
-            this.pageTotal = page.Data.Page.PageCount;
-
-            if (this.pageIndex < this.pageTotal) {
-                this.miniRefresh.resetUpLoading();
+            if (data) {
+                this.view(data);
             }
+            return data;
         }
-        miniRefresh: any;
-        init() {
-            element.IllegalDrop.list.innerHTML = "";
-            this.pageIndex = 0;
-            try {
-                this.miniRefresh = new MiniRefresh({
-                    container: "#" + MiniRefreshId.IllegalDrop,
-                    down: {
-                        callback: () => {
-                            setTimeout(() => {
-                                // 下拉事件
-                                this.refresh();
-                                this.miniRefresh.endDownLoading();
-                            }, 500);
-                        }
-                    },
-                    up: {
-                        isAuto: true,
-                        callback: async () => {
-                            let stop = true;
-                            try {
 
-                                
-                                if (!this.user.WUser.Resources)
-                                    return;
-                                if (this.pageIndex >= this.pageTotal)
-                                    return;
-                                
-                                const day = getAllDay(date);
-                                let divisionIds: string[];
-                                let stationIds = this.user.WUser.Resources.filter(x => x.ResourceType == ResourceType.GarbageStations).map(x => {
-                                    return x.Id
-                                })
-                                divisionIds = this.user.WUser.Resources.filter(x =>
-                                    x.ResourceType == ResourceType.Committees
-                                ).map(x => {
-                                    return x.Id
-                                });
+        clean() {
+            this.page = {};            
+            this.parentElement[this.eventType].innerHTML = "";
+        }
 
-                                if (divisionIds.length < 2) {
-                                    element.filterBtn.style.display = "none";
-                                }
-                                divisionIds = divisionIds.concat(this.user.WUser.Resources.filter(x => {
-                                    return x.ResourceType == ResourceType.County;
-                                }
-                                ).map(x => {
-                                    element.filterBtn.style.display = "";
-                                    return x.Id
-                                }));
-                                if (this.filter.divisionId) {
-                                    divisionIds = [this.filter.divisionId];
-                                }
-                                var data = await this.getData(day.begin, day.end, ++this.pageIndex, {
-                                    divisionIds: divisionIds,
-                                    stationIds: stationIds
-                                });
-                                
-                                this.view(date, data.Data);
-                                
-                                stop = data.Data.Page.PageIndex >= data.Data.Page.PageCount;
-                            } finally {                                
-                                this.miniRefresh.endUpLoading(stop);
-                            }
+        createMiniRefresh(id: string, isAuto:boolean, down: (r: MiniRefresh) => void, up: (r: MiniRefresh) => void) {
+
+            return new MiniRefresh({
+                container: "#" + id,
+                down: {
+                    bounceTime:0,
+                    callback: () => {                        
+                            down(this.miniRefresh[this.eventType]);                        
+                    }
+                },
+                up: {
+                    isAuto: isAuto,
+                    callback: () => {
+                        up(this.miniRefresh[this.eventType])
+                    }
+                }
+            });
+
+        }
+
+        miniRefreshDown(r: MiniRefresh) {
+            
+            // 下拉事件
+            this.clean();
+            console.log("miniRefreshDown");
+            
+            r.endDownLoading();
+            // r.resetUpLoading();      
+        }
+        async miniRefreshUp(r: MiniRefresh) {
+            {
+
+                let stop = true;
+                try {
+                    
+                    if (this.page[this.eventType]) {
+                        this.page[this.eventType].index++;
+                    }
+                    else {
+                        this.page[this.eventType] = {
+                            index: 1,
+                            size: 20
                         }
                     }
-                });
+
+                    let data = await this.refresh(this.page[this.eventType], this.eventType)
+
+                    if (data) {
+                        stop = data.Page.PageIndex >= data.Page.PageCount;
+                    }
+                    else {
+                        stop = true;
+                    }
+
+                } finally {
+                    r.endUpLoading(stop);
+                }
+            }
+        }
+
+        init() {
+            element.IllegalDrop.list.innerHTML = "";
+            element.MixedInto.list.innerHTML = "";
+            element.GarbageFull.list.innerHTML = "";
+            try {
+                this.miniRefresh[EventType.IllegalDrop] = this.createMiniRefresh(
+                    MiniRefreshId.IllegalDrop,
+                    true,
+                    (r) => {
+                        this.miniRefreshDown(r)
+                    },
+                    (r) => {                        
+                        this.miniRefreshUp(r)
+                    }
+                )
+                this.miniRefresh[EventType.MixedInto] = this.createMiniRefresh(
+                    MiniRefreshId.MixedInto,
+                    false,
+                    (r) => {
+                        this.miniRefreshDown(r)
+                    },
+                    (r) => {                        
+                        this.miniRefreshUp(r)
+                    }
+                )
+                this.miniRefresh[EventType.GarbageFull] = this.createMiniRefresh(
+                    MiniRefreshId.GarbageFull,
+                    false,
+                    (r) => {
+                        this.miniRefreshDown(r)
+                    },
+                    (r) => {                        
+                        this.miniRefreshUp(r)
+                    }
+                )
 
             } catch (error) {
                 console.error(error);
@@ -390,7 +394,7 @@ export namespace EventHistoryPage {
                         },
                         onConfirm: (result: any) => {
                             date = new Date(result[0].value, result[1].value - 1, result[2].value);
-                            this.loadData();
+                            this.loadData()
                             this.viewDatePicker(date);
                         },
                         title: '请选择日期'
@@ -426,15 +430,56 @@ export namespace EventHistoryPage {
             }
         }
 
+
+
         loadData() {
             if (this.record) {
-                this.record.refresh();
+                this.record.clean();
+                console.log("loadData");
+                this.record.miniRefresh[this.record.eventType].resetUpLoading();
             }
         }
 
         record?: IllegalDropEvent;
 
+        getEventTypeByIndex(index: number) {
+            switch (index) {
+                case 0:
+                    return EventType.IllegalDrop;
+                case 1:
+                    return EventType.GarbageFull;
+                case 2:
+                    return EventType.MixedInto;
+                default:
+                    return EventType.IllegalDrop;
+            }
+        }
+
+
+        SwiperControlChanged(index: number) {
+            if (this.record) {
+                console.log("SwiperControlChanged")                
+                this.record.eventType = this.getEventTypeByIndex(index);
+                this.record.clean();
+                this.record.miniRefresh[this.record.eventType].resetUpLoading();
+            }
+
+        }
         init() {
+
+            let swiper = new SwiperControl(
+                {
+                    selectors: {
+                        container: ".swiper-container",
+                        pagination: ".swiper-pagination"
+                    },
+                    navBar: ["乱扔垃圾", "满溢情况", "混合投放"],
+                    callback: (index) => {
+                        this.SwiperControlChanged(index);
+                    }
+                },
+            );
+
 
             this.viewDatePicker(new Date());
 
@@ -448,20 +493,24 @@ export namespace EventHistoryPage {
 
             this.loadNavigation();
             this.initDatePicker();
-            new HowellHttpClient.HttpClient().login((http: HowellAuthHttp) => {
 
-                const user = new SessionUser();
+            const user = (window.parent as NavigationWindow).User;
+            const http = (window.parent as NavigationWindow).Authentication;
+            console.log(http);
+            const type = user.WUser.Resources![0].ResourceType;
+            const service = new Service(http)
+            const dataController = ControllerFactory.Create(service, type, user.WUser.Resources!)
 
-                this.record = new IllegalDropEvent(new Service(http), user);
-                this.record.init();
-                this.record.loadAside();
-            });
+            this.record = new IllegalDropEvent(type, dataController, user.WUser.OpenId!);
+            this.record.init();
+            this.record.loadAside();
             // }
         }
     }
 }
-console.log("User", window.parent.User);
-console.log("Auth", window.parent.hwAuth);
+console.log("User", (window.parent as NavigationWindow).User);
+console.log("Auth", (window.parent as NavigationWindow).Authentication);
+
 const page = new EventHistoryPage.Page();
 page.viewDatePicker(new Date());
 page.init();

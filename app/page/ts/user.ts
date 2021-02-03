@@ -1,7 +1,6 @@
 import { Service } from "../../data-core/repuest/service";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
-import { SRServer } from "../../data-core/model/aiop/sr-server";
 
 
 namespace UserPage {

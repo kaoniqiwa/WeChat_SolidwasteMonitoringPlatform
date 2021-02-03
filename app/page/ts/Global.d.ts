@@ -8,6 +8,9 @@ declare class Guid {
     ToString(arg: string): string
 }
 
+
+
+
 declare interface Window {
     recordDetails?:any;
     showOrHideAside(url?: string);

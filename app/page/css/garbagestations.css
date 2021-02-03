@@ -229,10 +229,13 @@ body {
   box-sizing: border-box;
   transition: all 0.3s ease-in-out;
   font-size: 0;
+  height: 0;
+  padding-bottom: 23%;
 }
 .hw-content__card .swiper-container .swiper-wrapper .swiper-slide.zoomOut {
   width: 100%;
   padding: 0;
+  padding-bottom: 56.5%;
 }
 .hw-content__card .swiper-container .swiper-wrapper .swiper-slide img {
   width: 100%;
@@ -242,7 +245,14 @@ body {
   text-align: right;
   color: white;
   padding-right: 10px;
+  display: none;
 }
+.hw-content__card .swiper-container.zoomOut .swiper-pagination
+{
+  display: block;
+}
+
+
 #minirefresh {
   position: relative;
   height: 100%;

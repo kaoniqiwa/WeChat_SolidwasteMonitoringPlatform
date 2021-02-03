@@ -136,6 +136,9 @@
     height: 50%;
     line-height: 40px;
     vertical-align: middle;
+    overflow: hidden;
+    width: 100%;
+    color: #191919;
 }
 .record-item .content .footer{    
     height: 40px;
@@ -146,20 +149,28 @@
 .record-item .content .footer > .footer-title{
     font-size: 14.4px;
     color: #888;
+    
+    white-space:nowrap;
+    word-break:break-all;
+    overflow: hidden;
+    /* text-overflow: ellipsis;
+                -o-text-overflow:ellipsis; */
+    width: calc(100% - 48px);
+
 }
 .record-item .content .footer > .remark{
     font-size: 12px;
     color: #b2b2b2;
     float: right;
+    
+    width: 48px;
 }
 
 .page{
     overflow: hidden;
 }
 
-.minirefresh-wrap{
-    margin-top: 38px;
-}
+
 
 
 

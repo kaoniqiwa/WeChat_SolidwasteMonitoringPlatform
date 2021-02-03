@@ -91,7 +91,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  width: calc(100% - 100px);
+  width: calc(100% - 20px);
+  white-space:nowrap;
 }
 .container #getPage main .info-list .info-item main .detail .user-name {
   font-size: 19px;

@@ -1,5 +1,4 @@
 import { SessionUser } from "../../common/session-user";
-import { Resource } from "../../data-core/model/aiop/Resource";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 import { GarbageStation, GetGarbageStationsParams } from "../../data-core/model/waste-regulation/garbage-station";
 import { GenderType, ResourceRole, ResourceType, WeChatUser } from "../../data-core/model/we-chat";
