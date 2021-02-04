@@ -4,17 +4,21 @@ import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { SessionUser } from "../../common/session-user";
 import { AsideControl } from "./aside";
 import { NavigationWindow } from ".";
+import { ToastIcon, ToastMessage } from "./data-controllers/modules/ToastMessage";
 
 
 namespace UserPage {
     class Page {
 
         aside: AsideControl;
-
+        message: ToastMessage;
 
         constructor(private user: SessionUser, private service: Service) {
             this.aside = new AsideControl("aside");
-
+            this.message = new ToastMessage({
+                id: "message",
+                parent: document.body
+            })
         }
 
         element = {
@@ -31,27 +35,29 @@ namespace UserPage {
                 }
             },
             iframe: document.getElementById('user-child-iframe') as HTMLIFrameElement,
-            link:{
-                details:document.getElementById("link-details") as HTMLLinkElement,
-                list:document.getElementById("link-list") as HTMLLinkElement,
-                add:document.getElementById("link-add") as HTMLLinkElement
+            link: {
+                details: document.getElementById("link-details") as HTMLLinkElement,
+                list: document.getElementById("link-list") as HTMLLinkElement,
+                add: document.getElementById("link-add") as HTMLLinkElement
             }
         }
 
         init() {
             this.loadUser();
             window.element = this.element;
-            window.HideUserAside = this.hideAside;
+            window.HideUserAside = (result) => {
+                this.hideAside(result);
+            };
             this.element.btn.details.addEventListener('click', () => {
-                const url = this.element.link.details.href +"?openid=" + this.user.WUser.OpenId;
+                const url = this.element.link.details.href + "?openid=" + this.user.WUser.OpenId;
                 this.showAside(url)
             })
             this.element.btn.list.addEventListener('click', () => {
-                const url = this.element.link.list.href +"?openid=" + this.user.WUser.OpenId;
+                const url = this.element.link.list.href + "?openid=" + this.user.WUser.OpenId;
                 this.showAside(url)
             })
             this.element.btn.add.addEventListener('click', () => {
-                const url = this.element.link.add.href +"?openid=" + this.user.WUser.OpenId;
+                const url = this.element.link.add.href + "?openid=" + this.user.WUser.OpenId;
                 this.showAside(url)
             })
         }
@@ -78,15 +84,19 @@ namespace UserPage {
 
 
 
-        hideAside() {
+        hideAside(result?: string) {
             this.element.aside.classList.remove('active');
+            
+            if (result) {
+                this.message.show("添加成功", ToastIcon.success);
+            }
         }
     }
 
-    const user = (window.parent as NavigationWindow).User;            
-            const http = (window.parent as NavigationWindow).Authentication;
-            const service = new Service(http);
-            const page = new Page(user, service);
-            page.init();
+    const user = (window.parent as NavigationWindow).User;
+    const http = (window.parent as NavigationWindow).Authentication;
+    const service = new Service(http);
+    const page = new Page(user, service);
+    page.init();
 
 }

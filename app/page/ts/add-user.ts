@@ -273,8 +273,8 @@ class AddUser {
         this.service.wechat.create(this.myUser).then((res:any)=>{
             
             if(res.FaultCode == 0){
-                this.showToast();
-                window.parent?.HideUserAside();
+                //this.showToast();
+                window.parent?.HideUserAside("true");
             }else{
                 this.showWarnToast()
             }

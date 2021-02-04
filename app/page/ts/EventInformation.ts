@@ -123,7 +123,7 @@ export namespace EventInformationPage {
                 }
 
 
-                debugger;
+                
                 this.imageController.showDetail(selectors, [detail_img.src]);
                 let frame = document.getElementById(selectors.frameId) as HTMLImageElement;
                 let img = document.getElementById(selectors.imgId) as HTMLImageElement;

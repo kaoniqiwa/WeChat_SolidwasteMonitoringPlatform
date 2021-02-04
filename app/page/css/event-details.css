@@ -75,8 +75,8 @@ html,body{
 #origin-img .swiper-slide img
 {
   position: absolute;
-  padding-bottom: 50%;
-  top:40%;
+  margin-top: -33%;
+  top:50%;
 }
 
 #origin-img .swiper-slide img.max-frame{    

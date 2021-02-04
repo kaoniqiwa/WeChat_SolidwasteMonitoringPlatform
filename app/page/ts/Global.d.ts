@@ -14,7 +14,7 @@ declare class Guid {
 declare interface Window {
     recordDetails?:any;
     showOrHideAside(url?: string);
-    HideUserAside(callback?:any):void;
+    HideUserAside(params?:any):void;
 }
 
 declare interface HTMLDivElement{

@@ -4,6 +4,7 @@ import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { SessionUser } from "../../common/session-user";
 import { WeChatUser } from "../../data-core/model/we-chat";
 import { AsideControl } from "./aside";
+import { ToastIcon, ToastMessage } from "./data-controllers/modules/ToastMessage";
 
 
 
@@ -13,6 +14,7 @@ namespace UserListPage {
 
         asideControl: AsideControl;
 
+        toastMessage: ToastMessage;
 
         element = {
             back: document.querySelector('#back') as HTMLTemplateElement,
@@ -34,6 +36,7 @@ namespace UserListPage {
         constructor(private user: SessionUser, private service: Service) {
             this.asideControl = new AsideControl('aside', true);
             window.HideUserAside = (userId?) => {
+                
                 this.asideControl.Hide();
                 if (userId) {
                     let e = document.getElementById(userId);
@@ -41,8 +44,14 @@ namespace UserListPage {
                         e.parentElement!.removeChild(e);
                     }
                     this.userInfos.delete(userId);
+                    this.toastMessage.show("删除成功", ToastIcon.success)
                 }
             }
+
+            this.toastMessage = new ToastMessage({
+                id: "message",
+                parent: document.body
+            });
         }
 
         async loadData() {
@@ -140,7 +149,7 @@ namespace UserListPage {
                     main.data = v;
                     main.addEventListener('click', function () {
                         if (this.data) {
-                            
+
                             console.log('info click');
                             that.element.iframe.src = that.element.link.details.href + "?openid=" + that.user.WUser.OpenId + "&childId=" + (this.data as WeChatUser).Id;
                             that.asideControl.Show();
