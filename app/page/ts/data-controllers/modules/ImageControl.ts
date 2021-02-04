@@ -1,7 +1,7 @@
 
 declare var $: any;
 
-export class SwiperForImageController {
+export class ImageController {
 
     swiper: typeof Swiper;
     originImg: HTMLDivElement;
@@ -40,8 +40,8 @@ export class SwiperForImageController {
 
     showDetail(selectors: { frameId: string, imgId: string }, urls: string[], index: number = 0) {
         for (let i = 0; i < urls.length; i++) {
-            this.swiper.virtual.appendSlide('<div class="swiper-zoom-container"><div><img id="' + selectors.imgId + '" src="' + urls[i] +
-                '" /><div class="max-frame" id="' + selectors.frameId + '"></div></div></div>');
+            this.swiper.virtual.appendSlide('<div class="swiper-zoom-container"><img id="' + selectors.imgId + '" src="' + urls[i] +
+                '" /><img class="max-frame" id="'+selectors.frameId+'"></div>');
         }
         this.swiper.slideTo(index);
 

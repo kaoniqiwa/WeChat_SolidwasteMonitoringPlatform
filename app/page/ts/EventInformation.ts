@@ -13,13 +13,13 @@ import { GarbageFullEventData, GarbageFullEventRecord } from "../../data-core/mo
 import { EventData, EventRecord, EventRecordData } from "../../data-core/model/waste-regulation/event-record";
 import { AxiosResponse } from "axios";
 import { NavigationWindow } from ".";
-import { SwiperForImageController } from "./data-controllers/modules/SwiperForImageControl";
+import { ImageController } from "./data-controllers/modules/ImageControl";
 import { DataController } from "./data-controllers/DataController";
 
 export namespace EventInformationPage {
     export class EventDetail {
 
-        imageController: SwiperForImageController;
+        imageController: ImageController;
 
 
         constructor(private service: {
@@ -27,7 +27,7 @@ export namespace EventInformationPage {
             medium: MediumPicture
         },
             private user: SessionUser) {
-            this.imageController = new SwiperForImageController("#origin-img");
+            this.imageController = new ImageController("#origin-img");
         }
 
         init() {
@@ -114,7 +114,7 @@ export namespace EventInformationPage {
                 const frame = document.getElementById("frame")! as HTMLDivElement;
                 frame.style.width = detail_img.offsetWidth + "px";
                 frame.style.height = detail_img.offsetHeight + "px";
-                this.drawFrame(frame, item, detail_img.offsetWidth, detail_img.offsetHeight);
+                this.drawFrame(item, detail_img.offsetWidth, detail_img.offsetHeight, frame);
             };
             detail_img.addEventListener("click", () => {
                 let selectors = {
@@ -122,50 +122,99 @@ export namespace EventInformationPage {
                     imgId: "max-img"
                 }
 
+
+                debugger;
                 this.imageController.showDetail(selectors, [detail_img.src]);
-                let frame = document.getElementById(selectors.frameId) as HTMLDivElement;
+                let frame = document.getElementById(selectors.frameId) as HTMLImageElement;
                 let img = document.getElementById(selectors.imgId) as HTMLImageElement;
-
                 img.onload = () => {
-                    frame.style.width = img.offsetWidth + "px";
-                    frame.style.height = img.offsetHeight + "px";
-                    this.drawFrame1(frame, item, img);
+                    let url = this.drawFrame(item, img.naturalWidth, img.naturalHeight)!;
+                    frame.src = url;                    
                 }
-                img.addEventListener("touchmove", (e) => {
 
-                    // frame.style.scale = img.style.scale;
-                    frame.style.transform = img.style.transform;
-                    frame.style.transformBox = img.style.transformBox;
-                    frame.style.transformStyle = img.style.transformStyle;
-                    // frame.style.width = img.offsetWidth + "px";
-                    // frame.style.height = img.offsetHeight + "px";
-                })
+
+
+                // img.onload = () => {
+                //     frame.style.width = img.offsetWidth + "px";
+                //     frame.style.height = img.offsetHeight + "px";
+                //     this.drawFrame1(frame, item, img);
+                // }
+                // img.addEventListener("touchmove", (e) => {
+
+                //     // frame.style.scale = img.style.scale;
+                //     frame.style.transform = img.style.transform;
+                //     frame.style.transformBox = img.style.transformBox;
+                //     frame.style.transformStyle = img.style.transformStyle;
+                //     // frame.style.width = img.offsetWidth + "px";
+                //     // frame.style.height = img.offsetHeight + "px";
+                // })
 
             });
         }
 
 
-        drawFrame1(element: HTMLDivElement, item: IllegalDropEventRecord | MixedIntoEventRecord, img:HTMLImageElement) {
+        drawFrame1(element: HTMLDivElement, item: IllegalDropEventRecord | MixedIntoEventRecord, img: HTMLImageElement) {
             if (item && item.Data && item.Data.Objects) {
-                debugger;
+
                 const object = item.Data.Objects[0];
                 element.style.position = "absolute";
-                let width = Math.abs(object.Polygon[1].X - object.Polygon[0].X) ;
-                let height = Math.abs(object.Polygon[3].Y - object.Polygon[0].Y) ;
+                let width = Math.abs(object.Polygon[1].X - object.Polygon[0].X);
+                let height = Math.abs(object.Polygon[3].Y - object.Polygon[0].Y);
                 let x = object.Polygon[0].X;
                 let y = object.Polygon[0].Y;
                 element.style.border = "1px solid red";
 
-                element.style.width = width*100 + "%";
-                element.style.height = height*100 + "%";
-                
-                element.style.top = y*100 + "%";
-                element.style.left = x*100 + "%";
+                element.style.width = width * 100 + "%";
+                element.style.height = height * 100 + "%";
+
+                element.style.top = y * 100 + "%";
+                element.style.left = x * 100 + "%";
                 element.parentElement!.style.position = "absolute"
+                element.parentElement!.style.pointerEvents = "none";
             }
         }
 
-        drawFrame(element: HTMLDivElement, item: IllegalDropEventRecord | MixedIntoEventRecord, width: number, height: number) {
+        drawFrame2(item: IllegalDropEventRecord | MixedIntoEventRecord, img: HTMLImageElement) {
+
+            if (item && item.Data && item.Data.Objects) {
+                const objects = item.Data.Objects;
+
+                const width = img.naturalWidth;
+                const height = img.naturalHeight;
+
+
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d")!;
+                ctx.strokeStyle = "red";
+                ctx.drawImage(img, 0, 0, width, height);
+                for (let i = 0; i < objects.length; i++) {
+                    const obj = objects[i];
+                    if (!obj.Polygon)
+                        continue;
+                    ctx.beginPath();
+                    const first = obj.Polygon[0];
+                    let x = first.X * width;
+                    let y = first.Y * height;
+
+                    ctx.moveTo(x, y);
+
+                    for (let j = obj.Polygon.length - 1; j >= 0; j--) {
+                        const point = obj.Polygon[j];
+                        x = point.X * width;
+                        y = point.Y * height;
+                        ctx.lineTo(x, y);
+                        ctx.stroke();
+                    }
+                    ctx.closePath();
+
+                    return ctx.canvas.toDataURL()
+                }
+            }
+        }
+
+        drawFrame(item: IllegalDropEventRecord | MixedIntoEventRecord, width: number, height: number, element?: HTMLDivElement) {
 
             if (item && item.Data && item.Data.Objects) {
                 const objects = item.Data.Objects;
@@ -195,8 +244,10 @@ export namespace EventInformationPage {
                     }
                     ctx.closePath();
 
-
-                    element.style.backgroundImage = "url('" + ctx.canvas.toDataURL() + "')";
+                    if (element) {
+                        element.style.backgroundImage = "url('" + ctx.canvas.toDataURL() + "')";
+                    }
+                    return ctx.canvas.toDataURL();
                 }
             }
         }
@@ -207,22 +258,27 @@ export namespace EventInformationPage {
             const user = (window.parent as NavigationWindow).User;
             const http = (window.parent as NavigationWindow).Authentication;
 
-            const record = new EventDetail({
-                event: new EventRequestService(http),
-                medium: new MediumPicture()
-            }, user);
+            let client = new HowellHttpClient.HttpClient().login(async (http) => {
 
-            record.init();
+                let user = new SessionUser();
 
-            if (window.parent.recordDetails) {
-                record.fillDetail(window.parent.recordDetails);
-            }
-            else {
-                const data = await record.getData();
-                if (data) {
-                    record.fillDetail(data.Data);
+                const record = new EventDetail({
+                    event: new EventRequestService(http),
+                    medium: new MediumPicture()
+                }, user);
+
+                record.init();
+
+                if (window.parent.recordDetails) {
+                    record.fillDetail(window.parent.recordDetails);
                 }
-            }
+                else {
+                    const data = await record.getData();
+                    if (data) {
+                        record.fillDetail(data.Data);
+                    }
+                }
+            })
         }
     }
 

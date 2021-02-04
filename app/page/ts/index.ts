@@ -9,14 +9,14 @@ export interface NavigationWindow extends Window {
     Authentication: HowellAuthHttp;
 }
 
-
 namespace Navigation {
 
     window.recordDetails = null;
     window.showOrHideAside = function (url) {
         if (index < 0) {
             index = 1;
-            (items[index] as HTMLLinkElement).click();
+            let historyPage = (items[index] as HTMLLinkElement);
+            historyPage.click();
 
         }
         var asideContent = document.querySelector('.aside-content') as HTMLDivElement;
@@ -30,6 +30,7 @@ namespace Navigation {
 
             var details = document.getElementById("aside-details") as HTMLIFrameElement;
             if (url) {
+
                 details.src = url;
             }
 
@@ -52,6 +53,9 @@ namespace Navigation {
                 selecteds[i].className = '';
             }
             iframe.src = (this as HTMLLinkElement).href + window.location.search;
+            if (querys.eventtype) {
+                iframe.src += ("&eventtype=" + querys.eventtype);
+            }
             (this as HTMLLinkElement).className = "selected"
             return false;
         };
@@ -62,19 +66,36 @@ namespace Navigation {
 
     (window as unknown as NavigationWindow).User = new SessionUser();
     let index = 0;
-    var search = document.location.search.substr(1).toLocaleLowerCase();
+
+
+    var search = decodeURI(document.location.search).substr(1);
+
     var query = search.split('&');
     var querys: any = {
         openid: "",
         index: "0",
-        eventid: ""
+        eventid: "",
+        data: ""
     };
     for (let i = 0; i < query.length; i++) {
         let keyvalue = query[i].split('=');
-        querys[keyvalue[0]] = keyvalue[1];
+        querys[keyvalue[0].toLocaleLowerCase()] = keyvalue[1];
+    }
+    if (querys.data) {
+        // alert(querys.data);
+        console.log("source", querys.data)
+        querys.data = decodeURIComponent(querys.data);
+        querys.data = base64decode(querys.data);
+        console.log("base64decode", querys.data)
+
+        let params = querys.data.split("&");
+        for (let i = 0; i < params.length; i++) {
+            const param = params[i];
+            let p = param.split('=');
+            querys[p[0].toLocaleLowerCase()] = p[1];
+        }
     }
     if (querys.openid) {
-
         new HowellHttpClient.HttpClient().login(
             async (http: HowellAuthHttp) => {
                 (window as unknown as NavigationWindow).Authentication = http;
@@ -106,8 +127,12 @@ namespace Navigation {
     }
     else {
         if (querys.eventid) {
-            window.location.href = "http://51kongkong.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetUserOpenId?appid=wx119358d61e31da01&returnUrl="
+            let search = base64encode(location.search.substr(1));
+            let url = window.location.href.substr(0, window.location.href.indexOf('?'));
+            let href = "http://51kongkong.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetUserOpenId?appid=wx119358d61e31da01&returnUrl="
+                //+ url+"?data="+search;            
                 + window.location.href;
+            window.location.href = href;
         }
         else {
             location.href = "./register.html";

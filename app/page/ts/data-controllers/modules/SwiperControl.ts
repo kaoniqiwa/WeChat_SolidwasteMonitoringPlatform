@@ -33,34 +33,48 @@ export class SwiperControl {
         container: string,
         pagination: string
     };
+    initialSlide: number = 0;
     constructor(opts: {
         selectors: {
             container: string,
             pagination: string
         },
         navBar: string[],
-        callback?: (index: number) => void
+        callback?: (index: number) => void,
+        initialSlide: number
     }
     ) {
         this.selectors = opts.selectors;
         this.navBar = opts.navBar;
         this.callback = opts.callback;
+        this.initialSlide = opts.initialSlide;
         this.init();
     }
 
     init() {
         new Swiper(this.selectors.container, {
+
             on: {
-                slideChangeTransitionEnd: function (this: any) {
-                    // console.log(this.activeIndex)
-                    let activeIndex = this.activeIndex;
-                    this.pagination.bullets[activeIndex].scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start',
-                        inline: 'nearest'
-                    })
+                init: () => {
+                    
+                    console.log("Swiper init");
+                    if (this.callback) {
+                        this.callback(this.initialSlide)
+                    }
                 },
-                slideChangeTransitionStart:(sw:any)=>{
+                slideChangeTransitionEnd: function (this: any) {
+                    console.log(this.activeIndex)
+                    if (this.pagination.bullets) {
+                        let activeIndex = this.activeIndex;
+
+                        this.pagination.bullets[activeIndex].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                            inline: 'nearest'
+                        })
+                    }
+                },
+                slideChangeTransitionStart: (sw: any) => {
                     try {
                         if (this.callback) {
                             this.callback(sw.snapIndex);
@@ -74,12 +88,14 @@ export class SwiperControl {
                 el: this.selectors.pagination,
                 clickable: true,
                 renderBullet: (index: number, className: string) => {
-                    
+
+
                     return `
                         <div class="${className}">${this.navBar[index]}</div>            
                     `
                 }
-            }
+            },
+            initialSlide: this.initialSlide
         })
     }
 

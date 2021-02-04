@@ -71,7 +71,7 @@ export namespace EventHistoryPage {
             this.remark = this.element.getElementsByClassName('remark')[0] as HTMLDivElement;
             this.clear();
         }
-        clear(){
+        clear() {
             this.img.src = DataController.defaultImageUrl;
             this.title.innerHTML = "";
             this.footer.innerHTML = "";
@@ -171,9 +171,9 @@ export namespace EventHistoryPage {
         >(record: EventRecordData<T>) {
             let template = new Template();
 
-            
+
             if (record.ImageUrl) {
-                
+
                 template.img.src = record.ImageUrl;
             }
             if (record.Data.StationName) {
@@ -243,27 +243,27 @@ export namespace EventHistoryPage {
                 const data = list.Data[i];
                 this.datas[data.EventId!] = data;
                 let item = this.convert(data);
-                
+
                 this.parentElement[data.EventType].appendChild(item);
             }
             element.totalRecordCount.innerHTML = list.Page.TotalRecordCount.toString();
-            if (list.Page.TotalRecordCount == 0){
+            if (list.Page.TotalRecordCount == 0) {
                 element.recordCount.innerHTML = "0";
             }
-            else{
-                
+            else {
+
                 console.log("Page", list.Page);
                 element.recordCount.innerHTML = (list.Page.PageSize * (list.Page.PageIndex - 1) + list.Page.RecordCount).toString();
             }
 
         }
-        page: { [key:number]:Paged } = {};
+        page: { [key: number]: Paged } = {};
         eventType: EventType = EventType.IllegalDrop;
         selectedIds?: string[]
         async refresh(page: Paged, eventType: EventType) {
             console.log("current page", page);
             const day = getAllDay(date);
-            
+
             let data = await this.dataController.getEventList(day, page, eventType, this.selectedIds);
 
             if (data) {
@@ -273,18 +273,18 @@ export namespace EventHistoryPage {
         }
 
         clean() {
-            this.page = {};            
+            this.page = {};
             this.parentElement[this.eventType].innerHTML = "";
         }
 
-        createMiniRefresh(id: string, isAuto:boolean, down: (r: MiniRefresh) => void, up: (r: MiniRefresh) => void) {
+        createMiniRefresh(id: string, isAuto: boolean, down: (r: MiniRefresh) => void, up: (r: MiniRefresh) => void) {
 
             return new MiniRefresh({
                 container: "#" + id,
                 down: {
-                    bounceTime:0,
-                    callback: () => {                        
-                            down(this.miniRefresh[this.eventType]);                        
+                    bounceTime: 0,
+                    callback: () => {
+                        down(this.miniRefresh[this.eventType]);
                     }
                 },
                 up: {
@@ -298,11 +298,11 @@ export namespace EventHistoryPage {
         }
 
         miniRefreshDown(r: MiniRefresh) {
-            
+
             // 下拉事件
             this.clean();
             console.log("miniRefreshDown");
-            
+
             r.endDownLoading();
             // r.resetUpLoading();      
         }
@@ -311,7 +311,7 @@ export namespace EventHistoryPage {
 
                 let stop = true;
                 try {
-                    
+
                     if (this.page[this.eventType]) {
                         this.page[this.eventType].index++;
                     }
@@ -348,7 +348,7 @@ export namespace EventHistoryPage {
                     (r) => {
                         this.miniRefreshDown(r)
                     },
-                    (r) => {                        
+                    (r) => {
                         this.miniRefreshUp(r)
                     }
                 )
@@ -358,7 +358,7 @@ export namespace EventHistoryPage {
                     (r) => {
                         this.miniRefreshDown(r)
                     },
-                    (r) => {                        
+                    (r) => {
                         this.miniRefreshUp(r)
                     }
                 )
@@ -368,7 +368,7 @@ export namespace EventHistoryPage {
                     (r) => {
                         this.miniRefreshDown(r)
                     },
-                    (r) => {                        
+                    (r) => {
                         this.miniRefreshUp(r)
                     }
                 )
@@ -458,15 +458,36 @@ export namespace EventHistoryPage {
 
         SwiperControlChanged(index: number) {
             if (this.record) {
-                console.log("SwiperControlChanged")                
+                console.log("SwiperControlChanged")
                 this.record.eventType = this.getEventTypeByIndex(index);
                 this.record.clean();
                 this.record.miniRefresh[this.record.eventType].resetUpLoading();
             }
 
         }
-        init() {
+        getSwiperIndex(type: EventType) {
+            switch (type) {
 
+                case EventType.GarbageFull:
+                    return 1;
+                case EventType.MixedInto:
+                    return 2;
+                case EventType.IllegalDrop:
+                default:
+                    return 0;
+            }
+        }
+
+        initSwiper(){
+            
+            let eventType = EventType.IllegalDrop;
+            console.log(window.location.href);
+            let strEventType = getQueryVariable("eventtype");
+            console.log(strEventType)
+            if (strEventType) {
+                eventType = parseInt(strEventType);
+            }
+            
             let swiper = new SwiperControl(
                 {
                     selectors: {
@@ -476,9 +497,15 @@ export namespace EventHistoryPage {
                     navBar: ["乱扔垃圾", "满溢情况", "混合投放"],
                     callback: (index) => {
                         this.SwiperControlChanged(index);
-                    }
+                    },
+                    initialSlide: this.getSwiperIndex(eventType)
                 },
             );
+        }
+
+
+        init() {
+            
 
 
             this.viewDatePicker(new Date());
@@ -504,6 +531,8 @@ export namespace EventHistoryPage {
             this.record = new IllegalDropEvent(type, dataController, user.WUser.OpenId!);
             this.record.init();
             this.record.loadAside();
+
+            this.initSwiper();
             // }
         }
     }
