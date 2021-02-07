@@ -430,7 +430,11 @@ class GarbageStationClient {
             container.classList.add(ZoomStatus.out);
 
             let pagination = contentCard.querySelector('.swiper-pagination');
-
+            
+            if (v.swiper) {
+                v.swiper.destroy();
+                v.swiper = null
+            }
             v.swiper = new Swiper(container, { pagination: { el: pagination, type: 'fraction' } })
 
 
@@ -464,7 +468,7 @@ class GarbageStationClient {
 
             if (v.swiper) {
                 v.swiper.destroy();
-                v.swiper = null;
+                v.swiper = null
             }
         }
 

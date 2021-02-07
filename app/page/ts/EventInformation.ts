@@ -38,10 +38,6 @@ export namespace EventInformationPage {
                     // location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
                 });
             }
-            let max = document.getElementById("max")!;
-            max.addEventListener("click", () => {
-                max.style.display = '';
-            });
         }
 
 
