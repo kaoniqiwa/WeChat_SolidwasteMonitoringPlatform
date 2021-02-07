@@ -21,6 +21,10 @@ import { ClassNameHelper, Language } from "./language";
 let Swiper = Reflect.get(window, 'Swiper');
 let $ = Reflect.get(window, '$');
 
+enum ZoomStatus {
+    out = "zoomOut",
+    in = "zoomIn"
+}
 
 class GarbageStationClient {
     content: HTMLElement | null;
@@ -39,7 +43,7 @@ class GarbageStationClient {
     originImg: HTMLDivElement;
     hwBar: HTMLDivElement
 
-    zoomStatus: string = 'zoomIn';
+    zoomStatus: ZoomStatus = ZoomStatus.in;
     swiper: typeof Swiper;
     swiperStatus: boolean = false;
     originStatus: boolean = false;
@@ -137,21 +141,23 @@ class GarbageStationClient {
     bindEvents() {
         this.btnDivision.addEventListener('click', () => {
             this.asideControl.Show();
+
         })
         this.imgDivision.addEventListener('click', () => {
             // 在蒙版消失之前，所有按钮不能点击
+            debugger;
             if (this.originStatus) return
-            if (this.zoomStatus == 'zoomIn') {
+            if (this.zoomStatus == ZoomStatus.in) {
                 let icon = this.imgDivision.getElementsByClassName("howell-icon-list")[0]
                 icon.className = "howell-icon-list2";
                 this.zoomOut();
-                this.zoomStatus = 'zoomOut';
             } else {
                 let icon = this.imgDivision.getElementsByClassName("howell-icon-list2")[0]
                 icon.className = "howell-icon-list";
                 this.zoomIn();
-                this.zoomStatus = 'zoomIn'
             }
+            console.log("imgDivision click", this.zoomStatus)
+
 
         })
         this.searchInput.addEventListener('search', (e) => {
@@ -180,7 +186,7 @@ class GarbageStationClient {
         });
     }
     setNumberStatic(ids: string[]) {
-        let roles = ids.map(x=>{
+        let roles = ids.map(x => {
             let role = new ResourceRole();
             role.Id = x;
             role.ResourceType = type;
@@ -243,7 +249,7 @@ class GarbageStationClient {
                     title_bandage.classList.remove('green');
                     title_bandage.classList.remove('orange');
                     let states = v.StationState as Flags<StationState>;
-                    
+
                     if (states.contains(StationState.Error)) {
 
                         title_bandage.textContent = Language.StationState(StationState.Error);
@@ -376,6 +382,18 @@ class GarbageStationClient {
             }
         }
         this.asideControl.Hide();
+        if (this.zoomStatus == ZoomStatus.out) {
+            debugger;
+            this.zoomOut();
+        }
+        else if (this.zoomStatus == ZoomStatus.in) {
+            debugger;
+            this.zoomIn();
+        }
+        else {
+
+        }
+        console.log("confirmSelect click", this.zoomStatus)
 
     }
     filerContent() {
@@ -390,25 +408,26 @@ class GarbageStationClient {
         }
     }
     zoomOut() {
+        console.log(this.garbageElements);
         for (let [k, v] of this.garbageElements) {
             let contentCard = v.Element;
             contentCard.querySelectorAll('.content__img').forEach((element: HTMLElement) => {
-                element.classList.add('zoomOut');
+                element.classList.add(ZoomStatus.out);
             });
 
             contentCard.querySelectorAll('.swiper-slide').forEach((element: HTMLElement) => {
-                element.classList.add('zoomOut');
+                element.classList.add(ZoomStatus.out);
             });
             contentCard.querySelectorAll('.content__title__badage').forEach((element: HTMLElement) => {
-                element.classList.add('zoomOut');
+                element.classList.add(ZoomStatus.out);
             });
             contentCard.querySelectorAll('.content__footer').forEach((element: HTMLElement) => {
-                element.classList.add('zoomOut');
+                element.classList.add(ZoomStatus.out);
             });
 
             let container = contentCard.querySelector('.swiper-container');
             container.scrollLeft = 0;
-            container.classList.add('zoomOut');
+            container.classList.add(ZoomStatus.out);
 
             let pagination = contentCard.querySelector('.swiper-pagination');
 
@@ -417,33 +436,39 @@ class GarbageStationClient {
 
 
         }
+
+        this.zoomStatus = ZoomStatus.out;
     }
     zoomIn() {
         for (let [k, v] of this.garbageElements) {
             let contentCard = v.Element;
             contentCard.querySelectorAll('.swiper-slide').forEach((element: HTMLElement) => {
-                element.classList.remove('zoomOut');
+                element.classList.remove(ZoomStatus.out);
+                element.style.width = "";
             });
             contentCard.querySelectorAll('.content__title__badage').forEach((element: HTMLElement) => {
-                element.classList.remove('zoomOut');
+                element.classList.remove(ZoomStatus.out);
             });
             contentCard.querySelectorAll('.content__footer').forEach((element: HTMLElement) => {
-                element.classList.remove('zoomOut');
+                element.classList.remove(ZoomStatus.out);
             });
 
             contentCard.querySelectorAll('.content__img').forEach((element: HTMLElement) => {
-                element.classList.remove('zoomOut');
+                element.classList.remove(ZoomStatus.out);
             });
 
             let container = contentCard.querySelector('.swiper-container');
-            container.classList.remove('zoomOut');
+            container.classList.remove(ZoomStatus.out);
 
 
-            let swiper = v.swiper;
-            if (swiper)
-                swiper.destroy();
-            v.swiper = null;
+
+            if (v.swiper) {
+                v.swiper.destroy();
+                v.swiper = null;
+            }
         }
+
+        this.zoomStatus = ZoomStatus.in;
     }
     showDetail(info: { id: string, index: number }) {
 

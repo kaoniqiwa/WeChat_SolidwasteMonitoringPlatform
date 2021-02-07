@@ -255,8 +255,6 @@ export namespace EventInformationPage {
 
     class Page {
         async run() {
-            const user = (window.parent as NavigationWindow).User;
-            const http = (window.parent as NavigationWindow).Authentication;
 
             let client = new HowellHttpClient.HttpClient().login(async (http) => {
 
