@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/swiper.min.css" type='text/css'>
+    <!-- <script type="text/javascript" src="../assets/swiper.js"></script> -->
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .btns {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .swiper-container {
+            width: 100%;
+            border: 1px solid black;
+            overflow: auto;
+        }
+
+        .swiper-wrapper {}
+
+        .swiper-slide {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            user-select: none;
+            width: 100px;
+            height: 50px;
+            transition: all 0.5s;
+        }
+        .swiper-slide img{
+            width: 100%;
+        }
+
+        .red-slide {
+            background-color: red;
+        }
+
+        .blue-slide {
+            background-color: blue;
+        }
+
+        .green-slide {
+            background-color: green;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="demo01">
+        <h1>my swiper1</h1>
+        <div class='btns'>
+            <button class="zoomIn">放大</button>
+            <button class="zoomOut">缩小</button>
+        </div>
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide red-slide">Slide 1</div>
+                <div class="swiper-slide blue-slide">Slide 2</div>
+                <div class="swiper-slide green-slide">Slide 3</div>
+                <div class="swiper-slide red-slide">Slide 4</div>
+                <div class="swiper-slide blue-slide">Slide 5</div>
+                <div class="swiper-slide green-slide">Slide 6</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="demo02">
+        <h1>my swiper2</h1>
+        <div class='btns'>
+            <button class="zoomIn">放大</button>
+            <button class="zoomOut">缩小</button>
+        </div>
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide red-slide">
+                    <img src="../assets/upload/01.jpg" alt="">
+                </div>
+                <div class="swiper-slide blue-slide">
+                    <img src="../assets/upload/02.jpg" alt="">
+                </div>
+                <div class="swiper-slide green-slide">
+                    <img src="../assets/upload/03.jpg" alt="">
+                </div>
+                <div class="swiper-slide red-slide">
+                    <img src="../assets/upload/04.jpg" alt="">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <script src="./ts/pmx/pmx.ts"></script>
+</body>
+
+</html>
