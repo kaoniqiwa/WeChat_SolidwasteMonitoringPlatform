@@ -16,16 +16,16 @@ class HowellAuthHttp {
         this.axios = axios_1.default;
     }
 
-    getHtml(path){
-       return this.axios({
+    getHtml(path) {
+        return this.axios({
             method: 'get',
-            url:path,
+            url: path,
             responseType: 'html'
-          })
-          .catch(x=>{
+        })
+            .catch(x => {
 
-          })
-            .then(wwwAuth => { 
+            })
+            .then(wwwAuth => {
                 return wwwAuth;
             });
     }
@@ -39,12 +39,15 @@ class HowellAuthHttp {
             .get(path, httpOptions)
             .catch(error)
             .then(wwwAuth => {
-                return wwwAuth.data;
+                
+                if (wwwAuth)
+                    return wwwAuth.data;
+                return undefined;
             });
     }
 
     post(path, data, config) {
-       
+
         const myHeaders = this.getHttpHeaders('POST', path);
         const httpOptions = {
             headers: myHeaders
@@ -54,8 +57,9 @@ class HowellAuthHttp {
             .catch(this.getWwwAuth)
             .then(wwwAuth => {
 
-
-                return wwwAuth.data;
+                if (wwwAuth)
+                    return wwwAuth.data;
+                return undefined;
             });
     }
     put(path, data, config) {
@@ -86,18 +90,18 @@ class HowellAuthHttp {
             });
     }
 
-    auth(username,path, digestFn,fn) { 
-        this.username=username;
+    auth(username, path, digestFn, fn) {
+        this.username = username;
         const httpOptions = {
             headers: { 'X-WebBrowser-Authentication': 'Forbidden' }
         };
         return this.axios
             .get(path, httpOptions)
-            .catch((error) => { 
+            .catch((error) => {
                 if (error.response.status == 403) {
-                     
+
                     window['DIGEST'] = digestFn(error.response.headers);
-                    return this.get(path,fn);                  
+                    return this.get(path, fn);
                 }
             })
             .then(wwwAuth => {
@@ -106,9 +110,9 @@ class HowellAuthHttp {
     }
     //获取已授权的头部
     getHttpHeaders(method, uri) {
-        if (window['DIGEST']) {  
-            var challenge = window['DIGEST'].parseServerChallenge(null); 
-            this.nc += 1;            
+        if (window['DIGEST']) {
+            var challenge = window['DIGEST'].parseServerChallenge(null);
+            this.nc += 1;
             // 123456
             return window['DIGEST'].generateRequestHeader(this.nc, challenge, this.username, '', method, uri);
         }

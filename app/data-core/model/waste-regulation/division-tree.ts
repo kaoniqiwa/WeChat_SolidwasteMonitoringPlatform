@@ -1,10 +1,10 @@
   /**区划树形结构 */
-    export interface DivisionTree
+    export class DivisionTree
     {
         /**根名称，默认：根区划 */
-        Name: string;
+        Name!: string;
         /**子区划节点(可选) */
-        Nodes: DivisionNode[];
+        Nodes?: DivisionNode[];
     }
     /**区划节点 */
     export interface DivisionNode

@@ -19,52 +19,61 @@
 </head>
 
 <body>
-    <div class="max" id="max"></div>
-    <div class="mui-page mui-page-center" id="detail">
-        <div class="mui-page-content">
-            <div class="page__bd">
-                <div class="weui-form-preview">
-                    <div class="weui-form-preview__hd pic">
-                        <div class="weui-form-preview__item fill-width fill-height"
-                            style="height: 0; padding-bottom: 58.25%;">
-                            <img class="weui-media-box__thumb"
-                                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII="
-                                width="100%" id="detail_img" alt="">   
-                                <div class="frame" id="frame"></div>                         
-                        </div>
-                    </div>
-                    <div class="weui-form-preview__bd">
-                        <div class="weui-form-preview__item">
-                            <label class="weui-form-preview__label">报警类型</label>
-                            <span class="weui-form-preview__value red-text" id="police__type"></span>
-                        </div>
-                        <div class="weui-form-preview__item">
-                            <label class="weui-form-preview__label">摄像机</label>
-                            <span class="weui-form-preview__value sky-blue-text" id="camera__name"></span>
-                        </div>
-                        <div class="weui-form-preview__item">
-                            <label class="weui-form-preview__label">垃圾厢房</label>
-                            <span class="weui-form-preview__value" id="station__name"></span>
-                        </div>
-                        <div class="weui-form-preview__item">
-                            <label class="weui-form-preview__label">所属居委</label>
-                            <span class="weui-form-preview__value" id="rc__name"></span>
-                        </div>
-                        <div class="weui-form-preview__item">
-                            <label class="weui-form-preview__label">报警时间</label>
-                            <span class="weui-form-preview__value" id="police__time"></span>
-                        </div>
-                    </div>
+    <template id="template">
+        <div class="weui-form-preview">
+            <div class="weui-form-preview__hd pic">
+                <div class="weui-form-preview__item fill-width fill-height"
+                    style="height: 0; padding-bottom: 58.25%;">
+                    <img class="weui-media-box__thumb detail_img"
+                        data-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII="
+                        width="100%" id="" alt="">
+                    <div class="frame" id="frame"></div>
                 </div>
             </div>
-            <div class="page__ft item-content-center">
-                <div class="weui-btn" id="back__btn">返回报警记录</div>
+            <div class="weui-form-preview__bd">
+                <div class="weui-form-preview__item">
+                    <label class="weui-form-preview__label">报警类型</label>
+                    <span class="weui-form-preview__value red-text police__type"></span>
+                </div>
+                <div class="weui-form-preview__item">
+                    <label class="weui-form-preview__label">摄像机</label>
+                    <span class="weui-form-preview__value sky-blue-text camera__name"></span>
+                </div>
+                <div class="weui-form-preview__item">
+                    <label class="weui-form-preview__label">垃圾厢房</label>
+                    <span class="weui-form-preview__value station__name"></span>
+                </div>
+                <div class="weui-form-preview__item">
+                    <label class="weui-form-preview__label">所属居委</label>
+                    <span class="weui-form-preview__value rc__name"></span>
+                </div>
+                <div class="weui-form-preview__item">
+                    <label class="weui-form-preview__label">报警时间</label>
+                    <span class="weui-form-preview__value police__time"></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="page__ft item-content-center">
+            <div class="weui-btn back__btn">返回报警记录</div>
+        </div>
+    </template>
+    
+
+    <div class="mui-page mui-page-center" id="detail">
+        <div class="mui-page-content full">
+            <div class="page__bd full">
+                <div class="swiper-container page full" id="swiper-page">
+                    <div class="swiper-wrapper page">                        
+                    </div>
+                </div>
             </div>
         </div>
 
     </div>
 
-    <div class="swiper-container" id="origin-img">
+
+    <div class="swiper-container max" id="origin-img">
         <div class="swiper-wrapper" style="position: relative;"></div>
         <div class="swiper-pagination"></div>
     </div>

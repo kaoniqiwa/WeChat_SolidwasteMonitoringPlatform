@@ -3,19 +3,32 @@ import { HowellAuthHttp } from "./howell-auth-http";
 import { WeChatRequestService } from "./we-chat.service";
 import { SessionUser } from "../../common/session-user";
 import { getQueryVariable } from "../../common/tool";
+
+
+
 export namespace HowellHttpClient {
+
+    interface DigestWindow extends Window{
+        DIGEST:any;
+        data:any;
+        APPHTTP:HowellAuthHttp;
+    }
+
 
     export class HttpClient {
         userService: WeChatRequestService;
         user: SessionUser;
+        digistWindow:DigestWindow;
         constructor() {
+            this.digistWindow = window as unknown as DigestWindow;
             this.user = new SessionUser();
             this.userService = new WeChatRequestService(this.http);
+            
         }
 
         async login(seccess?: (http: HowellAuthHttp) => void, faild?: () => void) {
             const openid = getQueryVariable('openid');
-            if (window['DIGEST'] == null && openid) {
+            if (this.digistWindow.DIGEST == null && openid) {
                 // 123456
                 this.user.user = {
                     name: openid.trim(),
@@ -48,7 +61,7 @@ export namespace HowellHttpClient {
                     + window.location.href;
             }
             else if (eventId && openid) {
-                if (window['DIGEST'] == null) {
+                if (this.digistWindow.DIGEST == null) {
                     this.user.user = {
                         name: openid,
                         pwd: ''
@@ -57,8 +70,8 @@ export namespace HowellHttpClient {
                     const a = await this.userService.login(() => {
 
                     });
-                    if (a && a['data'])
-                        this.user.WUser = a['data'];
+                    if (a)
+                        this.user.WUser = a;
                     if (fn) fn(this.http);
                 }
             }
@@ -66,9 +79,9 @@ export namespace HowellHttpClient {
 
         get http() {
             var http_: HowellAuthHttp;
-            if (window['APPHTTP'] == null)
-                window['APPHTTP'] = new HowellAuthHttp(this.user.name, this.user.pwd);
-            http_ = window['APPHTTP'];
+            if (this.digistWindow['APPHTTP'] == null)
+            this.digistWindow['APPHTTP'] = new HowellAuthHttp(this.user.name, this.user.pwd);
+            http_ = this.digistWindow['APPHTTP'];
             return http_;
         }
 

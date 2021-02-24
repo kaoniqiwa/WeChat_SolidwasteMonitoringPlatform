@@ -38,7 +38,7 @@ namespace UserDetailsPage {
     const client = new HowellHttpClient.HttpClient();
     // client.login((http: HowellAuthHttp) => {
         // const user = new SessionUser();
-        // console.log(user)
+
         // const service = new Service(http);
         // const page = new Page(user, service);
         // page.init();

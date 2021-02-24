@@ -62,19 +62,17 @@ export class SwiperControl {
                         this.callback(this.initialSlide)
                     }
                 },
-                slideChangeTransitionEnd: function (this: any) {
-                    console.log(this.activeIndex)
-                    if (this.pagination.bullets) {
-                        let activeIndex = this.activeIndex;
+                slideChange: (sw: any) =>{
+                    console.log(sw.activeIndex)
+                    if (sw.pagination.bullets) {
+                        let activeIndex = sw.activeIndex;
 
-                        this.pagination.bullets[activeIndex].scrollIntoView({
+                        sw.pagination.bullets[activeIndex].scrollIntoView({
                             behavior: 'smooth',
                             block: 'start',
                             inline: 'nearest'
                         })
                     }
-                },
-                slideChangeTransitionStart: (sw: any) => {
                     try {
                         if (this.callback) {
                             this.callback(sw.snapIndex);

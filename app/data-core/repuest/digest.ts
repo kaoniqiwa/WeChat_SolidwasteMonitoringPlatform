@@ -14,10 +14,10 @@ export class Digest {
             sessionStorage.setItem('WWW-Authenticate', this.header);
         }
         else {
-            this.header = sessionStorage.getItem('WWW-Authenticate');
+            this.header = sessionStorage.getItem('WWW-Authenticate')!;
         }
     }
-    buildField(name, value) {
+    buildField(name:string, value:string) {
         return value ? name + "=\"" + value + "\", " : "";
     }
 

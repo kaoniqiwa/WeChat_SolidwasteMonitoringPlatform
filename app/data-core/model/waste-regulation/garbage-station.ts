@@ -18,23 +18,22 @@ export interface IFlags extends NumberConstructor {
 }
 
 export class Flags<T extends number | string>{
-    value:number;
-    constructor(val: number) {        
-        
+    value: number;
+    constructor(val: number) {
+
         this.value = val;
     }
-    getValues(): T[] {        
+    getValues(): T[] {
         // 10
         let str = this.value.toString(2);
         let result = new Array<T>()
-        for (let i = str.length -1, x=0; i >= 0; i--,x++) {
+        for (let i = str.length - 1, x = 0; i >= 0; i--, x++) {
             let value = parseInt(str[i]);
-            if(value)
-            {
+            if (value) {
                 let v = Math.pow(2, x);
                 result.push(v as T);
             }
-            
+
         }
         return result;
     }
@@ -90,7 +89,7 @@ export class GarbageStation extends ResponseData {
     private _StationState!: Flags<StationState>;
     set StationState(val: number | Flags<StationState>) {
         if (typeof (val) == "number") {
-            
+
             this._StationState = new Flags(val);
         }
         else {
@@ -101,9 +100,63 @@ export class GarbageStation extends ResponseData {
     // 垃圾厢房状态
     get StationState(): number | Flags<StationState> {
         return this._StationState;
-    }    
+    }
+    /** 评级 */
+    Grade?: number;
+
+    /**
+     * 计数时间段	O
+     * 
+     * @type {TimeRange[]}
+     * @memberof GarbageStation
+     */
+    CountSchedule?: TimeRange[];
 }
 
+export class Time extends Date {
+    constructor(val: string) {
+        super()
+        let items = val.split(":");
+        this.setHours(parseInt(items[0]));
+        this.setMinutes(parseInt(items[1]));
+        this.setSeconds(parseInt(items[2]));
+    }
+}
+
+export class TimeRange {
+    private beginTime?: Time;
+    set BeginTime(val: Time | string) {
+        if (typeof val === "string") {
+            if (val) {
+                this.beginTime = new Time(val);
+            }
+        }
+        else {
+            this.beginTime = val;
+        }
+    }
+    get BeginTime(): Time | string {
+        if (this.beginTime)
+            return this.beginTime;
+        return "";
+    }
+    private endTime?: Time;
+    set EndTime(val: Time | string) {
+        if (typeof val === "string") {
+            if (val) {
+                this.endTime = new Time(val);
+            }
+        }
+        else {
+            this.endTime = val;
+        }
+    }
+    get EndTime(): Time | string {
+        if (this.endTime)
+            return this.endTime;
+        return "";
+    }
+}
 
 
 /**获取垃圾房列表参数 */

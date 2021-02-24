@@ -15,39 +15,118 @@ import { AxiosResponse } from "axios";
 import { NavigationWindow } from ".";
 import { ImageController } from "./data-controllers/modules/ImageControl";
 import { DataController } from "./data-controllers/DataController";
+import { IDetailsEvent, OneDay, Paged } from "./data-controllers/IController";
+import { ControllerFactory } from "./data-controllers/ControllerFactory";
+import { Service } from "../../data-core/repuest/service";
+import { LoopPageControl } from "./data-controllers/modules/LoopPageControl";
 
 export namespace EventInformationPage {
     export class EventDetail {
 
         imageController: ImageController;
 
+        loopController: LoopPageControl;
 
-        constructor(private service: {
-            event: EventRequestService,
-            medium: MediumPicture
-        },
-            private user: SessionUser) {
-            this.imageController = new ImageController("#origin-img");
+        pageIndex?: number;
+        template: HTMLTemplateElement;
+        paged?: Paged;
+        day?: OneDay;
+        isLoaded: boolean = false;
+
+        get PageIndex() {
+
+            if (this.pageIndex == undefined && this.paged) {
+                const strIndex = getQueryVariable('pageindex');
+                if (strIndex) {
+                    this.pageIndex = parseInt(strIndex);
+                }
+            }
+            return this.pageIndex;
         }
+
+
+
+        constructor(private dataController: IDetailsEvent,
+            private user: SessionUser) {
+
+            if (window.parent) {
+                this.day = (window.parent as NavigationWindow).Day;
+                this.paged = (window.parent as NavigationWindow).RecordPage;
+            }
+
+
+            this.template = document.getElementById("template") as HTMLTemplateElement;
+            this.init();
+            this.imageController = new ImageController("#origin-img");
+            debugger;
+            this.loopController = new LoopPageControl("#swiper-page", {
+                callback: (index, element) => {
+                    if (this.isLoaded) {
+                        this.PageChange(index, element);
+                    }
+                },
+                loaded: (element: HTMLElement) => {
+                    this.loaded(element);
+                    this.isLoaded = true;
+                }
+            });
+            debugger;
+            this.loopController.init(this.PageIndex);
+        }
+
+        async loaded(element: HTMLElement) {
+
+            this.PageChange(this.PageIndex, element);
+
+        }
+
+
+        async PageChange(index: number | undefined, element: HTMLElement) {
+
+
+            element.innerHTML = this.template.innerHTML;
+            if (index != undefined) {
+                index += 1;
+            }
+            const data = await this.getData(index, this.day);
+            if (data) {
+                this.fillDetail(data, element);
+            }
+
+        }
+
+
 
         init() {
-            let btn = document.getElementById("back__btn")
+            let btn = document.getElementsByClassName("back__btn")
             if (btn) {
-                btn.addEventListener("click", () => {
-                    window.parent.showOrHideAside();
-                    // location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
-                });
+                for (let i = 0; i < btn.length; i++) {
+                    btn[i].addEventListener("click", () => {
+                        window.parent.showOrHideAside();
+                        // location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
+                    });
+                }
+
             }
+
+            if (this.paged) {
+                debugger;
+                let wrapper = document.querySelector(".swiper-wrapper.page") as HTMLDivElement;
+                for (let i = 0; i < this.paged.count!; i++) {
+                    let slide = document.createElement("div");
+                    slide.className = "swiper-slide page";
+                    wrapper.appendChild(slide);
+                }
+            }
+
+
         }
 
 
-        getData():
-            Promise<Response<IllegalDropEventRecord>> |
-            Promise<Response<MixedIntoEventRecord>> |
-            Promise<Response<GarbageFullEventRecord>> |
-            undefined {
+        async getData(pageIndex?: number, day?: OneDay) {
             const eventId = getQueryVariable('eventid');
             const strEventType = getQueryVariable('eventtype');
+
 
             let eventType = EventType.IllegalDrop;
 
@@ -56,41 +135,70 @@ export namespace EventInformationPage {
             }
 
             if (eventId) {
-                switch (eventType) {
-                    case EventType.IllegalDrop:
-                        return this.service.event.illegalDropSingle(eventId);
-                    case EventType.MixedInto:
-                        return this.service.event.mixedIntoSingle(eventId);
-                    case EventType.GarbageFull:
-                        return this.service.event.garbageFullSingle(eventId);
-                    default:
-                        break;
+                return await this.dataController.GetEventRecord(eventType, eventId);
+            }
+            else if (pageIndex != undefined && day) {
+                return await this.dataController.GetEventRecord(eventType, pageIndex, day);
+            }
+            else {
+                return undefined;
+            }
+        }
+
+        fillDetail(item: IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord, element?: HTMLElement) {
+            let source: HTMLElement | Document = element ? element : document;
+
+            const police__type = source.getElementsByClassName('police__type'),
+                camera__name = source.getElementsByClassName('camera__name'),
+                station__name = source.getElementsByClassName('station__name'),
+                rc__name = source.getElementsByClassName('rc__name'),
+                police__time = source.getElementsByClassName('police__time'),
+                detail_imgs = source.getElementsByClassName('detail_img');
+
+
+            let btn = source.getElementsByClassName("back__btn")
+            if (btn) {
+                for (let i = 0; i < btn.length; i++) {
+                    btn[i].addEventListener("click", () => {
+                        window.parent.showOrHideAside();
+                        // location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
+                    });
+                }
+
+            }
+
+
+
+            if (police__type) {
+                for (let i = 0; i < police__type.length; i++) {
+                    (police__type[i] as HTMLSpanElement).innerText = Language.EventType(item.EventType);
+                }
+            }
+            if (item.ResourceName && camera__name) {
+                for (let i = 0; i < camera__name.length; i++) {
+                    (camera__name[i] as HTMLSpanElement).innerText = item.ResourceName;
                 }
             }
 
-        }
-
-        fillDetail<T extends IllegalDropEventData | MixedIntoEventData | GarbageFullEventData>(item: EventRecordData<T>) {
-            const police__type = document.getElementById('police__type')!,
-                camera__name = document.getElementById('camera__name')!,
-                station__name = document.getElementById('station__name')!,
-                rc__name = document.getElementById('rc__name')!,
-                police__time = document.getElementById('police__time')!,
-                detail_img = document.getElementById('detail_img') as HTMLImageElement;
-            if (police__type) {
-                police__type.innerText = Language.EventType(item.EventType);
-            }
-            if (item.ResourceName) {
-                camera__name.innerText = item.ResourceName;
+            if (station__name) {
+                for (let i = 0; i < station__name.length; i++) {
+                    (station__name[i] as HTMLSpanElement).innerText = item.Data.StationName;
+                }
             }
 
-
-            station__name.innerText = item.Data.StationName;
-            if (item.Data.DivisionName) {
-                rc__name.innerText = item.Data.DivisionName;
+            if (item.Data.DivisionName && rc__name) {
+                for (let i = 0; i < rc__name.length; i++) {
+                    (rc__name[i] as HTMLSpanElement).innerText = item.Data.DivisionName;
+                }
             }
 
-            police__time.innerText = dateFormat(new Date(item.EventTime), 'yyyy-MM-dd HH:mm:ss');
+            if (police__time) {
+                for (let i = 0; i < police__time.length; i++) {
+                    (police__time[i] as HTMLSpanElement).innerText = dateFormat(new Date(item.EventTime), 'yyyy-MM-dd HH:mm:ss');
+                }
+            }
+
+
             let url: string = DataController.defaultImageUrl;
             if (item.ImageUrl) {
                 if (item.ImageUrl.indexOf('?') >= 0) {
@@ -98,54 +206,61 @@ export namespace EventInformationPage {
                     url = item.ImageUrl
                 }
                 else {
-                    let resUrl = this.service.medium.getData(item.ImageUrl);
+                    let resUrl = this.dataController.getImageUrl(item.ImageUrl);
                     if (resUrl) {
                         url = resUrl;
                     }
                 }
             }
 
-            detail_img.src = url;
-            detail_img.onload = () => {
-                const frame = document.getElementById("frame")! as HTMLDivElement;
-                frame.style.width = detail_img.offsetWidth + "px";
-                frame.style.height = detail_img.offsetHeight + "px";
-                this.drawFrame(item, detail_img.offsetWidth, detail_img.offsetHeight, frame);
-            };
-            detail_img.addEventListener("click", () => {
-                let selectors = {
-                    frameId: "max-frame",
-                    imgId: "max-img"
+            if (detail_imgs) {
+                for (let i = 0; i < detail_imgs.length; i++) {
+                    let detail_img = detail_imgs[i] as HTMLImageElement;
+                    detail_img.src = url;
+                    detail_img.onload = () => {
+                        detail_img.removeAttribute("data-src");
+                        const frame = detail_img.parentElement!.querySelector(".frame") as HTMLDivElement
+
+                        frame.style.width = detail_img.offsetWidth + "px";
+                        frame.style.height = detail_img.offsetHeight + "px";
+                        this.drawFrame(item, detail_img.offsetWidth, detail_img.offsetHeight, frame);
+                    };
+                    detail_img.addEventListener("click", () => {
+                        let selectors = {
+                            frameId: "max-frame",
+                            imgId: "max-img"
+                        }
+
+
+
+                        this.imageController.showDetail(selectors, [detail_img.src]);
+                        let frame = document.getElementById(selectors.frameId) as HTMLImageElement;
+                        let img = document.getElementById(selectors.imgId) as HTMLImageElement;
+                        img.onload = () => {
+                            let url = this.drawFrame(item, img.naturalWidth, img.naturalHeight)!;
+                            frame.src = url;
+                        }
+
+
+
+                        // img.onload = () => {
+                        //     frame.style.width = img.offsetWidth + "px";
+                        //     frame.style.height = img.offsetHeight + "px";
+                        //     this.drawFrame1(frame, item, img);
+                        // }
+                        // img.addEventListener("touchmove", (e) => {
+
+                        //     // frame.style.scale = img.style.scale;
+                        //     frame.style.transform = img.style.transform;
+                        //     frame.style.transformBox = img.style.transformBox;
+                        //     frame.style.transformStyle = img.style.transformStyle;
+                        //     // frame.style.width = img.offsetWidth + "px";
+                        //     // frame.style.height = img.offsetHeight + "px";
+                        // })
+
+                    });
                 }
-
-
-                
-                this.imageController.showDetail(selectors, [detail_img.src]);
-                let frame = document.getElementById(selectors.frameId) as HTMLImageElement;
-                let img = document.getElementById(selectors.imgId) as HTMLImageElement;
-                img.onload = () => {
-                    let url = this.drawFrame(item, img.naturalWidth, img.naturalHeight)!;
-                    frame.src = url;                    
-                }
-
-
-
-                // img.onload = () => {
-                //     frame.style.width = img.offsetWidth + "px";
-                //     frame.style.height = img.offsetHeight + "px";
-                //     this.drawFrame1(frame, item, img);
-                // }
-                // img.addEventListener("touchmove", (e) => {
-
-                //     // frame.style.scale = img.style.scale;
-                //     frame.style.transform = img.style.transform;
-                //     frame.style.transformBox = img.style.transformBox;
-                //     frame.style.transformStyle = img.style.transformStyle;
-                //     // frame.style.width = img.offsetWidth + "px";
-                //     // frame.style.height = img.offsetHeight + "px";
-                // })
-
-            });
+            }
         }
 
 
@@ -250,28 +365,26 @@ export namespace EventInformationPage {
     }
 
     class Page {
+
+        record?: EventDetail;
+        constructor() {
+
+        }
+
+
+
         async run() {
 
             let client = new HowellHttpClient.HttpClient().login(async (http) => {
 
                 let user = new SessionUser();
 
-                const record = new EventDetail({
-                    event: new EventRequestService(http),
-                    medium: new MediumPicture()
-                }, user);
+                let type = user.WUser.Resources![0].ResourceType;
+                let service = new Service(http);
+                let dataController = ControllerFactory.Create(service, type, user.WUser.Resources!);
 
-                record.init();
+                this.record = new EventDetail(dataController, user);
 
-                if (window.parent.recordDetails) {
-                    record.fillDetail(window.parent.recordDetails);
-                }
-                else {
-                    const data = await record.getData();
-                    if (data) {
-                        record.fillDetail(data.Data);
-                    }
-                }
             })
         }
     }

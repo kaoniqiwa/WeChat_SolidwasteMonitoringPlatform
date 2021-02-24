@@ -49,7 +49,10 @@ export class EventRecordData<T extends EventData> extends EventRecord
 }
 
 export class EventData {
-
+    StationId!:string;
+    StationName!:string;
+    DivisionId?:string;
+    DivisionName?:string;
 }
 
 

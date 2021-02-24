@@ -1,20 +1,13 @@
 
-import { Response } from "../../../data-core/model/response";
-import { PagedList, TimeUnit } from "../../../data-core/model/page";
-import { Division } from "../../../data-core/model/waste-regulation/division";
-import { EventNumberStatistic } from "../../../data-core/model/waste-regulation/division-event-numbers";
-import { DivisionNumberStatistic, GetDivisionStatisticNumbersParams } from "../../../data-core/model/waste-regulation/division-number-statistic";
+import { TimeUnit } from "../../../data-core/model/page";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
 import { ResourceRole, ResourceType } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
 import { IDataController, IGarbageStationController, OneDay, Paged, StatisticNumber } from "./IController";
 import { DataController } from "./DataController";
-import { IllegalDropEventRecord } from "../../../data-core/model/waste-regulation/illegal-drop-event-record";
-import { MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/mixed-into-event-record";
-import { dateFormat, enumForeach } from "../../../common/tool";
 import { GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record";
-import { GarbageFullEventRecord } from "../../../data-core/model/waste-regulation/garbage-full-event-record";
+
 
 export class CountDivisionController extends DataController implements IDataController, IGarbageStationController {
 	constructor(service: Service, roles: ResourceRole[]) {
@@ -51,7 +44,7 @@ export class CountDivisionController extends DataController implements IDataCont
 		const responseStatistic = await this.service.garbageStation.statisticNumberList({
 			Ids: sources.map(x => x.Id)
 		});
-		return responseStatistic.Data.Data.map(x => {
+		return responseStatistic.Data.map(x => {
 			let illegalDropNumber = 0;
 			let mixedIntoNumber = 0;
 			let garbageFullNumber = 0;
@@ -89,7 +82,7 @@ export class CountDivisionController extends DataController implements IDataCont
 		const responseStatistic = await this.service.division.statisticNumberList({
 			Ids: sources.map(x => x.Id)
 		});
-		return responseStatistic.Data.Data.map(x => {
+		return responseStatistic.Data.map(x => {
 			let illegalDropNumber = 0;
 			let mixedIntoNumber = 0;
 			let garbageFullNumber = 0;
@@ -131,7 +124,7 @@ export class CountDivisionController extends DataController implements IDataCont
 				BeginTime: day.begin.toISOString(),
 				EndTime: day.end.toISOString()
 			}, source.Id)
-			response.Data.Data.forEach(x => {
+			response.Data.forEach(x => {
 				let illegalDropNumber = 0;
 				let mixedIntoNumber = 0;
 				let garbageFullNumber = 0;
@@ -186,7 +179,7 @@ export class CountDivisionController extends DataController implements IDataCont
 				TimeUnit: TimeUnit.Hour
 			}, role.Id)
 
-			for (var x of data.Data.Data) {
+			for (var x of data.Data) {
 				for (const y of x.EventNumbers)
 					if (y.EventType == EventType.IllegalDrop)
 						result.push(y);
@@ -213,7 +206,7 @@ export class CountDivisionController extends DataController implements IDataCont
 		for (let i = 0; i < this.roles.length; i++) {
 			const role = this.roles[i];
 			const promise = await this.service.garbageStation.list({ DivisionId: role.Id });
-			result = result.concat(promise.Data.Data);
+			result = result.concat(promise.Data);
 		}
 		result = result.sort((a, b) => {
 			return a.DivisionId!.localeCompare(a.DivisionId!) || a.Name.localeCompare(b.Name);
@@ -235,7 +228,7 @@ export class CountDivisionController extends DataController implements IDataCont
 		for (let i = 0; i < this.roles.length; i++) {
 			const role = this.roles[i];
 			let promise = await this.service.division.list({ ParentId: role.Id });
-			result = result.concat(promise.Data.Data.map(x => {
+			result = result.concat(promise.Data.map(x => {
 				let r = new ResourceRole();
 				r.Id = x.Id;
 				r.Name = x.Name;

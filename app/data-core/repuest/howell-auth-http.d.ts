@@ -5,7 +5,7 @@ export declare class HowellAuthHttp {
     // private username;
     // private passwd;
     // private webBrowserAuth;
-    constructor(username: string, passwd: string, webBrowserAuth?: boolean, customAxios?: AxiosInstance | AxiosStatic);
+    constructor(username: string, passwd: string|null, webBrowserAuth?: boolean, customAxios?: AxiosInstance | AxiosStatic);
      set clientCredentials(credentials: ClientCredentials);
      get clientCredentials(): ClientCredentials;
      set digest(digest:Digest);

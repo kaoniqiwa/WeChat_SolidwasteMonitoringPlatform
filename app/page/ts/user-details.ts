@@ -48,7 +48,7 @@ namespace UserDetailsPage {
                 Ids: resources.map(x => x.Id)
             });
             promise.then(res => {
-                let data = res.Data.Data.map(x => {
+                let data = res.Data.map(x => {
                     return {
                         id: x.Id,
                         name: x.Name
@@ -76,7 +76,7 @@ namespace UserDetailsPage {
         loadGarbageStations(resources: ResourceRole[]) {
             let promise = this.service.garbageStation.list({ Ids: resources.map(x => x.Id) });
             promise.then(res => {
-                let data = res.Data.Data.map(x => {
+                let data = res.Data.map(x => {
                     return {
                         id: x.Id,
                         name: x.Name

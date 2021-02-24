@@ -1,17 +1,12 @@
 
-import { Response } from "../../../data-core/model/response";
-import { PagedList, TimeUnit } from "../../../data-core/model/page";
+import { TimeUnit } from "../../../data-core/model/page";
 import { EventNumberStatistic } from "../../../data-core/model/waste-regulation/division-event-numbers";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
-import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
-import { IllegalDropEventRecord } from "../../../data-core/model/waste-regulation/illegal-drop-event-record";
-import { MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/mixed-into-event-record";
 import { ResourceRole, ResourceType } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
 import { DataController } from "./DataController";
 import { IDataController, IGarbageStationController, OneDay, Paged, StatisticNumber } from "./IController";
 import { GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record";
-import { GarbageFullEventRecord } from "../../../data-core/model/waste-regulation/garbage-full-event-record";
 
 export class GarbageStationController extends DataController implements IDataController, IGarbageStationController {
 
@@ -35,7 +30,7 @@ export class GarbageStationController extends DataController implements IDataCon
 		const responseStatistic = await this.service.garbageStation.statisticNumberList({
 			Ids: sources.map(x => x.Id)
 		});
-		return responseStatistic.Data.Data.map(x => {
+		return responseStatistic.Data.map(x => {
 			let illegalDropNumber = 0;
 			let mixedIntoNumber = 0;
 			let garbageFullNumber = 0;
@@ -77,7 +72,7 @@ export class GarbageStationController extends DataController implements IDataCon
 				BeginTime: day.begin.toISOString(),
 				EndTime: day.end.toISOString()
 			}, source.Id)
-			response.Data.Data.forEach(x => {
+			response.Data.forEach(x => {
 				let illegalDropNumber = 0;
 				let mixedIntoNumber = 0;
 				let garbageFullNumber = 0;
@@ -187,11 +182,11 @@ export class GarbageStationController extends DataController implements IDataCon
 
 			if (datas.length > 0) {
 				for (let i = 0; i < datas.length; i++) {
-					datas[i] = EventNumberStatistic.Plus(datas[i], data.Data.Data[i]);
+					datas[i] = EventNumberStatistic.Plus(datas[i], data.Data[i]);
 				}
 			}
 			else {
-				datas = data.Data.Data;
+				datas = data.Data;
 			}
 		}
 		let result = new Array<EventNumber>()
@@ -218,14 +213,14 @@ export class GarbageStationController extends DataController implements IDataCon
 
 	getGarbageStationList = async () => {
 		let promise = await this.service.garbageStation.list({ Ids: this.roles.map(x => x.Id) });
-		return promise.Data.Data;
+		return promise.Data;
 	}
 	
 
 	getResourceRoleList = async () => {
 
 		let promise = await this.service.garbageStation.list({ Ids: this.roles.map(x => x.Id) });
-		return promise.Data.Data.map(x => {
+		return promise.Data.map(x => {
 			let role = new ResourceRole();
 			role.Id = x.Id;
 			role.Name = x.Name;

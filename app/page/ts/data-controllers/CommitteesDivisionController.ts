@@ -13,7 +13,7 @@ export class CommitteesDivisionController extends CountDivisionController {
 			const role = this.roles[i];
 
 			let promise = await this.service.garbageStation.list({DivisionId:role.Id});	
-			let current = promise.Data.Data.map(x => {
+			let current = promise.Data.map(x => {
 				let role = new ResourceRole();
 				role.ResourceType = ResourceType.Committees;
 				role.Id = x.Id;

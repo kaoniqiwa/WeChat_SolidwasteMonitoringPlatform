@@ -20,6 +20,9 @@ class mySwiper {
         if (typeof target == 'string') {
             this._target = target = document.querySelector(target) as HTMLDivElement;
         }
+        
+        this._target = target;
+    
         this._storage = {
             data: {
                 containerWidth: target.clientWidth,

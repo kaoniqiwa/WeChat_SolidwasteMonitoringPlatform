@@ -9,7 +9,7 @@ html,body{
 {
     height: 100%;
 }
-.mui-page .mui-page-content
+.mui-page .full
 {
     height: 100%;
 }
@@ -87,16 +87,10 @@ html,body{
 }
 
 
-.swiper-container {
+.swiper-container.max {
     overflow: auto;
   }
-  .swiper-container.zoomOut {
-    overflow: hidden;
-  }
-  .swiper-container.zoomIn {
-    overflow: auto;
-  }
-  .swiper-container .swiper-wrapper .swiper-slide {
+  .swiper-container.max .swiper-wrapper .swiper-slide {
     width: 140px;
     padding: 0 2px;
     box-sizing: border-box;
@@ -104,24 +98,15 @@ html,body{
     font-size: 0;
     height: 100%;
   }
-  .swiper-container .swiper-wrapper .swiper-slide.zoomOut {
-    width: 100%;
-    padding: 0;
-    padding-bottom: 56.5%;
-  }
-  .swiper-container .swiper-wrapper .swiper-slide img {
+  .swiper-container.max .swiper-wrapper .swiper-slide img {
     width: 100%;
   }
-  .swiper-container .swiper-pagination {
+  .swiper-container.max .swiper-pagination {
     box-sizing: border-box;
     text-align: right;
     color: white;
     padding-right: 10px;
     display: none;
-  }
-  .swiper-container.zoomOut .swiper-pagination
-  {
-    display: block;
   }
 
   #origin-img {
@@ -154,4 +139,13 @@ html,body{
     -ms-flex-align: center;
     align-items: center;
     text-align: center;
+  }
+
+  img {
+    opacity: 1;
+    transition: opacity 0.3s;
+  }
+  
+  img[data-src] {
+    opacity: 0;
   }

@@ -145,7 +145,7 @@ class GarbageStationClient {
         })
         this.imgDivision.addEventListener('click', () => {
             // 在蒙版消失之前，所有按钮不能点击
-            debugger;
+            
             if (this.originStatus) return
             if (this.zoomStatus == ZoomStatus.in) {
                 let icon = this.imgDivision.getElementsByClassName("howell-icon-list")[0]
@@ -383,11 +383,11 @@ class GarbageStationClient {
         }
         this.asideControl.Hide();
         if (this.zoomStatus == ZoomStatus.out) {
-            debugger;
+            
             this.zoomOut();
         }
         else if (this.zoomStatus == ZoomStatus.in) {
-            debugger;
+            
             this.zoomIn();
         }
         else {

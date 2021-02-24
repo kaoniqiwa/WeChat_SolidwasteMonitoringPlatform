@@ -1,24 +1,24 @@
 import { PagedList } from "../../../data-core/model/page";
 import { Response } from "../../../data-core/model/response";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
-import { GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record";
+import { EventData, EventRecordData, GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record";
 import { GarbageFullEventRecord } from "../../../data-core/model/waste-regulation/garbage-full-event-record";
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
-import { IllegalDropEventRecord } from "../../../data-core/model/waste-regulation/illegal-drop-event-record";
+import { IllegalDropEventData, IllegalDropEventRecord } from "../../../data-core/model/waste-regulation/illegal-drop-event-record";
 import { MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/mixed-into-event-record";
 import { ResourceRole } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
-import { IDataController, IEventHistory, IGarbageStationController, OneDay, Paged, StatisticNumber } from "./IController";
+import { IDataController, IDetailsEvent, IEventHistory, IGarbageStationController, OneDay, Paged, StatisticNumber } from "./IController";
 
-export class DataController implements IDataController, IGarbageStationController, IEventHistory {
-    
+export class DataController implements IDataController, IGarbageStationController, IEventHistory, IDetailsEvent {
+
     static readonly defaultImageUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABIAAAAKIAQAAAAAgULygAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAd2KE6QAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAHdElNRQflAgIBCxpFwPH8AAAAcklEQVR42u3BMQEAAADCoPVPbQZ/oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+A28XAAEDwmj2AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIxLTAyLTAyVDAxOjExOjI2KzAwOjAwOo9+nAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMS0wMi0wMlQwMToxMToyNiswMDowMEvSxiAAAAAASUVORK5CYII=";
+
 
     constructor(protected service: Service, roles: ResourceRole[]) {
         this.roles = roles;
     }
 
-    
 
 
     isToday(date: Date) {
@@ -58,7 +58,7 @@ export class DataController implements IDataController, IGarbageStationControlle
         let promise = await this.service.division.get(divisionId);
         return promise.Data;
     }
-    getCameraList = async (garbageStationId: string, loadImage: (cameraId:string, url?: string) => void) => {
+    getCameraList = async (garbageStationId: string, loadImage: (cameraId: string, url?: string) => void) => {
         let promise = await this.service.camera.list(garbageStationId);
         return promise.Data.sort((a, b) => {
             return a.CameraUsage - b.CameraUsage || a.Name.localeCompare(b.Name);
@@ -82,8 +82,8 @@ export class DataController implements IDataController, IGarbageStationControlle
         });
     }
     getImageUrl = (id: string) => {
-		return this.service.medium.getData(id);
-	}
+        return this.service.medium.getData(id);
+    }
     getGarbageStationEventCount = async (garbageStationIds: string[]) => {
         const promise = await this.service.garbageStation.statisticNumberList({ Ids: garbageStationIds });
         return promise.Data.Data.map(x => {
@@ -128,7 +128,6 @@ export class DataController implements IDataController, IGarbageStationControlle
 
     getEventList = async (day: OneDay, page: Paged, type: EventType, ids?: string[]) => {
 
-
         let params = this.getEventListParams(day, page, type, ids);
 
         let promise: Response<PagedList<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord>>
@@ -155,5 +154,51 @@ export class DataController implements IDataController, IGarbageStationControlle
         return promise.Data;
 
     }
+
+
+
+
+    async GetEventRecordById(type: EventType, eventId: string) {
+        let response: Response<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord>;
+        switch (type) {
+            case EventType.IllegalDrop:
+                response = await this.service.event.illegalDropSingle(eventId);
+                break;
+            case EventType.GarbageFull:
+                response = await this.service.event.garbageFullSingle(eventId);
+                break;
+            case EventType.MixedInto:
+                response = await this.service.event.mixedIntoSingle(eventId);
+                break;
+            default:
+                return undefined;
+        }
+        return response.Data;
+    }
+
+
+    GetEventRecord(type: EventType, eventId: string): Promise<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | undefined>;
+    GetEventRecord(type: EventType, index: number, day?:OneDay): Promise<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | undefined>;
+    async GetEventRecord(type: EventType, index: string | number, day?:OneDay) {
+        if (typeof index === "string") {
+            return await this.GetEventRecordById(type, index);
+        }
+        else if (typeof index === "number") {
+            if (!day) {
+                throw new Error("please choose one day");
+            }
+            let paged: Paged = { index: index, size: 1 };
+            let result = await this.getEventList(day, paged, type);
+            if (result) {
+                return result.Data[0];
+            }
+        }
+        else {
+            throw new Error("can not read index or eventId");
+        }
+    }
+
+
+
 
 }

@@ -7,10 +7,6 @@ import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { Service } from "../../data-core/repuest/service";
 import { Language } from "./language";
 
-// declare var  $:any;
-
-// console.log($)
-
 let $ = Reflect.get(window, '$');
 
 class AddUser {
@@ -179,7 +175,7 @@ class AddUser {
 
 
         return this.service.division.list(req).then(x => {
-            let divisions = x.Data.Data.sort((a, b) => {
+            let divisions = x.Data.sort((a, b) => {
                 return a.Name.localeCompare(b.Name);
             });
 
@@ -195,7 +191,7 @@ class AddUser {
         request.DivisionId = DivisionId;
         let mapedStations = new Map()
         return this.service.garbageStation.list(request).then(x => {
-            x.Data.Data.forEach(data => {
+            x.Data.forEach(data => {
                 mapedStations.set(data.Id, data)
             })
 

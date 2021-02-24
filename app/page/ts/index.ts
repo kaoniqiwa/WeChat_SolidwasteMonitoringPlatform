@@ -3,10 +3,13 @@ import { EventType } from "../../data-core/model/waste-regulation/event-number";
 import { WeChatUser } from "../../data-core/model/we-chat";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
+import { OneDay, Paged } from "./data-controllers/IController";
 
 export interface NavigationWindow extends Window {
     User: SessionUser;
     Authentication: HowellAuthHttp;
+    RecordPage?:Paged;
+    Day?:OneDay;
 }
 
 namespace Navigation {

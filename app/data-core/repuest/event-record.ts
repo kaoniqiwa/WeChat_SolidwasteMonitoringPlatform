@@ -8,6 +8,7 @@ import { HowellAuthHttp } from "./howell-auth-http";
 import { MixedIntoEventRecord } from "../model/waste-regulation/mixed-into-event-record";
 import { GarbageFullEventRecord } from "../model/waste-regulation/garbage-full-event-record";
 import { GetEventRecordsParams } from "../model/waste-regulation/event-record";
+import { plainToClass } from "class-transformer";
 
 export class EventRequestService {
     url: url.EventRecord;
@@ -15,26 +16,35 @@ export class EventRequestService {
         this.url = new url.EventRecord();
     }
 
-    illegalDropList(item: GetEventRecordsParams) {
-        return this.requestService.post<GetEventRecordsParams, Response<PagedList<IllegalDropEventRecord>>>(this.url.illegalDrop(), item);
+    async illegalDropList(item: GetEventRecordsParams) {
+        let response = await this.requestService.post<GetEventRecordsParams, Response<PagedList<IllegalDropEventRecord>>>(this.url.illegalDrop(), item);
+        response.Data.Data = plainToClass(IllegalDropEventRecord, response.Data.Data);
+        return response.Data;
     }
 
-    illegalDropSingle(id: string) {
-        return this.requestService.get<Response<IllegalDropEventRecord>>(this.url.illegalDropSingle(id));
+    async illegalDropSingle(id: string) {
+        let response = await this.requestService.get<Response<IllegalDropEventRecord>>(this.url.illegalDropSingle(id));
+        return plainToClass(IllegalDropEventRecord, response.Data);
     }
 
-    mixedIntoList(item: GetEventRecordsParams) {
-        return this.requestService.post<GetEventRecordsParams, Response<PagedList<MixedIntoEventRecord>>>(this.url.mixedIntoList(), item);
+    async mixedIntoList(item: GetEventRecordsParams) {
+        let response = await this.requestService.post<GetEventRecordsParams, Response<PagedList<MixedIntoEventRecord>>>(this.url.mixedIntoList(), item);
+        response.Data.Data = plainToClass(MixedIntoEventRecord, response.Data.Data);
+        return response.Data;
     }
 
-    mixedIntoSingle(id: string) {
-        return this.requestService.get<Response<MixedIntoEventRecord>>(this.url.mixedIntoSingle(id));
+    async mixedIntoSingle(id: string) {
+        let response = await this.requestService.get<Response<MixedIntoEventRecord>>(this.url.mixedIntoSingle(id));
+        return plainToClass(MixedIntoEventRecord, response.Data);
     }
-    garbageFullList(item: GetEventRecordsParams) {
-        return this.requestService.post<GetEventRecordsParams, Response<PagedList<GarbageFullEventRecord>>>(this.url.garbageFullList(), item);
+    async garbageFullList(item: GetEventRecordsParams) {
+        let response = await this.requestService.post<GetEventRecordsParams, Response<PagedList<GarbageFullEventRecord>>>(this.url.garbageFullList(), item);
+        response.Data.Data = plainToClass(GarbageFullEventRecord, response.Data.Data);
+        return response.Data;
     }
-    garbageFullSingle(id: string) {
-         return this.requestService.get<Response<GarbageFullEventRecord>>(this.url.mixedIntoSingle(id));
+    async garbageFullSingle(id: string) {
+         let response = await this.requestService.get<Response<GarbageFullEventRecord>>(this.url.mixedIntoSingle(id));
+         return plainToClass(GarbageFullEventRecord, response.Data);
     }
 
 

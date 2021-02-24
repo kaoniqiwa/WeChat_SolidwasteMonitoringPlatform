@@ -151,8 +151,8 @@ class GarbageStationClient {
         param.Ids = ids;
         const res = await this.service.garbageStation.statisticNumberList(param);
 
-        for (let i = 0; i < res.Data.Data.length; i++) {
-            const data = res.Data.Data[i];
+        for (let i = 0; i < res.Data.length; i++) {
+            const data = res.Data[i];
             this.GarbageStationNumberStatistic.set(data.Id, data);
         }
 
@@ -168,7 +168,7 @@ class GarbageStationClient {
 
         return this.service.division.list(req).then(x => {
 
-            let divisions = x.Data.Data.sort((a, b) => {
+            let divisions = x.Data.sort((a, b) => {
                 return a.Name.localeCompare(b.Name);
             });
 
@@ -188,7 +188,7 @@ class GarbageStationClient {
         let mapedStations = new Map()
         return this.service.garbageStation.list(request).then(x => {
 
-            x.Data.Data.forEach(data => {
+            x.Data.forEach(data => {
                 mapedStations.set(data.Id, data)
             })
 
@@ -310,7 +310,7 @@ class GarbageStationClient {
                 let wrapper = info.querySelector('.content__img .swiper-wrapper') as HTMLDivElement;
                 let slide = wrapper.querySelector('.swiper-slide') as HTMLDivElement;
 
-                if (numberStatic) {
+                if (numberStatic && numberStatic.TodayEventNumbers) {                    
                     let illegalDrop = info.querySelector('.illegalDrop-number') as HTMLSpanElement;
                     let illegalDropNumber = numberStatic.TodayEventNumbers.filter(x => x.EventType == EventType.IllegalDrop);
                     if (illegalDropNumber && illegalDropNumber.length > 0) {
@@ -325,7 +325,7 @@ class GarbageStationClient {
                 let imageUrls: Array<string> = [];
 
                 this.service.camera.list(v.Id).then(res => {
-                    let cameras = res.Data.sort((a, b) => {
+                    let cameras = res.sort((a, b) => {
                         return a.CameraUsage - b.CameraUsage || a.Name.localeCompare(b.Name);
                     });
                     cameras.forEach((camera, index) => {

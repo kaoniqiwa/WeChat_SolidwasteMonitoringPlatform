@@ -16,8 +16,8 @@ import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import { MixedIntoEventData, MixedIntoEventRecord } from "../../data-core/model/waste-regulation/mixed-into-event-record";
 import { EventType } from "../../data-core/model/waste-regulation/event-number";
 import { SwiperControl } from "./data-controllers/modules/SwiperControl";
-import { EventRecord, EventRecordData } from "../../data-core/model/waste-regulation/event-record";
-import { GarbageFullEventData } from "../../data-core/model/waste-regulation/garbage-full-event-record";
+import { EventData, EventRecord, EventRecordData } from "../../data-core/model/waste-regulation/event-record";
+import { GarbageFullEventData, GarbageFullEventRecord } from "../../data-core/model/waste-regulation/garbage-full-event-record";
 import { NavigationWindow } from ".";
 import { DataController } from "./data-controllers/DataController";
 
@@ -163,25 +163,24 @@ export namespace EventHistoryPage {
             this.miniRefresh[this.eventType].resetUpLoading();
         }
 
-
-        convert<T extends
-            IllegalDropEventData |
-            MixedIntoEventData |
-            GarbageFullEventData
-        >(record: EventRecordData<T>) {
+        convert(record: IllegalDropEventRecord|GarbageFullEventRecord|MixedIntoEventRecord, index: number, getImageUrl: (id: string) => string | undefined) {
             let template = new Template();
-
-
             if (record.ImageUrl) {
-
-                template.img.src = record.ImageUrl;
+                template.img.src = getImageUrl(record.ImageUrl) as string;
             }
+            if (record instanceof GarbageFullEventRecord) {
+                if (record.Data.CameraImageUrls && record.Data.CameraImageUrls.length > 0) {
+                    template.img.src = getImageUrl(record.Data.CameraImageUrls[0].ImageUrl) as string;
+                }
+            }
+
             if (record.Data.StationName) {
                 template.title.innerHTML = record.Data.StationName;
             }
             if (record.Data.DivisionName) {
                 template.footer.innerHTML = record.Data.DivisionName;
             }
+
             template.remark.innerHTML = dateFormat(new Date(record.EventTime), 'HH:mm:ss');
 
 
@@ -189,6 +188,10 @@ export namespace EventHistoryPage {
             item.id = record.EventId!;
             item.setAttribute('divisionid', record.Data.DivisionId!)
             item.innerHTML = template.element.innerHTML;
+            item.getElementsByTagName("img")[0].addEventListener("load", function () {
+                this.removeAttribute("data-src");
+            })
+
             item.getElementsByTagName("img")[0].addEventListener("error", function () {
                 this.src = DataController.defaultImageUrl;
                 this.style.background = "black";
@@ -196,8 +199,8 @@ export namespace EventHistoryPage {
 
             item.addEventListener("click", () => {
 
-                window.parent.recordDetails = record;
-                const url = "./event-details.html?openid=" + this.openId + "&eventid=" + record.EventId + "&eventtype=" + record.EventType;
+                //window.parent.recordDetails = record;                
+                const url = "./event-details.html?openid=" + this.openId + "&pageindex=" + (index) + "&eventtype=" + record.EventType;
                 // console.log(window.parent);
                 window.parent.showOrHideAside(url);
                 // const aside_details = document.getElementById("aside-details") as HTMLIFrameElement;
@@ -233,16 +236,12 @@ export namespace EventHistoryPage {
         }
 
 
-        view<T extends
-            IllegalDropEventData |
-            MixedIntoEventData |
-            GarbageFullEventData
-        >(list: PagedList<EventRecordData<T>>) {
+        view(list: PagedList<IllegalDropEventRecord|MixedIntoEventRecord|GarbageFullEventRecord>) {
 
             for (let i = 0; i < list.Data.length; i++) {
                 const data = list.Data[i];
                 this.datas[data.EventId!] = data;
-                let item = this.convert(data);
+                let item = this.convert(data, (list.Page.PageIndex - 1) * list.Page.PageSize + i, this.dataController.getImageUrl);
 
                 this.parentElement[data.EventType].appendChild(item);
             }
@@ -266,9 +265,23 @@ export namespace EventHistoryPage {
 
             let data = await this.dataController.getEventList(day, page, eventType, this.selectedIds);
 
+
+
             if (data) {
                 this.view(data);
+                if (window.parent) {
+                    (window.parent as NavigationWindow).Day = getAllDay(date);
+                    (window.parent as NavigationWindow).RecordPage = {
+                        index: data.Page.PageIndex,
+                        size: data.Page.PageSize,
+                        count: data.Page.TotalRecordCount
+
+                    }
+                }
             }
+
+
+
             return data;
         }
 
@@ -318,7 +331,8 @@ export namespace EventHistoryPage {
                     else {
                         this.page[this.eventType] = {
                             index: 1,
-                            size: 20
+                            size: 20,
+                            count: 0
                         }
                     }
 
@@ -338,6 +352,7 @@ export namespace EventHistoryPage {
         }
 
         init() {
+
             element.IllegalDrop.list.innerHTML = "";
             element.MixedInto.list.innerHTML = "";
             element.GarbageFull.list.innerHTML = "";
@@ -394,6 +409,7 @@ export namespace EventHistoryPage {
                         },
                         onConfirm: (result: any) => {
                             date = new Date(result[0].value, result[1].value - 1, result[2].value);
+
                             this.loadData()
                             this.viewDatePicker(date);
                         },
@@ -478,8 +494,8 @@ export namespace EventHistoryPage {
             }
         }
 
-        initSwiper(){
-            
+        initSwiper() {
+
             let eventType = EventType.IllegalDrop;
             console.log(window.location.href);
             let strEventType = getQueryVariable("eventtype");
@@ -487,7 +503,7 @@ export namespace EventHistoryPage {
             if (strEventType) {
                 eventType = parseInt(strEventType);
             }
-            
+
             let swiper = new SwiperControl(
                 {
                     selectors: {
@@ -505,7 +521,7 @@ export namespace EventHistoryPage {
 
 
         init() {
-            
+
 
 
             this.viewDatePicker(new Date());

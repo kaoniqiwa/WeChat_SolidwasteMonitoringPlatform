@@ -9,6 +9,7 @@ import { PagedList, PageTimeUnitParams } from "../model/page";
 import { BatchRequest,BatchResult } from "../model/batch";
 import { Response } from "../model/response"; 
 import { HowellAuthHttp } from "./howell-auth-http";
+import { plainToClass } from "class-transformer";
  
 export class DivisionRequestService extends SaveModel{
     url: url.Division;
@@ -16,48 +17,63 @@ export class DivisionRequestService extends SaveModel{
         super();
         this.url = new url.Division();
     }
-    create(item:Division){ 
-        return this.requestService.post<Division, Response<Division>>(this.url.create(), this.toModel(item,this.formMustField.division));
+    async create(item:Division){ 
+        let response = await this.requestService.post<Division, Response<Division>>(this.url.create(), this.toModel(item,this.formMustField.division));
+        return plainToClass(Division, response.Data);
     }
 
-    createMore(item:BatchRequest){ 
-        return this.requestService.post<BatchRequest, Response<BatchResult>>(this.url.create(), item);
+    async createMore(item:BatchRequest){ 
+        let response = await this.requestService.post<BatchRequest, Response<BatchResult>>(this.url.create(), item);
+        return plainToClass(BatchResult, response.Data);
     }
 
-    get(id: string) {
-        return this.requestService.get<Response<Division>>(this.url.get(id));
+    async get(id: string) {
+        let response = await this.requestService.get<Response<Division>>(this.url.get(id));
+        return plainToClass(Division, response.Data);
     }
 
-    set(item: Division){
-        return this.requestService.put<Division, Response<Division>>(this.url.edit(item.Id), this.toModel(item,this.formMustField.division));
+    async set(item: Division){
+        let response = await this.requestService.put<Division, Response<Division>>(this.url.edit(item.Id), this.toModel(item,this.formMustField.division));
+        return plainToClass(Division, response.Data);
     }
 
-    del(id: string) {
-        return this.requestService.delete<Division>(this.url.del(id));
+    async del(id: string) {
+        let response = await this.requestService.delete<Response<Division>>(this.url.del(id));
+        return plainToClass(Division, response.Data);
     }
 
-    list(item:GetDivisionsParams){
-        return this.requestService.post<GetDivisionsParams, Response<PagedList<Division>>>(this.url.list(), item);
+    async list(item:GetDivisionsParams){
+        let response = await this.requestService.post<GetDivisionsParams, Response<PagedList<Division>>>(this.url.list(), item);
+        response.Data.Data =  plainToClass(Division, response.Data.Data);
+        return response.Data;
     }
 
-    tree(){
-        return this.requestService.get<DivisionTree>(this.url.tree());
+    async tree(){
+        let response = await this.requestService.get<Response<DivisionTree>>(this.url.tree());
+        return plainToClass(DivisionTree, response.Data);
     }
 
-    volumesHistory(item:PageTimeUnitParams,divisionsId:string){
-        return this.requestService.post<PageTimeUnitParams, Response<PagedList<GarbageVolume>>>(this.url.volumesHistory(divisionsId), item);
+    async volumesHistory(item:PageTimeUnitParams,divisionsId:string){
+        let response = await this.requestService.post<PageTimeUnitParams, Response<PagedList<GarbageVolume>>>(this.url.volumesHistory(divisionsId), item);
+        response.Data.Data =  plainToClass(GarbageVolume, response.Data.Data);
+        return response.Data;
     }
 
-    eventNumbersHistory(item:PageTimeUnitParams,divisionsId:string){
-        return this.requestService.post<PageTimeUnitParams, Response<PagedList<EventNumberStatistic>>>(this.url.eventNumbersHistory(divisionsId), item);
+    async eventNumbersHistory(item:PageTimeUnitParams,divisionsId:string){
+        let response = await this.requestService.post<PageTimeUnitParams, Response<PagedList<EventNumberStatistic>>>(this.url.eventNumbersHistory(divisionsId), item);
+        response.Data.Data =  plainToClass(EventNumberStatistic, response.Data.Data);
+        return response.Data;
     }
 
-    statisticNumber(divisionsId: string) {
-        return this.requestService.get<DivisionNumberStatistic>(this.url.statisticNumber(divisionsId));
+    async statisticNumber(divisionsId: string) {
+        let response = await this.requestService.get<Response<DivisionNumberStatistic>>(this.url.statisticNumber(divisionsId));
+        return plainToClass(Division, response.Data);
     }
 
-    statisticNumberList(item:GetDivisionStatisticNumbersParams){
-        return this.requestService.post<GetDivisionStatisticNumbersParams, Response<PagedList<DivisionNumberStatistic>>>(this.url.statisticNumberList(), item);
+    async statisticNumberList(item:GetDivisionStatisticNumbersParams){
+        let response = await this.requestService.post<GetDivisionStatisticNumbersParams, Response<PagedList<DivisionNumberStatistic>>>(this.url.statisticNumberList(), item);
+        response.Data.Data =  plainToClass(DivisionNumberStatistic, response.Data.Data);
+        return response.Data;
     }
 }
 

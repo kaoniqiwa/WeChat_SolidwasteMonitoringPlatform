@@ -214,8 +214,8 @@ class StationList {
         }
 
         const res = await this.service.division.list(params);
-        if (res && res.Data && res.Data.Data && res.Data.Data.length > 0) {
-            return res.Data.Data[0];
+        if (res && res.Data && res.Data.length > 0) {
+            return res.Data[0];
         }
     }
 
@@ -229,11 +229,11 @@ class StationList {
 
         return this.service.garbageStation.list(request).then(x => {
 
-            page = x.Data.Page;
+            page = x.Page;
             if (this.myList && this.myTemplate) {
                 let content = this.myTemplate?.content as DocumentFragment;
                 this.myList.innerHTML = '';
-                x.Data.Data.forEach(item => {
+                x.Data.forEach(item => {
                     // 如果本地数据库没有记录，则保存记录，且checkbox 初始状态为未选择
                     if (!storedData.has(item.Id)) {
                         storedData.set(item.Id, {
