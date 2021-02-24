@@ -13,12 +13,10 @@
     "history": "parcel ./app/page/history.html --port 4200",
     "garbage": "parcel ./app/page/garbage-stations.html --port 4200",
     "map": "parcel ./app/page/map.html --port 4200",
-
     "debug": "parcel build ./app/page/index.html --out-dir dist --public-url /",
     "build": "parcel build ./app/page/index.html --out-dir dist/WeChat --public-url /WeChat/",
     "test": "parcel build ./app/page/index.html --out-dir dist/wechat/test --public-url /WeChat/test/",
-
-    "clean": "rm -rf ./dist"
+    "clean": "rmdir /q /s dist"
   },
   "keywords": [],
   "author": "",
@@ -30,7 +28,10 @@
   },
   "dependencies": {
     "axios": "^0.21.0",
+    "class-transformer": "^0.4.0",
     "parcel-bundler": "^1.12.4",
+    "reflect-metadata": "^0.1.13",
+    "swiper": "^6.4.11",
     "ts-md5": "^1.2.7",
     "tslib": "^2.0.3"
   }
