@@ -240,4 +240,14 @@ export interface IDetailsEvent {
      * @memberof IGarbageStationController
      */
     getImageUrl(id: string): string | undefined;
+    
+    /**
+     * 获取摄像机信息
+     *
+     * @param {string} garbageStationId
+     * @param {string} cameraId
+     * @returns {Promise<Camera>}
+     * @memberof IDetailsEvent
+     */
+    GetCamera(garbageStationId:string, cameraId:string):Promise<Camera>;
 }

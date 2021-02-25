@@ -19,6 +19,7 @@ import { IDetailsEvent, OneDay, Paged } from "./data-controllers/IController";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import { Service } from "../../data-core/repuest/service";
 import { LoopPageControl } from "./data-controllers/modules/LoopPageControl";
+import Swiper from "swiper";
 
 export namespace EventInformationPage {
     export class EventDetail {
@@ -58,7 +59,7 @@ export namespace EventInformationPage {
             this.template = document.getElementById("template") as HTMLTemplateElement;
             this.init();
             this.imageController = new ImageController("#origin-img");
-            debugger;
+
             this.loopController = new LoopPageControl("#swiper-page", {
                 callback: (index, element) => {
                     if (this.isLoaded) {
@@ -70,7 +71,7 @@ export namespace EventInformationPage {
                     this.isLoaded = true;
                 }
             });
-            debugger;
+
             this.loopController.init(this.PageIndex);
         }
 
@@ -108,15 +109,19 @@ export namespace EventInformationPage {
                 }
 
             }
-
+            let wrapper = document.querySelector(".swiper-wrapper.page") as HTMLDivElement;
             if (this.paged) {
-                debugger;
-                let wrapper = document.querySelector(".swiper-wrapper.page") as HTMLDivElement;
+
+
                 for (let i = 0; i < this.paged.count!; i++) {
                     let slide = document.createElement("div");
                     slide.className = "swiper-slide page";
                     wrapper.appendChild(slide);
                 }
+            } else {
+                let slide = document.createElement("div");
+                slide.className = "swiper-slide page";
+                wrapper.appendChild(slide);
             }
 
 
@@ -145,7 +150,7 @@ export namespace EventInformationPage {
             }
         }
 
-        fillDetail(item: IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord, element?: HTMLElement) {
+        fillEventRecord(item: IllegalDropEventRecord | MixedIntoEventRecord, element?: HTMLElement) {
             let source: HTMLElement | Document = element ? element : document;
 
             const police__type = source.getElementsByClassName('police__type'),
@@ -166,8 +171,6 @@ export namespace EventInformationPage {
                 }
 
             }
-
-
 
             if (police__type) {
                 for (let i = 0; i < police__type.length; i++) {
@@ -260,6 +263,162 @@ export namespace EventInformationPage {
 
                     });
                 }
+            }
+        }
+        fillGarbageFullEventRecord(item: GarbageFullEventRecord, element?: HTMLElement) {
+            let source: HTMLElement | Document = element ? element : document;
+
+            const police__type = source.getElementsByClassName('police__type'),
+                camera__name = source.querySelector('.camera__name') as HTMLElement,
+                station__name = source.getElementsByClassName('station__name'),
+                rc__name = source.getElementsByClassName('rc__name'),
+                police__time = source.getElementsByClassName('police__time');
+
+
+            if (source instanceof HTMLElement) {
+                source.id = item.Id;
+            }
+
+            let btn = source.getElementsByClassName("back__btn")
+            if (btn) {
+                for (let i = 0; i < btn.length; i++) {
+                    btn[i].addEventListener("click", () => {
+                        window.parent.showOrHideAside();
+                        // location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
+                    });
+                }
+
+            }
+
+            if (police__type) {
+                for (let i = 0; i < police__type.length; i++) {
+                    (police__type[i] as HTMLSpanElement).innerText = Language.EventType(item.EventType);
+                }
+            }
+
+
+            if (station__name) {
+                for (let i = 0; i < station__name.length; i++) {
+                    (station__name[i] as HTMLSpanElement).innerText = item.Data.StationName;
+                }
+            }
+
+            if (item.Data.DivisionName && rc__name) {
+                for (let i = 0; i < rc__name.length; i++) {
+                    (rc__name[i] as HTMLSpanElement).innerText = item.Data.DivisionName;
+                }
+            }
+
+            if (police__time) {
+                for (let i = 0; i < police__time.length; i++) {
+                    (police__time[i] as HTMLSpanElement).innerText = dateFormat(new Date(item.EventTime), 'yyyy-MM-dd HH:mm:ss');
+                }
+            }
+
+
+            let url: string = DataController.defaultImageUrl;
+
+            camera__name.innerHTML = "";
+            if (item.Data.CameraImageUrls && item.Data.CameraImageUrls.length > 0) {                
+                console.log(item.Data.CameraImageUrls);
+                let container = source.querySelector(".swiper-container-img") as HTMLDivElement;
+                let wrapper = container.querySelector(".swiper-wrapper") as HTMLDivElement;
+                let template = wrapper.querySelector(".weui-form-preview__item") as HTMLDivElement;
+                let urls = new Array<string>();
+                for (let i = 0; i < item.Data.CameraImageUrls.length; i++) {
+                    let element = template;
+                    if (i > 0) {
+                        element = template.cloneNode(true) as HTMLDivElement;
+                        wrapper.appendChild(element);
+                    }
+
+                    const detail_img = element.querySelector(".detail_img") as HTMLImageElement;
+
+
+                    const imageUrl = item.Data.CameraImageUrls[i];
+                    url = this.dataController.getImageUrl(imageUrl.ImageUrl) as string;
+                    urls.push(url);
+
+
+                    if (detail_img) {
+                        detail_img.src = url;
+
+                        detail_img.onload = () => {
+                            detail_img.removeAttribute("data-src");
+                        };
+                        detail_img.addEventListener("click", () => {
+                            let selectors = {
+                                //frameId: "max-frame",
+                                imgId: "max-img"
+                            }
+                            let index = 0;
+                            let str = detail_img.getAttribute("index");
+                            if(str)
+                            {
+                                index = parseInt(str);
+                            }
+                            this.imageController.showDetail(selectors, urls, index);
+                        });
+
+
+                        detail_img.setAttribute("cameraName", imageUrl.CameraName);
+                        detail_img.setAttribute("cameraId", imageUrl.CameraId);
+                        detail_img.setAttribute("stationId", item.Data.StationId);
+                        detail_img.setAttribute("index", i.toString());
+
+                    }
+                }
+                let swiper = new Swiper("#" + item.Id + " .swiper-container-img", {
+                    on: {
+                        slideChange: async (sw) => {
+                            let img = sw.slides[sw.activeIndex].querySelector(".detail_img") as HTMLImageElement
+                            let cameraName = img.getAttribute("cameraName");
+                            if (!cameraName || cameraName == "null") {
+                                let stationId = img.getAttribute("stationId");
+                                let cameraId = img.getAttribute("cameraId");
+                                if (stationId && cameraId) {
+                                    let camera = await this.dataController.GetCamera(stationId, cameraId);
+                                    cameraName = camera.Name;
+                                }
+                            }
+                            let camera__name = source.querySelector('.camera__name') as HTMLElement;
+                            if (cameraName) {
+                                camera__name.innerHTML = cameraName;
+                            }
+                        },
+                        init: async (sw) => {
+                            let img = sw.slides[sw.activeIndex].querySelector(".detail_img") as HTMLImageElement
+                            let cameraName = img.getAttribute("cameraName");
+                            if (!cameraName || cameraName == "null") {
+                                let stationId = img.getAttribute("stationId");
+                                let cameraId = img.getAttribute("cameraId");
+                                if (stationId && cameraId) {
+                                    let camera = await this.dataController.GetCamera(stationId, cameraId);
+                                    cameraName = camera.Name;
+                                }
+                            }
+                            let camera__name = source.querySelector("#" + item.Id + ' .camera__name') as HTMLElement;
+                            if (cameraName) {
+                                camera__name.innerHTML = cameraName;
+                            }
+                        }
+                    },
+                    pagination: {
+                        el: '.swiper-pagination-img',
+                        type: 'fraction',
+                    }
+                });
+            }
+        }
+
+
+
+        fillDetail(item: IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord, element?: HTMLElement) {
+            if (item instanceof GarbageFullEventRecord) {
+                this.fillGarbageFullEventRecord(item, element);
+            }
+            else {
+                this.fillEventRecord(item, element);
             }
         }
 

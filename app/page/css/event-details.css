@@ -52,7 +52,7 @@ html,body{
     position: absolute;
     width: calc(100% - 30px);
     height: calc(100% - 45px);
-    top: 15px;
+    top: 0px;
     pointer-events:none;
     background-repeat: no-repeat;
 }

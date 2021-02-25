@@ -1,5 +1,6 @@
 import { PagedList } from "../../../data-core/model/page";
 import { Response } from "../../../data-core/model/response";
+import { Camera } from "../../../data-core/model/waste-regulation/camera";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
 import { EventData, EventRecordData, GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record";
 import { GarbageFullEventRecord } from "../../../data-core/model/waste-regulation/garbage-full-event-record";
@@ -56,11 +57,11 @@ export class DataController implements IDataController, IGarbageStationControlle
 
     getDivision = async (divisionId: string) => {
         let promise = await this.service.division.get(divisionId);
-        return promise.Data;
+        return promise;
     }
     getCameraList = async (garbageStationId: string, loadImage: (cameraId: string, url?: string) => void) => {
         let promise = await this.service.camera.list(garbageStationId);
-        return promise.Data.sort((a, b) => {
+        return promise.sort((a, b) => {
             return a.CameraUsage - b.CameraUsage || a.Name.localeCompare(b.Name);
         }).map(x => {
             if (x.ImageUrl) {
@@ -86,7 +87,7 @@ export class DataController implements IDataController, IGarbageStationControlle
     }
     getGarbageStationEventCount = async (garbageStationIds: string[]) => {
         const promise = await this.service.garbageStation.statisticNumberList({ Ids: garbageStationIds });
-        return promise.Data.Data.map(x => {
+        return promise.Data.map(x => {
             let result: StatisticNumber = {
                 id: x.Id,
                 name: x.Name,
@@ -94,17 +95,18 @@ export class DataController implements IDataController, IGarbageStationControlle
                 mixedIntoNumber: 0,
                 garbageFullNumber: 0
             };
-
-            let illegalDropNumber = x.TodayEventNumbers.find(y => y.EventType == EventType.IllegalDrop);
-            if (illegalDropNumber)
-                result.illegalDropNumber = illegalDropNumber.DayNumber;
-            let mixedIntoNumber = x.TodayEventNumbers.find(y => y.EventType == EventType.MixedInto);
-            if (mixedIntoNumber) {
-                result.mixedIntoNumber = mixedIntoNumber.DayNumber;
-            }
-            let garbageFullNumber = x.TodayEventNumbers.find(y => y.EventType == EventType.GarbageFull);
-            if (garbageFullNumber) {
-                result.garbageFullNumber = garbageFullNumber.DayNumber;
+            if (x.TodayEventNumbers) {
+                let illegalDropNumber = x.TodayEventNumbers.find(y => y.EventType == EventType.IllegalDrop);
+                if (illegalDropNumber)
+                    result.illegalDropNumber = illegalDropNumber.DayNumber;
+                let mixedIntoNumber = x.TodayEventNumbers.find(y => y.EventType == EventType.MixedInto);
+                if (mixedIntoNumber) {
+                    result.mixedIntoNumber = mixedIntoNumber.DayNumber;
+                }
+                let garbageFullNumber = x.TodayEventNumbers.find(y => y.EventType == EventType.GarbageFull);
+                if (garbageFullNumber) {
+                    result.garbageFullNumber = garbageFullNumber.DayNumber;
+                }
             }
             return result;
         });
@@ -130,7 +132,7 @@ export class DataController implements IDataController, IGarbageStationControlle
 
         let params = this.getEventListParams(day, page, type, ids);
 
-        let promise: Response<PagedList<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord>>
+        let promise: PagedList<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord>
 
         switch (type) {
             case EventType.IllegalDrop:
@@ -146,12 +148,12 @@ export class DataController implements IDataController, IGarbageStationControlle
                 return undefined;
         }
 
-        promise.Data.Data.forEach(x => {
-            if (x.ImageUrl) {
-                x.ImageUrl = this.service.medium.getData(x.ImageUrl) as string;
-            }
-        });
-        return promise.Data;
+        // promise.Data.forEach(x => {
+        //     if (x.ImageUrl) {
+        //         x.ImageUrl = this.service.medium.getData(x.ImageUrl) as string;
+        //     }
+        // });
+        return promise;
 
     }
 
@@ -159,7 +161,7 @@ export class DataController implements IDataController, IGarbageStationControlle
 
 
     async GetEventRecordById(type: EventType, eventId: string) {
-        let response: Response<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord>;
+        let response: IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord;
         switch (type) {
             case EventType.IllegalDrop:
                 response = await this.service.event.illegalDropSingle(eventId);
@@ -173,13 +175,13 @@ export class DataController implements IDataController, IGarbageStationControlle
             default:
                 return undefined;
         }
-        return response.Data;
+        return response;
     }
 
 
     GetEventRecord(type: EventType, eventId: string): Promise<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | undefined>;
-    GetEventRecord(type: EventType, index: number, day?:OneDay): Promise<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | undefined>;
-    async GetEventRecord(type: EventType, index: string | number, day?:OneDay) {
+    GetEventRecord(type: EventType, index: number, day?: OneDay): Promise<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | undefined>;
+    async GetEventRecord(type: EventType, index: string | number, day?: OneDay) {
         if (typeof index === "string") {
             return await this.GetEventRecordById(type, index);
         }
@@ -199,6 +201,9 @@ export class DataController implements IDataController, IGarbageStationControlle
     }
 
 
+    GetCamera(garbageStationId:string, cameraId:string):Promise<Camera>{
+        return this.service.camera.get(garbageStationId, cameraId)
+    }
 
 
 }

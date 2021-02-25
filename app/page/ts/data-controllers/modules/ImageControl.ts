@@ -38,15 +38,15 @@ export class ImageController {
         });
     }
 
-    showDetail(selectors: { frameId: string, imgId: string }, urls: string[], index: number = 0) {
+    showDetail(selectors: { frameId?: string, imgId: string }, urls: string[], index: number = 0) {
         for (let i = 0; i < urls.length; i++) {
             this.swiper.virtual.appendSlide('<div class="swiper-zoom-container"><img id="' + selectors.imgId + '" src="' + urls[i] +
-                '" /><img class="max-frame" id="'+selectors.frameId+'"></div>');
+                '" />' + (selectors.frameId ? '<img class="max-frame" id="' + selectors.frameId + '">' : '') + '</div>');
         }
-        this.swiper.slideTo(index);
+        //this.swiper.slideTo(index);
 
         $(this.originImg).fadeIn(() => {
-            this.originStatus = true;            
+            this.originStatus = true;
         })
         this.swiperStatus = true;
 
