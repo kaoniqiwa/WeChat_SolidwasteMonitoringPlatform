@@ -137,6 +137,10 @@ class GarbageStationClient {
             this.bindEvents();
         }
 
+        let icon = document.querySelector('#img_division i') as HTMLElement;
+        icon.className = "howell-icon-list";
+        this.zoomIn();
+
     }
     bindEvents() {
         this.btnDivision.addEventListener('click', () => {
