@@ -234,6 +234,7 @@ body {
   font-size: 0;
   height: 0;
   padding-bottom: 23%;
+  overflow: hidden;
 }
 .hw-content__card .swiper-container .swiper-wrapper .swiper-slide.zoomOut {
   width: 100%;
