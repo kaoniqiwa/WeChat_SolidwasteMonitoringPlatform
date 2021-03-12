@@ -94,7 +94,7 @@ html,body{
     width: 140px;
     padding: 0 2px;
     box-sizing: border-box;
-    transition: all 0.3s ease-in-out;
+    /* transition: all 0.3s ease-in-out; */
     font-size: 0;
     height: 100%;
   }

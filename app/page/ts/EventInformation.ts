@@ -276,7 +276,7 @@ export namespace EventInformationPage {
 
 
             if (source instanceof HTMLElement) {
-                source.id = item.Id;
+                source.id = item.EventId!;
             }
 
             let btn = source.getElementsByClassName("back__btn")
@@ -346,6 +346,9 @@ export namespace EventInformationPage {
                         detail_img.onload = () => {
                             detail_img.removeAttribute("data-src");
                         };
+                        detail_img.onerror = ()=>{
+                            // detail_img.src = 
+                        }
                         detail_img.addEventListener("click", () => {
                             let selectors = {
                                 //frameId: "max-frame",
@@ -368,19 +371,19 @@ export namespace EventInformationPage {
 
                     }
                 }
-                let swiper = new Swiper("#" + item.Id + " .swiper-container-img", {
+                let swiper = new Swiper(source.querySelector(".swiper-container-img") as HTMLElement, {                    
                     on: {
                         slideChange: async (sw) => {
                             let img = sw.slides[sw.activeIndex].querySelector(".detail_img") as HTMLImageElement
                             let cameraName = img.getAttribute("cameraName");
-                            if (!cameraName || cameraName == "null") {
-                                let stationId = img.getAttribute("stationId");
-                                let cameraId = img.getAttribute("cameraId");
-                                if (stationId && cameraId) {
-                                    let camera = await this.dataController.GetCamera(stationId, cameraId);
-                                    cameraName = camera.Name;
-                                }
-                            }
+                            // if (!cameraName || cameraName == "null") {
+                            //     let stationId = img.getAttribute("stationId");
+                            //     let cameraId = img.getAttribute("cameraId");
+                            //     if (stationId && cameraId) {
+                            //         let camera = await this.dataController.GetCamera(stationId, cameraId);
+                            //         cameraName = camera.Name;
+                            //     }
+                            // }                            
                             let camera__name = source.querySelector('.camera__name') as HTMLElement;
                             if (cameraName) {
                                 camera__name.innerHTML = cameraName;
@@ -389,15 +392,15 @@ export namespace EventInformationPage {
                         init: async (sw) => {
                             let img = sw.slides[sw.activeIndex].querySelector(".detail_img") as HTMLImageElement
                             let cameraName = img.getAttribute("cameraName");
-                            if (!cameraName || cameraName == "null") {
-                                let stationId = img.getAttribute("stationId");
-                                let cameraId = img.getAttribute("cameraId");
-                                if (stationId && cameraId) {
-                                    let camera = await this.dataController.GetCamera(stationId, cameraId);
-                                    cameraName = camera.Name;
-                                }
-                            }
-                            let camera__name = source.querySelector("#" + item.Id + ' .camera__name') as HTMLElement;
+                            // if (!cameraName || cameraName == "null") {
+                            //     let stationId = img.getAttribute("stationId");
+                            //     let cameraId = img.getAttribute("cameraId");
+                            //     if (stationId && cameraId) {
+                            //         let camera = await this.dataController.GetCamera(stationId, cameraId);
+                            //         cameraName = camera.Name;
+                            //     }
+                            // }
+                            let camera__name = source.querySelector('.camera__name') as HTMLElement;
                             if (cameraName) {
                                 camera__name.innerHTML = cameraName;
                             }

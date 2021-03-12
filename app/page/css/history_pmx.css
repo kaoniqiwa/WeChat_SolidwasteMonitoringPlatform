@@ -70,7 +70,7 @@
   flex-grow: 1;
   margin-top: 1px;
   background-color: hsl(0, 0%, 100%);
-  overflow: auto;
+  /* overflow: auto; */
   /* 受swiper.css margin影响，需要设置 width*/
   width: 100%;
 }

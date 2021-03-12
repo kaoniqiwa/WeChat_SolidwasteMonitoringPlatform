@@ -237,7 +237,7 @@ class AddUser {
             role.Name = v.name;
             role.Id = v.id;
             role.RoleFlags = 0;
-            role.AllSubResources = false;
+            role.AllSubResources = true;
             role.ResourceType = v.resourceType
             Resources.push(role)
         }

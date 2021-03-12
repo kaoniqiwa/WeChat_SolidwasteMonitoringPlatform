@@ -30,8 +30,7 @@ export class LoopPageControl {
             this.swiper = new Swiper(this.element, {    
                 initialSlide:index,            
                 on: {
-                    init:(sw:any)=>{
-                        debugger
+                    init:(sw:any)=>{                        
                         try {                
                             console.log(sw)            ;
                             if (this.loaded) {

@@ -46,16 +46,7 @@ export class EventRequestService {
 
         let response = await this.requestService.get<Response<GarbageFullEventRecord>>(this.url.garbageFullSingle(id));
 
-        let result = plainToClass(GarbageFullEventRecord, response.Data);
-        if (result.Data.CameraImageUrls) {
-            result.Data.CameraImageUrls = result.Data.CameraImageUrls.sort((a, b) => {
-                if (a.CameraName && b.CameraName) {
-                    return a.CameraName.localeCompare(b.CameraName) && a.CameraName.length - b.CameraName.length;
-                }
-                return 0;
-            })
-        }
-        return result;
+        return plainToClass(GarbageFullEventRecord, response.Data);
     }
 
 

@@ -3,7 +3,7 @@ import { Response } from "../../../data-core/model/response";
 import { Camera } from "../../../data-core/model/waste-regulation/camera";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
 import { EventData, EventRecordData, GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record";
-import { GarbageFullEventRecord } from "../../../data-core/model/waste-regulation/garbage-full-event-record";
+import { CameraImageUrl, GarbageFullEventRecord } from "../../../data-core/model/waste-regulation/garbage-full-event-record";
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
 import { IllegalDropEventData, IllegalDropEventRecord } from "../../../data-core/model/waste-regulation/illegal-drop-event-record";
 import { MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/mixed-into-event-record";
@@ -142,7 +142,22 @@ export class DataController implements IDataController, IGarbageStationControlle
                 promise = await this.service.event.mixedIntoList(params);
                 break;
             case EventType.GarbageFull:
+                debugger;
                 promise = await this.service.event.garbageFullList(params);
+                let records = new Array<GarbageFullEventRecord>();
+                promise.Data.forEach(record => {
+                    if (record instanceof GarbageFullEventRecord) {
+                        if (record.Data.CameraImageUrls) {
+                            record.Data.CameraImageUrls = record.Data.CameraImageUrls.sort((a, b) => {
+                                if (a.CameraName && b.CameraName)
+                                    return a.CameraName.length - b.CameraName.length || a.CameraName.localeCompare(b.CameraName);
+                                return 0;
+                            });
+                        }
+                        records.push(record);
+                    }
+                })
+                promise.Data = records;
                 break;
             default:
                 return undefined;
@@ -157,17 +172,23 @@ export class DataController implements IDataController, IGarbageStationControlle
 
     }
 
-
-
-
-    async GetEventRecordById(type: EventType, eventId: string) {
+    async GetEventRecordById(type: EventType, eventId: string) {        
         let response: IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord;
         switch (type) {
             case EventType.IllegalDrop:
                 response = await this.service.event.illegalDropSingle(eventId);
                 break;
             case EventType.GarbageFull:
+                debugger;
                 response = await this.service.event.garbageFullSingle(eventId);
+                let record = (response as GarbageFullEventRecord);
+                if (record.Data.CameraImageUrls) {
+                    (response as GarbageFullEventRecord).Data.CameraImageUrls = record.Data.CameraImageUrls.sort((a, b) => {
+                        if (a.CameraName && b.CameraName)
+                            return a.CameraName.length - b.CameraName.length  || a.CameraName.localeCompare(b.CameraName);
+                        return 0;
+                    });
+                }
                 break;
             case EventType.MixedInto:
                 response = await this.service.event.mixedIntoSingle(eventId);
@@ -201,7 +222,7 @@ export class DataController implements IDataController, IGarbageStationControlle
     }
 
 
-    GetCamera(garbageStationId:string, cameraId:string):Promise<Camera>{
+    GetCamera(garbageStationId: string, cameraId: string): Promise<Camera> {
         return this.service.camera.get(garbageStationId, cameraId)
     }
 

@@ -14,6 +14,7 @@ import { Service } from "../../data-core/repuest/service";
 import { AsideControl } from "./aside";
 import { AsideListPage, AsideListPageWindow, SelectionMode } from "./aside-list";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
+import { DataController } from "./data-controllers/DataController";
 import { IGarbageStationController } from "./data-controllers/IController";
 import { ClassNameHelper, Language } from "./language";
 
@@ -149,7 +150,7 @@ class GarbageStationClient {
         })
         this.imgDivision.addEventListener('click', () => {
             // 在蒙版消失之前，所有按钮不能点击
-            
+
             if (this.originStatus) return
             if (this.zoomStatus == ZoomStatus.in) {
                 let icon = this.imgDivision.getElementsByClassName("howell-icon-list")[0]
@@ -283,8 +284,13 @@ class GarbageStationClient {
 
                     this.dataController.getCameraList(v.Id, (cameraId: string, url?: string) => {
                         let img = document.getElementById(cameraId) as HTMLImageElement;
-                        // img.setAttribute('index', index + '')
+                        // img.setAttribute('index', index + '')                        
                         img.src = url!;
+
+                        img.onerror = () => {
+                            img.src = DataController.defaultImageUrl;
+                        }
+
                     }).then(cameras => {
                         cameras.forEach((camera, index) => {
 
@@ -387,11 +393,11 @@ class GarbageStationClient {
         }
         this.asideControl.Hide();
         if (this.zoomStatus == ZoomStatus.out) {
-            
+
             this.zoomOut();
         }
         else if (this.zoomStatus == ZoomStatus.in) {
-            
+
             this.zoomIn();
         }
         else {
@@ -434,7 +440,7 @@ class GarbageStationClient {
             container.classList.add(ZoomStatus.out);
 
             let pagination = contentCard.querySelector('.swiper-pagination');
-            
+
             if (v.swiper) {
                 v.swiper.destroy();
                 v.swiper = null
