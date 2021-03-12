@@ -109,6 +109,12 @@ html,body{
     padding-right: 10px;
     /* display: none; */
   }
+  .swiper-pagination-img{
+    color:white;
+    text-align: right;
+    bottom:0px;
+    left:-4px;
+  }
 
   #origin-img {
     display: none;

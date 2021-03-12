@@ -19,7 +19,9 @@ import { IDetailsEvent, OneDay, Paged } from "./data-controllers/IController";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import { Service } from "../../data-core/repuest/service";
 import { LoopPageControl } from "./data-controllers/modules/LoopPageControl";
-import Swiper from "swiper";
+import Swiper,{Pagination} from "swiper";
+
+Swiper.use([Pagination])
 
 export namespace EventInformationPage {
     export class EventDetail {
@@ -319,7 +321,7 @@ export namespace EventInformationPage {
             let url: string = DataController.defaultImageUrl;
 
             camera__name.innerHTML = "";
-            if (item.Data.CameraImageUrls && item.Data.CameraImageUrls.length > 0) {                
+            if (item.Data.CameraImageUrls && item.Data.CameraImageUrls.length > 0) {
                 console.log(item.Data.CameraImageUrls);
                 let container = source.querySelector(".swiper-container-img") as HTMLDivElement;
                 let wrapper = container.querySelector(".swiper-wrapper") as HTMLDivElement;
@@ -346,7 +348,7 @@ export namespace EventInformationPage {
                         detail_img.onload = () => {
                             detail_img.removeAttribute("data-src");
                         };
-                        detail_img.onerror = ()=>{
+                        detail_img.onerror = () => {
                             // detail_img.src = 
                         }
                         detail_img.addEventListener("click", () => {
@@ -356,8 +358,7 @@ export namespace EventInformationPage {
                             }
                             let index = 0;
                             let str = detail_img.getAttribute("index");
-                            if(str)
-                            {
+                            if (str) {
                                 index = parseInt(str);
                             }
                             this.imageController.showDetail(selectors, urls, index);
@@ -371,6 +372,13 @@ export namespace EventInformationPage {
 
                     }
                 }
+                console.log('swiper', Swiper)
+                
+                // new Swiper('.swiper-container-img', {
+                //     pagination: {
+                //         el: '.swiper-pagination-img', type: 'fraction'
+                //     }
+                // })
                 let swiper = new Swiper(source.querySelector(".swiper-container-img") as HTMLElement, {                    
                     on: {
                         slideChange: async (sw) => {
@@ -411,6 +419,7 @@ export namespace EventInformationPage {
                         type: 'fraction',
                     }
                 });
+
             }
         }
 
@@ -553,6 +562,5 @@ export namespace EventInformationPage {
 
     let page = new Page();
     page.run();
-
 
 }
