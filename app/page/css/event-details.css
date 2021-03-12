@@ -12,6 +12,7 @@ html,body{
 .mui-page .full
 {
     height: 100%;
+    overflow: auto;
 }
 
 .weui-form-preview__value, .weui-form-preview__label
@@ -103,10 +104,10 @@ html,body{
   }
   .swiper-container.max .swiper-pagination {
     box-sizing: border-box;
-    text-align: right;
+    /* text-align: right; */
     color: white;
     padding-right: 10px;
-    display: none;
+    /* display: none; */
   }
 
   #origin-img {
