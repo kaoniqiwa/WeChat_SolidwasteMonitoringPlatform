@@ -1,9 +1,12 @@
+import Swiper,{Pagination,Virtual} from 'swiper';
+
+Swiper.use([Pagination,Virtual])
 
 declare var $: any;
 
 export class ImageController {
 
-    swiper: typeof Swiper;
+    swiper:  Swiper;
     originImg: HTMLDivElement;
     swiperStatus: boolean = false;
     originStatus: boolean = false;
