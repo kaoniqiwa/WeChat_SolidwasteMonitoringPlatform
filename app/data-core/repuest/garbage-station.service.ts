@@ -10,7 +10,7 @@ import { Response } from '../model/response';
 import { HowellAuthHttp } from './howell-auth-http';
 import { EventNumberStatistic } from '../model/waste-regulation/division-event-numbers';
 import {
-    GarbageStationNumberStatistic, GetGarbageStationStatisticNumbersParams
+    GarbageStationNumberStatistic, GarbageStationNumberStatisticV2, GetGarbageStationStatisticNumbersParams, GetGarbageStationStatisticNumbersParamsV2
 } from '../model/waste-regulation/garbage-station-number-statistic';
 import { GarbageStationType } from "../model/waste-regulation/garbage-station-type";
 import { plainToClass } from 'class-transformer';
@@ -78,6 +78,13 @@ export class GarbageStationRequestService extends SaveModel {
             Response<PagedList<GarbageStationNumberStatistic>>>(this.url.statisticNumberList(), item);
         response.Data.Data = plainToClass(GarbageStationNumberStatistic, response.Data.Data);
         return response.Data;
+    }
+
+    async statisticNumberHistoryList(params:GetGarbageStationStatisticNumbersParamsV2)
+    {
+        let response = await this.requestService.post<GetGarbageStationStatisticNumbersParamsV2, 
+        Response<Array<GarbageStationNumberStatisticV2>>>(this.url.statisticNumberHistoryList(), params);
+        return plainToClass(GarbageStationNumberStatisticV2, response.Data);
     }
 }
 

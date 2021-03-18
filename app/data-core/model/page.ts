@@ -21,7 +21,39 @@ export interface IPageParams {
 /**统计时间单位:1-Hour，2-Day */
 export enum TimeUnit {
     Hour = 1,
-    Day = 2
+    Day = 2,
+    Week = 3,
+    Month = 4
+}
+export class StatisticTime {
+    /**
+     *	年	O
+     *
+     * @type {number}
+     * @memberof StatisticTime
+     */
+    Year?: number;
+    /**
+     *
+     *
+     * @type {number}
+     * @memberof StatisticTime
+     */
+    Month?: number;
+    /**
+     *	日	O
+     *
+     * @type {number}
+     * @memberof StatisticTime
+     */
+    Day?: number;
+    /**
+     *	第几周	O
+     *
+     * @type {number}
+     * @memberof StatisticTime
+     */
+    Week?: number;
 }
 export interface IIntervalParams {
     BeginTime: Date | string;

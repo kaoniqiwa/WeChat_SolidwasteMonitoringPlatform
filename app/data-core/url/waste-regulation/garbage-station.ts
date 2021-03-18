@@ -33,6 +33,9 @@ export class GarbageStations extends GarbageBaseUrl implements IUrl {
     statisticNumberList(): string {
         return this.gateway + `GarbageStations/Statistic/Number/List`;
     }
+    statisticNumberHistoryList():string{
+        return this.gateway + `GarbageStations/Statistic/Number/History/List`
+    }
 }
 
 export class Camera extends GarbageBaseUrl implements IUrl {

@@ -5,6 +5,7 @@ import { EventNumber, EventType } from "../../../data-core/model/waste-regulatio
 import { EventData, EventRecordData } from "../../../data-core/model/waste-regulation/event-record";
 import { GarbageFullEventRecord } from "../../../data-core/model/waste-regulation/garbage-full-event-record";
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
+import { GarbageStationNumberStatistic, GarbageStationNumberStatisticV2 } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
 import { IllegalDropEventRecord } from "../../../data-core/model/waste-regulation/illegal-drop-event-record";
 import { MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/mixed-into-event-record";
 import { ResourceRole } from "../../../data-core/model/we-chat";
@@ -121,7 +122,7 @@ export interface IDataController {
      */
     getStatisticNumberList(day: OneDay): Promise<Array<StatisticNumber>>;
     /**
-     * 获取例是记录
+     * 获取历史记录
      *
      * @param {OneDay} day
      * @returns {Promise<Array<EventNumber>>}
@@ -250,4 +251,33 @@ export interface IDetailsEvent {
      * @memberof IDetailsEvent
      */
     GetCamera(garbageStationId:string, cameraId:string):Promise<Camera>;
+}
+
+export interface IGarbageStationNumberStatistic{
+    /**
+     * 获取垃圾厢房列表
+     *
+     * @returns {Promise<Array<GarbageStation>>}
+     * @memberof IGarbageStationController
+     */
+     getGarbageStationList(): Promise<Array<GarbageStation>>;
+
+    /**
+     * 获取垃圾厢房数据统计
+     *
+     * @param {string[]} ids 垃圾厢房ID
+     * @returns {Promise<Array<GarbageStationNumberStatistic>>}
+     * @memberof IGarbageStationNumberStatistic
+     */
+    getGarbageStationNumberStatisticList(ids:string[]):Promise<Array<GarbageStationNumberStatistic>>
+
+    /**
+     * 获取垃圾厢房数据统计
+     *
+     * @param {string} id 垃圾厢房ID
+     * @param {OneDay} day 日期
+     * @returns {Promise<Array<GarbageStationNumberStatisticV2>>} 
+     * @memberof IGarbageStationNumberStatistic
+     */
+    getGarbageStationNumberStatisticByDay(id:string, day:OneDay):Promise<Array<GarbageStationNumberStatisticV2>>
 }

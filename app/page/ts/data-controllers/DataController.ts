@@ -1,17 +1,18 @@
-import { PagedList } from "../../../data-core/model/page";
+import { PagedList, TimeUnit } from "../../../data-core/model/page";
 import { Response } from "../../../data-core/model/response";
 import { Camera } from "../../../data-core/model/waste-regulation/camera";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
 import { EventData, EventRecordData, GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record";
 import { CameraImageUrl, GarbageFullEventRecord } from "../../../data-core/model/waste-regulation/garbage-full-event-record";
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
+import { GarbageStationNumberStatistic, GarbageStationNumberStatisticV2, GetGarbageStationStatisticNumbersParams } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
 import { IllegalDropEventData, IllegalDropEventRecord } from "../../../data-core/model/waste-regulation/illegal-drop-event-record";
 import { MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/mixed-into-event-record";
 import { ResourceRole } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
-import { IDataController, IDetailsEvent, IEventHistory, IGarbageStationController, OneDay, Paged, StatisticNumber } from "./IController";
+import { IDataController, IDetailsEvent, IEventHistory, IGarbageStationController, IGarbageStationNumberStatistic, OneDay, Paged, StatisticNumber } from "./IController";
 
-export class DataController implements IDataController, IGarbageStationController, IEventHistory, IDetailsEvent {
+export class DataController implements IDataController, IGarbageStationController, IEventHistory, IDetailsEvent, IGarbageStationNumberStatistic {
 
     static readonly defaultImageUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABIAAAAKIAQAAAAAgULygAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAd2KE6QAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAHdElNRQflAgIBCxpFwPH8AAAAcklEQVR42u3BMQEAAADCoPVPbQZ/oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+A28XAAEDwmj2AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIxLTAyLTAyVDAxOjExOjI2KzAwOjAwOo9+nAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMS0wMi0wMlQwMToxMToyNiswMDowMEvSxiAAAAAASUVORK5CYII=";
 
@@ -172,7 +173,7 @@ export class DataController implements IDataController, IGarbageStationControlle
 
     }
 
-    async GetEventRecordById(type: EventType, eventId: string) {        
+    async GetEventRecordById(type: EventType, eventId: string) {
         let response: IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord;
         switch (type) {
             case EventType.IllegalDrop:
@@ -185,7 +186,7 @@ export class DataController implements IDataController, IGarbageStationControlle
                 if (record.Data.CameraImageUrls) {
                     (response as GarbageFullEventRecord).Data.CameraImageUrls = record.Data.CameraImageUrls.sort((a, b) => {
                         if (a.CameraName && b.CameraName)
-                            return a.CameraName.length - b.CameraName.length  || a.CameraName.localeCompare(b.CameraName);
+                            return a.CameraName.length - b.CameraName.length || a.CameraName.localeCompare(b.CameraName);
                         return 0;
                     });
                 }
@@ -225,6 +226,42 @@ export class DataController implements IDataController, IGarbageStationControlle
     GetCamera(garbageStationId: string, cameraId: string): Promise<Camera> {
         return this.service.camera.get(garbageStationId, cameraId)
     }
+
+
+
+    /**
+     * 获取垃圾厢房数据统计
+     *
+     * @param {string[]} ids 垃圾厢房ID
+     * @returns {Promise<GarbageStationNumberStatistic[]>}
+     * @memberof DataController
+     */
+    async getGarbageStationNumberStatisticList(ids: string[]): Promise<GarbageStationNumberStatistic[]> {
+        let params = new GetGarbageStationStatisticNumbersParams();
+        params.Ids = ids;
+        let response = await this.service.garbageStation.statisticNumberList(params);
+        return response.Data;
+    }
+
+    /**
+     * 获取垃圾厢房数据统计
+     *
+     * @param {string} id 垃圾厢房ID
+     * @param {OneDay} day 日期
+     * @returns {Promise<GarbageStationNumberStatisticV2[]>}
+     * @memberof DataController
+     */
+    async getGarbageStationNumberStatistic(id: string, day: OneDay): Promise<GarbageStationNumberStatisticV2[]> {
+
+         let response = this.service.garbageStation.statisticNumberHistoryList({
+             BeginTime:day.begin.toJSON(),
+             EndTime:day.end.toJSON(),
+             GarbageStationIds:[id],
+             TimeUnit:TimeUnit.Day
+         })
+         return response;
+    }
+
 
 
 }
