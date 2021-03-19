@@ -47,7 +47,7 @@ body{
 }
 
 .card.top{
-    /* height: 345px; */
+    height: 335px;
 }
 .card.chart{
     height: 256px;
@@ -93,4 +93,15 @@ margin-top: 10px;
 
 .orange-bg{
     background-color: orange;
+}
+.swiper-pagination{
+   
+    text-align: right;
+    left:-15px  !important;
+}
+#rank-pagination{
+    bottom:88% !important;
+}
+#chart-pagination{
+    bottom:86% !important;
 }

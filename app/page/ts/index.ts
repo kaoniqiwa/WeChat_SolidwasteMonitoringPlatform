@@ -8,10 +8,11 @@ import { OneDay, Paged } from "./data-controllers/IController";
 export interface NavigationWindow extends Window {
     User: SessionUser;
     Authentication: HowellAuthHttp;
-    RecordPage?:Paged;
-    Day?:OneDay;
+    RecordPage?: Paged;
+    Day?: OneDay;
 }
 
+// 命名空间编译成自执行函数
 namespace Navigation {
 
     window.recordDetails = null;
@@ -70,7 +71,7 @@ namespace Navigation {
     (window as unknown as NavigationWindow).User = new SessionUser();
     let index = 0;
 
-
+    // 获得OpenId
     var search = decodeURI(document.location.search).substr(1);
 
     var query = search.split('&');
@@ -98,6 +99,7 @@ namespace Navigation {
             querys[p[0].toLocaleLowerCase()] = p[1];
         }
     }
+    // 有OpenId,则获得该OpenId的信息
     if (querys.openid) {
         new HowellHttpClient.HttpClient().login(
             async (http: HowellAuthHttp) => {
@@ -121,6 +123,7 @@ namespace Navigation {
                 }
                 console.log(index);
                 if (index >= 0) {
+                    // 手动触发按钮点击动作
                     (items[index] as HTMLLinkElement).click();
                 }
             },

@@ -53,7 +53,10 @@ export class DataController implements IDataController, IGarbageStationControlle
     };
     getGarbageStationStatisticNumberListInToday!: (sources: ResourceRole[]) => Promise<Array<StatisticNumber>>
     getStatisticNumberList!: (day: OneDay) => Promise<StatisticNumber[]>;
-    getHistory!: (day: OneDay) => Promise<EventNumber[]>;
+    getHistory!: (day: OneDay) => Promise<EventNumber[] | {
+        'IllegalDrop': Array<EventNumber>,
+        'MixedInto': Array<EventNumber>,
+    }>;
 
 
     getDivision = async (divisionId: string) => {
@@ -253,13 +256,13 @@ export class DataController implements IDataController, IGarbageStationControlle
      */
     async getGarbageStationNumberStatistic(id: string, day: OneDay): Promise<GarbageStationNumberStatisticV2[]> {
 
-         let response = this.service.garbageStation.statisticNumberHistoryList({
-             BeginTime:day.begin.toJSON(),
-             EndTime:day.end.toJSON(),
-             GarbageStationIds:[id],
-             TimeUnit:TimeUnit.Day
-         })
-         return response;
+        let response = this.service.garbageStation.statisticNumberHistoryList({
+            BeginTime: day.begin.toJSON(),
+            EndTime: day.end.toJSON(),
+            GarbageStationIds: [id],
+            TimeUnit: TimeUnit.Day
+        })
+        return response;
     }
 
 

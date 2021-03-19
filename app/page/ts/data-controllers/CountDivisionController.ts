@@ -40,7 +40,7 @@ export class CountDivisionController extends DataController implements IDataCont
 	// }
 
 
-	getGarbageStationStatisticNumberListInToday = async (sources:ResourceRole[]):Promise<Array<StatisticNumber>>=>{
+	getGarbageStationStatisticNumberListInToday = async (sources: ResourceRole[]): Promise<Array<StatisticNumber>> => {
 		const responseStatistic = await this.service.garbageStation.statisticNumberList({
 			Ids: sources.map(x => x.Id)
 		});
@@ -154,7 +154,7 @@ export class CountDivisionController extends DataController implements IDataCont
 	}
 
 	getStatisticNumberList = async (day: OneDay): Promise<Array<StatisticNumber>> => {
-		
+
 		const now = new Date();
 		const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		const dataDate = new Date(day.begin.getFullYear(), day.begin.getMonth(), day.begin.getDate());
@@ -170,38 +170,57 @@ export class CountDivisionController extends DataController implements IDataCont
 	}
 
 	getHistory = async (day: OneDay) => {
-		const result = new Array<EventNumber>();
+
+		// 乱丢垃圾数组
+		const illegalDropResult = new Array<EventNumber>();
+
+		// 混合投放数组
+		const mixedIntoResult = new Array<EventNumber>();
+
 		for (let i = 0; i < this.roles.length; i++) {
 			const role = this.roles[i];
+
+			// 以小时为单位获得垃圾投放数量信息
 			const data = await this.service.division.eventNumbersHistory({
 				BeginTime: day.begin.toISOString(),
 				EndTime: day.end.toISOString(),
 				TimeUnit: TimeUnit.Hour
 			}, role.Id)
 
+			console.log('countDivisionController', data.Data)
 			for (var x of data.Data) {
 				for (const y of x.EventNumbers)
 					if (y.EventType == EventType.IllegalDrop)
-						result.push(y);
+						illegalDropResult.push(y);
+					else if (y.EventType == EventType.MixedInto)
+						mixedIntoResult.push(y)
+
+
 			}
 		}
-
+		// 获得0点至当前分钟的垃圾投放数量
 		let alldayCount = await this.getEventCount(day);
-		let count = result[result.length - 1].DayNumber;
-		let current = alldayCount.illegalDropNumber - count;
 
-		let thelast = new EventNumber();
-		thelast.DayNumber = current;
-		thelast.EventType = EventType.IllegalDrop;
-		thelast.DeltaNumber = current;
+		console.log('allDay', alldayCount)
 
-		result.push(thelast);
+		// illegalDropResult 按小时为单位计算，超过小时部分投放的垃圾数量未计算在内
+		let illegalDropCount = illegalDropResult[illegalDropResult.length - 1].DayNumber;
+		let illegalDropCurrent = alldayCount.illegalDropNumber - illegalDropCount;
 
-		return result;
+		let mixedIntoCount = mixedIntoResult[mixedIntoResult.length - 1].DayNumber;
+		let mixedIntoCurrent = alldayCount.mixedIntoNumber - mixedIntoCount;
+
+		illegalDropResult.push(new EventNumber(EventType.IllegalDrop, illegalDropCurrent, illegalDropCurrent));
+		mixedIntoResult.push(new EventNumber(EventType.MixedInto, mixedIntoCurrent, mixedIntoCurrent));
+
+		return {
+			'IllegalDrop': illegalDropResult,
+			'MixedInto': mixedIntoResult
+		};
 	}
 
 	getGarbageStationList = async () => {
-		
+
 		let result = new Array<GarbageStation>();
 		for (let i = 0; i < this.roles.length; i++) {
 			const role = this.roles[i];

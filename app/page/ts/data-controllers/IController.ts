@@ -54,7 +54,7 @@ export interface Paged {
      * @memberof Paged
      */
     size: number;
-    count?:number;
+    count?: number;
 }
 
 
@@ -128,7 +128,10 @@ export interface IDataController {
      * @returns {Promise<Array<EventNumber>>}
      * @memberof IDataController
      */
-    getHistory(day: OneDay): Promise<Array<EventNumber>>;
+    getHistory(day: OneDay): Promise<Array<EventNumber> | {
+        'IllegalDrop': Array<EventNumber>,
+        'MixedInto': Array<EventNumber>,
+    }>;
 
 }
 export interface IGarbageStationController {
@@ -213,7 +216,7 @@ export interface IEventHistory {
 }
 export interface IDetailsEvent {
 
-    
+
     /**
      * 获取事件记录
      *
@@ -223,7 +226,7 @@ export interface IDetailsEvent {
      * @memberof IDetailsEvent
      */
     GetEventRecord(type: EventType, eventId: string): Promise<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | undefined>;
-    
+
     /**
      * 获取事件记录
      *
@@ -232,16 +235,16 @@ export interface IDetailsEvent {
      * @returns {(Promise<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | undefined>)}
      * @memberof IDetailsEvent
      */
-    GetEventRecord(type: EventType, index: number, day:OneDay): Promise<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | undefined>;
-/**
-     * 获取图片URL
-     *
-     * @param {string} id 图片ID
-     * @returns {(string | undefined)}
-     * @memberof IGarbageStationController
-     */
+    GetEventRecord(type: EventType, index: number, day: OneDay): Promise<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | undefined>;
+    /**
+         * 获取图片URL
+         *
+         * @param {string} id 图片ID
+         * @returns {(string | undefined)}
+         * @memberof IGarbageStationController
+         */
     getImageUrl(id: string): string | undefined;
-    
+
     /**
      * 获取摄像机信息
      *
@@ -250,17 +253,17 @@ export interface IDetailsEvent {
      * @returns {Promise<Camera>}
      * @memberof IDetailsEvent
      */
-    GetCamera(garbageStationId:string, cameraId:string):Promise<Camera>;
+    GetCamera(garbageStationId: string, cameraId: string): Promise<Camera>;
 }
 
-export interface IGarbageStationNumberStatistic{
+export interface IGarbageStationNumberStatistic {
     /**
      * 获取垃圾厢房列表
      *
      * @returns {Promise<Array<GarbageStation>>}
      * @memberof IGarbageStationController
      */
-     getGarbageStationList(): Promise<Array<GarbageStation>>;
+    getGarbageStationList(): Promise<Array<GarbageStation>>;
 
     /**
      * 获取垃圾厢房数据统计
@@ -269,7 +272,7 @@ export interface IGarbageStationNumberStatistic{
      * @returns {Promise<Array<GarbageStationNumberStatistic>>}
      * @memberof IGarbageStationNumberStatistic
      */
-    getGarbageStationNumberStatisticList(ids:string[]):Promise<Array<GarbageStationNumberStatistic>>
+    getGarbageStationNumberStatisticList(ids: string[]): Promise<Array<GarbageStationNumberStatistic>>
 
     /**
      * 获取垃圾厢房数据统计
@@ -279,5 +282,5 @@ export interface IGarbageStationNumberStatistic{
      * @returns {Promise<Array<GarbageStationNumberStatisticV2>>} 
      * @memberof IGarbageStationNumberStatistic
      */
-    getGarbageStationNumberStatisticByDay(id:string, day:OneDay):Promise<Array<GarbageStationNumberStatisticV2>>
+     getGarbageStationNumberStatistic(id: string, day: OneDay): Promise<Array<GarbageStationNumberStatisticV2>>
 }

@@ -8,26 +8,26 @@ import { Service } from "../../data-core/repuest/service";
 import { ResourceType } from "../../data-core/model/we-chat";
 import { IDataController, StatisticNumber } from "./data-controllers/IController";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
+import Swiper, { Pagination } from 'swiper';
 
+Swiper.use([Pagination])
 
 declare var weui: any;
 
 namespace GarbageCondition {
 
 	var date = new Date();
-	const bgColor = ['red-bg', 'red-bg', 'red-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg', 'orange-bg'];
 
 
 
-
-	export class IllegalDropHistoryChart {
+	export class HistoryChart {
 		constructor(private page: Page) {
 		}
 
 		convert(datas: Array<EventNumber>): AppEChart.LineOption {
 			const lc = this.joinPart(new AppEChart.LineOption());
 			lc.seriesData = new Array();
-lc.boundaryGap = true;
+			lc.boundaryGap = true;
 
 			for (let i = 0; i < datas.length; i++) {
 				const data = datas[i];
@@ -36,8 +36,11 @@ lc.boundaryGap = true;
 			return lc;
 		}
 
-		async view(opts: AppEChart.LineOption) {
-			new AppEChart.EChartLine().init(this.page.element.chart.illegalDrop, opts);
+		async view(opts: AppEChart.LineOption, elements: HTMLElement[]) {
+
+			elements.forEach(element => {
+				new AppEChart.EChartLine().init(element, opts)
+			})
 		}
 
 		private joinPart(t1: AppEChart.LineOption) {
@@ -60,41 +63,30 @@ lc.boundaryGap = true;
 
 	}
 
-	export class IllegalDropOrder {
-
+	export class GarbageDropOrder {
 		constructor(private page: Page) { }
 
 
 
-		async view(viewModel: Array<{ name: string, subName: number, subNameAfter: string }>) {
+		async view(viewModel: Array<{ name: string, subName: number, subNameAfter: string }>, target: HTMLElement) {
 
 			var html = '';
-			this.page.element.list.illegalDrop.innerHTML = '';
+			target.innerHTML = '';
 			for (let i = 0; i < viewModel.length; i++) {
 				const t = viewModel[i];
-				if (i == viewModel.length - 1) {
-					html += ` <div class="fill-width top5-list-wrap m-b-10">
-                                        <div class="pull-left number-item text-center m-r-10  ${bgColor[i]}">
-                                            <label class="white-text ">${i + 1}</label>
-                                        </div>
-                                        <div class="pull-left card-box-title width black-text">${t.name}</div>
-                                        <div class="pull-right card-box-title sky-blue-text">${t.subName} <label class="list-desc-unit">${t.subNameAfter}</label></div>
-                                    </div> `;
-				}
-				else html += ` <div class="fill-width top5-list-wrap =">
-                              <div class="pull-left number-item text-center m-r-10  ${bgColor[i]}">
+				html += ` <div class=" top5-list-wrap">
+                              <div class="pull-left number-item ${i < 3 ? 'red-bg' : "orange-bg"}">
                                   <label class="white-text ">${i + 1}</label>
                               </div>
-                              <div class="pull-left card-box-title width black-text">${t.name}</div>
-                              <div class="pull-right card-box-title sky-blue-text">${t.subName} <label class="list-desc-unit">${t.subNameAfter}</label></div>
+                              <div class="pull-left">${t.name}</div>
+                              <div class="pull-right sky-blue-text">${t.subName} <label class="list-desc-unit">${t.subNameAfter}</label></div>
                           </div> `;
 
 			}
-			this.page.element.list.illegalDrop.insertAdjacentHTML('afterbegin', html);
+			target.insertAdjacentHTML('afterbegin', html);
 
 		}
 	}
-
 
 	export class DivisionGarbageCount {
 		constructor(private page: Page) { }
@@ -109,20 +101,19 @@ lc.boundaryGap = true;
 
 	class Page {
 
-
-
 		type: ResourceType;
 
-		history: GarbageCondition.IllegalDropHistoryChart;
-		order: GarbageCondition.IllegalDropOrder;
+		history: GarbageCondition.HistoryChart;
+		dropOrder: GarbageCondition.GarbageDropOrder;
+
 		count: GarbageCondition.DivisionGarbageCount;
-		constructor(private dataController:IDataController) {
+		constructor(private dataController: IDataController) {
 			this.type = user.WUser.Resources![0].ResourceType;
-			this.history = new GarbageCondition.IllegalDropHistoryChart(this);
-			this.order = new GarbageCondition.IllegalDropOrder(this);
+			this.history = new GarbageCondition.HistoryChart(this);
+			this.dropOrder = new GarbageCondition.GarbageDropOrder(this);
 			this.count = new GarbageCondition.DivisionGarbageCount(this);
 
-			
+
 		}
 
 		element = {
@@ -135,9 +126,11 @@ lc.boundaryGap = true;
 			},
 			list: {
 				illegalDrop: document.getElementById("top")!,
+				mixDrop: document.getElementById("top2")!,
 			},
 			chart: {
-				illegalDrop: document.getElementById("chart")!
+				illegalDrop: Array.from(document.querySelectorAll<HTMLElement>(".illegalChart")),
+				mixDrop: Array.from(document.querySelectorAll<HTMLElement>(".mixIntoChart"))
 			}
 		}
 
@@ -145,27 +138,50 @@ lc.boundaryGap = true;
 
 		loadData() {
 
-			
+
+			/**
+			 *  swiper会根据 loop:true,复制一份Dom,
+			 *  所以先初始化swiper,再echart
+			 *   在用echart时，dom元素为类选择器
+			 */
+			new Swiper("#diagram", {
+				loop: true,
+				pagination:{
+					el:'#chart-pagination'
+				}
+			})
+
 
 			let day = getAllDay(date);
 
 			let historyData = this.dataController.getHistory(day);
 
-			historyData.then(x => {
-				if (x) {
-					let opts = this.history.convert(x);
+			historyData.then(datas => {
+				console.log('datas', datas)
+				if (datas && "IllegalDrop" in datas) {
+					let illegalOpts = this.history.convert(datas.IllegalDrop);
+					let mixinOpts = this.history.convert(datas.MixedInto);
 
-					this.history.view(opts);
+
+					this.element.chart.illegalDrop = Array.from(document.querySelectorAll<HTMLElement>(".illegalChart"));
+
+					this.history.view(illegalOpts, this.element.chart.illegalDrop);
+
+					this.element.chart.mixDrop = Array.from(document.querySelectorAll<HTMLElement>(".mixIntoChart"))
+					this.history.view(mixinOpts, this.element.chart.mixDrop);
+
 				}
 			});
+
 
 
 			const promise = this.dataController.getStatisticNumberList(day);
 			promise.then(data => {
 				if (data) {
+					console.log('居委会信息', data)
 					const items = data.sort((a, b) => {
 						return b.illegalDropNumber - a.illegalDropNumber;
-					}).splice(0, 10);
+					})
 
 					const viewModel = items.map(x => {
 						return {
@@ -174,7 +190,31 @@ lc.boundaryGap = true;
 							subNameAfter: '起'
 						}
 					})
-					this.order.view(viewModel);
+					this.dropOrder.view(viewModel, this.element.list.illegalDrop);
+
+					// 混合投放排行榜
+					const items2 = data.sort((a, b) => {
+						return b.mixedIntoNumber - a.mixedIntoNumber;
+					})
+					const viewModel2 = items2.map(x => {
+						return {
+							name: x.name,
+							subName: x.mixedIntoNumber,
+							subNameAfter: '起'
+						}
+					})
+					this.dropOrder.view(viewModel2, this.element.list.mixDrop);
+
+
+					// 等待dom数据填充进去再创建swiper,否则显示空白div
+					let swiper = new Swiper("#rank", {
+						loop: true,
+						pagination: {
+							el: '#rank-pagination'
+						}
+					})
+
+					console.log(swiper)
 				}
 			})
 
@@ -256,6 +296,8 @@ lc.boundaryGap = true;
 
 
 	const user = new SessionUser();
+
+	console.log(user)
 	if (user.WUser.Resources) {
 		const type = user.WUser.Resources![0].ResourceType;
 
@@ -271,7 +313,6 @@ lc.boundaryGap = true;
 	}
 
 }
-
 
 
 

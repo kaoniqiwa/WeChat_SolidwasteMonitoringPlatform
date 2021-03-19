@@ -1,70 +1,73 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>生活垃圾监管平台</title>
     <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
     <link href="./css/aside.css" rel="stylesheet" />
     <link href="./css/index.css" rel="stylesheet" />
-    
+
     <script src="../assets/base64.js"></script>
+  </head>
 
-</head>
-
-<body>
-
+  <body>
+    <!-- 内容区 -->
     <div class="main">
-        <iframe id="main"></iframe>
+      <iframe id="main"></iframe>
     </div>
+
+    <!-- 底部按钮区 -->
     <div class="bar bottom">
-        <ul>
-            <li>
-                <a class="bar-item" href="data.html">
-                    <div class="howell-icon-chart icon"> </div>
-                    <div>每日数据</div>
-                </a>
-            </li>
-            <li>
-                <a class="bar-item" href="./history.html">
-                    <div class="howell-icon-alarm2 icon"> </div>
-                    <div>报警记录</div>
-                </a>
-            </li>
-            <li>
-                <a class="bar-item" href="./garbage-stations.html">
-                    <div class="howell-icon-garbage icon"> </div>
-                    <div>垃圾厢房</div>
-                </a>
-            </li>
-            <li>
-                <a class="bar-item" href="./map.html">
-                    <div class="howell-icon-map6 icon"> </div>
-                    <div>清运路线</div>
-                </a>
-            </li>
-            <li>
-                <a class="bar-item" href="./user.html">
-                    <div class="howell-icon-human icon"> </div>
-                    <div>个人中心</div>
-                </a>
-            </li>
-        </ul>
+      <ul>
+        <li>
+          <a class="bar-item" href="data.html">
+            <div class="howell-icon-chart icon"></div>
+            <div>每日数据</div>
+          </a>
+        </li>
+        <li>
+          <a class="bar-item" href="./history.html">
+            <div class="howell-icon-alarm2 icon"></div>
+            <div>报警记录</div>
+          </a>
+        </li>
+        <li>
+          <a class="bar-item" href="./garbage-stations.html">
+            <div class="howell-icon-garbage icon"></div>
+            <div>垃圾厢房</div>
+          </a>
+        </li>
+        <li>
+          <a class="bar-item" href="./map.html">
+            <div class="howell-icon-map6 icon"></div>
+            <div>清运路线</div>
+          </a>
+        </li>
+        <li>
+          <a class="bar-item" href="./user.html">
+            <div class="howell-icon-human icon"></div>
+            <div>个人中心</div>
+          </a>
+        </li>
+      </ul>
     </div>
-    <div class='backdrop'></div>
-    <aside class='aside-content details'>
-        <iframe id="aside-details" src="./event-details.html"></iframe>
+    <!-- 黑色背景-->
+    <div class="backdrop"></div>
+
+    <!-- 辅助侧边栏 -->
+    <aside class="aside-content details">
+      <iframe id="aside-details" src="./event-details.html"></iframe>
     </aside>
-    <div style="display: none;">
-    <a href="./register.html"></a>
+    <div style="display: none">
+      <a href="./register.html"></a>
     </div>
-</body>
+  </body>
 
-<script type="text/javascript">
-    
-</script>
+  <script type="text/javascript"></script>
 
-<script src="./ts/index.ts"></script>
-
+  <script src="./ts/index.ts"></script>
 </html>

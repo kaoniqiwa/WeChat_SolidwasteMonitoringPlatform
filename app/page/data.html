@@ -1,91 +1,113 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>生活垃圾监管平台</title>
     <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
-    <link crossorigin="anonymous"
-        integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
-        href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
+    <link
+      crossorigin="anonymous"
+      integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+      href="https://lib.baomitu.com/weui/2.4.1/style/weui.css"
+      rel="stylesheet"
+    />
+    <link href="./css/swiper.min.css" rel="stylesheet" />
     <link href="./css/index.css" rel="stylesheet" />
     <link href="./css/data.css" rel="stylesheet" />
 
-    <link href="../../minirefresh/minirefresh.css" rel="stylesheet" />    
-    <script crossorigin="anonymous" integrity="sha384-xtrmUNWJ2tdS4FJyVhTG4xpPXkfHBFY36SOeegdD40rRPQOCNBfiaxPY1ji+RKS2"
-        src="https://lib.baomitu.com/echarts/3.8.5/echarts.min.js"></script>
+    <link href="../../minirefresh/minirefresh.css" rel="stylesheet" />
+    <script
+      crossorigin="anonymous"
+      integrity="sha384-xtrmUNWJ2tdS4FJyVhTG4xpPXkfHBFY36SOeegdD40rRPQOCNBfiaxPY1ji+RKS2"
+      src="https://lib.baomitu.com/echarts/3.8.5/echarts.min.js"
+    ></script>
 
     <style>
-        .top5-list-wrap {
-            height: 30px;
-            display: flow-root;
-            width: calc(100%);
-            line-height: 30px;
-        }
-        .top5-list-wrap > div
-{    
-    max-height: 100%;
-}
+      .top5-list-wrap {
+        height: 30px;
+        display: flow-root;
+        width: calc(100%);
+        line-height: 30px;
+      }
+      .top5-list-wrap > div {
+        max-height: 100%;
+      }
     </style>
-</head>
+  </head>
 
-<body ontouchstart>
+  <body ontouchstart>
     <div class="bar header">
-        <div class="content ">
-            <div class="left" id="date">
-                2020年12月31日
-            </div>
-            <div class="btn right filter" id="showDatePicker">
-                <i class="howell-icon-calendar" style="font-weight: bold;"></i>
-            </div>
+      <div class="content">
+        <div class="left" id="date">2020年12月31日</div>
+        <div class="btn right filter" id="showDatePicker">
+          <i class="howell-icon-calendar" style="font-weight: bold"></i>
         </div>
+      </div>
     </div>
-    <div class="minirefresh-wrap" id="refreshContainer" style="top: 40px;">
-        <div class="minirefresh-scroll">
-            <div class="page">
-                <div class="card count">
-                    <div class="text title">
-                        乱丢垃圾
-                    </div>
-                    <div class="content">
-                        <span class="value" id="illegalDrop">0</span>
-                        <span class="text">起</span>
-                    </div>
-                </div>
-                <div class="card count">
-                    <div class="text title">
-                        混合投放
-                    </div>
-                    <div class="content">
-                        <span class="value" id="hybridPush">0</span>
-                        <span class="text">起</span>
-                    </div>
-                </div>
+    <div class="minirefresh-wrap" id="refreshContainer" style="top: 40px">
+      <div class="minirefresh-scroll">
+        <div class="page">
+          <div class="card count">
+            <div class="text title">乱丢垃圾</div>
+            <div class="content">
+              <span class="value" id="illegalDrop">0</span>
+              <span class="text">起</span>
+            </div>
+          </div>
+          <div class="card count">
+            <div class="text title">混合投放</div>
+            <div class="content">
+              <span class="value" id="hybridPush">0</span>
+              <span class="text">起</span>
+            </div>
+          </div>
+
+          <div class="swiper-container" id="rank">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide">
                 <div class="card top" id="top-div">
-                    <div class="text title">
-                        乱丢垃圾行为排行
-                    </div>
-                    <div class="content top_content">
-                        <div class="body" id="top">
-
-                        </div>
-                    </div>
+                  <div class="text title">乱丢垃圾行为排行</div>
+                  <div class="content top_content">
+                    <div class="body" id="top"></div>
+                  </div>
                 </div>
-                <div class="card chart">
-                    <div class="text title">
-                        乱丢垃圾图表
-                    </div>
-                    <div class="content" id="chart">
+              </div>
 
-                    </div>
+              <div class="swiper-slide">
+                <div class="card top" id="top2-div">
+                  <div class="text title">混合投放排行</div>
+                  <div class="content top_content">
+                    <div class="body" id="top2"></div>
+                  </div>
                 </div>
+              </div>
             </div>
-        </div>
-    </div>
-</body>
-<script src="../../minirefresh/minirefresh.js"></script>
-<script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
-<script src="./ts/data.ts"></script>
+            <div class="swiper-pagination" id="rank-pagination"></div>
+          </div>
 
+          <div class="swiper-container" id="diagram">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide">
+                <div class="card chart">
+                  <div class="text title">乱丢垃圾图表</div>
+                  <div class="content illegalChart"></div>
+                </div>
+              </div>
+
+              <div class="swiper-slide">
+                <div class="card chart">
+                  <div class="text title">混合投放图表</div>
+                  <div class="content mixIntoChart"></div>
+                </div>
+              </div>
+            </div>
+            <div class="swiper-pagination" id="chart-pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="../../minirefresh/minirefresh.js"></script>
+  <script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
+  <script src="./ts/data.ts"></script>
 </html>
