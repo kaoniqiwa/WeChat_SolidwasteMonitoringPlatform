@@ -27,11 +27,152 @@
 
   <body>
     <div id="app">
-      <div class="page">
+      <div
+        class="el-table el-table--enable-row-transition el-table--enable-row-hover"
+        id="top"
+      >
+        <div class="el-table__header-wrapper">
+          <table cellspacing="0" cellpadding="0" class="el-table__header">
+            <colgroup>
+              <col width="180" />
+              <col width="180" />
+              <col width="180" />
+              <col width="180" />
+              <col width="180" />
+              <col width="180" />
+              <col width="180" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th class="is-leaf"><div class="cell">名称</div></th>
+                <th class="is-leaf"><div class="cell">评分</div></th>
+                <th class="is-leaf"><div class="cell">平均落地时长</div></th>
+                <th class="is-leaf"><div class="cell">最大落地时长</div></th>
+                <th class="is-leaf"><div class="cell">总落地时长</div></th>
+                <th class="is-leaf"><div class="cell">乱认垃圾</div></th>
+                <th class="is-leaf"><div class="cell">混合投放</div></th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <div class="el-table__body-wrapper">
+          <table cellspacing="0" cellpadding="0" class="el-table__body">
+            <colgroup>
+              <col width="180" />
+              <col width="180" />
+              <col width="180" />
+              <col width="180" />
+              <col width="180" />
+              <col width="180" />
+              <col width="180" />
+            </colgroup>
+
+            <tbody>
+              <!-- <tr class="el-table__row">
+                <td>
+                  <div class="cell">2016-05-03</div>
+                </td>
+                <td>
+                  <div class="cell">Tom</div>
+                </td>
+                <td>
+                  <div class="cell">No. 189, Grove St, Los Angeles</div>
+                </td>
+              </tr>
+
+              <tr class="el-table__row">
+                <td>
+                  <div class="cell">2016-05-02</div>
+                </td>
+                <td>
+                  <div class="cell">Tom</div>
+                </td>
+                <td>
+                  <div class="cell">No. 189, Grove St, Los Angeles</div>
+                </td>
+              </tr>
+
+              <tr class="el-table__row">
+                <td>
+                  <div class="cell">2016-05-01</div>
+                </td>
+                <td>
+                  <div class="cell">Tom</div>
+                </td>
+                <td>
+                  <div class="cell">No. 189, Grove St, Los Angeles</div>
+                </td>
+              </tr>
+
+              <tr class="el-table__row">
+                <td>
+                  <div class="cell">2016-05-06</div>
+                </td>
+                <td>
+                  <div class="cell">Tom</div>
+                </td>
+                <td>
+                  <div class="cell">No. 189, Grove St, Los Angeles</div>
+                </td>
+              </tr>
+
+              <tr class="el-table__row">
+                <td>
+                  <div class="cell">2016-05-05</div>
+                </td>
+                <td>
+                  <div class="cell">Tom</div>
+                </td>
+                <td>
+                  <div class="cell">No. 189, Grove St, Los Angeles</div>
+                </td>
+              </tr>
+
+              <tr class="el-table__row">
+                <td>
+                  <div class="cell">2016-05-06</div>
+                </td>
+                <td>
+                  <div class="cell">Tom</div>
+                </td>
+                <td>
+                  <div class="cell">No. 189, Grove St, Los Angeles</div>
+                </td>
+              </tr>
+
+              <tr class="el-table__row">
+                <td>
+                  <div class="cell">2016-05-07</div>
+                </td>
+                <td>
+                  <div class="cell">Tom</div>
+                </td>
+                <td>
+                  <div class="cell">No. 189, Grove St, Los Angeles</div>
+                </td>
+              </tr>
+
+              <tr class="el-table__row">
+                <td>
+                  <div class="cell">2016-05-08</div>
+                </td>
+                <td>
+                  <div class="cell">Tom</div>
+                </td>
+                <td>
+                  <div class="cell">No. 189, Grove St, Los Angeles</div>
+                </td>
+              </tr> -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- <div class="page">
         <div class="card top" id="top-div">
           <div class="text title">乱丢垃圾行为排行</div>
           <div class="content top_content">
-            <div class="body" id="top"></div>
+            
           </div>
         </div>
 
@@ -39,7 +180,7 @@
           <div class="text title">混合投放图表</div>
           <div class="content mixIntoChart"></div>
         </div>
-      </div>
+      </div> -->
     </div>
   </body>
   <script src="../../minirefresh/minirefresh.js"></script>

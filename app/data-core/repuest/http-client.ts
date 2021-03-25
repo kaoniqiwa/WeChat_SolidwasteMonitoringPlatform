@@ -26,7 +26,7 @@ export namespace HowellHttpClient {
             
         }
 
-        async login(seccess?: (http: HowellAuthHttp) => void, faild?: () => void) {
+        async login(success?: (http: HowellAuthHttp) => void, fail?: () => void) {
             const openid = getQueryVariable('openid');
             if (this.digistWindow.DIGEST == null && openid) {
                 // 123456
@@ -41,11 +41,11 @@ export namespace HowellHttpClient {
 
                 if (a) {
                     this.user.WUser = a;
-                    if (seccess) seccess(this.http);
+                    if (success) success(this.http);
                 }
                 else {
-                    if (faild) {
-                        faild();
+                    if (fail) {
+                        fail();
                     }
                 }
 
