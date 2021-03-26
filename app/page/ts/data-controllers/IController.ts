@@ -2,12 +2,10 @@ import { PagedList } from "../../../data-core/model/page";
 import { Camera } from "../../../data-core/model/waste-regulation/camera";
 import { Division } from "../../../data-core/model/waste-regulation/division";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
-import { EventData, EventRecordData } from "../../../data-core/model/waste-regulation/event-record";
-import { GarbageFullEventRecord } from "../../../data-core/model/waste-regulation/garbage-full-event-record";
+import { GarbageDropEventRecord, GarbageFullEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/event-record";
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
 import { GarbageStationNumberStatistic, GarbageStationNumberStatisticV2 } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
-import { IllegalDropEventRecord } from "../../../data-core/model/waste-regulation/illegal-drop-event-record";
-import { MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/mixed-into-event-record";
+
 import { ResourceRole } from "../../../data-core/model/we-chat";
 
 /**
@@ -204,7 +202,7 @@ export interface IEventHistory {
      * @returns {(Promise<PagedList<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord> | undefined>)}
      * @memberof IEventHistory
      */
-    getEventList(day: OneDay, page: Paged, type: EventType, ids?: string[]): Promise<PagedList<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord> | undefined>;
+    getEventList(day: OneDay, page: Paged, type: EventType, ids?: string[]): Promise<PagedList<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord|GarbageDropEventRecord> | undefined>;
     /**
      * 获取图片URL
      *

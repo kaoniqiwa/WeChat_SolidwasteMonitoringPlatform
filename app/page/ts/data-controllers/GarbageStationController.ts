@@ -2,11 +2,11 @@
 import { TimeUnit } from "../../../data-core/model/page";
 import { EventNumberStatistic } from "../../../data-core/model/waste-regulation/division-event-numbers";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
+import { GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record-params";
 import { ResourceRole, ResourceType } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
 import { DataController } from "./DataController";
 import { IDataController, IGarbageStationController, OneDay, Paged, StatisticNumber } from "./IController";
-import { GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record";
 
 export class GarbageStationController extends DataController implements IDataController, IGarbageStationController {
 
@@ -22,7 +22,7 @@ export class GarbageStationController extends DataController implements IDataCon
 			return TimeUnit.Day;
 		}
 	}
-	getGarbageStationStatisticNumberListInToday = async (sources:ResourceRole[]):Promise<Array<StatisticNumber>>=>{
+	getGarbageStationStatisticNumberListInToday = async (sources: ResourceRole[]): Promise<Array<StatisticNumber>> => {
 		return this.getStatisticNumberListInToday(sources);
 	}
 	getStatisticNumberListInToday = async (sources: ResourceRole[]): Promise<Array<StatisticNumber>> => {
@@ -215,7 +215,7 @@ export class GarbageStationController extends DataController implements IDataCon
 		let promise = await this.service.garbageStation.list({ Ids: this.roles.map(x => x.Id) });
 		return promise.Data;
 	}
-	
+
 
 	getResourceRoleList = async () => {
 
@@ -230,15 +230,15 @@ export class GarbageStationController extends DataController implements IDataCon
 	}
 
 	getEventListParams(day: OneDay, page: Paged, type: EventType, ids?: string[]) {
-		const params = new GetEventRecordsParams();
-		params.BeginTime = day.begin.toISOString();
-		params.EndTime = day.end.toISOString();
-		params.PageSize = page.size;
-		params.PageIndex = page.index;
-		params.Desc = true;
+		const params = {
+			BeginTime: day.begin.toISOString(),
+			EndTime: day.end.toISOString(),
+			PageSize: page.size,
+			PageIndex: page.index,
+			Desc: true,
 
-		params.StationIds = this.roles.map(x => x.Id);
-
+			StationIds: this.roles.map(x => x.Id)
+		}
 		if (ids) {
 			params.StationIds = ids;
 		}

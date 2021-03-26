@@ -25,6 +25,12 @@ export class Language {
                 return '垃圾容量事件';
             case EventType.GarbageFull:
                 return '垃圾满溢事件';
+                case EventType.GarbageDrop:
+                    return '垃圾落地事件';
+                case EventType.GarbageDropHandle:
+                    return '垃圾落地事件 已处置';
+                    case EventType.GarbageDropTimeout:
+                    return '垃圾落地事件 已超时';
             default:
                 return '';
         }
