@@ -2,13 +2,10 @@
 import { PagedList } from "../model/page";
 import { Response } from "../model/response";
 import * as url from "../url/waste-regulation/event";
-
-import { IllegalDropEventRecord } from "../model/waste-regulation/illegal-drop-event-record";
 import { HowellAuthHttp } from "./howell-auth-http";
-import { MixedIntoEventRecord } from "../model/waste-regulation/mixed-into-event-record";
-import { GarbageFullEventRecord } from "../model/waste-regulation/garbage-full-event-record";
-import { GetEventRecordsParams } from "../model/waste-regulation/event-record";
+import { GarbageDropEventRecord, GarbageFullEventRecord, GetEventRecordsParams, IllegalDropEventRecord, MixedIntoEventRecord } from "../model/waste-regulation/event-record";
 import { plainToClass } from "class-transformer";
+import { GetGarbageDropEventRecordsParams } from "../model/waste-regulation/event-record-params";
 
 export class EventRequestService {
     url: url.EventRecord;
@@ -49,6 +46,16 @@ export class EventRequestService {
         return plainToClass(GarbageFullEventRecord, response.Data);
     }
 
+    async garbageDropList(item: GetGarbageDropEventRecordsParams) {
+        let response = await this.requestService.post<GetGarbageDropEventRecordsParams, Response<PagedList<GarbageDropEventRecord>>>(this.url.garbageDropList(), item);
+        response.Data.Data = plainToClass(GarbageDropEventRecord, response.Data.Data);
+        return response.Data;
+    }
+    async garbageDropSingle(id: string) {
+        let response = await this.requestService.get<Response<GarbageDropEventRecord>>(this.url.garbageDropSingle(id));
+
+        return plainToClass(GarbageDropEventRecord, response.Data);
+    }
 
 
 }

@@ -28,6 +28,8 @@ export class LoopPageControl {
     init(index:number = 0) {
         if (this.element) {
             this.swiper = new Swiper(this.element, {    
+                noSwiping: true,
+    noSwipingSelector: 'img',
                 initialSlide:index,            
                 on: {
                     init:(sw:any)=>{                        

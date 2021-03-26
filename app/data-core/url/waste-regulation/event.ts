@@ -30,6 +30,13 @@ export class EventRecord extends GarbageBaseUrl {
     {
         return this.gateway + `Events/Records/GarbageFull/${id}`;
     }
-
+    garbageDropList() {
+        return this.gateway + `Events/Records/GarbageDrop/List`;
+    }
+    garbageDropSingle(id:string)
+    {
+        return this.gateway + `Events/Records/GarbageDrop/${id}`;
+    }
+    
 
 }

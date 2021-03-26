@@ -1,23 +1,19 @@
 
-import { HowellHttpClient } from "../../data-core/repuest/http-client";
-import { SessionUser } from "../../common/session-user";
 import { getQueryVariable, dateFormat, getAllDay } from "../../common/tool";
-import { IllegalDropEventData, IllegalDropEventRecord } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
-import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
+
 import { PagedList } from "../../data-core/model/page";
-import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 import { Service } from "../../data-core/repuest/service";
-import { ResourceRole, ResourceType } from "../../data-core/model/we-chat";
+import { ResourceType } from "../../data-core/model/we-chat";
 import { AsideControl } from "./aside";
 import { AsideListPage, AsideListPageWindow, SelectionMode } from "./aside-list";
 import { Language } from "./language";
 import { IEventHistory, Paged } from "./data-controllers/IController";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
-import { MixedIntoEventData, MixedIntoEventRecord } from "../../data-core/model/waste-regulation/mixed-into-event-record";
+
 import { EventType } from "../../data-core/model/waste-regulation/event-number";
 import { SwiperControl } from "./data-controllers/modules/SwiperControl";
-import { EventData, EventRecord, EventRecordData } from "../../data-core/model/waste-regulation/event-record";
-import { GarbageFullEventData, GarbageFullEventRecord } from "../../data-core/model/waste-regulation/garbage-full-event-record";
+import { EventRecord, GarbageDropEventRecord, GarbageFullEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../../data-core/model/waste-regulation/event-record";
+
 import { NavigationWindow } from ".";
 import { DataController } from "./data-controllers/DataController";
 
@@ -47,6 +43,9 @@ export namespace EventHistoryPage {
         },
         GarbageFull: {
             list: document.getElementById("garbageFull") as HTMLDivElement
+        },
+        GarbageDrop: {
+            list: document.getElementById("garbageDrop") as HTMLDivElement
         }
     }
 
@@ -54,7 +53,8 @@ export namespace EventHistoryPage {
     var MiniRefreshId = {
         IllegalDrop: "illegalDropRefreshContainer",
         MixedInto: "mixedIntoRefreshContainer",
-        GarbageFull: "garbageFullRefreshContainer"
+        GarbageFull: "garbageFullRefreshContainer",
+        GarbageDrop: "garbageDropRefreshContainer"
     }
 
     class Template {
@@ -104,6 +104,9 @@ export namespace EventHistoryPage {
             this.parentElement[EventType.IllegalDrop] = element.IllegalDrop.list;
             this.parentElement[EventType.MixedInto] = element.MixedInto.list;
             this.parentElement[EventType.GarbageFull] = element.GarbageFull.list;
+            this.parentElement[EventType.GarbageDrop] = element.GarbageDrop.list;
+            this.parentElement[EventType.GarbageDropTimeout] = element.GarbageDrop.list;
+            this.parentElement[EventType.GarbageDropHandle] = element.GarbageDrop.list;
 
 
 
@@ -163,7 +166,7 @@ export namespace EventHistoryPage {
             this.miniRefresh[this.eventType].resetUpLoading();
         }
 
-        convert(record: IllegalDropEventRecord|GarbageFullEventRecord|MixedIntoEventRecord, index: number, getImageUrl: (id: string) => string | undefined) {
+        convert(record: IllegalDropEventRecord | GarbageFullEventRecord | MixedIntoEventRecord | GarbageDropEventRecord, index: number, getImageUrl: (id: string) => string | undefined) {
             let template = new Template();
             if (record.ImageUrl) {
                 template.img.src = getImageUrl(record.ImageUrl) as string;
@@ -171,6 +174,11 @@ export namespace EventHistoryPage {
             if (record instanceof GarbageFullEventRecord) {
                 if (record.Data.CameraImageUrls && record.Data.CameraImageUrls.length > 0) {
                     template.img.src = getImageUrl(record.Data.CameraImageUrls[0].ImageUrl) as string;
+                }
+            }
+            if (record instanceof GarbageDropEventRecord) {
+                if (record.Data.DropImageUrls && record.Data.DropImageUrls.length > 0) {
+                    template.img.src = getImageUrl(record.Data.DropImageUrls[0].ImageUrl) as string;
                 }
             }
 
@@ -230,13 +238,17 @@ export namespace EventHistoryPage {
                     return element.MixedInto.list;
                 case EventType.GarbageFull:
                     return element.GarbageFull.list;
+                case EventType.GarbageDrop:
+                case EventType.GarbageDropHandle:
+                case EventType.GarbageDropTimeout:
+                    return element.GarbageDrop.list;
                 default:
                     return undefined;
             }
         }
 
 
-        view(list: PagedList<IllegalDropEventRecord|MixedIntoEventRecord|GarbageFullEventRecord>) {
+        view(list: PagedList<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | GarbageDropEventRecord>) {
 
             for (let i = 0; i < list.Data.length; i++) {
                 const data = list.Data[i];
@@ -356,6 +368,7 @@ export namespace EventHistoryPage {
             element.IllegalDrop.list.innerHTML = "";
             element.MixedInto.list.innerHTML = "";
             element.GarbageFull.list.innerHTML = "";
+            element.GarbageDrop.list.innerHTML = "";
             try {
                 this.miniRefresh[EventType.IllegalDrop] = this.createMiniRefresh(
                     MiniRefreshId.IllegalDrop,
@@ -379,6 +392,16 @@ export namespace EventHistoryPage {
                 )
                 this.miniRefresh[EventType.GarbageFull] = this.createMiniRefresh(
                     MiniRefreshId.GarbageFull,
+                    false,
+                    (r) => {
+                        this.miniRefreshDown(r)
+                    },
+                    (r) => {
+                        this.miniRefreshUp(r)
+                    }
+                )
+                this.miniRefresh[EventType.GarbageDrop] = this.createMiniRefresh(
+                    MiniRefreshId.GarbageDrop,
                     false,
                     (r) => {
                         this.miniRefreshDown(r)
@@ -466,6 +489,8 @@ export namespace EventHistoryPage {
                     return EventType.GarbageFull;
                 case 2:
                     return EventType.MixedInto;
+                case 3:
+                    return EventType.GarbageDrop;
                 default:
                     return EventType.IllegalDrop;
             }
@@ -483,7 +508,10 @@ export namespace EventHistoryPage {
         }
         getSwiperIndex(type: EventType) {
             switch (type) {
-
+                case EventType.GarbageDrop:
+                case EventType.GarbageDropTimeout:
+                case EventType.GarbageDropHandle:
+                    return 3;
                 case EventType.GarbageFull:
                     return 1;
                 case EventType.MixedInto:
@@ -510,7 +538,7 @@ export namespace EventHistoryPage {
                         container: ".swiper-container",
                         pagination: ".swiper-pagination"
                     },
-                    navBar: ["乱扔垃圾", "满溢情况", "混合投放"],
+                    navBar: ["乱扔垃圾", "满溢情况", "混合投放", "垃圾落地"],
                     callback: (index) => {
                         this.SwiperControlChanged(index);
                     },

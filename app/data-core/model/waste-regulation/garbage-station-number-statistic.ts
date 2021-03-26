@@ -328,3 +328,77 @@ export class GarbageStationNumberStatisticV2 {
    */
   CleanDuration?: number;
 }
+
+export interface GetGarbageStationStatisticGarbageCountsParams {
+  /**
+   *	日期	M
+   *
+   * @type {Date}
+   * @memberof GetGarbageStationStatisticGarbageCountsParams
+   */
+  Date: Date;
+  /**
+   *	垃圾房ID列表	M
+   *
+   * @type {string[]}
+   * @memberof GetGarbageStationStatisticGarbageCountsParams
+   */
+  GarbageStationIds: string[]
+}
+/**
+ *垃圾房的垃圾堆数量统计信息
+ *
+ * @export
+ * @class GarbageStationGarbageCountStatistic
+ */
+export class GarbageStationGarbageCountStatistic {
+  /**
+   *	垃圾房ID	M
+   *
+   * @type {string}
+   * @memberof GarbageStationGarbageCountStatistic
+   */
+  Id: string;
+  /**
+   *	垃圾房名称	M
+   *
+   * @type {string}
+   * @memberof GarbageStationGarbageCountStatistic
+   */
+  Name: string;
+  /**
+   *	开始时间	M
+   *
+   * @type {Date}
+   * @memberof GarbageStationGarbageCountStatistic
+   */
+  BeginTime: Date;
+  /**
+   *	结束时间	M
+   *
+   * @type {Date}
+   * @memberof GarbageStationGarbageCountStatistic
+   */
+  EndTime: Date;
+  /**
+   *	垃圾堆数量	M
+   *
+   * @type {number}
+   * @memberof GarbageStationGarbageCountStatistic
+   */
+  GarbageCount: number;
+  /**
+   *	有垃圾时长，单位：分钟	O
+   *
+   * @type {number}
+   * @memberof GarbageStationGarbageCountStatistic
+   */
+  GarbageDuration?: number;
+  /**
+   *	无垃圾时长，单位：分钟	O
+   *
+   * @type {number}
+   * @memberof GarbageStationGarbageCountStatistic
+   */
+  CleanDuration?: number;
+}

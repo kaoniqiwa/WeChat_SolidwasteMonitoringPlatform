@@ -1,17 +1,9 @@
-import { Response } from "../../data-core/model/response";
+
 import { dateFormat, getQueryVariable } from "../../common/tool";
-import { Mediume as MediumPicture } from "../../data-core/url/medium";
-import { IllegalDropEventData, IllegalDropEventRecord } from "../../data-core/model/waste-regulation/illegal-drop-event-record";
-import { EventRequestService } from "../../data-core/repuest/event-record";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
-import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { SessionUser } from "../../common/session-user";
 import { Language } from "./language";
 import { EventType } from "../../data-core/model/waste-regulation/event-number";
-import { MixedIntoEventData, MixedIntoEventRecord } from "../../data-core/model/waste-regulation/mixed-into-event-record";
-import { GarbageFullEventData, GarbageFullEventRecord } from "../../data-core/model/waste-regulation/garbage-full-event-record";
-import { EventData, EventRecord, EventRecordData } from "../../data-core/model/waste-regulation/event-record";
-import { AxiosResponse } from "axios";
 import { NavigationWindow } from ".";
 import { ImageController } from "./data-controllers/modules/ImageControl";
 import { DataController } from "./data-controllers/DataController";
@@ -19,9 +11,23 @@ import { IDetailsEvent, OneDay, Paged } from "./data-controllers/IController";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import { Service } from "../../data-core/repuest/service";
 import { LoopPageControl } from "./data-controllers/modules/LoopPageControl";
-import Swiper,{Pagination} from "swiper";
+import Swiper, { Pagination } from "swiper";
+import { CameraImageUrl, GarbageDropEventRecord, GarbageFullEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../../data-core/model/waste-regulation/event-record";
 
 Swiper.use([Pagination])
+
+
+class GarbageDropImageUrl extends CameraImageUrl {
+    constructor(url: CameraImageUrl, type: EventType) {
+        super();
+        this.CameraId = url.CameraId;
+        this.CameraName = url.CameraName;
+        this.ImageUrl = url.ImageUrl;
+        this.EventType = type;
+    }
+    EventType: EventType;
+}
+
 
 export namespace EventInformationPage {
     export class EventDetail {
@@ -373,13 +379,13 @@ export namespace EventInformationPage {
                     }
                 }
                 console.log('swiper', Swiper)
-                
+
                 // new Swiper('.swiper-container-img', {
                 //     pagination: {
                 //         el: '.swiper-pagination-img', type: 'fraction'
                 //     }
                 // })
-                let swiper = new Swiper(source.querySelector(".swiper-container-img") as HTMLElement, {                    
+                let swiper = new Swiper(source.querySelector(".swiper-container-img") as HTMLElement, {
                     on: {
                         slideChange: async (sw) => {
                             let img = sw.slides[sw.activeIndex].querySelector(".detail_img") as HTMLImageElement
@@ -422,12 +428,192 @@ export namespace EventInformationPage {
 
             }
         }
+        fillGarbageDropEventRecord(item: GarbageDropEventRecord, element?: HTMLElement) {
+            let source: HTMLElement | Document = element ? element : document;
 
+            const police__type = source.getElementsByClassName('police__type'),
+                camera__name = source.querySelector('.camera__name') as HTMLElement,
+                station__name = source.getElementsByClassName('station__name'),
+                rc__name = source.getElementsByClassName('rc__name'),
+                police__time = source.getElementsByClassName('police__time');
+
+
+            if (source instanceof HTMLElement) {
+                source.id = item.EventId!;
+            }
+
+            let btn = source.getElementsByClassName("back__btn")
+            if (btn) {
+                for (let i = 0; i < btn.length; i++) {
+                    btn[i].addEventListener("click", () => {
+                        window.parent.showOrHideAside();
+                        // location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
+                    });
+                }
+
+            }
+
+            if (police__type) {
+                for (let i = 0; i < police__type.length; i++) {
+                    (police__type[i] as HTMLSpanElement).innerText = Language.EventType(item.EventType);
+                }
+            }
+
+
+            if (station__name) {
+                for (let i = 0; i < station__name.length; i++) {
+                    (station__name[i] as HTMLSpanElement).innerText = item.Data.StationName;
+                }
+            }
+
+            if (item.Data.DivisionName && rc__name) {
+                for (let i = 0; i < rc__name.length; i++) {
+                    (rc__name[i] as HTMLSpanElement).innerText = item.Data.DivisionName;
+                }
+            }
+
+            if (police__time) {
+                for (let i = 0; i < police__time.length; i++) {
+                    (police__time[i] as HTMLSpanElement).innerText = dateFormat(new Date(item.EventTime), 'yyyy-MM-dd HH:mm:ss');
+                }
+            }
+
+
+            let url: string = DataController.defaultImageUrl;
+
+            camera__name.innerHTML = "";
+            let imgUrls = new Array<GarbageDropImageUrl>();
+            if (item.Data.DropImageUrls) {
+                imgUrls = imgUrls.concat(item.Data.DropImageUrls.map(x => {
+                    return new GarbageDropImageUrl(x, EventType.GarbageDrop);
+                }));
+            }
+            if (item.Data.TimeoutImageUrls) {
+                imgUrls = imgUrls.concat(item.Data.TimeoutImageUrls.map(x => {
+                    return new GarbageDropImageUrl(x, EventType.GarbageDropTimeout);
+                }));
+            }
+            
+            if (item.Data.HandleImageUrls) {
+                imgUrls = imgUrls.concat(item.Data.HandleImageUrls.map(x => {
+                    return new GarbageDropImageUrl(x, EventType.GarbageDropHandle);
+                }));
+            }
+            if (imgUrls.length > 0) {
+                console.log(imgUrls);
+                let container = source.querySelector(".swiper-container-img") as HTMLDivElement;
+                let wrapper = container.querySelector(".swiper-wrapper") as HTMLDivElement;
+                let template = wrapper.querySelector(".weui-form-preview__item") as HTMLDivElement;
+                let urls = new Array<string>();
+                for (let i = 0; i < imgUrls.length; i++) {
+                    let element = template;
+                    if (i > 0) {
+                        element = template.cloneNode(true) as HTMLDivElement;
+                        wrapper.appendChild(element);
+                    }
+
+                    const detail_img = element.querySelector(".detail_img") as HTMLImageElement;
+
+
+                    const imageUrl = imgUrls[i];
+                    url = this.dataController.getImageUrl(imageUrl.ImageUrl) as string;
+                    urls.push(url);
+
+
+                    if (detail_img) {
+                        detail_img.src = url;
+
+                        detail_img.onload = () => {
+                            detail_img.removeAttribute("data-src");
+                        };
+                        detail_img.onerror = () => {
+                            // detail_img.src = 
+                        }
+                        detail_img.addEventListener("click", () => {
+                            let selectors = {
+                                //frameId: "max-frame",
+                                imgId: "max-img"
+                            }
+                            let index = 0;
+                            let str = detail_img.getAttribute("index");
+                            if (str) {
+                                index = parseInt(str);
+                            }
+                            this.imageController.showDetail(selectors, urls, index);
+                        });
+
+                        detail_img.setAttribute("eventType", imageUrl.EventType.toString());
+                        detail_img.setAttribute("cameraName", imageUrl.CameraName);
+                        detail_img.setAttribute("cameraId", imageUrl.CameraId);
+                        detail_img.setAttribute("stationId", item.Data.StationId);
+                        detail_img.setAttribute("index", i.toString());
+
+                    }
+                }
+                console.log('swiper', Swiper)
+
+                // new Swiper('.swiper-container-img', {
+                //     pagination: {
+                //         el: '.swiper-pagination-img', type: 'fraction'
+                //     }
+                // })
+                let swiper = new Swiper(source.querySelector(".swiper-container-img") as HTMLElement, {
+                    on: {
+                        slideChange: async (sw) => {
+                            let img = sw.slides[sw.activeIndex].querySelector(".detail_img") as HTMLImageElement
+                            let cameraName = img.getAttribute("cameraName");
+                            // if (!cameraName || cameraName == "null") {
+                            //     let stationId = img.getAttribute("stationId");
+                            //     let cameraId = img.getAttribute("cameraId");
+                            //     if (stationId && cameraId) {
+                            //         let camera = await this.dataController.GetCamera(stationId, cameraId);
+                            //         cameraName = camera.Name;
+                            //     }
+                            // }                            
+                            let camera__name = source.querySelector('.camera__name') as HTMLElement;
+                            if (cameraName) {
+                                camera__name.innerHTML = cameraName;
+                            }
+
+                            let eventType = img.getAttribute('eventType');
+                            let police__type = source.querySelector('.police__type') as HTMLElement;
+                            if (eventType) {
+                                police__type.innerHTML = Language.EventType(parseInt(eventType));
+                            }
+                        },
+                        init: async (sw) => {
+                            let img = sw.slides[sw.activeIndex].querySelector(".detail_img") as HTMLImageElement
+                            let cameraName = img.getAttribute("cameraName");
+                            // if (!cameraName || cameraName == "null") {
+                            //     let stationId = img.getAttribute("stationId");
+                            //     let cameraId = img.getAttribute("cameraId");
+                            //     if (stationId && cameraId) {
+                            //         let camera = await this.dataController.GetCamera(stationId, cameraId);
+                            //         cameraName = camera.Name;
+                            //     }
+                            // }
+                            let camera__name = source.querySelector('.camera__name') as HTMLElement;
+                            if (cameraName) {
+                                camera__name.innerHTML = cameraName;
+                            }
+                        }
+                    },
+                    pagination: {
+                        el: '.swiper-pagination-img',
+                        type: 'fraction',
+                    }
+                });
+
+            }
+        }
 
 
         fillDetail(item: IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord, element?: HTMLElement) {
             if (item instanceof GarbageFullEventRecord) {
                 this.fillGarbageFullEventRecord(item, element);
+            }
+            if (item instanceof GarbageDropEventRecord) {
+                this.fillGarbageDropEventRecord(item, element)
             }
             else {
                 this.fillEventRecord(item, element);

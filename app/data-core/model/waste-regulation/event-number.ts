@@ -31,5 +31,27 @@ export enum EventType {
     /** 垃圾容量事件 */
     GarbageVolume = 3,
     /** 垃圾满溢事件 */
-    GarbageFull = 4
+    GarbageFull = 4,
+    /** 小包垃圾落地事件 */
+    GarbageDrop = 5,
+    /** 小包垃圾落地超时事件 */
+    GarbageDropTimeout = 6,
+    /** 小包垃圾处置完成事件 */
+    GarbageDropHandle = 7,
+}
+export enum EventTypeName {
+    /** 乱认垃圾事件 */
+    IllegalDrop = 'IllegalDrop',
+    /** 混合投放事件 */
+    MixedInto = 'MixedInto',
+    /** 垃圾容量事件 */
+    GarbageVolume = 'GarbageVolume',
+    /** 垃圾满溢事件 */
+    GarbageFull = 'GarbageFull',
+    /** 小包垃圾落地事件 */
+    GarbageDrop = 'GarbageDrop',
+    /** 小包垃圾落地超时事件 */
+    GarbageDropTimeout = 'GarbageDropTimeout',
+    /** 小包垃圾处置完成事件 */
+    GarbageDropHandle = 'GarbageDropHandle',
 }

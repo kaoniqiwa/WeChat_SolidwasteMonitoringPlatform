@@ -6,6 +6,7 @@ import { GarbageStationController } from "./GarbageStationController";
 
 export class ControllerFactory {
     static Create(service: Service, type: ResourceType, resources: ResourceRole[]) {
+        
         switch (type) {
             case ResourceType.County:
                 return new CountDivisionController(service, resources);

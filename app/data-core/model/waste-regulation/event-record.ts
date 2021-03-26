@@ -1,5 +1,7 @@
 
+import { Point } from "../point";
 import { EventType } from "./event-number";
+import { EventData, GarbageDropEventData, GarbageFullEventData, IllegalDropEventData, MixedIntoEventData } from "./event-record-data";
 
 export enum EventResourceType {
     /** 监控点 */
@@ -42,42 +44,60 @@ export class EventRecord {
 
 
 }
-
-export class EventRecordData<T extends EventData> extends EventRecord
-{
+export class EventRecordData<T extends EventData> extends EventRecord {
     Data!: T
 }
 
-export class EventData {
-    StationId!:string;
-    StationName!:string;
-    DivisionId?:string;
-    DivisionName?:string;
+
+
+
+
+/** 垃圾满溢事件 */
+export class GarbageFullEventRecord extends EventRecordData<GarbageFullEventData> {
+
+}
+
+/**
+ * 摄像机照片地址
+ *
+ * @export
+ * @class CameraImageUrl
+ */
+export class CameraImageUrl {
+    /**
+     *	摄像机ID	M
+     *
+     * @type {string}
+     * @memberof CameraImageUrl
+     */
+    CameraId!: string
+    /**
+     *	摄像机名称	M
+     *
+     * @type {string}
+     * @memberof CameraImageUrl
+     */
+    CameraName!: string
+    /**
+     *	照片地址	M
+     *
+     * @type {string}
+     * @memberof CameraImageUrl
+     */
+    ImageUrl!: string
+}
+
+/**乱扔垃圾事件记录 */
+export class IllegalDropEventRecord extends EventRecordData<IllegalDropEventData>
+{
 }
 
 
-/**获取事件记录参数 */
-export class GetEventRecordsParams {
-    /**页码[1-n](可选) */
-    PageIndex?: number | null;
-    /**分页大小[1-100](可选) */
-    PageSize?: number | null;
-    /**开始时间 */
-    BeginTime!: Date | string;
-    /**结束时间 */
-    EndTime!: Date | string;
-    /**所属区划ID列表(可选) */
-    DivisionIds?: string[];
-    /**垃圾房ID列表(可选) */
-    StationIds?: string[];
-    /**资源ID列表(可选) */
-    ResourceIds?: string[];
-    /**区划名称(可选)，支持LIKE */
-    DivisionName?: string;
-    /**垃圾房名称(可选)，支持LIKE */
-    StationName?: string;
-    /**资源名称(可选)，支持LIKE */
-    ResourceName?: string;
-    /** 是否倒序时间排列 */
-    Desc?: boolean;
+/**混合投放事件记录 */
+export class MixedIntoEventRecord extends EventRecordData<MixedIntoEventData>
+{
+}
+
+export class GarbageDropEventRecord  extends EventRecordData<GarbageDropEventData>{
+
 }

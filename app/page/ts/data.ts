@@ -25,6 +25,7 @@ namespace GarbageCondition {
 		}
 
 		convert(datas: Array<EventNumber>): AppEChart.LineOption {
+			
 			const lc = this.joinPart(new AppEChart.LineOption());
 			lc.seriesData = new Array();
 			lc.boundaryGap = true;
@@ -153,12 +154,13 @@ namespace GarbageCondition {
 
 
 			let day = getAllDay(date);
-
+			
 			let historyData = this.dataController.getHistory(day);
 
 			historyData.then(datas => {
 				console.log('datas', datas)
 				if (datas && "IllegalDrop" in datas) {
+					
 					let illegalOpts = this.history.convert(datas.IllegalDrop);
 					let mixinOpts = this.history.convert(datas.MixedInto);
 

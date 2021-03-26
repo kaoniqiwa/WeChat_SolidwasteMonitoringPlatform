@@ -6,7 +6,7 @@ import { ResourceRole, ResourceType } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
 import { IDataController, IGarbageStationController, OneDay, Paged, StatisticNumber } from "./IController";
 import { DataController } from "./DataController";
-import { GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record";
+import { GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record-params";
 
 
 export class CountDivisionController extends DataController implements IDataController, IGarbageStationController {
@@ -153,21 +153,6 @@ export class CountDivisionController extends DataController implements IDataCont
 		return result;
 	}
 
-	getStatisticNumberList = async (day: OneDay): Promise<Array<StatisticNumber>> => {
-
-		const now = new Date();
-		const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-		const dataDate = new Date(day.begin.getFullYear(), day.begin.getMonth(), day.begin.getDate());
-
-		let roles = await this.getResourceRoleList()
-
-		if (dataDate.getTime() - today.getTime() >= 0) {
-			return this.getStatisticNumberListInToday(roles);
-		}
-		else {
-			return this.getStatisticNumberListInOtherDay(day, roles);
-		}
-	}
 
 	getHistory = async (day: OneDay) => {
 
@@ -262,15 +247,14 @@ export class CountDivisionController extends DataController implements IDataCont
 
 
 	getEventListParams(day: OneDay, page: Paged, type: EventType, ids?: string[]) {
-		const params = new GetEventRecordsParams();
-		params.BeginTime = day.begin.toISOString();
-		params.EndTime = day.end.toISOString();
-		params.PageSize = page.size;
-		params.PageIndex = page.index;
-		params.Desc = true;
-
-		params.DivisionIds = this.roles.map(x => x.Id);
-
+		const params = {
+			BeginTime: day.begin.toISOString(),
+			EndTime: day.end.toISOString(),
+			PageSize: page.size,
+			PageIndex: page.index,
+			Desc: true,
+			DivisionIds: this.roles.map(x => x.Id)
+		}
 		if (ids) {
 			params.DivisionIds = ids;
 		}
