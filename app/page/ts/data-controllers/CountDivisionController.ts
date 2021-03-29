@@ -172,7 +172,7 @@ export class CountDivisionController extends DataController implements IDataCont
 				TimeUnit: TimeUnit.Hour
 			}, role.Id)
 
-			console.log('countDivisionController', data.Data)
+			// console.log('countDivisionController', data.Data)
 			for (var x of data.Data) {
 				for (const y of x.EventNumbers)
 					if (y.EventType == EventType.IllegalDrop)
