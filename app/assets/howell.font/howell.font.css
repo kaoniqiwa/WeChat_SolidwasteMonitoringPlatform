@@ -2331,3 +2331,23 @@ a .howell-icon-flip-vertical:before {
 .howell-icon-arrow2down:before {
     content: "\f338";
 }
+
+.howell-icon-zoomout:before {
+    content: "\f339";
+}
+
+.howell-icon-zoomin:before {
+    content: "\f340";
+}
+
+.howell-icon-arrow:before {
+    content: "\f341";
+}
+
+.howell-icon-garbagebags:before {
+    content: "\f342";
+}
+
+.howell-icon-arrow2:before {
+    content: "\f343";
+}
