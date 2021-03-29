@@ -130,7 +130,32 @@ export interface IDataController {
         'IllegalDrop': Array<EventNumber>,
         'MixedInto': Array<EventNumber>,        
     }>;
+/**
+     * 获取垃圾厢房列表
+     *
+     * @returns {Promise<Array<GarbageStation>>}
+     * @memberof IGarbageStationController
+     */
+ getGarbageStationList(): Promise<Array<GarbageStation>>;
 
+ /**
+  * 获取垃圾厢房数据统计
+  *
+  * @param {string[]} ids 垃圾厢房ID
+  * @returns {Promise<Array<GarbageStationNumberStatistic>>}
+  * @memberof IGarbageStationNumberStatistic
+  */
+ getGarbageStationNumberStatisticList(ids: string[]): Promise<Array<GarbageStationNumberStatistic>>
+
+ /**
+  * 获取垃圾厢房数据统计
+  *
+  * @param {string} id 垃圾厢房ID
+  * @param {Date} date 日期
+  * @returns {Promise<Array<GarbageStationGarbageCountStatistic>>} 
+  * @memberof IGarbageStationNumberStatistic
+  */
+  getGarbageStationNumberStatistic(id: string, date: Date): Promise<Array<GarbageStationGarbageCountStatistic>>
 }
 export interface IGarbageStationController {
     /**
