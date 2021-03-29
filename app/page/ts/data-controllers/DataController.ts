@@ -284,7 +284,7 @@ export abstract class DataController implements IDataController, IGarbageStation
     async getGarbageStationNumberStatistic(id: string, date: Date): Promise<GarbageStationGarbageCountStatistic[]> {
 
         let response = this.service.garbageStation.statisticGarbageCountHistoryList({
-            Date :date,
+            Date :date.toISOString(),
             GarbageStationIds:[id],
             
         });

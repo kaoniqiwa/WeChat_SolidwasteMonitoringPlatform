@@ -336,7 +336,7 @@ export interface GetGarbageStationStatisticGarbageCountsParams {
    * @type {Date}
    * @memberof GetGarbageStationStatisticGarbageCountsParams
    */
-  Date: Date;
+  Date: string;
   /**
    *	垃圾房ID列表	M
    *
