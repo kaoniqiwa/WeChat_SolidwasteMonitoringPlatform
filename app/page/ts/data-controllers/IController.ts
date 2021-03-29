@@ -4,7 +4,7 @@ import { Division } from "../../../data-core/model/waste-regulation/division";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
 import { GarbageDropEventRecord, GarbageFullEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/event-record";
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
-import { GarbageStationNumberStatistic, GarbageStationNumberStatisticV2 } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
+import { GarbageStationGarbageCountStatistic, GarbageStationNumberStatistic, GarbageStationNumberStatisticV2 } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
 
 import { ResourceRole } from "../../../data-core/model/we-chat";
 
@@ -128,7 +128,7 @@ export interface IDataController {
      */
     getHistory(day: OneDay): Promise<Array<EventNumber> | {
         'IllegalDrop': Array<EventNumber>,
-        'MixedInto': Array<EventNumber>,
+        'MixedInto': Array<EventNumber>,        
     }>;
 
 }
@@ -276,9 +276,38 @@ export interface IGarbageStationNumberStatistic {
      * 获取垃圾厢房数据统计
      *
      * @param {string} id 垃圾厢房ID
-     * @param {OneDay} day 日期
-     * @returns {Promise<Array<GarbageStationNumberStatisticV2>>} 
+     * @param {Date} date 日期
+     * @returns {Promise<Array<GarbageStationGarbageCountStatistic>>} 
      * @memberof IGarbageStationNumberStatistic
      */
-     getGarbageStationNumberStatistic(id: string, day: OneDay): Promise<Array<GarbageStationNumberStatisticV2>>
+     getGarbageStationNumberStatistic(id: string, date: Date): Promise<Array<GarbageStationGarbageCountStatistic>>
+}
+
+export interface IGarbageDrop{
+/**
+     * 获取资源列表
+     *
+     * @returns {Promise<Array<ResourceRole>>}
+     * @memberof IGarbageDrop
+     */
+ getResourceRoleList(): Promise<Array<ResourceRole>>;
+ /**
+  * 获取事件列表
+  *
+  * @param {OneDay} day 哪一天
+  * @param {Paged} page 分页
+  * @param {EventType} type 事件类型
+  * @param {string[]} [ids] 
+  * @returns {(Promise<PagedList<GarbageDropEventRecord> | undefined>)}
+  * @memberof IGarbageDrop
+  */
+ getGarbageDropEventList(day: OneDay, page: Paged, type: EventType, ids?: string[]): Promise<PagedList<GarbageDropEventRecord> | undefined>;
+ /**
+  * 获取图片URL
+  *
+  * @param {string} id 图片ID
+  * @returns {(string | undefined)}
+  * @memberof IGarbageDrop
+  */
+ getImageUrl(id: string): string | undefined;
 }

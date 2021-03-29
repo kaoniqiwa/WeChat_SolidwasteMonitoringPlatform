@@ -7,12 +7,12 @@ import { ResourceType } from "../../data-core/model/we-chat";
 import { AsideControl } from "./aside";
 import { AsideListPage, AsideListPageWindow, SelectionMode } from "./aside-list";
 import { Language } from "./language";
-import { IEventHistory, Paged } from "./data-controllers/IController";
+import { IEventHistory, IGarbageDrop, Paged } from "./data-controllers/IController";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
 
 import { EventType } from "../../data-core/model/waste-regulation/event-number";
 import { SwiperControl } from "./data-controllers/modules/SwiperControl";
-import { EventRecord, GarbageDropEventRecord, GarbageFullEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../../data-core/model/waste-regulation/event-record";
+import { EventRecord, GarbageDropEventRecord } from "../../data-core/model/waste-regulation/event-record";
 
 import { NavigationWindow } from ".";
 import { DataController } from "./data-controllers/DataController";
@@ -33,28 +33,24 @@ export namespace EventHistoryPage {
             iframe: document.getElementById('aside-iframe') as HTMLIFrameElement
         },
         filterBtn: document.querySelector('#filter') as HTMLDivElement,
-        totalRecordCount: document.getElementById("illegalDropTotalRecordCount")!,
-        recordCount: document.getElementById("illegalDropRecordCount")!,
-        IllegalDrop: {
-            list: document.getElementById("illegalDrop") as HTMLDivElement,
-        },
-        MixedInto: {
-            list: document.getElementById("mixedInto") as HTMLDivElement
-        },
-        GarbageFull: {
-            list: document.getElementById("garbageFull") as HTMLDivElement
-        },
+        totalRecordCount: document.getElementById("garbageDropTotalRecordCount")!,
+        recordCount: document.getElementById("garbageDropRecordCount")!,
         GarbageDrop: {
-            list: document.getElementById("garbageDrop") as HTMLDivElement
+            list: document.getElementById("garbageDrop") as HTMLDivElement,
+        },
+        GarbageDropHandle: {
+            list: document.getElementById("garbageDropHandle") as HTMLDivElement
+        },
+        GarbageDropTimeout: {
+            list: document.getElementById("garbageDropTimeout") as HTMLDivElement
         }
     }
 
 
     var MiniRefreshId = {
-        IllegalDrop: "illegalDropRefreshContainer",
-        MixedInto: "mixedIntoRefreshContainer",
-        GarbageFull: "garbageFullRefreshContainer",
-        GarbageDrop: "garbageDropRefreshContainer"
+        GarbageDrop: "garbageDropRefreshContainer",
+        GarbageDropHandle: "garbageDropHandleRefreshContainer",
+        GarbageDropTimeout: "garbageDropTimeoutRefreshContainer"
     }
 
     class Template {
@@ -80,7 +76,7 @@ export namespace EventHistoryPage {
     }
 
 
-    export class IllegalDropEvent {
+    export class GarbageDropEvent {
         /**
          * autho:pmx
          */
@@ -98,15 +94,12 @@ export namespace EventHistoryPage {
         }
 
         defaultDivisionId = '';
-        constructor(private type: ResourceType, private dataController: IEventHistory, private openId: string) {
+        constructor(private type: ResourceType, private dataController: IGarbageDrop, private openId: string) {
 
 
-            this.parentElement[EventType.IllegalDrop] = element.IllegalDrop.list;
-            this.parentElement[EventType.MixedInto] = element.MixedInto.list;
-            this.parentElement[EventType.GarbageFull] = element.GarbageFull.list;
             this.parentElement[EventType.GarbageDrop] = element.GarbageDrop.list;
-            this.parentElement[EventType.GarbageDropTimeout] = element.GarbageDrop.list;
-            this.parentElement[EventType.GarbageDropHandle] = element.GarbageDrop.list;
+            this.parentElement[EventType.GarbageDropHandle] = element.GarbageDropHandle.list;
+            this.parentElement[EventType.GarbageDropTimeout] = element.GarbageDropTimeout.list;
 
 
 
@@ -166,15 +159,10 @@ export namespace EventHistoryPage {
             this.miniRefresh[this.eventType].resetUpLoading();
         }
 
-        convert(record: IllegalDropEventRecord | GarbageFullEventRecord | MixedIntoEventRecord | GarbageDropEventRecord, index: number, getImageUrl: (id: string) => string | undefined) {
+        convert(record: GarbageDropEventRecord, index: number, getImageUrl: (id: string) => string | undefined) {
             let template = new Template();
             if (record.ImageUrl) {
                 template.img.src = getImageUrl(record.ImageUrl) as string;
-            }
-            if (record instanceof GarbageFullEventRecord) {
-                if (record.Data.CameraImageUrls && record.Data.CameraImageUrls.length > 0) {
-                    template.img.src = getImageUrl(record.Data.CameraImageUrls[0].ImageUrl) as string;
-                }
             }
             if (record instanceof GarbageDropEventRecord) {
                 if (record.Data.DropImageUrls && record.Data.DropImageUrls.length > 0) {
@@ -207,16 +195,6 @@ export namespace EventHistoryPage {
 
             item.addEventListener("click", () => {
 
-                switch (record.EventType) {
-                    case EventType.GarbageDropTimeout:
-                    case EventType.GarbageDropHandle:
-                        record.EventType = EventType.GarbageDrop;
-                        break;
-                    default:
-                        break;
-                }
-
-
                 //window.parent.recordDetails = record;                
                 const url = "./event-details.html?openid=" + this.openId + "&pageindex=" + (index) + "&eventtype=" + record.EventType;
                 // console.log(window.parent);
@@ -242,23 +220,19 @@ export namespace EventHistoryPage {
 
         getElementByDataType(type: EventType) {
             switch (type) {
-                case EventType.IllegalDrop:
-                    return element.IllegalDrop.list;
-                case EventType.MixedInto:
-                    return element.MixedInto.list;
-                case EventType.GarbageFull:
-                    return element.GarbageFull.list;
                 case EventType.GarbageDrop:
-                case EventType.GarbageDropHandle:
-                case EventType.GarbageDropTimeout:
                     return element.GarbageDrop.list;
+                case EventType.GarbageDropHandle:
+                    return element.GarbageDropHandle.list;
+                case EventType.GarbageDropTimeout:
+                    return element.GarbageDropTimeout.list;
                 default:
                     return undefined;
             }
         }
 
 
-        view(list: PagedList<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | GarbageDropEventRecord>) {
+        view(list: PagedList<GarbageDropEventRecord>) {
 
             for (let i = 0; i < list.Data.length; i++) {
                 const data = list.Data[i];
@@ -279,13 +253,13 @@ export namespace EventHistoryPage {
 
         }
         page: { [key: number]: Paged } = {};
-        eventType: EventType = EventType.IllegalDrop;
+        eventType: EventType = EventType.GarbageDrop;
         selectedIds?: string[]
         async refresh(page: Paged, eventType: EventType) {
             console.log("current page", page);
             const day = getAllDay(date);
 
-            let data = await this.dataController.getEventList(day, page, eventType, this.selectedIds);
+            let data = await this.dataController.getGarbageDropEventList(day, page, eventType, this.selectedIds);
 
 
 
@@ -375,13 +349,12 @@ export namespace EventHistoryPage {
 
         init() {
 
-            element.IllegalDrop.list.innerHTML = "";
-            element.MixedInto.list.innerHTML = "";
-            element.GarbageFull.list.innerHTML = "";
             element.GarbageDrop.list.innerHTML = "";
+            element.GarbageDropHandle.list.innerHTML = "";
+            element.GarbageDropTimeout.list.innerHTML = "";            
             try {
-                this.miniRefresh[EventType.IllegalDrop] = this.createMiniRefresh(
-                    MiniRefreshId.IllegalDrop,
+                this.miniRefresh[EventType.GarbageDrop] = this.createMiniRefresh(
+                    MiniRefreshId.GarbageDrop,
                     true,
                     (r) => {
                         this.miniRefreshDown(r)
@@ -390,8 +363,8 @@ export namespace EventHistoryPage {
                         this.miniRefreshUp(r)
                     }
                 )
-                this.miniRefresh[EventType.MixedInto] = this.createMiniRefresh(
-                    MiniRefreshId.MixedInto,
+                this.miniRefresh[EventType.GarbageDropHandle] = this.createMiniRefresh(
+                    MiniRefreshId.GarbageDropHandle,
                     false,
                     (r) => {
                         this.miniRefreshDown(r)
@@ -400,18 +373,8 @@ export namespace EventHistoryPage {
                         this.miniRefreshUp(r)
                     }
                 )
-                this.miniRefresh[EventType.GarbageFull] = this.createMiniRefresh(
-                    MiniRefreshId.GarbageFull,
-                    false,
-                    (r) => {
-                        this.miniRefreshDown(r)
-                    },
-                    (r) => {
-                        this.miniRefreshUp(r)
-                    }
-                )
-                this.miniRefresh[EventType.GarbageDrop] = this.createMiniRefresh(
-                    MiniRefreshId.GarbageDrop,
+                this.miniRefresh[EventType.GarbageDropTimeout] = this.createMiniRefresh(
+                    MiniRefreshId.GarbageDropTimeout,
                     false,
                     (r) => {
                         this.miniRefreshDown(r)
@@ -489,20 +452,18 @@ export namespace EventHistoryPage {
             }
         }
 
-        record?: IllegalDropEvent;
+        record?: GarbageDropEvent;
 
         getEventTypeByIndex(index: number) {
             switch (index) {
                 case 0:
-                    return EventType.IllegalDrop;
-                case 1:
-                    return EventType.GarbageFull;
-                case 2:
-                    return EventType.MixedInto;
-                case 3:
                     return EventType.GarbageDrop;
+                case 1:
+                    return EventType.GarbageDropTimeout;
+                case 2:
+                    return EventType.GarbageDropHandle;
                 default:
-                    return EventType.IllegalDrop;
+                    return EventType.GarbageDrop;
             }
         }
 
@@ -518,15 +479,11 @@ export namespace EventHistoryPage {
         }
         getSwiperIndex(type: EventType) {
             switch (type) {
-                case EventType.GarbageDrop:
                 case EventType.GarbageDropTimeout:
-                case EventType.GarbageDropHandle:
-                    return 3;
-                case EventType.GarbageFull:
                     return 1;
-                case EventType.MixedInto:
+                case EventType.GarbageDropHandle:
                     return 2;
-                case EventType.IllegalDrop:
+                case EventType.GarbageDrop:
                 default:
                     return 0;
             }
@@ -534,7 +491,7 @@ export namespace EventHistoryPage {
 
         initSwiper() {
 
-            let eventType = EventType.IllegalDrop;
+            let eventType = EventType.GarbageDrop;
             console.log(window.location.href);
             let strEventType = getQueryVariable("eventtype");
             console.log(strEventType)
@@ -548,7 +505,7 @@ export namespace EventHistoryPage {
                         container: ".swiper-container",
                         pagination: ".swiper-pagination"
                     },
-                    navBar: ["乱扔垃圾", "满溢情况", "混合投放", "垃圾落地"],
+                    navBar: ["垃圾落地", "处置超时", "处置完成"],
                     callback: (index) => {
                         this.SwiperControlChanged(index);
                     },
@@ -582,7 +539,7 @@ export namespace EventHistoryPage {
             const service = new Service(http)
             const dataController = ControllerFactory.Create(service, type, user.WUser.Resources!)
 
-            this.record = new IllegalDropEvent(type, dataController, user.WUser.OpenId!);
+            this.record = new GarbageDropEvent(type, dataController, user.WUser.OpenId!);
             this.record.init();
             this.record.loadAside();
 

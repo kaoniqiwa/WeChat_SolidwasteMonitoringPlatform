@@ -26,11 +26,11 @@ export class Language {
             case EventType.GarbageFull:
                 return '垃圾满溢事件';
                 case EventType.GarbageDrop:
-                    return '垃圾落地事件';
+                    return '小包垃圾落地';
                 case EventType.GarbageDropHandle:
-                    return '垃圾落地事件 已处置';
+                    return '小包垃圾处置完成';
                     case EventType.GarbageDropTimeout:
-                    return '垃圾落地事件 已超时';
+                    return '小包垃圾处置超时';
             default:
                 return '';
         }

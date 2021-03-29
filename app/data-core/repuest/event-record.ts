@@ -3,9 +3,9 @@ import { PagedList } from "../model/page";
 import { Response } from "../model/response";
 import * as url from "../url/waste-regulation/event";
 import { HowellAuthHttp } from "./howell-auth-http";
-import { GarbageDropEventRecord, GarbageFullEventRecord, GetEventRecordsParams, IllegalDropEventRecord, MixedIntoEventRecord } from "../model/waste-regulation/event-record";
+import { GarbageDropEventRecord, GarbageFullEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../model/waste-regulation/event-record";
 import { plainToClass } from "class-transformer";
-import { GetGarbageDropEventRecordsParams } from "../model/waste-regulation/event-record-params";
+import { GetEventRecordsParams, GetGarbageDropEventRecordsParams } from "../model/waste-regulation/event-record-params";
 
 export class EventRequestService {
     url: url.EventRecord;

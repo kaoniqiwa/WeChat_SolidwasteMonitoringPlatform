@@ -17,10 +17,21 @@ namespace Navigation {
 
     window.recordDetails = null;
     window.showOrHideAside = function (url) {
-        if (index < 0) {
+        if (index < -1) {
+            index = 3;
+            let garbageDropPage = (items[index] as HTMLLinkElement);
+            garbageDropPage.click();
+        }
+        else if (index < 0) {
             index = 1;
             let historyPage = (items[index] as HTMLLinkElement);
             historyPage.click();
+        }
+        else if (index > 0) {
+            // let garbageDropPage = (items[index] as HTMLLinkElement);
+            // garbageDropPage.click();
+        }
+        else {
 
         }
         var asideContent = document.querySelector('.aside-content') as HTMLDivElement;
@@ -111,6 +122,17 @@ namespace Navigation {
                     let eventType = EventType.IllegalDrop;
                     if (querys.eventtype) {
                         eventType = parseInt(querys.eventtype);
+                    }
+                    switch (eventType) {
+                        case EventType.GarbageDrop:
+                        case EventType.GarbageDropTimeout:
+                        case EventType.GarbageDropHandle:
+                            querys.index = -2;
+                            eventType = EventType.GarbageDrop
+                            break;
+
+                        default:
+                            break;
                     }
                     window.showOrHideAside("./event-details.html?openid=" + querys.openid + "&eventid=" + querys.eventid + "&eventtype=" + eventType);
                 }

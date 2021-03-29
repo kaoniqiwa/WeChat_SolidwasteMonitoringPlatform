@@ -2,14 +2,14 @@ import { PagedList, TimeUnit } from "../../../data-core/model/page";
 import { Camera } from "../../../data-core/model/waste-regulation/camera";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
 import { GarbageDropEventRecord, GarbageFullEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/event-record";
-import { GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record-params";
+import { GetEventRecordsParams, GetGarbageDropEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record-params";
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
-import { GarbageStationNumberStatistic, GarbageStationNumberStatisticV2, GetGarbageStationStatisticNumbersParams } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
+import { GarbageStationGarbageCountStatistic, GarbageStationNumberStatistic, GarbageStationNumberStatisticV2, GetGarbageStationStatisticNumbersParams } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
 import { ResourceRole } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
-import { IDataController, IDetailsEvent, IEventHistory, IGarbageStationController, IGarbageStationNumberStatistic, OneDay, Paged, StatisticNumber } from "./IController";
+import { IDataController, IDetailsEvent, IEventHistory, IGarbageDrop, IGarbageStationController, IGarbageStationNumberStatistic, OneDay, Paged, StatisticNumber } from "./IController";
 
-export abstract class DataController implements IDataController, IGarbageStationController, IEventHistory, IDetailsEvent, IGarbageStationNumberStatistic {
+export abstract class DataController implements IDataController, IGarbageStationController, IEventHistory, IDetailsEvent, IGarbageStationNumberStatistic, IGarbageDrop {
 
     static readonly defaultImageUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABIAAAAKIAQAAAAAgULygAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAd2KE6QAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAHdElNRQflAgIBCxpFwPH8AAAAcklEQVR42u3BMQEAAADCoPVPbQZ/oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+A28XAAEDwmj2AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIxLTAyLTAyVDAxOjExOjI2KzAwOjAwOo9+nAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMS0wMi0wMlQwMToxMToyNiswMDowMEvSxiAAAAAASUVORK5CYII=";
 
@@ -17,6 +17,7 @@ export abstract class DataController implements IDataController, IGarbageStation
     constructor(protected service: Service, roles: ResourceRole[]) {
         this.roles = roles;
     }
+
 
 
 
@@ -132,7 +133,7 @@ export abstract class DataController implements IDataController, IGarbageStation
     }
 
     getEventListParams(day: OneDay, page: Paged, type: EventType, ids?: string[]) {
-        const params:GetEventRecordsParams = {
+        const params: GetEventRecordsParams = {
             BeginTime: day.begin.toISOString(),
             EndTime: day.end.toISOString(),
             PageSize: page.size,
@@ -280,17 +281,36 @@ export abstract class DataController implements IDataController, IGarbageStation
      * @returns {Promise<GarbageStationNumberStatisticV2[]>}
      * @memberof DataController
      */
-    async getGarbageStationNumberStatistic(id: string, day: OneDay): Promise<GarbageStationNumberStatisticV2[]> {
+    async getGarbageStationNumberStatistic(id: string, date: Date): Promise<GarbageStationGarbageCountStatistic[]> {
 
-        let response = this.service.garbageStation.statisticNumberHistoryList({
-            BeginTime: day.begin.toJSON(),
-            EndTime: day.end.toJSON(),
-            GarbageStationIds: [id],
-            TimeUnit: TimeUnit.Day
-        })
+        let response = this.service.garbageStation.statisticGarbageCountHistoryList({
+            Date :date,
+            GarbageStationIds:[id],
+            
+        });
         return response;
     }
+    async getGarbageDropEventList(day: OneDay, page: Paged, type: EventType, ids?: string[]): Promise<PagedList<GarbageDropEventRecord>> {
+        debugger;
+        let params: GetGarbageDropEventRecordsParams = this.getEventListParams(day, page, type, ids);
+        params.IsHandle = false;
+        params.IsTimeout = false;
+        switch (type) {
+            case EventType.GarbageDrop:
 
+                break;
+            case EventType.GarbageDropTimeout:
+                params.IsTimeout = true;
+                break;
+            case EventType.GarbageDropHandle:
+                params.IsHandle = true;
+                break;
+
+            default:
+                break;
+        }
+        return await this.service.event.garbageDropList(params);
+    }
 
 
 }

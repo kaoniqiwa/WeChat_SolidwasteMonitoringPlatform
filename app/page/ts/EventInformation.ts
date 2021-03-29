@@ -455,7 +455,11 @@ export namespace EventInformationPage {
 
             if (police__type) {
                 for (let i = 0; i < police__type.length; i++) {
-                    (police__type[i] as HTMLSpanElement).innerText = Language.EventType(item.EventType);
+                    let text = ""//item.EventDescription;
+                    if (!text) {
+                        text = Language.EventType(item.EventType)
+                    }
+                    (police__type[i] as HTMLSpanElement).innerText = text;
                 }
             }
 
@@ -493,7 +497,7 @@ export namespace EventInformationPage {
                     return new GarbageDropImageUrl(x, EventType.GarbageDropTimeout);
                 }));
             }
-            
+
             if (item.Data.HandleImageUrls) {
                 imgUrls = imgUrls.concat(item.Data.HandleImageUrls.map(x => {
                     return new GarbageDropImageUrl(x, EventType.GarbageDropHandle);
