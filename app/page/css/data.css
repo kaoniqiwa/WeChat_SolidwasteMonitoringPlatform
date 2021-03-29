@@ -16,7 +16,7 @@ body{
 }
 
 .card:last-child{
-    margin-bottom: 24px;
+    /* margin-bottom: 24px; */
 }
 
 .card .title
@@ -47,7 +47,7 @@ body{
 }
 
 .card.top{
-    height: 335px;
+    height: 336px;
 }
 .card.chart{
     height: 256px;

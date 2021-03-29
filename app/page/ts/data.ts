@@ -9,6 +9,35 @@ import { ResourceType } from "../../data-core/model/we-chat";
 import { IDataController, StatisticNumber } from "./data-controllers/IController";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import Swiper, { Pagination } from 'swiper';
+import { CandlestickOption } from './echart'
+import { GarbageStationGarbageCountStatistic } from "../../data-core/model/waste-regulation/garbage-station-number-statistic";
+
+import * as echarts from 'echarts/core';
+import {
+	GridComponent,
+	GridComponentOption,
+	TooltipComponentOption,
+	TooltipComponent,
+	DataZoomComponent,
+	DataZoomComponentOption,
+	VisualMapComponent,
+	VisualMapComponentOption,
+} from 'echarts/components';
+
+import { LineChart, LineSeriesOption, BarChart, BarSeriesOption } from 'echarts/charts';
+
+import { CanvasRenderer } from "echarts/renderers";
+
+echarts.use([
+	GridComponent,
+	LineChart,
+	BarChart,
+	VisualMapComponent,
+	CanvasRenderer,
+	TooltipComponent,
+	DataZoomComponent
+])
+
 
 Swiper.use([Pagination])
 
@@ -25,7 +54,7 @@ namespace GarbageCondition {
 		}
 
 		convert(datas: Array<EventNumber>): AppEChart.LineOption {
-			
+
 			const lc = this.joinPart(new AppEChart.LineOption());
 			lc.seriesData = new Array();
 			lc.boundaryGap = true;
@@ -93,8 +122,8 @@ namespace GarbageCondition {
 		constructor(private page: Page) { }
 
 		async view(data: StatisticNumber) {
-			this.page.element.count.illegalDrop.innerHTML = data.illegalDropNumber.toString();
-			this.page.element.count.hybridPush.innerHTML = data.mixedIntoNumber.toString();
+			this.page.element.count.illegalDropCount.innerHTML = data.illegalDropNumber.toString();
+			this.page.element.count.mixIntoCount.innerHTML = data.mixedIntoNumber.toString();
 		}
 	}
 
@@ -106,15 +135,33 @@ namespace GarbageCondition {
 
 		history: GarbageCondition.HistoryChart;
 		dropOrder: GarbageCondition.GarbageDropOrder;
-
+		candlestickOption: CandlestickOption;
 		count: GarbageCondition.DivisionGarbageCount;
+		rankSwiper: null | Swiper = null;
+		chartSwiper: null | Swiper = null;
+
+		private _activeIndex: number = 0;
+
+		get activeIndex() {
+			return this._activeIndex;
+		}
+		set activeIndex(val) {
+			this._activeIndex = val;
+
+			if (this.rankSwiper && this.rankSwiper.slides.length > this.activeIndex) {
+				this.rankSwiper.slideTo(this.activeIndex);
+			}
+			if (this.chartSwiper && this.chartSwiper.slides.length > this.activeIndex) {
+				this.chartSwiper.slideTo(this.activeIndex)
+			}
+		}
+
 		constructor(private dataController: IDataController) {
 			this.type = user.WUser.Resources![0].ResourceType;
 			this.history = new GarbageCondition.HistoryChart(this);
 			this.dropOrder = new GarbageCondition.GarbageDropOrder(this);
 			this.count = new GarbageCondition.DivisionGarbageCount(this);
-
-
+			this.candlestickOption = new CandlestickOption();
 		}
 
 		element = {
@@ -122,47 +169,38 @@ namespace GarbageCondition {
 			date: document.getElementById("date")!,
 			datePicker: document.getElementById("showDatePicker")!,
 			count: {
-				illegalDrop: document.getElementById("illegalDrop")!,
-				hybridPush: document.getElementById("hybridPush")!
+				illegalDropCount: document.getElementById("illegalDropCount")!,
+				mixIntoCount: document.getElementById("mixIntoCount")!
 			},
 			list: {
-				illegalDrop: document.getElementById("top")!,
-				mixDrop: document.getElementById("top2")!,
+				illegalDropRank: document.getElementById("illegalDropRank")!,
+				mixIntoRank: document.getElementById("mixIntoRank")!,
+				littleGarbageRank: document.getElementById("littleGarbageRank")!,
 			},
 			chart: {
 				illegalDrop: Array.from(document.querySelectorAll<HTMLElement>(".illegalChart")),
-				mixDrop: Array.from(document.querySelectorAll<HTMLElement>(".mixIntoChart"))
+				mixDrop: Array.from(document.querySelectorAll<HTMLElement>(".mixIntoChart")),
+				littelGarbageChart: document.querySelector<HTMLElement>('#littelGarbageChart')
 			}
 		}
 
 
 
 		loadData() {
+			let day = getAllDay(date);
 
-
-			/**
-			 *  swiper会根据 loop:true,复制一份Dom,
-			 *  所以先初始化swiper,再echart
-			 *   在用echart时，dom元素为类选择器
-			 */
-			new Swiper("#diagram", {
-				loop: true,
-				pagination:{
-					el:'#chart-pagination'
-				}
+			// 数量接口
+			let eventCountPromise = this.dataController.getEventCount(day)
+			eventCountPromise.then(data => {
+				this.count.view(data);
 			})
 
+			// 图表接口
+			this.dataController.getHistory(day).then(historyData => {
+				if (historyData && "IllegalDrop" in historyData) {
 
-			let day = getAllDay(date);
-			
-			let historyData = this.dataController.getHistory(day);
-
-			historyData.then(datas => {
-				console.log('datas', datas)
-				if (datas && "IllegalDrop" in datas) {
-					
-					let illegalOpts = this.history.convert(datas.IllegalDrop);
-					let mixinOpts = this.history.convert(datas.MixedInto);
+					let illegalOpts = this.history.convert(historyData.IllegalDrop);
+					let mixinOpts = this.history.convert(historyData.MixedInto);
 
 
 					this.element.chart.illegalDrop = Array.from(document.querySelectorAll<HTMLElement>(".illegalChart"));
@@ -172,62 +210,441 @@ namespace GarbageCondition {
 					this.element.chart.mixDrop = Array.from(document.querySelectorAll<HTMLElement>(".mixIntoChart"))
 					this.history.view(mixinOpts, this.element.chart.mixDrop);
 
+
+				} else {
+					throw new Error('')
 				}
-			});
+			}).then(() => {
+				this.chartSwiper = new Swiper("#diagram", {
+					initialSlide: this.activeIndex,
+					pagination: {
+						el: '#chart-pagination'
+					},
+					on: {
+						slideChange: (swiper) => {
+							this.activeIndex = swiper.activeIndex;
 
-
-
-			const promise = this.dataController.getStatisticNumberList(day);
-			promise.then(data => {
-				if (data) {
-					console.log('居委会信息', data)
-					const items = data.sort((a, b) => {
-						return b.illegalDropNumber - a.illegalDropNumber;
-					})
-
-					const viewModel = items.map(x => {
-						return {
-							name: x.name,
-							subName: x.illegalDropNumber,
-							subNameAfter: '起'
 						}
-					})
-					this.dropOrder.view(viewModel, this.element.list.illegalDrop);
+					}
+				})
+			}).catch(error => {
 
-					// 混合投放排行榜
-					const items2 = data.sort((a, b) => {
-						return b.mixedIntoNumber - a.mixedIntoNumber;
-					})
-					const viewModel2 = items2.map(x => {
-						return {
-							name: x.name,
-							subName: x.mixedIntoNumber,
-							subNameAfter: '起'
-						}
-					})
-					this.dropOrder.view(viewModel2, this.element.list.mixDrop);
-
-
-					// 等待dom数据填充进去再创建swiper,否则显示空白div
-					let swiper = new Swiper("#rank", {
-						loop: true,
-						pagination: {
-							el: '#rank-pagination'
-						}
-					})
-
-					console.log(swiper)
-				}
 			})
 
-			let eventCountPromise = this.dataController.getEventCount(day)
-			eventCountPromise.then(data => {
-				this.count.view(data);
+			Promise.all([
+				this.dataController.getStatisticNumberList(day),
+				this.getGarbageStationNumberStatisticList()
+			]).then(([listData, statisticData]) => {
+
+				console.log('居委会信息', listData)
+				const items = listData.sort((a, b) => {
+					return b.illegalDropNumber - a.illegalDropNumber;
+				})
+
+				const viewModel = items.map(x => {
+					return {
+						name: x.name,
+						subName: x.illegalDropNumber,
+						subNameAfter: '起'
+					}
+				})
+				this.dropOrder.view(viewModel, this.element.list.illegalDropRank);
+
+				// 混合投放排行榜
+				const items2 = listData.sort((a, b) => {
+					return b.mixedIntoNumber - a.mixedIntoNumber;
+				})
+				const viewModel2 = items2.map(x => {
+					return {
+						name: x.name,
+						subName: x.mixedIntoNumber,
+						subNameAfter: '起'
+					}
+				})
+				this.dropOrder.view(viewModel2, this.element.list.mixIntoRank);
+
+
+				console.log('统计信息', statisticData)
+
+
+				const viewModel3 = statisticData.map(x => {
+					return {
+						name: x.Name,
+						subName: Number(x.GarbageRatio.toFixed(0)),
+						subNameAfter: '分'
+					}
+
+				})
+				this.dropOrder.view(viewModel3, this.element.list.littleGarbageRank)
+
+
+			}).then(() => {
+				this.rankSwiper = new Swiper("#rank", {
+					initialSlide: this.activeIndex,
+					pagination: {
+						el: '#rank-pagination'
+					},
+					on: {
+						slideChange: (swiper) => {
+							this.activeIndex = swiper.activeIndex;
+
+						}
+					}
+				})
+
+
 			})
 
+			this.dataController.getGarbageStationNumberStatistic("310109011002002000", new Date(),).then((res) => {
+				console.log('小包垃圾:', res)
+				this.fillCandlestickOption(res);
+				this.drawChart()
+			}).catch((err) => {
+				console.log('error', err)
+			})
 		}
 
+		fillCandlestickOption(lineDataSource: Array<GarbageStationGarbageCountStatistic>
+		) {
 
+			this.candlestickOption.barData = new Array();
+			this.candlestickOption.barDataB = new Array();
+			this.candlestickOption.lineData = new Array();
+			this.candlestickOption.lineDataB = new Array();
+			this.candlestickOption.xAxisBar = new Array();
+			this.candlestickOption.xAxisLine = new Array();
+			// console.log(eventNumberStatistic);
+			const toFormat = function (params: { value: number }) {
+				return params.value == 0 ? '' : '{Sunny|}'
+			}, rich = {
+				value: {
+					// lineHeight: 18,
+					align: 'center'
+				},
+				Sunny: {
+					width: 12,
+					height: 18,
+					align: 'center',
+					backgroundColor: {
+						image: '/assets/img/arrow-tag-a.png',
+					},
+					// opacity: 0.3
+				}
+			}
+			for (var i = 9; i <= 21; i++)
+				for (var u = 0; u < 60; u++) {
+					const m = u < 10 ? ('0' + u) : (u == 60 ? '00' : u);
+
+					this.candlestickOption.xAxisLine.push(i + ':' + m);
+					this.candlestickOption.xAxisBar.push(i + ':' + m);
+					this.candlestickOption.barData.push({
+						value: 0,
+						itemStyle: {
+							color: 'rgba(16,22,48,0)',
+							//color: '#fff'
+						},
+						label: {
+							show: false,
+							formatter: toFormat,
+							rich: rich,
+						},
+						emphasis: {
+							label: {
+								rich: {
+									Sunny: {
+										width: 12,
+										height: 18,
+										align: 'center',
+										backgroundColor: {
+											image: '/assets/img/arrow-tag.png',
+										}
+									}
+								}
+							}
+						}
+					});
+					this.candlestickOption.barDataB.push({
+						value: 0,
+						itemStyle: {
+							color: 'rgba(16,22,48,0)'
+						},
+						label: {
+							show: false,
+							formatter: toFormat,
+							rich: rich
+						},
+						emphasis: {
+							label: {
+								rich: {
+									Sunny: {
+										width: 12,
+										height: 18,
+										align: 'center',
+										backgroundColor: {
+											image: '/assets/img/arrow-tag.png',
+										}
+									}
+								}
+							}
+						}
+					});
+					if (i == 21) break;
+				}
+
+			// toIllegalDropTick(0, 100);
+			var tag = 0;
+			for (var i = 9; i < 21; i++)
+				for (var u = 0; u < 60; u++) {
+
+					const item = lineDataSource.find(x => {
+						const date = new Date(x.BeginTime);
+						return (date.getHours() == i && date.getMinutes() == u);
+					});
+					var garbageCount = 0;
+					if (item) {// green  coffee
+						garbageCount = item.GarbageCount > 0 ? 1 : 0;
+						this.candlestickOption.lineDataB.push('-');//断开 
+					}
+					else this.candlestickOption.lineDataB.push(0); //gay 链接 
+
+					this.candlestickOption.lineData.push(garbageCount);
+
+
+
+					tag += 1;
+				}
+
+			/** 9:00 填补 */
+			this.candlestickOption.lineData.push(0);
+			/**
+			 * 拉长没数据 线
+			 */
+			const grayIndex = new Array<number>();
+			for (let i = 0; i < this.candlestickOption.lineDataB.length; i++)
+				if (this.candlestickOption.lineDataB[i] == 0)
+					grayIndex.push(i + 1);
+
+			grayIndex.map(g => {
+				this.candlestickOption.lineDataB[g] = 0;
+			});
+
+			console.log(this.candlestickOption)
+		}
+		drawChart() {
+			let myChart = echarts.init(this.element.chart.littelGarbageChart)
+			let options = {
+				xAxis: {
+					type: 'category',
+					data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+				},
+				yAxis: {
+					type: 'value'
+				},
+				series: [{
+					data: [150, 230, 224, 218, 135, 147, 260],
+					type: 'line'
+				}]
+			}
+			const options1 = {
+				animation: false,
+
+				tooltip: {
+					trigger: 'axis',
+					formatter: '{b}',
+					axisPointer: {
+						lineStyle: {
+							color: '#5e6ebf',
+							width: 1.2
+						}
+					}
+				},
+				visualMap: {
+					show: false,
+
+					pieces: [{
+						gt: 0.005,
+						lte: 1,
+						color: '#CD661D'
+					}, {
+						gte: 0,
+						lte: 0.005,
+						color: '#28ce38'
+					}],
+					seriesIndex: 0,
+				},
+				grid: [
+					{
+						top: 20,
+						left: '40px',
+						right: '60px',
+						height: '60%',
+					},
+					{
+						left: '40px',
+						right: '60px',
+						top: '74%',
+						height: '10%'
+					}
+				],
+				xAxis: [
+					{
+						type: 'category',
+						data: this.candlestickOption.xAxisLine,
+						scale: true,
+						boundaryGap: false,
+						axisLine: {
+							onZero: false,
+							lineStyle: {
+								color: '#7d90bc'
+							}
+						},
+						splitLine: {
+							lineStyle: {
+								color: 'rgb(117,134,224,0.3)'
+							}
+						},
+						min: 'dataMin',
+						max: 'dataMax',
+						axisLabel: {
+							color: '#CFD7FE',
+							fontSize: "16",
+						},
+						axisTick: {        //刻度线
+
+							lineStyle: {
+								color: 'rgb(117,134,224,0.3)'
+							}
+						},
+					},
+					{
+						type: 'category',
+						gridIndex: 1,
+						data: this.candlestickOption.xAxisBar,
+						scale: true,
+						boundaryGap: false,
+						axisLine: { show: false, onZero: false },
+						axisTick: { show: false },
+						splitLine: { show: false },
+						axisPointer: {
+							show: true,
+							type: 'none',
+
+						},
+
+						min: 'dataMin',
+						max: 'dataMax',
+
+						axisLabel: {
+							show: false
+						},
+					}
+				],
+				yAxis: [
+					{
+						scale: true,
+						splitArea: {
+							show: false
+						},
+						axisTick: {        //刻度线
+							show: false
+						},
+
+						axisLine: {
+							show: false,
+							onZero: false,//y轴
+							lineStyle: {
+								color: '#7d90bc'
+							}
+						},
+						axisLabel: {
+							color: '#CFD7FE',
+							fontSize: "16",
+							show: false,
+						},
+						splitLine: {
+							lineStyle: {
+								color: 'rgb(117,134,224,0.3)'
+							}
+						}
+					},
+					{
+						scale: true,
+						gridIndex: 1,
+						axisLabel: { show: false },
+						axisLine: { show: false },
+						axisTick: { show: false },
+						splitLine: { show: false },
+						axisPointer: {
+							show: false
+						}
+					}
+				],
+				dataZoom: [
+					{
+						type: 'inside',
+						xAxisIndex: [0, 1],
+						start: 0,
+						end: 100
+					},
+					{
+						show: true,
+						xAxisIndex: [0, 1],
+						type: 'slider',
+						top: '84%',
+						start: 0,
+						end: 100,
+						fillerColor: 'rgb(117,134,224,0.5)',
+						borderColor: '#5e6ebf',
+						textStyle: {
+							color: '#CFD7FE',
+							fontSize: "16",
+						}
+					}
+				],
+				series: [{
+					name: 'theLine',
+					type: 'line',
+					data: this.candlestickOption.lineData,
+					step: 'end',
+					symbolSize: 8,
+				}, {
+					name: 'theLineB',
+					type: 'line',
+					data: this.candlestickOption.lineDataB,
+					symbolSize: 8,
+					itemStyle: {
+						color: 'gray'
+					}
+				},
+				{
+					name: 'theBar',
+					type: 'bar',
+					xAxisIndex: 1,
+					yAxisIndex: 1,
+					data: this.candlestickOption.barData
+				}
+				]
+			}
+			myChart.setOption(options1)
+		}
+
+		async getGarbageStationNumberStatisticList() {
+
+			let stationList = await this.dataController.getGarbageStationList()
+			let ids = stationList.map(item => {
+				return item.Id
+			})
+			console.log('ID列表:', ids);
+
+			let res = await this.dataController.getGarbageStationNumberStatisticList(
+				ids
+			)
+			res = res.sort(function (a, b) {
+				return a.GarbageRatio - b.GarbageRatio
+			})
+
+			return res
+		}
 
 
 		init() {

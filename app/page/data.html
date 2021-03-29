@@ -50,14 +50,14 @@
           <div class="card count">
             <div class="text title">乱丢垃圾</div>
             <div class="content">
-              <span class="value" id="illegalDrop">0</span>
+              <span class="value" id="illegalDropCount">0</span>
               <span class="text">起</span>
             </div>
           </div>
           <div class="card count">
             <div class="text title">混合投放</div>
             <div class="content">
-              <span class="value" id="hybridPush">0</span>
+              <span class="value" id="mixIntoCount">0</span>
               <span class="text">起</span>
             </div>
           </div>
@@ -68,7 +68,7 @@
                 <div class="card top" id="top-div">
                   <div class="text title">乱丢垃圾行为排行</div>
                   <div class="content top_content">
-                    <div class="body" id="top"></div>
+                    <div class="body" id="illegalDropRank"></div>
                   </div>
                 </div>
               </div>
@@ -77,10 +77,20 @@
                 <div class="card top" id="top2-div">
                   <div class="text title">混合投放排行</div>
                   <div class="content top_content">
-                    <div class="body" id="top2"></div>
+                    <div class="body" id="mixIntoRank"></div>
                   </div>
                 </div>
               </div>
+
+               <div class="swiper-slide">
+                <div class="card top" id="top3-div">
+                  <div class="text title">小包垃圾排行榜</div>
+                  <div class="content top_content">
+                    <div class="body" id="littleGarbageRank"></div>
+                  </div>
+                </div>
+              </div>
+
             </div>
             <div class="swiper-pagination" id="rank-pagination"></div>
           </div>
@@ -102,6 +112,10 @@
               </div>
             </div>
             <div class="swiper-pagination" id="chart-pagination"></div>
+          </div>
+
+          <div id="littelGarbageChart" style="height:300px;">
+
           </div>
         </div>
       </div>
