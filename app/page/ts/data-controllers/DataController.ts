@@ -1,3 +1,4 @@
+import { dateFormat } from "../../../common/tool";
 import { PagedList, TimeUnit } from "../../../data-core/model/page";
 import { Camera } from "../../../data-core/model/waste-regulation/camera";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
@@ -284,7 +285,7 @@ export abstract class DataController implements IDataController, IGarbageStation
     async getGarbageStationNumberStatistic(id: string, date: Date): Promise<GarbageStationGarbageCountStatistic[]> {
 
         let response = this.service.garbageStation.statisticGarbageCountHistoryList({
-            Date :date.toISOString(),
+            Date :dateFormat(date, "yyyy-MM-dd"),
             GarbageStationIds:[id],
             
         });
