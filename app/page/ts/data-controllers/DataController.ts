@@ -5,10 +5,10 @@ import { EventNumber, EventType } from "../../../data-core/model/waste-regulatio
 import { GarbageDropEventRecord, GarbageFullEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/event-record";
 import { GetEventRecordsParams, GetGarbageDropEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record-params";
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
-import { GarbageStationGarbageCountStatistic, GarbageStationNumberStatistic, GarbageStationNumberStatisticV2, GetGarbageStationStatisticNumbersParams } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
+import { GarbageStationGarbageCountStatistic, GarbageStationNumberStatistic, GarbageStationNumberStatisticV2, GetGarbageStationStatisticGarbageCountsParams, GetGarbageStationStatisticNumbersParams, GetGarbageStationStatisticNumbersParamsV2 } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
 import { ResourceRole } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
-import { IDataController, IDetailsEvent, IEventHistory, IGarbageDrop, IGarbageStationController, IGarbageStationNumberStatistic, OneDay, Paged, StatisticNumber } from "./IController";
+import { GarbageCountsParams, IDataController, IDetailsEvent, IEventHistory, IGarbageDrop, IGarbageStationController, IGarbageStationNumberStatistic, OneDay, Paged, StatisticNumber } from "./IController";
 
 export abstract class DataController implements IDataController, IGarbageStationController, IEventHistory, IDetailsEvent, IGarbageStationNumberStatistic, IGarbageDrop {
 
@@ -153,6 +153,8 @@ export abstract class DataController implements IDataController, IGarbageStation
 
         let params = this.getEventListParams(day, page, type, ids);
 
+
+
         let promise: PagedList<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord>
 
         switch (type) {
@@ -181,8 +183,20 @@ export abstract class DataController implements IDataController, IGarbageStation
                 promise.Data = records;
                 break;
             case EventType.GarbageDrop:
+
+                (params as GetGarbageDropEventRecordsParams).IsHandle = false;
+                (params as GetGarbageDropEventRecordsParams).IsTimeout = false;
+                promise = await this.service.event.garbageDropList(params);
+                break;
             case EventType.GarbageDropHandle:
+
+                (params as GetGarbageDropEventRecordsParams).IsHandle = true;
+                (params as GetGarbageDropEventRecordsParams).IsTimeout = false;
+                promise = await this.service.event.garbageDropList(params);
+                break;
             case EventType.GarbageDropTimeout:
+                (params as GetGarbageDropEventRecordsParams).IsHandle = false;
+                (params as GetGarbageDropEventRecordsParams).IsTimeout = true;
                 promise = await this.service.event.garbageDropList(params);
 
                 break;
@@ -235,6 +249,7 @@ export abstract class DataController implements IDataController, IGarbageStation
     GetEventRecord(type: EventType, eventId: string): Promise<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | undefined>;
     GetEventRecord(type: EventType, index: number, day?: OneDay): Promise<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | undefined>;
     async GetEventRecord(type: EventType, index: string | number, day?: OneDay) {
+        debugger;
         if (typeof index === "string") {
             return await this.GetEventRecordById(type, index);
         }
@@ -259,19 +274,15 @@ export abstract class DataController implements IDataController, IGarbageStation
     }
 
 
-
-    /**
-     * 获取垃圾厢房数据统计
-     *
-     * @param {string[]} ids 垃圾厢房ID
-     * @returns {Promise<GarbageStationNumberStatistic[]>}
-     * @memberof DataController
-     */
-    async getGarbageStationNumberStatisticList(ids: string[]): Promise<GarbageStationNumberStatistic[]> {
-        let params = new GetGarbageStationStatisticNumbersParams();
-        params.Ids = ids;
-        let response = await this.service.garbageStation.statisticNumberList(params);
-        return response.Data;
+    async getGarbageStationNumberStatisticList(ids: string[], day: OneDay): Promise<GarbageStationNumberStatisticV2[]> {
+        let params: GetGarbageStationStatisticNumbersParamsV2 = {
+            BeginTime: day.begin,
+            EndTime: day.end,
+            GarbageStationIds: ids,
+            TimeUnit: TimeUnit.Day
+        };
+        let response = await this.service.garbageStation.statisticNumberHistoryList(params);
+        return response;
     }
 
     /**
@@ -285,9 +296,9 @@ export abstract class DataController implements IDataController, IGarbageStation
     async getGarbageStationNumberStatistic(id: string, date: Date): Promise<GarbageStationGarbageCountStatistic[]> {
 
         let response = this.service.garbageStation.statisticGarbageCountHistoryList({
-            Date :dateFormat(date, "yyyy-MM-dd"),
-            GarbageStationIds:[id],
-            
+            Date: dateFormat(date, "yyyy-MM-dd"),
+            GarbageStationIds: [id],
+
         });
         return response;
     }
