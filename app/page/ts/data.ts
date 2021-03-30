@@ -280,8 +280,10 @@ namespace GarbageCondition {
 			})
 			// console.log('ID列表:', ids);
 
+			let day = getAllDay(date);
+
 			let res = await this.dataController.getGarbageStationNumberStatisticList(
-				ids
+				ids,day
 			)
 			res = res.sort(function (a, b) {
 				return a.GarbageRatio - b.GarbageRatio

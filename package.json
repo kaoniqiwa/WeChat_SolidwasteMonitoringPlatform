@@ -31,6 +31,7 @@
     "axios": "^0.21.0",
     "class-transformer": "^0.4.0",
     "echarts": "^5.0.2",
+    "jquery": "^3.6.0",
     "parcel-bundler": "^1.12.4",
     "reflect-metadata": "^0.1.13",
     "swiper": "^6.4.11",
