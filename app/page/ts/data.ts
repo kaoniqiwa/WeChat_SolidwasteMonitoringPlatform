@@ -204,18 +204,20 @@ namespace GarbageCondition {
 					throw new Error('')
 				}
 			}).then(() => {
-				this.chartSwiper = new Swiper("#diagram", {
-					initialSlide: this.activeIndex,
-					pagination: {
-						el: '#chart-pagination'
-					},
-					on: {
-						slideChange: (swiper) => {
-							this.activeIndex = swiper.activeIndex;
+				if (!this.chartSwiper) {
+					this.chartSwiper = new Swiper("#diagram", {
+						initialSlide: this.activeIndex,
+						pagination: {
+							el: '#chart-pagination'
+						},
+						on: {
+							slideChange: (swiper) => {
+								this.activeIndex = swiper.activeIndex;
 
+							}
 						}
-					}
-				})
+					})
+				}
 			}).catch(error => {
 
 			})
@@ -253,14 +255,14 @@ namespace GarbageCondition {
 				this.dropOrder.view(viewModel2, this.element.list.mixIntoRank);
 
 
-				console.log('统计信息', statisticData)
+				// console.log('统计信息', statisticData)
 
 
 				const viewModel3 = statisticData.map(x => {
 					// x.GarbageRatio = 91
 					return {
 						name: x.Name,
-						subName:x.GarbageRatio == 100 ? x.GarbageRatio.toFixed(0) : x.GarbageRatio.toFixed(2),
+						subName: x.GarbageRatio == 100 ? x.GarbageRatio.toFixed(0) : x.GarbageRatio.toFixed(2),
 						subNameAfter: '分'
 					}
 
@@ -269,20 +271,20 @@ namespace GarbageCondition {
 
 
 			}).then(() => {
-				this.rankSwiper = new Swiper("#rank", {
-					initialSlide: this.activeIndex,
-					pagination: {
-						el: '#rank-pagination'
-					},
-					on: {
-						slideChange: (swiper) => {
-							this.activeIndex = swiper.activeIndex;
-
+				if (!this.rankSwiper) {
+					this.rankSwiper = new Swiper("#rank", {
+						initialSlide: this.activeIndex,
+						pagination: {
+							el: '#rank-pagination'
+						},
+						on: {
+							slideChange: (swiper) => {
+								this.activeIndex = swiper.activeIndex;
+								// console.log('activeIndex', this.activeIndex)
+							}
 						}
-					}
-				})
-
-
+					})
+				}
 			})
 
 
