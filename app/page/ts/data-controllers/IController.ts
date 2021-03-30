@@ -214,6 +214,18 @@ export interface IGarbageStationController {
      * @memberof IGarbageStationController
      */
     getImageUrl(id: string): string | undefined;
+
+    
+    /**
+     * 获取垃圾厢房数据统计
+     *
+     * @param {string[]} ids 垃圾厢房ID
+     * @param {OneDay} day 日期
+     * @returns {Promise<Array<GarbageStationNumberStatisticV2>>}
+     * @memberof IGarbageStationNumberStatistic
+     */
+     getGarbageStationNumberStatisticList(ids: string[], day:OneDay): Promise<Array<GarbageStationNumberStatisticV2>>
+
 }
 
 export interface IEventHistory {
