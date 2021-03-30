@@ -74,19 +74,33 @@ namespace GarbageCondition {
 
 
 
-		async view(viewModel: Array<{ name: string, subName: number, subNameAfter: string }>, target: HTMLElement) {
+		async view(viewModel: Array<{ name: string, subName: string, subNameAfter: string }>, target: HTMLElement) {
 
 			var html = '';
 			target.innerHTML = '';
 			for (let i = 0; i < viewModel.length; i++) {
 				const t = viewModel[i];
-				html += ` <div class=" top5-list-wrap">
-                              <div class="pull-left number-item ${i < 3 ? 'red-bg' : "orange-bg"}">
-                                  <label class="white-text ">${i + 1}</label>
-                              </div>
-                              <div class="pull-left">${t.name}</div>
-                              <div class="pull-right sky-blue-text">${t.subName} <label class="list-desc-unit">${t.subNameAfter}</label></div>
-                          </div> `;
+				// html += ` <div class=" top5-list-wrap">
+				//               <div class="pull-left number-item ${i < 3 ? 'red-bg' : "orange-bg"}">
+				//                   <label class="white-text ">${i + 1}</label>
+				//               </div>
+				//               <div class="pull-left">${t.name}</div>
+				//               <div class="pull-right sky-blue-text">${t.subName} <label class="list-desc-unit">${t.subNameAfter}</label></div>
+				//           </div> `;
+
+				html += `
+						<div class='wrapper'>
+							<div class='prefix'>
+								<div class="${i < 3 ? 'red-bg' : 'orange-bg'} prefix__number">${i + 1}</div>
+								<div class='prefix__title'>${t.name}</div>
+							</div>
+							<div class='suffix'>
+								<div class='sky-blue-text'>${t.subName}</div>
+								<div class='list-desc-unit'>${t.subNameAfter}</div>
+							</div>
+						</div>
+				`;
+
 
 			}
 			target.insertAdjacentHTML('afterbegin', html);
@@ -219,7 +233,7 @@ namespace GarbageCondition {
 				const viewModel = items.map(x => {
 					return {
 						name: x.name,
-						subName: x.illegalDropNumber,
+						subName: x.illegalDropNumber.toString(),
 						subNameAfter: '起'
 					}
 				})
@@ -232,20 +246,21 @@ namespace GarbageCondition {
 				const viewModel2 = items2.map(x => {
 					return {
 						name: x.name,
-						subName: x.mixedIntoNumber,
+						subName: x.mixedIntoNumber.toString(),
 						subNameAfter: '起'
 					}
 				})
 				this.dropOrder.view(viewModel2, this.element.list.mixIntoRank);
 
 
-				// console.log('统计信息', statisticData)
+				console.log('统计信息', statisticData)
 
 
 				const viewModel3 = statisticData.map(x => {
+					// x.GarbageRatio = 91
 					return {
 						name: x.Name,
-						subName: Number(x.GarbageRatio.toFixed(0)),
+						subName:x.GarbageRatio == 100 ? x.GarbageRatio.toFixed(0) : x.GarbageRatio.toFixed(2),
 						subNameAfter: '分'
 					}
 
@@ -270,6 +285,7 @@ namespace GarbageCondition {
 
 			})
 
+
 		}
 
 		async getGarbageStationNumberStatisticList() {
@@ -283,7 +299,7 @@ namespace GarbageCondition {
 			let day = getAllDay(date);
 
 			let res = await this.dataController.getGarbageStationNumberStatisticList(
-				ids,day
+				ids, day
 			)
 			res = res.sort(function (a, b) {
 				return a.GarbageRatio - b.GarbageRatio
