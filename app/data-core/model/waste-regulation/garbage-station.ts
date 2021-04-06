@@ -39,6 +39,7 @@ export class Flags<T extends number | string>{
     }
     contains(t: T) {
         return this.getValues().indexOf(t) >= 0;
+        // return this.getValues().includes(t)
     }
 }
 
