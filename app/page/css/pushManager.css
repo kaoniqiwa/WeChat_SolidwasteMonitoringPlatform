@@ -1,0 +1,20 @@
+.container{
+    display: flex;
+    height: 100%;
+}
+.container .page{    
+    height: 100%;
+}
+.container .page > main
+{
+ margin-top: 47px; 
+}
+
+.other
+{
+    height: calc(100% - 383px);
+}
+.ok
+{
+    top:40%
+}

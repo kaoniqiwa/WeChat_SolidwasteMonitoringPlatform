@@ -1,12 +1,14 @@
+
 import { PagedList } from "../../../data-core/model/page";
+import { User } from "../../../data-core/model/user-stystem";
 import { Camera } from "../../../data-core/model/waste-regulation/camera";
 import { Division } from "../../../data-core/model/waste-regulation/division";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
 import { GarbageDropEventRecord, GarbageFullEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/event-record";
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
-import { GarbageStationGarbageCountStatistic, GarbageStationNumberStatistic, GarbageStationNumberStatisticV2 } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
-
-import { ResourceRole } from "../../../data-core/model/we-chat";
+import { GarbageStationGarbageCountStatistic, GarbageStationNumberStatisticV2 } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
+import { ResourceRole, WeChatUser } from "../../../data-core/model/we-chat";
+import { GarbageStationViewModel } from "./ViewModels";
 
 
 export interface GarbageCountsParams {
@@ -106,6 +108,10 @@ export interface StatisticNumber {
     garbageFullNumber: number;
 }
 
+
+
+
+
 export interface IDataController {
     roles: ResourceRole[]
     /**
@@ -139,10 +145,10 @@ export interface IDataController {
     /**
          * 获取垃圾厢房列表
          *
-         * @returns {Promise<Array<GarbageStation>>}
+         * @returns {Promise<Array<GarbageStationModel>>}
          * @memberof IDataController
          */
-    getGarbageStationList(): Promise<Array<GarbageStation>>;
+    getGarbageStationList(): Promise<Array<GarbageStationViewModel>>;
 
     /**
      * 获取垃圾厢房数据统计
@@ -215,7 +221,7 @@ export interface IGarbageStationController {
      */
     getImageUrl(id: string): string | undefined;
 
-    
+
     /**
      * 获取垃圾厢房数据统计
      *
@@ -224,7 +230,7 @@ export interface IGarbageStationController {
      * @returns {Promise<Array<GarbageStationNumberStatisticV2>>}
      * @memberof IGarbageStationNumberStatistic
      */
-     getGarbageStationNumberStatisticList(ids: string[], day:OneDay): Promise<Array<GarbageStationNumberStatisticV2>>
+    getGarbageStationNumberStatisticList(ids: string[], day: OneDay): Promise<Array<GarbageStationNumberStatisticV2>>
 
 }
 
@@ -315,7 +321,7 @@ export interface IGarbageStationNumberStatistic {
      * @returns {Promise<Array<GarbageStationNumberStatisticV2>>}
      * @memberof IGarbageStationNumberStatistic
      */
-    getGarbageStationNumberStatisticList(ids: string[], day:OneDay): Promise<Array<GarbageStationNumberStatisticV2>>
+    getGarbageStationNumberStatisticList(ids: string[], day: OneDay): Promise<Array<GarbageStationNumberStatisticV2>>
 
     /**
      * 获取垃圾厢房数据统计
@@ -355,4 +361,9 @@ export interface IGarbageDrop {
      * @memberof IGarbageDrop
      */
     getImageUrl(id: string): string | undefined;
+}
+
+export interface IUserPushManager {
+    GetUser(id:string):Promise<WeChatUser>;
+    SetUser(user: WeChatUser): void;
 }

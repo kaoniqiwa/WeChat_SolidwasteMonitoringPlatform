@@ -7,6 +7,7 @@ import { ResourceRole, ResourceType } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
 import { DataController } from "./DataController";
 import { IDataController, IGarbageStationController, OneDay, Paged, StatisticNumber } from "./IController";
+import { GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
 
 export class GarbageStationController extends DataController implements IDataController, IGarbageStationController {
 
@@ -213,7 +214,20 @@ export class GarbageStationController extends DataController implements IDataCon
 
 	getGarbageStationList = async () => {
 		let promise = await this.service.garbageStation.list({ Ids: this.roles.map(x => x.Id) });
-		return promise.Data;
+
+		let statisic = await this.service.garbageStation.statisticNumberList({ Ids: promise.Data.map(x => x.Id) })
+
+		let result = new Array<GarbageStationViewModel>()
+		for (let i = 0; i < promise.Data.length; i++) {
+			const item = promise.Data[i];
+			let vm = ViewModelConverter.Convert(item);
+			vm.NumberStatistic = statisic.Data.find(x => x.Id == vm.Id);
+			result.push(vm);
+		}
+		result = result.sort((a, b) => {
+			return a.DivisionId!.localeCompare(a.DivisionId!) || a.Name.localeCompare(b.Name);
+		})
+		return result;		
 	}
 
 

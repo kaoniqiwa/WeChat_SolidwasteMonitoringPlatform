@@ -12,7 +12,7 @@ import { ControllerFactory } from "./data-controllers/ControllerFactory";
 
 import { EventType } from "../../data-core/model/waste-regulation/event-number";
 import { SwiperControl } from "./data-controllers/modules/SwiperControl";
-import { EventRecord, GarbageDropEventRecord } from "../../data-core/model/waste-regulation/event-record";
+import { CameraImageUrl, EventRecord, GarbageDropEventRecord } from "../../data-core/model/waste-regulation/event-record";
 
 import { NavigationWindow } from ".";
 import { DataController } from "./data-controllers/DataController";
@@ -165,8 +165,21 @@ export namespace EventHistoryPage {
                 template.img.src = getImageUrl(record.ImageUrl) as string;
             }
             if (record instanceof GarbageDropEventRecord) {
-                if (record.Data.DropImageUrls && record.Data.DropImageUrls.length > 0) {
-                    template.img.src = getImageUrl(record.Data.DropImageUrls[0].ImageUrl) as string;
+                let urls:CameraImageUrl[];
+                if(record.Data.IsHandle)
+                {
+                    urls = record.Data.HandleImageUrls;
+                }
+                else if(record.Data.IsTimeout)
+                {
+                    urls = record.Data.TimeoutImageUrls;
+                }
+                else
+                {
+                    urls = record.Data.DropImageUrls;
+                }
+                if (urls && urls.length > 0) {
+                    template.img.src = getImageUrl(urls[0].ImageUrl) as string;
                 }
             }
 

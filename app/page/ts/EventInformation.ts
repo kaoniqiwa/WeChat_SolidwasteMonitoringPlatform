@@ -7,7 +7,7 @@ import { EventType } from "../../data-core/model/waste-regulation/event-number";
 import { NavigationWindow } from ".";
 import { ImageController } from "./data-controllers/modules/ImageControl";
 import { DataController } from "./data-controllers/DataController";
-import { IDetailsEvent, OneDay, Paged } from "./data-controllers/IController";
+import { GarbageCountsParams, IDetailsEvent, OneDay, Paged } from "./data-controllers/IController";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import { Service } from "../../data-core/repuest/service";
 import { LoopPageControl } from "./data-controllers/modules/LoopPageControl";
@@ -97,6 +97,7 @@ export namespace EventInformationPage {
             if (index != undefined) {
                 index += 1;
             }
+            debugger;
             const data = await this.getData(index, this.day);
             if (data) {
                 this.fillDetail(data, element);
@@ -487,22 +488,29 @@ export namespace EventInformationPage {
 
             camera__name.innerHTML = "";
             let imgUrls = new Array<GarbageDropImageUrl>();
-            if (item.Data.DropImageUrls) {
-                imgUrls = imgUrls.concat(item.Data.DropImageUrls.map(x => {
-                    return new GarbageDropImageUrl(x, EventType.GarbageDrop);
-                }));
+
+            if (item.Data.IsHandle) {
+                if (item.Data.HandleImageUrls) {
+                    imgUrls = item.Data.HandleImageUrls.map(x => {
+                        return new GarbageDropImageUrl(x, EventType.GarbageDropHandle);
+                    });
+                }
             }
-            if (item.Data.TimeoutImageUrls) {
-                imgUrls = imgUrls.concat(item.Data.TimeoutImageUrls.map(x => {
-                    return new GarbageDropImageUrl(x, EventType.GarbageDropTimeout);
-                }));
+            else if (item.Data.IsTimeout) {
+                if (item.Data.TimeoutImageUrls) {
+                    imgUrls = item.Data.TimeoutImageUrls.map(x => {
+                        return new GarbageDropImageUrl(x, EventType.GarbageDropTimeout);
+                    });
+                }
+            }
+            else {
+                if (item.Data.DropImageUrls) {
+                    imgUrls = item.Data.DropImageUrls.map(x => {
+                        return new GarbageDropImageUrl(x, EventType.GarbageDrop);
+                    });
+                }
             }
 
-            if (item.Data.HandleImageUrls) {
-                imgUrls = imgUrls.concat(item.Data.HandleImageUrls.map(x => {
-                    return new GarbageDropImageUrl(x, EventType.GarbageDropHandle);
-                }));
-            }
             if (imgUrls.length > 0) {
                 console.log(imgUrls);
                 let container = source.querySelector(".swiper-container-img") as HTMLDivElement;
@@ -612,7 +620,7 @@ export namespace EventInformationPage {
         }
 
 
-        fillDetail(item: IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord, element?: HTMLElement) {
+        fillDetail(item: IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | GarbageDropEventRecord, element?: HTMLElement) {
             if (item instanceof GarbageFullEventRecord) {
                 this.fillGarbageFullEventRecord(item, element);
             }

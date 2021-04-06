@@ -1,22 +1,30 @@
 import { dateFormat } from "../../../common/tool";
 import { PagedList, TimeUnit } from "../../../data-core/model/page";
+import { User } from "../../../data-core/model/user-stystem";
 import { Camera } from "../../../data-core/model/waste-regulation/camera";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
 import { GarbageDropEventRecord, GarbageFullEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/event-record";
 import { GetEventRecordsParams, GetGarbageDropEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record-params";
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
 import { GarbageStationGarbageCountStatistic, GarbageStationNumberStatistic, GarbageStationNumberStatisticV2, GetGarbageStationStatisticGarbageCountsParams, GetGarbageStationStatisticNumbersParams, GetGarbageStationStatisticNumbersParamsV2 } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
-import { ResourceRole } from "../../../data-core/model/we-chat";
+import { ResourceRole, WeChatUser } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
-import { GarbageCountsParams, IDataController, IDetailsEvent, IEventHistory, IGarbageDrop, IGarbageStationController, IGarbageStationNumberStatistic, OneDay, Paged, StatisticNumber } from "./IController";
+import { GarbageCountsParams, IDataController, IDetailsEvent, IEventHistory, IGarbageDrop, IGarbageStationController, IGarbageStationNumberStatistic, IUserPushManager, OneDay, Paged, StatisticNumber } from "./IController";
+import { GarbageStationViewModel } from "./ViewModels";
 
-export abstract class DataController implements IDataController, IGarbageStationController, IEventHistory, IDetailsEvent, IGarbageStationNumberStatistic, IGarbageDrop {
+export abstract class DataController implements IDataController, IGarbageStationController, IEventHistory, IDetailsEvent, IGarbageStationNumberStatistic, IGarbageDrop, IUserPushManager {
 
     static readonly defaultImageUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABIAAAAKIAQAAAAAgULygAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAd2KE6QAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAHdElNRQflAgIBCxpFwPH8AAAAcklEQVR42u3BMQEAAADCoPVPbQZ/oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+A28XAAEDwmj2AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIxLTAyLTAyVDAxOjExOjI2KzAwOjAwOo9+nAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMS0wMi0wMlQwMToxMToyNiswMDowMEvSxiAAAAAASUVORK5CYII=";
 
 
     constructor(protected service: Service, roles: ResourceRole[]) {
         this.roles = roles;
+    }
+    GetUser(id:string): Promise<WeChatUser> {        
+        return this.service.wechat.get(id);
+    }
+    SetUser(user: WeChatUser): void {
+        this.service.wechat.set(user);
     }
 
 
@@ -32,7 +40,7 @@ export abstract class DataController implements IDataController, IGarbageStation
 
     roles: ResourceRole[];
 
-    abstract getGarbageStationList: () => Promise<GarbageStation[]>;
+    abstract getGarbageStationList: () => Promise<GarbageStationViewModel[]>;
     abstract getResourceRoleList: () => Promise<ResourceRole[]>;
     getEventCount = async (day: OneDay) => {
         let result: StatisticNumber = {

@@ -44,6 +44,14 @@ export class User {
     /** 创建者	O	R	*/
     CreatorId?: string;
 
+    /**
+     *	停止推送的事件类型	O	RW
+     *
+     * @type {number[]}
+     * @memberof User
+     */
+    OffEvents?:number[];
+
 }
 /** 隐私数据显示	M	RW	
     3- 不显示|部分显示，1-显示

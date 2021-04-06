@@ -7,6 +7,12 @@ import { NavigationWindow } from ".";
 import { ToastIcon, ToastMessage } from "./data-controllers/modules/ToastMessage";
 
 
+export interface UserWindow extends Window{
+    User:SessionUser;
+    Authentication:HowellAuthHttp
+}
+
+
 namespace UserPage {
     class Page {
 
@@ -26,7 +32,8 @@ namespace UserPage {
             btn: {
                 details: document.getElementById('btn-user-details')!,
                 add: document.getElementById('btn-add-user')!,
-                list: document.getElementById('btn-user-list')!
+                list: document.getElementById('btn-user-list')!,
+                pushManager:document.getElementById('btn-push-manager') as HTMLDivElement
             },
             info: {
                 name: document.getElementById('name')!,
@@ -38,7 +45,8 @@ namespace UserPage {
             link: {
                 details: document.getElementById("link-details") as HTMLLinkElement,
                 list: document.getElementById("link-list") as HTMLLinkElement,
-                add: document.getElementById("link-add") as HTMLLinkElement
+                add: document.getElementById("link-add") as HTMLLinkElement,
+                pushManager:document.getElementById("link-push") as HTMLLinkElement
             }
         }
 
@@ -59,6 +67,11 @@ namespace UserPage {
             this.element.btn.add.addEventListener('click', () => {
                 const url = this.element.link.add.href + "?openid=" + this.user.WUser.OpenId;
                 this.showAside(url)
+            })
+            this.element.btn.pushManager.addEventListener('click', ()=>{
+                const url = this.element.link.pushManager.href + "?openid=" + this.user.WUser.OpenId;
+                this.showAside(url)
+                
             })
         }
 
@@ -95,6 +108,8 @@ namespace UserPage {
 
     const user = (window.parent as NavigationWindow).User;
     const http = (window.parent as NavigationWindow).Authentication;
+    (window as unknown as UserWindow).User = user;
+    (window as unknown as UserWindow).Authentication = http;
     const service = new Service(http);
     const page = new Page(user, service);
     page.init();

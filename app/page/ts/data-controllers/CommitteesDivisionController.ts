@@ -7,6 +7,7 @@ import { Service } from "../../../data-core/repuest/service";
 import { CountDivisionController } from "./CountDivisionController";
 import { DataController } from "./DataController";
 import { OneDay, StatisticNumber } from "./IController";
+import { GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
 
 export class CommitteesDivisionController extends DataController {
 
@@ -19,10 +20,22 @@ export class CommitteesDivisionController extends DataController {
 		let list = new Array<GarbageStation>();
 		for (let i = 0; i < this.roles.length; i++) {
 			const role = this.roles[i];
-			let promise = await this.service.garbageStation.list({ DivisionId: role.Id});
+			let promise = await this.service.garbageStation.list({ DivisionId: role.Id });
 			list = list.concat(promise.Data);
-		}		
-		return list;
+		}
+		let statisic = await this.service.garbageStation.statisticNumberList({ Ids: list.map(x => x.Id) })
+
+		let result = new Array<GarbageStationViewModel>()
+		for (let i = 0; i < list.length; i++) {
+			const item = list[i];
+			let vm = ViewModelConverter.Convert(item);
+			vm.NumberStatistic = statisic.Data.find(x => x.Id == vm.Id);
+			result.push(vm);
+		}
+		result = result.sort((a, b) => {
+			return a.DivisionId!.localeCompare(a.DivisionId!) || a.Name.localeCompare(b.Name);
+		})
+		return result;
 	}
 	getGarbageStationStatisticNumberListInToday = async (sources: ResourceRole[]): Promise<Array<StatisticNumber>> => {
 		return this.getStatisticNumberListInToday(sources);
@@ -149,20 +162,20 @@ export class CommitteesDivisionController extends DataController {
 			while (begin.getTime() >= day.begin.getTime()) {
 				let item = new EventNumberStatistic();
 				item.EndTime = begin.toISOString();
-				begin.setHours(begin.getHours()-1)
+				begin.setHours(begin.getHours() - 1)
 				item.BeginTime = begin.toISOString();
 				item.EventNumbers = [
 					{
-						EventType:EventType.IllegalDrop,
-						DayNumber:0
+						EventType: EventType.IllegalDrop,
+						DayNumber: 0
 					},
 					{
-						EventType:EventType.MixedInto,
-						DayNumber:0
+						EventType: EventType.MixedInto,
+						DayNumber: 0
 					}
 				]
-				
-				data.Data.unshift(item)				
+
+				data.Data.unshift(item)
 			}
 			for (var x of data.Data) {
 				for (const y of x.EventNumbers)

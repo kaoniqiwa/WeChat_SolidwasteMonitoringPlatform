@@ -7,6 +7,7 @@ import { Service } from "../../../data-core/repuest/service";
 import { IDataController, IGarbageStationController, OneDay, Paged, StatisticNumber } from "./IController";
 import { DataController } from "./DataController";
 import { GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record-params";
+import { GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
 
 
 export class CountDivisionController extends DataController implements IDataController, IGarbageStationController {
@@ -206,15 +207,25 @@ export class CountDivisionController extends DataController implements IDataCont
 
 	getGarbageStationList = async () => {
 
-		let result = new Array<GarbageStation>();
+		let list = new Array<GarbageStation>();
 		for (let i = 0; i < this.roles.length; i++) {
 			const role = this.roles[i];
 			const promise = await this.service.garbageStation.list({ DivisionId: role.Id });
-			result = result.concat(promise.Data);
+			list = list.concat(promise.Data);
+		}
+		let statisic = await this.service.garbageStation.statisticNumberList({ Ids: list.map(x => x.Id) })
+
+		let result = new Array<GarbageStationViewModel>()
+		for (let i = 0; i < list.length; i++) {
+			const item = list[i];
+			let vm = ViewModelConverter.Convert(item);
+			vm.NumberStatistic = statisic.Data.find(x => x.Id == vm.Id);
+			result.push(vm);
 		}
 		result = result.sort((a, b) => {
 			return a.DivisionId!.localeCompare(a.DivisionId!) || a.Name.localeCompare(b.Name);
 		})
+
 		return result;
 	}
 

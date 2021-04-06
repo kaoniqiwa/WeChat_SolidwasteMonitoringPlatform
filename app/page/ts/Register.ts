@@ -2,6 +2,9 @@
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { WeChatCodeRequestService, WeChatRequestService } from "../../data-core/repuest/we-chat.service";
 import { SessionUser } from "../../common/session-user";
+import { ResourceType } from "../../data-core/model/we-chat";
+import { EventType } from "../../data-core/model/waste-regulation/event-number";
+import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 export namespace RegisterPage {
 
     class Message {
@@ -132,11 +135,39 @@ export namespace RegisterPage {
 
                         const buser = await this.regist();
                         if (buser && buser.Resources && buser.Resources.length > 0) {
-                            this.page.Message.show("注册成功");
-                            setTimeout(() => {
+                            
 
-                                location.href = "./index.html?openid=" + buser.OpenId;
-                            }, 1500);
+                            const client = new HowellHttpClient.HttpClient();
+                            client.login((http: HowellAuthHttp) => {
+                                this.page.Message.show("注册成功");
+                                const service = new WeChatRequestService(http);
+                                let promise = service.get(buser.Id);
+                                promise.then((user => {
+                                    switch (user.Resources[0].ResourceType) {
+                                        case ResourceType.County:
+                                            user.OffEvents = [EventType.GarbageDrop, EventType.GarbageDropTimeout, EventType.GarbageDropHandle]
+                                            break;
+                                        case ResourceType.Committees:
+                                            user.OffEvents = [EventType.GarbageDropTimeout, EventType.GarbageDropHandle]
+                                            break;
+                                        case ResourceType.GarbageStations:
+                                            break;
+                                        default:
+                                            break;
+                                    }
+
+                                    service.set(user);
+                                    
+                                setTimeout(() => {
+                                    location.href = "./index.html?openid=" + buser.OpenId + "&index=4";
+                                }, 1500);
+                                }))
+
+                            });
+
+
+
+
                         }
                         else {
                             this.page.Message.show("您还未被分配权限，请联系管理员");

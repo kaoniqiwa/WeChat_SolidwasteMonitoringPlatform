@@ -30,6 +30,14 @@ export class WeChatUser {
     Note?: string;
     /**	是否可以分配微信子用户 */
     CanCreateWeChatUser?: boolean;
+
+    /**
+     *	停止推送的事件类型	O	RW
+     *
+     * @type {number[]}
+     * @memberof WeChatUser
+     */
+    OffEvents?:number[];
 }
 
 export class ResourceRole {
