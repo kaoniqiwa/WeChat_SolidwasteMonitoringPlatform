@@ -15,22 +15,32 @@ import { AsideControl } from "./aside";
 import { AsideListPage, AsideListPageWindow, SelectionMode } from "./aside-list";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import { DataController } from "./data-controllers/DataController";
-import { IGarbageStationController } from "./data-controllers/IController";
+import { IGarbageStationController, StatisticNumber } from "./data-controllers/IController";
 import { ClassNameHelper, Language } from "./language";
-import Swiper from 'swiper';
+import Swiper, { Virtual, Pagination, } from 'swiper';
 import $ from 'jquery';
-import { number } from "echarts/core";
+import MyAside from './myAside';
+
+// 理论上应在ts中根据需求导入minirefresh，而不是写死在html中，受项目parcel-bundler版本限制，未实现
+// import "minirefresh";
 
 
-// let Swiper = Reflect.get(window, 'Swiper');
-// let $ = Reflect.get(window, '$');
+
+
+
+// 模块化方式使用 Swiper库
+Swiper.use([
+    Virtual,
+    Pagination
+])
+
 
 enum ZoomStatus {
     out = "zoomOut",
     in = "zoomIn"
 }
-
-class GarbageStationClient {
+// 使用简单的观察者模式，实现 GarbageStationClient 和 myAside 类的通信
+class GarbageStationClient implements IObserver {
     content: HTMLElement | null;
     template: HTMLTemplateElement | null;
     asideTemplate: HTMLTemplateElement | null;
@@ -48,7 +58,7 @@ class GarbageStationClient {
     hwBar: HTMLDivElement
 
     zoomStatus: ZoomStatus = ZoomStatus.in;
-    swiper: typeof Swiper;
+    swiper: Swiper;
     swiperStatus: boolean = false;
     originStatus: boolean = false;
 
@@ -62,120 +72,245 @@ class GarbageStationClient {
 
     dataController: IGarbageStationController;
     type: ResourceType;
+    garbageStations: GarbageStation[];
+    numberList: StatisticNumber[];
+    roleList: ResourceRole[];
+    myAside: MyAside;
+    _show = false;
+    get show() {
+        return this._show
+    }
+    set show(val) {
+        this._show = val;
+        if (val) {
+           $(this.elements.asideContainer).show();
+           setTimeout(() => {
+               this.myAside.slideIn()
+           }, 100);
+        }
+        else {
+            setTimeout(() => {
+                $(this.elements.asideContainer).hide();
+            }, 300);
+        }
+
+    }
+
+    elements = {
+        doms: {
+            container: document.querySelector('#hw-container') as HTMLDivElement,
+            template: document.querySelector('#card-template') as HTMLTemplateElement,
+        },
+        btns: {
+            imgDivision: document.querySelector('#img_division') as HTMLDivElement,
+            btnDivision: document.querySelector('#btn_division') as HTMLDivElement,
+            searchInput: document.querySelector('#searchInput') as HTMLInputElement,
+            btnSearch: document.querySelector('#btn_search') as HTMLInputElement,
+            imgIcon: document.querySelector('#img_division i') as HTMLElement
+        },
+
+        asideContainer: document.querySelector('#aside-container') as HTMLElement,
+        originImg: document.querySelector('#origin-img') as HTMLDivElement,
+        hwBar: document.querySelector('.hw-bar') as HTMLDivElement,
+        backdrop: document.querySelector(".backdrop") as HTMLDivElement
+    }
 
     constructor(type: ResourceType, dataController: IGarbageStationController
-        //     {
-        //     garbageStation: GarbageStationRequestService,        
-        //     division: DivisionRequestService,
-        //     camera: CameraRequestService,
-        //     media: ResourceMediumRequestService
-        // }
     ) {
         this.type = type;
         this.dataController = dataController;
 
 
-        this.asideControl = new AsideControl("aside-control");
-        this.asideControl.backdrop = document.querySelector(".backdrop") as HTMLDivElement;
-        this.asideIframe = document.querySelector("#aside-iframe") as HTMLIFrameElement;
 
-        this.content = document.querySelector('#content');
-        this.template = document.querySelector('#card-template') as HTMLTemplateElement;
-        this.asideTemplate = document.querySelector('#aside-template') as HTMLTemplateElement;
-        this.asideMain = document.querySelector('.aside-main') as HTMLDivElement;
+    }
+    update(args) {
+        if (args && args.selectedItems) {
+            let selectedItems = [...args.selectedItems]
+            let ids = selectedItems.map(item => {
+                return item.getAttribute('id')
+            });
+            this.confirmSelect(ids);
+        }
+        if (args && 'show' in args) {
+            this.show = args.show;
+        }
+    }
+    init() {
+        this.loadData().then(() => {
+            this.createAside()
+            this.resetBar()
+            this.createContent();
+            this.createNumberList();
 
-        this.btnDivision = document.querySelector('#btn_division') as HTMLDivElement;
-        this.imgDivision = document.querySelector('#img_division') as HTMLDivElement;
+            if (!refreshed) {
+                this.bindEvents();
+            }
+        })
 
-        this.searchInput = document.querySelector('#searchInput') as HTMLInputElement;
+    }
+    async loadData() {
+        // 拉取厢房数据
+        this.garbageStations = await this.dataController.getGarbageStationList();
+        let ids = this.garbageStations.map(item => item.Id)
+        console.log(this.garbageStations)
 
-        this.btnSearch = document.querySelector('#btn_search') as HTMLInputElement;
+        // 获取垃圾厢房当天的统计数据
+        let roles = ids.map(x => {
+            let role = new ResourceRole();
+            role.Id = x;
+            role.ResourceType = type;
+            return role;
+        })
+        this.numberList = await this.dataController.getGarbageStationStatisticNumberListInToday(roles);
+        console.log(this.numberList)
 
-        this.originImg = document.querySelector('#origin-img') as HTMLDivElement;
-        this.hwBar = document.querySelector('.hw-bar') as HTMLDivElement;
-
-        this.swiper = new Swiper(this.originImg, {
-            zoom: true,
-            width: window.innerWidth,
-            virtual: true,
-            spaceBetween: 20,
-            pagination: {
-                el: '.swiper-pagination',
-                type: 'fraction',
-            },
-            on: {
-                click: () => {
-
-                    $(this.originImg).fadeOut(() => {
-                        this.originStatus = false;
-                    })
-
-
-                    $(this.hwBar).fadeIn()
-
-
-                    this.swiper.virtual.slides.length = 0;
-                    this.swiper.virtual.cache = [];
-                    this.swiperStatus = false;
-                },
-            },
-
-        });
+        this.roleList = await this.dataController.getResourceRoleList()
 
     }
 
-    init() {
+    resetBar() {
+        this.elements.btns.imgIcon.className = "howell-icon-list";
+        this.elements.btns.searchInput.value = "";
+    }
+    createContent() {
+        let _this = this;
+        // 清空容器内容
+        this.elements.doms.container.innerHTML = "";
 
-        // 创建主页面
-        this.createContent();
+        // 模板内容
+        let tempContent = this.elements.doms.template?.content as DocumentFragment;
 
-        // 创建侧边
-        if (!refreshed) {
-            let promise = this.dataController.getResourceRoleList();
-            promise.then(x => {
-                this.createAside(this.type, x);
+        let len = this.garbageStations.length
+        for (let i = 0; i < len; i++) {
+            const v = this.garbageStations[i];
+
+            if (typeof v.StationState == "number") {
+                v.StationState = new Flags<StationState>(v.StationState);
+            }
+            if (!v.DivisionId)
+                continue;
+            let info = tempContent.cloneNode(true) as DocumentFragment;
+            let content_card = info.querySelector('.hw-content__card') as HTMLDivElement;
+            content_card.setAttribute('id', v.Id)
+            content_card.setAttribute('divisionid', v.DivisionId)
+
+
+            // 标题
+            let title_head = info.querySelector('.content__title__head') as HTMLDivElement;
+            title_head.textContent = v.Name
+
+            // 标题状态
+            let title_bandage = info.querySelector('.content__title__badage') as HTMLDivElement;
+
+            title_bandage.classList.remove('red');
+            title_bandage.classList.remove('green');
+            title_bandage.classList.remove('orange');
+            let states = v.StationState as Flags<StationState>;
+
+            if (states.contains(StationState.Error)) {
+
+                title_bandage.textContent = Language.StationState(StationState.Error);
+                title_bandage.classList.add('red');
+            }
+            else if (states.contains(StationState.Full)) {
+                title_bandage.textContent = Language.StationState(StationState.Full);
+                title_bandage.classList.add('orange');
+            }
+            else {
+                title_bandage.textContent = Language.StationState(StationState.Normal);
+                title_bandage.classList.add('green');
+            }
+            this.createFooter(v.Id, v.DivisionId);
+
+            let wrapper = info.querySelector('.content__img .swiper-wrapper') as HTMLDivElement;
+            let slide = wrapper.querySelector('.swiper-slide') as HTMLDivElement;
+            let imageUrls: Array<string> = [];
+
+            this.dataController.getCameraList(v.Id, (cameraId: string, url?: string) => {
+                let img = document.getElementById(cameraId) as HTMLImageElement;
+                // img.setAttribute('index', index + '')                        
+                img.src = url!;
+
+                img.onerror = () => {
+                    img.src = DataController.defaultImageUrl;
+                }
+
+            }).then(cameras => {
+                cameras.forEach((camera, index) => {
+
+                    imageUrls.push(camera.ImageUrl!)
+                    let div: HTMLDivElement;
+
+                    index != 0 ? div = slide?.cloneNode(true) as HTMLDivElement : div = slide;
+
+                    let img = div!.querySelector('img') as HTMLImageElement;
+                    img.id = camera.Id;
+                    img.setAttribute('index', index + '')
+                    // img!.src = camera.ImageUrl!;
+
+                    if (!camera.OnlineStatus == undefined || camera.OnlineStatus == OnlineStatus.Offline) {
+                        let nosignal = div.querySelector('.nosignal') as HTMLDivElement;
+                        nosignal.style.display = "block";
+                    }
+
+
+                    wrapper!.appendChild(div);
+                })
             })
+            content_card.addEventListener('click', function (e) {
+                let target = e.target as HTMLElement;
+                // 如果点击图片，则传递图片index和父元素id
+                // 小窗口的时候才会全屏显示功能
+                if (target.tagName.toString().toLowerCase() == 'img') {
+                    let ev = new CustomEvent('cat', {
+                        detail: {
+                            index: target.getAttribute('index'),
+                            id: v.Id
+                        }
+                    })
+                    _this.customElement.dispatchEvent(ev)
+                }
+
+            })
+
+            this.garbageElements.set(v.Id, {
+                Element: content_card,
+                id: v.Id,
+                divisionId: v.DivisionId,
+                imageUrls: imageUrls
+            })
+
+            this.elements.doms.container?.appendChild(info)
         }
-        if (!refreshed) {
-
-            this.bindEvents();
-        }
-
-        let icon = document.querySelector('#img_division i') as HTMLElement;
-        icon.className = "howell-icon-list";
-        this.zoomIn();
-
     }
     bindEvents() {
-        this.btnDivision.addEventListener('click', () => {
-            this.asideControl.Show();
-
+        this.elements.btns.btnDivision.addEventListener('click', () => {
+            this.toggle()
         })
-        this.imgDivision.addEventListener('click', () => {
+        this.elements.btns.imgDivision.addEventListener('click', () => {
             // 在蒙版消失之前，所有按钮不能点击
 
             if (this.originStatus) return
             if (this.zoomStatus == ZoomStatus.in) {
-                let icon = this.imgDivision.getElementsByClassName("howell-icon-list")[0]
+                let icon = this.elements.btns.imgDivision.getElementsByClassName("howell-icon-list")[0]
                 icon.className = "howell-icon-list2";
                 this.zoomOut();
             } else {
-                let icon = this.imgDivision.getElementsByClassName("howell-icon-list2")[0]
+                let icon = this.elements.btns.imgDivision.getElementsByClassName("howell-icon-list2")[0]
                 icon.className = "howell-icon-list";
                 this.zoomIn();
             }
-            console.log("imgDivision click", this.zoomStatus)
 
 
         })
-        this.searchInput.addEventListener('search', (e) => {
+        this.elements.btns.searchInput.addEventListener('search', (e) => {
             this.filerContent();
 
         })
-        this.btnSearch.addEventListener('click', () => {
+        this.elements.btns.btnSearch.addEventListener('click', () => {
             this.filerContent();
         })
-        // 用私有变量监听事件
+        // // 用私有变量监听事件
         this.customElement.addEventListener('cat', (e: any) => {
             this.showDetail({
                 id: e.detail.id,
@@ -184,7 +319,7 @@ class GarbageStationClient {
         })
     }
 
-    setFooter(id: string, divisionId: string) {
+    createFooter(id: string, divisionId: string) {
         let p = this.dataController.getDivision(divisionId);
         p.then(division => {
             let info = document.getElementById(id) as HTMLDivElement;
@@ -193,187 +328,32 @@ class GarbageStationClient {
             content_footer.innerHTML = division.Name;
         });
     }
-    setNumberStatic(ids: string[]) {
-        let roles = ids.map(x => {
-            let role = new ResourceRole();
-            role.Id = x;
-            role.ResourceType = type;
-            return role;
-        })
-        let promise = this.dataController.getGarbageStationStatisticNumberListInToday(roles);
-        promise.then(array => {
-            for (let i = 0; i < array.length; i++) {
-                const numberStatic = array[i];
-                if (numberStatic) {
-                    let info = document.getElementById(numberStatic.id) as HTMLDivElement;
-                    if (info) {
-                        let illegalDrop = info.querySelector('.illegalDrop-number') as HTMLSpanElement;
-                        illegalDrop.innerHTML = numberStatic.illegalDropNumber.toString();
-                        let mixedInto = info.querySelector('.MixedInto-number') as HTMLSpanElement;
-                        mixedInto.innerHTML = numberStatic.mixedIntoNumber.toString();
-                    }
+    createNumberList() {
+        let len = this.numberList.length;
+        for (let i = 0; i < len; i++) {
+            const numberStatic = this.numberList[i];
+            if (numberStatic) {
+                let info = document.getElementById(numberStatic.id) as HTMLDivElement;
+                if (info) {
+                    let illegalDrop = info.querySelector('.illegalDrop-number') as HTMLSpanElement;
+                    illegalDrop.innerHTML = numberStatic.illegalDropNumber.toString();
+                    let mixedInto = info.querySelector('.MixedInto-number') as HTMLSpanElement;
+                    mixedInto.innerHTML = numberStatic.mixedIntoNumber.toString();
                 }
             }
         }
-        );
-
     }
-
-
-    createContent() {
-        let _this = this;
-        if (this.content && this.template) {
-            this.content.innerHTML = '';
-            let tempContent = this.template?.content as DocumentFragment;
-
-            let promise = this.dataController.getGarbageStationList();
-
-            promise.then(async garbageStations => {
-                for (let i = 0; i < garbageStations.length; i++) {
-                    const v = garbageStations[i];
-
-                    if (typeof v.StationState == "number") {
-                        v.StationState = new Flags<StationState>(v.StationState);
-                    }
-                    if (!v.DivisionId)
-                        continue;
-
-                    let info = tempContent.cloneNode(true) as DocumentFragment;
-
-                    // 最外层div
-                    let content_card = info.querySelector('.hw-content__card') as HTMLDivElement;
-                    content_card.setAttribute('id', v.Id)
-                    content_card.setAttribute('divisionid', v.DivisionId)
-
-
-                    // 标题
-                    let title_head = info.querySelector('.content__title__head') as HTMLDivElement;
-                    title_head.textContent = v.Name
-
-                    // 标题状态
-                    let title_bandage = info.querySelector('.content__title__badage') as HTMLDivElement;
-
-                    title_bandage.classList.remove('red');
-                    title_bandage.classList.remove('green');
-                    title_bandage.classList.remove('orange');
-                    let states = v.StationState as Flags<StationState>;
-
-                    if (states.contains(StationState.Error)) {
-
-                        title_bandage.textContent = Language.StationState(StationState.Error);
-                        title_bandage.classList.add('red');
-                    }
-                    else if (states.contains(StationState.Full)) {
-                        title_bandage.textContent = Language.StationState(StationState.Full);
-                        title_bandage.classList.add('orange');
-                    }
-                    else {
-                        title_bandage.textContent = Language.StationState(StationState.Normal);
-                        title_bandage.classList.add('green');
-                    }
-
-
-                    //所在居委会         
-
-                    this.setFooter(v.Id, v.DivisionId);
-                    // 加载图片
-                    let container = info.querySelector('.content__img .swiper-container');
-                    let wrapper = info.querySelector('.content__img .swiper-wrapper') as HTMLDivElement;
-                    let slide = wrapper.querySelector('.swiper-slide') as HTMLDivElement;
-
-
-                    let imageUrls: Array<string> = [];
-
-
-                    this.dataController.getCameraList(v.Id, (cameraId: string, url?: string) => {
-                        let img = document.getElementById(cameraId) as HTMLImageElement;
-                        // img.setAttribute('index', index + '')                        
-                        img.src = url!;
-
-                        img.onerror = () => {
-                            img.src = DataController.defaultImageUrl;
-                        }
-
-                    }).then(cameras => {
-                        cameras.forEach((camera, index) => {
-
-                            imageUrls.push(camera.ImageUrl!)
-                            let div: HTMLDivElement;
-
-                            index != 0 ? div = slide?.cloneNode(true) as HTMLDivElement : div = slide;
-
-                            let img = div!.querySelector('img') as HTMLImageElement;
-                            img.id = camera.Id;
-                            img.setAttribute('index', index + '')
-                            // img!.src = camera.ImageUrl!;
-
-                            if (!camera.OnlineStatus == undefined || camera.OnlineStatus == OnlineStatus.Offline) {
-                                let nosignal = div.querySelector('.nosignal') as HTMLDivElement;
-                                nosignal.style.display = "block";
-                            }
-
-
-                            wrapper!.appendChild(div);
-                        })
-                    })
-
-                    // 父元素代理子元素的点击事件
-                    content_card.addEventListener('click', function (e) {
-                        let target = e.target as HTMLElement;
-                        // 如果点击图片，则传递图片index和父元素id
-                        // 小窗口的时候才会全屏显示功能
-                        if (target.tagName.toString().toLowerCase() == 'img') {
-                            let ev = new CustomEvent('cat', {
-                                detail: {
-                                    index: target.getAttribute('index'),
-                                    id: v.Id
-                                }
-                            })
-                            _this.customElement.dispatchEvent(ev)
-                        }
-
-                    })
-
-                    this.content?.appendChild(info)
-                    this.garbageElements.set(v.Id, {
-                        Element: content_card,
-                        id: v.Id,
-                        divisionId: v.DivisionId,
-                        imageUrls: imageUrls
-                    })
-                }
-
-                this.setNumberStatic(garbageStations.map(x => x.Id));
-            });
-
-
-
-        }
+    toggle() {
+        this.show = !this.show;
     }
-    createAside(type: ResourceType, roles: Array<ResourceRole>) {
-        if (this.asideIframe.contentWindow) {
-            let currentWindow = this.asideIframe.contentWindow as AsideListPageWindow;
-            this.asidePage = currentWindow.Page;
-            this.asidePage.canSelected = true;
-            this.asidePage.selectionMode = SelectionMode.single;
-            this.asidePage.view({
-                title: Language.ResourceType(type),
-                items: roles.map(x => {
-                    return {
-                        id: x.Id,
-                        name: x.Name!
-                    };
-                }),
-                footer_display: true
-            })
-            this.asidePage.confirmclicked = (selecteds) => {
-                let selectedIds = [];
-                for (let id in selecteds) {
-                    selectedIds.push(id)
-                }
-                this.confirmSelect(selectedIds)
-            }
-        }
+    createAside() {
+        this.myAside = null;
+        this.myAside = new MyAside(this.elements.asideContainer, {
+            title: Language.ResourceType(type),
+            data: this.roleList
+        }, SelectionMode.multiple).init()
+
+        this.myAside.add(this)
     }
     resetSelected() {
         for (let [k, v] of this.selectedDivisions) {
@@ -385,8 +365,6 @@ class GarbageStationClient {
     }
     confirmSelect(selectedIds: string[]) {
 
-
-
         for (let [k, v] of this.garbageElements) {
             if (selectedIds.length == 0 || selectedIds.includes(v.divisionId) || selectedIds.includes(v.id)) {
                 v.Element.style.display = 'block'
@@ -394,7 +372,6 @@ class GarbageStationClient {
                 v.Element.style.display = 'none'
             }
         }
-        this.asideControl.Hide();
         if (this.zoomStatus == ZoomStatus.out) {
 
             this.zoomOut();
@@ -410,9 +387,10 @@ class GarbageStationClient {
 
     }
     filerContent() {
-        let str = this.searchInput.value;
+        let str = this.elements.btns.searchInput.value;
         for (let [k, v] of this.garbageElements) {
             let div = v.Element;
+            // console.log(div)
             if (str && !div.textContent.includes(str)) {
                 div.style.display = 'none';
             } else {
@@ -489,33 +467,52 @@ class GarbageStationClient {
     }
     showDetail(info: { id: string, index: number }) {
 
+
+
         let element = this.garbageElements.get(info.id)
 
         let imgs = element.imageUrls
 
 
-        for (let i = 0; i < imgs.length; i++) {
-            let url = this.dataController.getImageUrl(imgs[i]);
-            this.swiper.virtual.appendSlide('<div class="swiper-zoom-container"><img src="' + url +
-                '" /></div>');
-        }
-        this.swiper.slideTo(info.index);
+        $(this.elements.originImg).fadeIn(() => {
+            this.originStatus = true;
 
-        $(this.originImg).fadeIn(() => {
-            this.originStatus = true
+
+            // Swiper初始化时，元素 display不能为 none
+            if (!this.swiper) {
+                this.swiper = new Swiper(this.elements.originImg, {
+                    virtual: true,
+                    pagination: {
+                        el: '.swiper-pagination',
+                        type: 'fraction',
+                    },
+                    on: {
+                        click: () => {
+                            $(this.elements.originImg).fadeOut(() => {
+                                this.originStatus = false;
+                                this.swiper.virtual.removeAllSlides()
+                                this.swiper.virtual.cache = [];
+
+                            })
+                            $(this.elements.hwBar).fadeIn()
+                        },
+                    },
+
+                });
+
+
+            }
+
+            for (let i = 0; i < imgs.length; i++) {
+                let url = this.dataController.getImageUrl(imgs[i]);
+                this.swiper.virtual.appendSlide('<div class="swiper-zoom-container"><img src="' + url +
+                    '" /></div>');
+            }
+            this.swiper.slideTo(info.index, 0);
+
         })
-        $(this.hwBar).fadeOut()
-
-
-        this.swiperStatus = true;
-
+        $(this.elements.hwBar).fadeOut()
     }
-    hideDetail() {
-
-
-    }
-
-
 }
 
 let refreshed = false;
@@ -523,10 +520,13 @@ let refreshed = false;
 const user = (window.parent as NavigationWindow).User;
 const http = (window.parent as NavigationWindow).Authentication;
 
+console.log(user);
 const service = new Service(http);
 const type = user.WUser.Resources![0].ResourceType;
 const dataController = ControllerFactory.Create(service, type, user.WUser.Resources!);
 const stationClient = new GarbageStationClient(type, dataController);
+
+stationClient.init();
 
 
 
@@ -539,13 +539,7 @@ let miniRefresh = new MiniRefresh({
             // 下拉事件
 
             refreshed = true;
-            if (stationClient.asidePage) {
-                stationClient.asidePage.resetSelected();
-            }
-            // render().then(() => {
-            //     miniRefresh.endDownLoading();
-            // })
-            render();
+            stationClient.init();
             miniRefresh.endDownLoading();
         }
     },
@@ -560,21 +554,4 @@ let miniRefresh = new MiniRefresh({
         }
     }
 });
-
-// 加载数据，数据加载完成，创建页面内容
-render()
-
-function render() {
-
-    stationClient.init();
-
-
-    // return stationClient.loadData()
-    //     .then((res) => {
-    //         stationClient.init();
-    //     })
-    // .catch((e) => {
-    //     console.error(`出错了~ ${e}`)
-    // })
-}
 
