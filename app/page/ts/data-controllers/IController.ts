@@ -174,10 +174,10 @@ export interface IGarbageStationController {
     /**
      * 获取垃圾厢房列表
      *
-     * @returns {Promise<Array<GarbageStation>>}
+     * @returns {Promise<Array<GarbageStationViewModel>>}
      * @memberof IGarbageStationController
      */
-    getGarbageStationList(): Promise<Array<GarbageStation>>;
+    getGarbageStationList(): Promise<Array<GarbageStationViewModel>>;
 
     /**
      * 获取区划列表

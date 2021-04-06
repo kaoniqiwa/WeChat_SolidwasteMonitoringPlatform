@@ -225,9 +225,11 @@ export class GarbageStationController extends DataController implements IDataCon
 			result.push(vm);
 		}
 		result = result.sort((a, b) => {
-			return a.DivisionId!.localeCompare(a.DivisionId!) || a.Name.localeCompare(b.Name);
+			if (a.DivisionId && b.DivisionId)
+				return a.DivisionId.localeCompare(a.DivisionId) || a.Name.localeCompare(b.Name);
+			return 0;
 		})
-		return result;		
+		return result;
 	}
 
 
