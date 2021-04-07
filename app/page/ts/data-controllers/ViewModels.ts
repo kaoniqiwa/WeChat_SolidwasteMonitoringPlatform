@@ -7,8 +7,8 @@ export class GarbageStationViewModel extends GarbageStation {
 
 export class ViewModelConverter {
     static Convert(model: GarbageStation): GarbageStationViewModel {
-        if (model instanceof GarbageStation) {
-            return Object.assign(GarbageStationViewModel, model);
+        if (model instanceof GarbageStation) {            
+            return Object.assign(new GarbageStationViewModel(), model);
         }        
     }
 }
