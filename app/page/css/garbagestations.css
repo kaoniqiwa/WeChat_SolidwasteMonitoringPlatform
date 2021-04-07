@@ -169,10 +169,17 @@ body {
   justify-content: space-between;
   
 }
+.hw-content .hw-content__card .content__footer .division-name{
+  height:20px;
+  overflow:hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 .hw-content .hw-content__card .content__footer .static-number{
-  width: 70px;
+  /* width: 70px; */
   display: flex;
   justify-content: space-between;
+  flex-shrink: 0;
 }
 .hw-content .hw-content__card .content__footer .static-number{
   margin-left: 20px;

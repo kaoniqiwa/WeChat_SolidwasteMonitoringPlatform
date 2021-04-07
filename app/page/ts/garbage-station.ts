@@ -20,6 +20,7 @@ import { ClassNameHelper, Language } from "./language";
 import Swiper, { Virtual, Pagination, } from 'swiper';
 import $ from 'jquery';
 import MyAside from './myAside';
+import { GarbageStationViewModel } from "./data-controllers/ViewModels";
 
 // 理论上应在ts中根据需求导入minirefresh，而不是写死在html中，受项目parcel-bundler版本限制，未实现
 // import "minirefresh";
@@ -72,7 +73,7 @@ class GarbageStationClient implements IObserver {
 
     dataController: IGarbageStationController;
     type: ResourceType;
-    garbageStations: GarbageStation[];
+    garbageStations: GarbageStationViewModel[];
     numberList: StatisticNumber[];
     roleList: ResourceRole[];
     myAside: MyAside;
@@ -83,10 +84,10 @@ class GarbageStationClient implements IObserver {
     set show(val) {
         this._show = val;
         if (val) {
-           $(this.elements.asideContainer).show();
-           setTimeout(() => {
-               this.myAside.slideIn()
-           }, 100);
+            $(this.elements.asideContainer).show();
+            setTimeout(() => {
+                this.myAside.slideIn()
+            }, 100);
         }
         else {
             setTimeout(() => {
@@ -152,7 +153,7 @@ class GarbageStationClient implements IObserver {
         // 拉取厢房数据
         this.garbageStations = await this.dataController.getGarbageStationList();
         let ids = this.garbageStations.map(item => item.Id)
-        console.log(this.garbageStations)
+        console.log('厢房数据', this.garbageStations)
 
         // 获取垃圾厢房当天的统计数据
         let roles = ids.map(x => {
@@ -162,7 +163,7 @@ class GarbageStationClient implements IObserver {
             return role;
         })
         this.numberList = await this.dataController.getGarbageStationStatisticNumberListInToday(roles);
-        console.log(this.numberList)
+        console.log('今日统计数据', this.numberList)
 
         this.roleList = await this.dataController.getResourceRoleList()
 
@@ -201,6 +202,8 @@ class GarbageStationClient implements IObserver {
 
             // 标题状态
             let title_bandage = info.querySelector('.content__title__badage') as HTMLDivElement;
+
+            info.querySelector('.constDrop-number').textContent = (v.NumberStatistic.CurrentGarbageTime >> 0) + '';
 
             title_bandage.classList.remove('red');
             title_bandage.classList.remove('green');
