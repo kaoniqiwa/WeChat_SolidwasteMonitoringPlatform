@@ -228,10 +228,19 @@ export interface IGarbageStationController {
      * @param {string[]} ids 垃圾厢房ID
      * @param {OneDay} day 日期
      * @returns {Promise<Array<GarbageStationNumberStatisticV2>>}
-     * @memberof IGarbageStationNumberStatistic
+     * @memberof IGarbageStationController
      */
     getGarbageStationNumberStatisticList(ids: string[], day: OneDay): Promise<Array<GarbageStationNumberStatisticV2>>
 
+        /**
+     * 获取垃圾厢房数据统计
+     *
+     * @param {string} id 垃圾厢房ID
+     * @param {Date} date 日期
+     * @returns {Promise<Array<GarbageStationGarbageCountStatistic>>} 
+     * @memberof IGarbageStationController
+     */
+         getGarbageStationNumberStatistic(id: string, date: Date): Promise<Array<GarbageStationGarbageCountStatistic>>
 }
 
 export interface IEventHistory {
