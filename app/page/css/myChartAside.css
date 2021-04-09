@@ -1,0 +1,80 @@
+.echart-inner-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    font-family: -apple-system-font, Helvetica Neue, sans-serif;
+}
+
+.echart-inner-container .inner-mask {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.echart-inner-container .inner-content {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: white;
+}
+
+.echart-inner-container .inner-bar {
+    height: 60px;
+    padding: 0 12px;
+    color: #b2b2b2;
+    display: flex;
+    align-items: center;
+}
+
+.echart-inner-container .inner-main {
+    padding: 16px;
+}
+
+.echart-inner-container .inner-main .inner-txt {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 25px;
+}
+
+.echart-inner-container .inner-main .inner-txt .inner-title {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.echart-inner-container .inner-main .inner-txt .inner-date {
+    color: #888;
+    font-size: 14.4px;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.echart-inner-container .inner-chart {
+    height: 256px;
+}
+
+.echart-inner-container .inner-footer {
+    height: 40px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top:5px;
+}
+
+.echart-inner-container .inner-footer .inner-btn {
+    width: 45%;
+    height: 100%;
+    background-color: #3a94ff;
+    color: white;
+    border-radius: 4.8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

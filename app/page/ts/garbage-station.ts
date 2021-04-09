@@ -1,12 +1,12 @@
 import { NavigationWindow } from ".";
 import { SessionUser } from "../../common/session-user";
-import { dateFormat } from "../../common/tool";
+import { dateFormat, getAllDay } from "../../common/tool";
 import { ResponseData } from "../../data-core/model/response-data";
 import { OnlineStatus } from "../../data-core/model/waste-regulation/camera";
 import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
 import { EventType } from "../../data-core/model/waste-regulation/event-number";
 import { Flags, GarbageStation, GetGarbageStationsParams, StationState } from "../../data-core/model/waste-regulation/garbage-station";
-import { GarbageStationNumberStatistic, GetGarbageStationStatisticNumbersParams } from "../../data-core/model/waste-regulation/garbage-station-number-statistic";
+import { GarbageStationGarbageCountStatistic, GarbageStationNumberStatistic, GetGarbageStationStatisticNumbersParams } from "../../data-core/model/waste-regulation/garbage-station-number-statistic";
 import { ResourceRole, ResourceType } from "../../data-core/model/we-chat";
 import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
 import { HowellHttpClient } from "../../data-core/repuest/http-client";
@@ -20,13 +20,41 @@ import { ClassNameHelper, Language } from "./language";
 import Swiper, { Virtual, Pagination, } from 'swiper';
 import $ from 'jquery';
 import MyAside from './myAside';
+import EchartsAside from "./echartsAside";
 import { GarbageStationViewModel } from "./data-controllers/ViewModels";
+import { CandlestickOption } from "./echart";
+
+
+
+import * as echarts from 'echarts/core';
+import {
+    GridComponent,
+    GridComponentOption,
+    TooltipComponentOption,
+    TooltipComponent,
+    DataZoomComponent,
+    DataZoomComponentOption,
+    VisualMapComponent,
+    VisualMapComponentOption,
+} from 'echarts/components';
+
+import { LineChart, LineSeriesOption, BarChart, BarSeriesOption } from 'echarts/charts';
+
+import { CanvasRenderer } from "echarts/renderers";
+
+echarts.use([
+    GridComponent,
+    LineChart,
+    BarChart,
+    VisualMapComponent,
+    CanvasRenderer,
+    TooltipComponent,
+    DataZoomComponent
+])
+
 
 // 理论上应在ts中根据需求导入minirefresh，而不是写死在html中，受项目parcel-bundler版本限制，未实现
 // import "minirefresh";
-
-
-
 
 
 // 模块化方式使用 Swiper库
@@ -42,6 +70,9 @@ enum ZoomStatus {
 }
 // 使用简单的观察者模式，实现 GarbageStationClient 和 myAside 类的通信
 class GarbageStationClient implements IObserver {
+    candlestickOption: CandlestickOption = new CandlestickOption()
+
+
     content: HTMLElement | null;
     template: HTMLTemplateElement | null;
     asideTemplate: HTMLTemplateElement | null;
@@ -77,6 +108,13 @@ class GarbageStationClient implements IObserver {
     numberList: StatisticNumber[];
     roleList: ResourceRole[];
     myAside: MyAside;
+
+    myChartAside: EchartsAside;
+    myChartOptions: {
+        date: Date,
+        data: Array<GarbageStationGarbageCountStatistic>
+    }
+
     _show = false;
     get show() {
         return this._show
@@ -87,20 +125,35 @@ class GarbageStationClient implements IObserver {
             $(this.elements.asideContainer).show();
             setTimeout(() => {
                 this.myAside.slideIn()
-            }, 100);
+            }, 1e2);
         }
         else {
             setTimeout(() => {
                 $(this.elements.asideContainer).hide();
-            }, 300);
+            }, 3e2);
         }
 
+    }
+    _showChart: boolean = false;
+
+    get showChart() {
+        return this._showChart;
+    }
+    set showChart(val) {
+        this._showChart = val;
+        console.log(this.myChartOptions)
+        if (val) {
+            this.elements.doms.chartContainer.classList.add('slideIn')
+        } else {
+            this.elements.doms.chartContainer.classList.remove('slideIn')
+        }
     }
 
     elements = {
         doms: {
             container: document.querySelector('#hw-container') as HTMLDivElement,
             template: document.querySelector('#card-template') as HTMLTemplateElement,
+            chartContainer: document.querySelector<HTMLElement>('#chart-container')
         },
         btns: {
             imgDivision: document.querySelector('#img_division') as HTMLDivElement,
@@ -113,7 +166,7 @@ class GarbageStationClient implements IObserver {
         asideContainer: document.querySelector('#aside-container') as HTMLElement,
         originImg: document.querySelector('#origin-img') as HTMLDivElement,
         hwBar: document.querySelector('.hw-bar') as HTMLDivElement,
-        backdrop: document.querySelector(".backdrop") as HTMLDivElement
+
     }
 
     constructor(type: ResourceType, dataController: IGarbageStationController
@@ -125,6 +178,7 @@ class GarbageStationClient implements IObserver {
 
     }
     update(args) {
+        console.log('ppp')
         if (args && args.selectedItems) {
             let selectedItems = [...args.selectedItems]
             let ids = selectedItems.map(item => {
@@ -135,10 +189,14 @@ class GarbageStationClient implements IObserver {
         if (args && 'show' in args) {
             this.show = args.show;
         }
+        if (args && 'showChart' in args) {
+            this.showChart = args.showChart
+        }
     }
     init() {
         this.loadData().then(() => {
-            this.createAside()
+            this.createAside();
+            this.createChartAside();
             this.resetBar()
             this.createContent();
             this.createNumberList();
@@ -166,6 +224,17 @@ class GarbageStationClient implements IObserver {
         console.log('今日统计数据', this.numberList)
 
         this.roleList = await this.dataController.getResourceRoleList()
+
+
+
+        // this.dataController.getGarbageStationNumberStatistic("310109011002002000", new Date(),).then((res) => {
+        //     console.log('小包垃圾:', res)
+        //     this.fillCandlestickOption(res);
+        //     this.drawChart()
+        // }).catch((err) => {
+        //     console.log('error', err)
+        // })
+
 
     }
 
@@ -203,7 +272,18 @@ class GarbageStationClient implements IObserver {
             // 标题状态
             let title_bandage = info.querySelector('.content__title__badage') as HTMLDivElement;
 
-            info.querySelector('.constDrop-number').textContent = (v.NumberStatistic.CurrentGarbageTime >> 0) + '';
+
+            // v.NumberStatistic.CurrentGarbageTime = 64;
+            let currentGarbageTime = v.NumberStatistic.CurrentGarbageTime >> 0;
+            let hour = Math.floor(currentGarbageTime / 60);
+            let minute = currentGarbageTime - hour * 60;
+
+            let hour2 = hour.toString().padStart(2, '0');
+            let minute2 = minute.toString().padStart(2, '0');
+
+            // console.log(hour,minute);
+
+            info.querySelector('.constDrop-number').textContent = `${hour2}:${minute2}`
 
             title_bandage.classList.remove('red');
             title_bandage.classList.remove('green');
@@ -272,6 +352,31 @@ class GarbageStationClient implements IObserver {
                         }
                     })
                     _this.customElement.dispatchEvent(ev)
+                } else {
+
+                    let date = new Date();
+                    _this.dataController.getGarbageStationNumberStatistic((e.currentTarget as HTMLDivElement).id, date).then(res => {
+                        _this.myChartOptions = {
+                            date: date,
+                            data: res
+                        };
+                        _this.myChartAside.title = res[0].Name;
+                        _this.myChartAside.date = date;
+                        _this.myChartAside.data = res;
+
+                        _this.showChart = true;
+                    })
+
+
+
+                    // this.dataController.getGarbageStationNumberStatistic("310109011002002000", new Date(),).then((res) => {
+                    //     console.log('小包垃圾:', res)
+                    //     this.fillCandlestickOption(res);
+                    //     this.drawChart()
+                    // }).catch((err) => {
+                    //     console.log('error', err)
+                    // })
+
                 }
 
             })
@@ -357,6 +462,15 @@ class GarbageStationClient implements IObserver {
         }, SelectionMode.multiple).init()
 
         this.myAside.add(this)
+    }
+    createChartAside() {
+        this.myChartAside = null;
+        this.myChartAside = new EchartsAside(this.elements.doms.chartContainer, {
+            title: '广中一村8号厢房',
+            date: new Date(),
+            data: []
+        }).init();
+        this.myChartAside.add(this)
     }
     resetSelected() {
         for (let [k, v] of this.selectedDivisions) {
@@ -516,6 +630,271 @@ class GarbageStationClient implements IObserver {
         })
         $(this.elements.hwBar).fadeOut()
     }
+
+    fillCandlestickOption(lineDataSource: Array<GarbageStationGarbageCountStatistic>
+    ) {
+
+        this.candlestickOption.barData = new Array();
+        this.candlestickOption.barDataB = new Array();
+        this.candlestickOption.lineData = new Array();
+        this.candlestickOption.lineDataB = new Array();
+        this.candlestickOption.xAxisBar = new Array();
+        this.candlestickOption.xAxisLine = new Array();
+        // console.log(eventNumberStatistic);
+        const toFormat = function (params: { value: number }) {
+            return params.value == 0 ? '' : '{Sunny|}'
+        }, rich = {
+            value: {
+                // lineHeight: 18,
+                align: 'center'
+            },
+            Sunny: {
+                width: 12,
+                height: 18,
+                align: 'center',
+                backgroundColor: {
+                    image: '../../assets/img/arrow-tag-a.png',
+                },
+                // opacity: 0.3
+            }
+        }
+        for (var i = 9; i <= 21; i++)
+            for (var u = 0; u < 60; u++) {
+                const m = u < 10 ? ('0' + u) : (u == 60 ? '00' : u);
+
+                this.candlestickOption.xAxisLine.push(i + ':' + m);
+                this.candlestickOption.xAxisBar.push(i + ':' + m);
+                this.candlestickOption.barData.push({
+                    value: 0,
+                    itemStyle: {
+                        color: 'rgba(16,22,48,0)',
+                        //color: '#fff'
+                    },
+                    label: {
+                        show: false,
+                        formatter: toFormat,
+                        rich: rich,
+                    },
+                    emphasis: {
+                        label: {
+                            rich: {
+                                Sunny: {
+                                    width: 12,
+                                    height: 18,
+                                    align: 'center',
+                                    backgroundColor: {
+                                        image: '../../assets/img/arrow-tag.png',
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                this.candlestickOption.barDataB.push({
+                    value: 0,
+                    itemStyle: {
+                        color: 'rgba(16,22,48,0)'
+                    },
+                    label: {
+                        show: false,
+                        formatter: toFormat,
+                        rich: rich
+                    },
+                    emphasis: {
+                        label: {
+                            rich: {
+                                Sunny: {
+                                    width: 12,
+                                    height: 18,
+                                    align: 'center',
+                                    backgroundColor: {
+                                        image: '/assets/img/arrow-tag.png',
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                if (i == 21) break;
+            }
+
+        // toIllegalDropTick(0, 100);
+        var tag = 0;
+        for (var i = 9; i < 21; i++)
+            for (var u = 0; u < 60; u++) {
+
+                const item = lineDataSource.find(x => {
+                    const date = new Date(x.BeginTime);
+                    return (date.getHours() == i && date.getMinutes() == u);
+                });
+                var garbageCount = 0;
+                if (item) {// green  coffee
+                    garbageCount = item.GarbageCount > 0 ? 1 : 0;
+                    this.candlestickOption.lineDataB.push('-');//断开 
+                }
+                else this.candlestickOption.lineDataB.push(0); //gay 链接 
+
+                this.candlestickOption.lineData.push(garbageCount);
+
+
+
+                tag += 1;
+            }
+
+        /** 9:00 填补 */
+        this.candlestickOption.lineData.push(0);
+        /**
+         * 拉长没数据 线
+         */
+        const grayIndex = new Array<number>();
+        for (let i = 0; i < this.candlestickOption.lineDataB.length; i++)
+            if (this.candlestickOption.lineDataB[i] == 0)
+                grayIndex.push(i + 1);
+
+        grayIndex.map(g => {
+            this.candlestickOption.lineDataB[g] = 0;
+        });
+
+        console.log(this.candlestickOption)
+    }
+    drawChart() {
+        let myChart = echarts.init(this.elements.doms.chartContainer)
+        let options = {
+            xAxis: {
+                type: 'category',
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: [150, 230, 224, 218, 135, 147, 260],
+                type: 'line'
+            }]
+        }
+        const options1 = {
+            animation: false,
+
+            tooltip: {
+                trigger: 'axis',
+                formatter: '{b}',
+                axisPointer: {
+                    lineStyle: {
+                        color: '#5e6ebf',
+                        width: 1.2
+                    }
+                }
+            },
+            visualMap: {
+                show: false,
+
+                pieces: [{
+                    gt: 0.005,
+                    lte: 1,
+                    color: '#CD661D'
+                }, {
+                    gte: 0,
+                    lte: 0.005,
+                    color: '#28ce38'
+                }],
+                seriesIndex: 0,
+            },
+            dataZoom: [
+                {
+                    type: 'inside',
+                    xAxisIndex: [0, 1],
+                    start: 0,
+                    end: 100
+                }
+            ],
+            grid: [
+                {
+                    top: '20%',
+                    bottom: '10px',
+                    containLabel: true
+                },
+            ],
+            xAxis: [
+                {
+                    type: 'category',
+                    data: this.candlestickOption.xAxisLine,
+                    scale: true,
+                    boundaryGap: false,
+                    axisLine: {
+                        onZero: false,
+                        lineStyle: {
+                            color: '#7d90bc'
+                        }
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgb(117,134,224,0.3)'
+                        }
+                    },
+                    min: 'dataMin',
+                    max: 'dataMax',
+                    axisLabel: {
+                        color: '#CFD7FE',
+                        fontSize: "16",
+                    },
+                    axisTick: {        //刻度线
+
+                        lineStyle: {
+                            color: 'rgb(117,134,224,0.3)'
+                        }
+                    },
+                },
+            ],
+            yAxis: [
+                {
+                    scale: true,
+                    splitArea: {
+                        show: false
+                    },
+                    axisTick: {        //刻度线
+                        show: false
+                    },
+
+                    axisLine: {
+                        show: false,
+                        onZero: false,//y轴
+                        lineStyle: {
+                            color: '#7d90bc'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#CFD7FE',
+                        fontSize: "16",
+                        show: false,
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgb(117,134,224,0.3)'
+                        }
+                    }
+                },
+            ],
+            series: [{
+                name: 'theLine',
+                type: 'line',
+                data: this.candlestickOption.lineData,
+                step: 'end',
+                symbolSize: 8,
+            }, {
+                name: 'theLineB',
+                type: 'line',
+                data: this.candlestickOption.lineDataB,
+                symbolSize: 8,
+                itemStyle: {
+                    color: 'gray'
+                }
+            },
+            ]
+        }
+        myChart.setOption(options1)
+    }
+
+
 }
 
 let refreshed = false;

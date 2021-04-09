@@ -100,7 +100,7 @@ export default class MyAside extends IAside {
         super();
         this.outterContainer = typeof selector == "string" ? document.querySelector(selector) as HTMLElement : selector;
 
-        this.innerContainer.classList.add("inner-container");
+        this.innerContainer.classList.add("aside-inner-container");
         this.innerContainer.innerHTML = this.template;
 
     }

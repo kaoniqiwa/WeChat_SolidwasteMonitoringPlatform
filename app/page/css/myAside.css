@@ -1,10 +1,10 @@
-.inner-container {
+.aside-inner-container {
     width: 100%;
     height: 100%;
     position: relative;
 }
 
-.inner-mask {
+.aside-inner-container .inner-mask {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -13,7 +13,7 @@
     background: rgba(0, 0, 0, 0.4);
 }
 
-.inner-content {
+.aside-inner-container .inner-content {
     width: 80%;
     height: 100%;
     position: absolute;
@@ -26,11 +26,11 @@
     transition: transform 0.3s;
 }
 
-.inner-content.slideIn {
+.aside-inner-container .inner-content.slideIn {
     transform: translateX(0);
 }
 
-.inner-title {
+.aside-inner-container .inner-title {
     height: 30px;
     margin-left: 20px;
     font-size: 14px;
@@ -38,7 +38,7 @@
     line-height: 44px;
 }
 
-.inner-main {
+.aside-inner-container .inner-main {
     margin: 15px;
     overflow: auto;
     height: calc(100% - 115px);
@@ -48,7 +48,7 @@
 
 }
 
-.inner-item {
+.aside-inner-container .inner-item {
     margin-top: 5px;
     margin-bottom: 5px;
     box-sizing: border-box;
@@ -71,18 +71,18 @@
     text-overflow: ellipsis;
 }
 
-.inner-item.selected {
+.aside-inner-container .inner-item.selected {
     background-color: #c5dfff;
     color: #4097ff;
 }
 
-.inner-footer {
+.aside-inner-container .inner-footer {
     height: 50px;
     flex-shrink: 0;
     display: flex;
 }
 
-.inner-btn {
+.aside-inner-container .inner-btn {
     color: #fff;
     border: 1px solid #007aff;
     background-color: #007aff;

@@ -19,6 +19,8 @@
       type="text/css"
     />
     <link rel="stylesheet" href="./css/myAside.css" type="text/css" />
+    <link rel="stylesheet" href="./css/myChartAside.css" type="text/css" />
+
     <link rel="stylesheet" href="./css/index.css" type="text/css" />
     <link rel="stylesheet" href="./css/garbagestations.css" type="text/css" />
 
@@ -70,10 +72,6 @@
                 <div class="content__footer">
                   <div class="division-name"></div>
                   <div class="static-number">
-                    <div class="constDrop item" title="垃圾落地">
-                      <i class="howell-icon-fullgarbage"></i>
-                      <span class="constDrop-number">0</span>
-                    </div>
                     <div class="illegalDrop item" title="乱扔垃圾">
                       <i class="howell-icon-nolittering"></i>
                       <span class="illegalDrop-number">0</span>
@@ -81,6 +79,11 @@
                     <div class="MixedInto item" title="混合投放">
                       <i class="howell-icon-mixlittering"></i>
                       <span class="MixedInto-number">0</span>
+                    </div>
+
+                    <div class="constDrop item" title="垃圾落地">
+                      <i class="howell-icon-garbagebags"></i>
+                      <span class="constDrop-number">0</span>
                     </div>
                   </div>
                 </div>
@@ -103,6 +106,10 @@
     >
       <div class="swiper-wrapper"></div>
       <div class="swiper-pagination"></div>
+    </div>
+
+    <div id="chart-container">
+    
     </div>
 
     <script src="./ts/garbage-station.ts"></script>
