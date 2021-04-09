@@ -360,10 +360,16 @@ class GarbageStationClient implements IObserver {
                             date: date,
                             data: res
                         };
-                        _this.myChartAside.title = res[0].Name;
-                        _this.myChartAside.date = date;
-                        _this.myChartAside.data = res;
 
+                        // _this.myChartAside.title = res[0].Name;
+                        // _this.myChartAside.date = date;
+                        // _this.myChartAside.data = res;
+
+                        Object.assign(_this.myChartAside,{
+                            title:res[0].Name,
+                            date,
+                            data:res
+                        })
                         _this.showChart = true;
                     })
 
