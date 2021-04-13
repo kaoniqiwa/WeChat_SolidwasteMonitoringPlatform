@@ -465,7 +465,7 @@ class GarbageStationClient implements IObserver {
         this.myAside = new MyAside(this.elements.container.asideContainer, {
             title: Language.ResourceType(type),
             data: this.roleList
-        }, SelectionMode.multiple).init()
+        }, SelectionMode.single).init()
 
         this.myAside.add(this)
     }
