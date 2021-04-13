@@ -68,6 +68,13 @@ enum ZoomStatus {
     out = "zoomOut",
     in = "zoomIn"
 }
+interface IActiveElement{
+    Element: HTMLDivElement,
+    id: string,
+    divisionId: string,
+    imageUrls: Array<string>,
+    swiper?:Swiper
+}
 // 使用简单的观察者模式，实现 GarbageStationClient 和 myAside 类的通信
 class GarbageStationClient implements IObserver {
     candlestickOption: CandlestickOption = new CandlestickOption()
@@ -79,7 +86,7 @@ class GarbageStationClient implements IObserver {
     asideMain?: HTMLDivElement;
 
     GarbageStationNumberStatistic: Map<string, GarbageStationNumberStatistic> = new Map();
-    garbageElements: Map<string, any> = new Map();
+    garbageElements: Map<string, IActiveElement> = new Map();
     garbageElementsDivision: Map<string, any> = new Map();
 
     btnDivision: HTMLDivElement;
@@ -89,14 +96,18 @@ class GarbageStationClient implements IObserver {
     originImg: HTMLDivElement;
     hwBar: HTMLDivElement
 
-    zoomStatus: ZoomStatus = ZoomStatus.in;
+    zoomStatus: ZoomStatus = ZoomStatus.out;
     swiper: Swiper;
     swiperStatus: boolean = false;
     originStatus: boolean = false;
+    activeIndex: number;
+    activeElement: IActiveElement;
 
     asideControl: AsideControl;
     asidePage?: AsideListPage;
     asideIframe: HTMLIFrameElement;
+
+
 
     selectedDivisions: Map<string, any> = new Map();
 
@@ -222,16 +233,18 @@ class GarbageStationClient implements IObserver {
             return role;
         })
         this.numberList = await this.dataController.getGarbageStationStatisticNumberListInToday(roles);
-        console.log('今日统计数据', this.numberList)
+        console.log('底部数量数据', this.numberList)
 
         this.roleList = await this.dataController.getResourceRoleList();
 
-        console.log('筛选数据', this.roleList)
+        console.log('侧边栏筛选数据', this.roleList)
 
 
     }
 
     resetBar() {
+        $(this.elements.others.originImg).hide();
+        this.zoomStatus = ZoomStatus.out;
         this.elements.btns.imgIcon.className = "howell-icon-list";
         this.elements.btns.searchInput.value = "";
     }
@@ -347,17 +360,6 @@ class GarbageStationClient implements IObserver {
                     _this.customElement.dispatchEvent(ev)
                 } else {
                     _this.myChartAside.id = currentTarget.id;
-                    // let date = new Date();
-                    // _this.dataController.getGarbageStationNumberStatistic(currentTarget.id, date).then(res => {
-
-                    //     Object.assign(_this.myChartAside, {
-                    //         title: currentTarget.dataset['cardname'],
-                    //         date,
-                    //         data: res,
-                    //         garbageStations:_this.garbageStations
-                    //     })
-                    //     _this.showChart = true;
-                    // })
                     _this.showChart = true;
                 }
 
@@ -374,6 +376,7 @@ class GarbageStationClient implements IObserver {
         }
     }
     bindEvents() {
+        let _this = this;
         this.elements.btns.btnDivision.addEventListener('click', () => {
             this.toggle()
         })
@@ -381,15 +384,19 @@ class GarbageStationClient implements IObserver {
             // 在蒙版消失之前，所有按钮不能点击
 
             if (this.originStatus) return
+
             if (this.zoomStatus == ZoomStatus.in) {
-                let icon = this.elements.btns.imgDivision.getElementsByClassName("howell-icon-list")[0]
-                icon.className = "howell-icon-list2";
+                this.elements.btns.imgIcon.classList.remove('howell-icon-list2')
+                this.elements.btns.imgIcon.classList.add('howell-icon-list')
                 this.zoomOut();
             } else {
-                let icon = this.elements.btns.imgDivision.getElementsByClassName("howell-icon-list2")[0]
-                icon.className = "howell-icon-list";
+
+                this.elements.btns.imgIcon.classList.remove('howell-icon-list')
+                this.elements.btns.imgIcon.classList.add('howell-icon-list2')
+
                 this.zoomIn();
             }
+            console.log('当前状态', this.zoomStatus)
 
 
         })
@@ -405,7 +412,24 @@ class GarbageStationClient implements IObserver {
             this.showDetail({
                 id: e.detail.id,
                 index: e.detail.index
-            });
+            }, Math.random() * 10 >> 0);
+        })
+        this.elements.others.originImg.addEventListener('click', function () {
+           
+            _this.activeIndex = _this.swiper.activeIndex;
+            if(_this.activeElement.swiper){
+                _this.activeElement.swiper.slideTo(_this.activeIndex,0)
+            }else{
+                _this.activeElement.Element.querySelector(`.swiper-slide:nth-of-type(${_this.activeIndex + 1})`).scrollIntoView({
+                    block:'nearest',
+                    behavior:'auto',
+                    inline:'nearest'
+                });
+            }
+          
+            $(this).fadeOut();
+            _this.originStatus = false;
+
         })
     }
 
@@ -497,120 +521,112 @@ class GarbageStationClient implements IObserver {
             }
         }
     }
-    zoomOut() {
-        console.log(this.garbageElements);
-        for (let [k, v] of this.garbageElements) {
-            let contentCard = v.Element;
-            contentCard.querySelectorAll('.content__img').forEach((element: HTMLElement) => {
-                element.classList.add(ZoomStatus.out);
-            });
-
-            contentCard.querySelectorAll('.swiper-slide').forEach((element: HTMLElement) => {
-                element.classList.add(ZoomStatus.out);
-            });
-            contentCard.querySelectorAll('.content__title__badage').forEach((element: HTMLElement) => {
-                element.classList.add(ZoomStatus.out);
-            });
-            contentCard.querySelectorAll('.content__footer').forEach((element: HTMLElement) => {
-                element.classList.add(ZoomStatus.out);
-            });
-
-            let container = contentCard.querySelector('.swiper-container');
-            container.scrollLeft = 0;
-            container.classList.add(ZoomStatus.out);
-
-            let pagination = contentCard.querySelector('.swiper-pagination');
-
-            if (v.swiper) {
-                v.swiper.destroy();
-                v.swiper = null
-            }
-            v.swiper = new Swiper(container, { pagination: { el: pagination, type: 'fraction' } })
-
-
-
-        }
-
-        this.zoomStatus = ZoomStatus.out;
-    }
+    // 放大
     zoomIn() {
+        let _this = this;
+        // console.log(this.garbageElements);
         for (let [k, v] of this.garbageElements) {
             let contentCard = v.Element;
+            contentCard.querySelectorAll('.content__img').forEach((element: HTMLElement) => {
+                element.classList.add(ZoomStatus.in);
+            });
+
             contentCard.querySelectorAll('.swiper-slide').forEach((element: HTMLElement) => {
-                element.classList.remove(ZoomStatus.out);
-                element.style.width = "";
+                element.classList.add(ZoomStatus.in);
             });
             contentCard.querySelectorAll('.content__title__badage').forEach((element: HTMLElement) => {
-                element.classList.remove(ZoomStatus.out);
+                element.classList.add(ZoomStatus.in);
             });
             contentCard.querySelectorAll('.content__footer').forEach((element: HTMLElement) => {
-                element.classList.remove(ZoomStatus.out);
+                element.classList.add(ZoomStatus.in);
             });
 
-            contentCard.querySelectorAll('.content__img').forEach((element: HTMLElement) => {
-                element.classList.remove(ZoomStatus.out);
-            });
+            let container = contentCard.querySelector('.swiper-container') as HTMLDivElement;
+            container.scrollLeft = 0;
+            container.classList.add(ZoomStatus.in);
 
-            let container = contentCard.querySelector('.swiper-container');
-            container.classList.remove(ZoomStatus.out);
-
-
+            let pagination = contentCard.querySelector('.swiper-pagination') as HTMLDivElement;
 
             if (v.swiper) {
                 v.swiper.destroy();
                 v.swiper = null
             }
+            v.swiper = new Swiper(container, {
+                pagination: {
+                    el: pagination,
+                    type: 'fraction'
+                },
+            })
+
+
+
         }
 
         this.zoomStatus = ZoomStatus.in;
     }
-    showDetail(info: { id: string, index: number }) {
+    // 缩小
+    zoomOut() {
+        for (let [k, v] of this.garbageElements) {
+            let contentCard = v.Element;
+            contentCard.querySelectorAll('.swiper-slide').forEach((element: HTMLElement) => {
+                element.classList.remove(ZoomStatus.in);
+                element.style.width = "";
+            });
+            contentCard.querySelectorAll('.content__title__badage').forEach((element: HTMLElement) => {
+                element.classList.remove(ZoomStatus.in);
+            });
+            contentCard.querySelectorAll('.content__footer').forEach((element: HTMLElement) => {
+                element.classList.remove(ZoomStatus.in);
+            });
+
+            contentCard.querySelectorAll('.content__img').forEach((element: HTMLElement) => {
+                element.classList.remove(ZoomStatus.in);
+            });
+
+            let container = contentCard.querySelector('.swiper-container');
+            container.classList.remove(ZoomStatus.in);
 
 
 
-        let element = this.garbageElements.get(info.id)
-
-        let imgs = element.imageUrls
-
-
-        $(this.elements.others.originImg).fadeIn(() => {
-            this.originStatus = true;
-
-
-            // Swiper初始化时，元素 display不能为 none
-            if (!this.swiper) {
-                this.swiper = new Swiper(this.elements.others.originImg, {
-                    virtual: true,
-                    pagination: {
-                        el: '.swiper-pagination',
-                        type: 'fraction',
-                    },
-                    on: {
-                        click: () => {
-                            $(this.elements.others.originImg).fadeOut(() => {
-                                this.originStatus = false;
-                                this.swiper.virtual.removeAllSlides()
-                                this.swiper.virtual.cache = [];
-
-                            })
-                            $(this.elements.others.hwBar).fadeIn()
-                        },
-                    },
-
-                });
-
-
+            if (v.swiper) {
+                v.swiper.destroy();
+                v.swiper = null
             }
+        }
 
-            for (let i = 0; i < imgs.length; i++) {
-                let url = this.dataController.getImageUrl(imgs[i]);
-                this.swiper.virtual.appendSlide('<div class="swiper-zoom-container"><img src="' + url +
-                    '" /></div>');
-            }
-            this.swiper.slideTo(info.index, 0);
+        this.zoomStatus = ZoomStatus.out;
+    }
+    showDetail(info: { id: string, index: number }, a: number) {
+        let _this = this;
+        let element = this.garbageElements.get(info.id);
+        let imgs = element.imageUrls;
+        this.activeElement = element;
 
-        })
-        $(this.elements.others.hwBar).fadeOut()
+
+        if (this.swiper) {
+            this.swiper.destroy();
+            this.swiper = null;
+        };
+        $(this.elements.others.originImg).fadeIn()
+        this.originStatus = true;
+        if (!this.swiper) {
+            this.swiper = new Swiper(this.elements.others.originImg, {
+                virtual: true,
+                pagination: {
+                    el: '.swiper-pagination',
+                    type: 'fraction',
+                },
+            })
+        }
+        this.swiper.virtual.removeAllSlides()
+        this.swiper.virtual.cache = [];
+        for (let i = 0; i < imgs.length; i++) {
+            let url = this.dataController.getImageUrl(imgs[i]);
+            this.swiper.virtual.appendSlide('<div class="swiper-zoom-container"><img src="' + url +
+                '" /></div>');
+        }
+        this.swiper.slideTo(info.index, 0);
+
     }
 
     fillCandlestickOption(lineDataSource: Array<GarbageStationGarbageCountStatistic>
