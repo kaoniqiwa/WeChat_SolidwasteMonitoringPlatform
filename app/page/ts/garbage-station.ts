@@ -68,12 +68,13 @@ enum ZoomStatus {
     out = "zoomOut",
     in = "zoomIn"
 }
-interface IActiveElement{
+interface IActiveElement {
     Element: HTMLDivElement,
     id: string,
     divisionId: string,
     imageUrls: Array<string>,
-    swiper?:Swiper
+    state: Flags<StationState>
+    swiper?: Swiper
 }
 // 使用简单的观察者模式，实现 GarbageStationClient 和 myAside 类的通信
 class GarbageStationClient implements IObserver {
@@ -192,11 +193,15 @@ class GarbageStationClient implements IObserver {
     }
     update(args) {
         if (args && args.selectedItems) {
-            let selectedItems = [...args.selectedItems]
+            let selectedItems = [...args.selectedItems];
+            let selectedFilter = [...args.selectedFilter]
             let ids = selectedItems.map(item => {
                 return item.getAttribute('id')
             });
-            this.confirmSelect(ids);
+            let states = selectedFilter.map(item => {
+                return Number(item.dataset['state'])
+            })
+            this.confirmSelect(ids, states);
         }
         if (args && 'show' in args) {
             this.show = args.show;
@@ -259,6 +264,8 @@ class GarbageStationClient implements IObserver {
         let len = this.garbageStations.length
         for (let i = 0; i < len; i++) {
             const v = this.garbageStations[i];
+
+            // v.StationState = Math.random() * 3 >> 0;
 
             if (typeof v.StationState == "number") {
                 v.StationState = new Flags<StationState>(v.StationState);
@@ -369,7 +376,8 @@ class GarbageStationClient implements IObserver {
                 Element: content_card,
                 id: v.Id,
                 divisionId: v.DivisionId,
-                imageUrls: imageUrls
+                imageUrls: imageUrls,
+                state: v.StationState
             })
 
             this.elements.container.hwContainer?.appendChild(info)
@@ -415,18 +423,18 @@ class GarbageStationClient implements IObserver {
             }, Math.random() * 10 >> 0);
         })
         this.elements.others.originImg.addEventListener('click', function () {
-           
+
             _this.activeIndex = _this.swiper.activeIndex;
-            if(_this.activeElement.swiper){
-                _this.activeElement.swiper.slideTo(_this.activeIndex,0)
-            }else{
+            if (_this.activeElement.swiper) {
+                _this.activeElement.swiper.slideTo(_this.activeIndex, 0)
+            } else {
                 _this.activeElement.Element.querySelector(`.swiper-slide:nth-of-type(${_this.activeIndex + 1})`).scrollIntoView({
-                    block:'nearest',
-                    behavior:'auto',
-                    inline:'nearest'
+                    block: 'nearest',
+                    behavior: 'auto',
+                    inline: 'nearest'
                 });
             }
-          
+
             $(this).fadeOut();
             _this.originStatus = false;
 
@@ -486,28 +494,32 @@ class GarbageStationClient implements IObserver {
 
 
     }
-    confirmSelect(selectedIds: string[]) {
+    confirmSelect(selectedIds: string[], states: StationState[]) {
+
+        console.log(selectedIds, states)
 
         for (let [k, v] of this.garbageElements) {
-            if (selectedIds.length == 0 || selectedIds.includes(v.divisionId) || selectedIds.includes(v.id)) {
-                v.Element.style.display = 'block'
-            } else {
-                v.Element.style.display = 'none'
+
+            // 默认显示
+            v.Element.style.display = 'block';
+
+            if (selectedIds.length && !selectedIds.includes(v.divisionId)) {
+                v.Element.style.display = 'none';
+            }
+            if (states.length && !states.includes(v.state.value)) {
+                v.Element.style.display = 'none';
+            }
+
+            if (this.zoomStatus == ZoomStatus.out) {
+
+                this.zoomOut();
+            }
+            else if (this.zoomStatus == ZoomStatus.in) {
+
+                this.zoomIn();
             }
         }
-        if (this.zoomStatus == ZoomStatus.out) {
-
-            this.zoomOut();
-        }
-        else if (this.zoomStatus == ZoomStatus.in) {
-
-            this.zoomIn();
-        }
-        else {
-
-        }
         console.log("confirmSelect click", this.zoomStatus)
-
     }
     filerContent() {
         let str = this.elements.btns.searchInput.value;

@@ -22,6 +22,8 @@
        *　　　　┗┻┛　┗┻┛+ + + +
        */
 
+import { HttpResponse } from "../../data-core/model/response";
+import { Flags, StationState } from "../../data-core/model/waste-regulation/garbage-station";
 import { ResourceRole, ResourceType } from "../../data-core/model/we-chat";
 import IAside from "./IAside";
 
@@ -46,14 +48,16 @@ export default class MyAside extends IAside {
 
         }
     selectedItems: Set<HTMLDivElement> = new Set();// 方便删除元素
+
+    selectedFilter: Set<HTMLDivElement> = new Set();
     // 使用数据拦截，实现数据单向绑定
     _title: string;
     get title() {
         return this._title;
     }
     set title(val) {
-        if (this.elements.content && this.elements.content.title)
-            this.elements.content.title.textContent = val;
+        if (this.elements.content && this.elements.content.roleTitle)
+            this.elements.content.roleTitle.textContent = val;
         this._title = val;
     }
     _data: ResourceRole[];
@@ -63,9 +67,9 @@ export default class MyAside extends IAside {
 
     }
     set data(val: ResourceRole[]) {
-        if (this.elements.content && this.elements.content.asideMain) {
+        if (this.elements.content && this.elements.content.roleContent) {
             // 一定要清
-            this.elements.content.asideMain.innerHTML = '';
+            this.elements.content.roleContent.innerHTML = '';
             let fragment = document.createDocumentFragment();
             val.forEach((item, index) => {
                 let el: HTMLDivElement = document.createElement('div');
@@ -74,7 +78,7 @@ export default class MyAside extends IAside {
                 el.setAttribute('id', item.Id)
                 fragment.appendChild(el);
             })
-            this.elements.content.asideMain.appendChild(fragment)
+            this.elements.content.roleContent.appendChild(fragment)
         }
         this._data = val;
     }
@@ -83,10 +87,14 @@ export default class MyAside extends IAside {
     template: string = `
     <div class="inner-mask"></div>
     <div class='inner-content'>
-         <div class='inner-title'>
+        <div class='inner-title'>筛选</div>
+        <div class='inner-main' id='filter-content'>
+            <div class='inner-item normal1' data-state='0'>正常</div>
+            <div class='inner-item full1' data-state='1'>满溢</div>
+            <div class='inner-item error1' data-state='2'>异常</div>
         </div>
-        <div class='inner-main'>
-            <div class='inner-item'></div>
+        <div class='inner-title' id="role-title"> </div>
+        <div class='inner-main' id='role-content'>
         </div>
         <div class='inner-footer'>
             <div class='inner-btn inner-reset'>重置</div>
@@ -112,10 +120,10 @@ export default class MyAside extends IAside {
             mask: this.innerContainer.querySelector('.inner-mask') as HTMLDivElement,
             content: {
                 innerContent: this.innerContainer.querySelector('.inner-content') as HTMLDivElement,
-                title: this.innerContainer.querySelector('.inner-title'),
-                asideMain: this.innerContainer.querySelector('.inner-main') as HTMLDivElement,
-                asideTemplate: this.innerContainer.querySelector('#inner-template') as HTMLTemplateElement,
-                asideItem: this.innerContainer.querySelector('.inner-item') as HTMLDivElement,
+                roleTitle: this.innerContainer.querySelector('#role-title'),
+                roleContent: this.innerContainer.querySelector('#role-content') as HTMLDivElement,
+                filterContent: this.innerContainer.querySelector('#filter-content') as HTMLDivElement,
+
             },
             footer: {
                 resetBtn: this.innerContainer.querySelector('.inner-reset') as HTMLDivElement,
@@ -133,9 +141,10 @@ export default class MyAside extends IAside {
         return this;
     }
     bindEvents() {
-        if (this.elements.content && this.elements.content.asideMain) {
-            let _self = this;
-            this.elements.content.asideMain.addEventListener('click', function (e: MouseEvent) {
+        let _self = this;
+        if (this.elements.content && this.elements.content.roleContent) {
+
+            this.elements.content.roleContent.addEventListener('click', function (e: MouseEvent) {
                 let target = e.target as HTMLDivElement;
                 // 点击的是 inner-item 项
                 if (target.classList.contains('inner-item')) {
@@ -146,6 +155,7 @@ export default class MyAside extends IAside {
                             _self.selectedItems.clear();
                             target.classList.remove('selected');
                         } else {
+                            // 虽然单选只有一个
                             for (let item of _self.selectedItems.values()) {
                                 item.classList.remove('selected')
                             }
@@ -167,7 +177,6 @@ export default class MyAside extends IAside {
 
 
                 }
-                console.log(_self.selectedItems);
             })
         }
         if (this.elements.footer && this.elements.footer.resetBtn) {
@@ -176,13 +185,21 @@ export default class MyAside extends IAside {
                     item.classList.remove('selected')
                 }
                 this.selectedItems = new Set();
+
+                for (let item of this.selectedFilter.values()) {
+                    item.classList.remove('selected')
+                }
+                this.selectedFilter = new Set();
+
             })
         }
         if (this.elements.footer && this.elements.footer.confirmBtn) {
             this.elements.footer.confirmBtn.addEventListener('click', () => {
                 this.notify({
                     selectedItems: this.selectedItems,
-                    show: false
+                    selectedFilter: this.selectedFilter,
+                    show: false,
+
                 })
                 this.slideOut()
             })
@@ -195,6 +212,42 @@ export default class MyAside extends IAside {
                 this.slideOut()
             })
         }
+        if (this.elements.content.filterContent) {
+            this.elements.content.filterContent.addEventListener('click', function (e: MouseEvent) {
+                let target = e.target as HTMLDivElement;
+                // 点击的是 inner-item 项
+                if (target.classList.contains('inner-item')) {
+
+                    if (_self.mode == SelectionMode.single) {
+                        if (_self.selectedFilter.has(target)) {
+                            _self.selectedFilter.clear();
+                            target.classList.remove('selected');
+                        } else {
+                            for (let item of _self.selectedFilter.values()) {
+                                item.classList.remove('selected')
+                            }
+                            _self.selectedFilter = new Set([target])
+                            target.classList.add('selected');
+                        }
+                    } else if (_self.mode == SelectionMode.multiple) {
+                        if (_self.selectedFilter.has(target)) {
+                            _self.selectedFilter.delete(target);
+                        } else {
+                            _self.selectedFilter.add(target);
+                        }
+                        if (!target.classList.contains('selected')) {
+                            target.classList.add('selected');
+                        } else {
+                            target.classList.remove('selected')
+                        }
+
+                    }
+
+
+                }
+            })
+        }
+
     }
     slideIn() {
         this.elements.content.innerContent.classList.add('slideIn')
