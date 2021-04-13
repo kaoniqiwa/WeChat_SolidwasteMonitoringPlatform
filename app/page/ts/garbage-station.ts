@@ -122,14 +122,14 @@ class GarbageStationClient implements IObserver {
     set show(val) {
         this._show = val;
         if (val) {
-            $(this.elements.asideContainer).show();
+            $(this.elements.container.asideContainer).show();
             setTimeout(() => {
                 this.myAside.slideIn()
             }, 1e2);
         }
         else {
             setTimeout(() => {
-                $(this.elements.asideContainer).hide();
+                $(this.elements.container.asideContainer).hide();
             }, 3e2);
         }
 
@@ -141,19 +141,20 @@ class GarbageStationClient implements IObserver {
     }
     set showChart(val) {
         this._showChart = val;
-        console.log(this.myChartOptions)
         if (val) {
-            this.elements.doms.chartContainer.classList.add('slideIn')
+            this.elements.container.chartContainer.classList.add('slideIn')
         } else {
-            this.elements.doms.chartContainer.classList.remove('slideIn')
+            this.elements.container.chartContainer.classList.remove('slideIn')
         }
     }
 
     elements = {
-        doms: {
-            container: document.querySelector('#hw-container') as HTMLDivElement,
-            template: document.querySelector('#card-template') as HTMLTemplateElement,
-            chartContainer: document.querySelector<HTMLElement>('#chart-container')
+        container: {
+            hwContainer: document.querySelector('#hw-container') as HTMLDivElement,
+
+            chartContainer: document.querySelector<HTMLElement>('#chart-container'),
+
+            asideContainer: document.querySelector('#aside-container') as HTMLElement,
         },
         btns: {
             imgDivision: document.querySelector('#img_division') as HTMLDivElement,
@@ -162,10 +163,11 @@ class GarbageStationClient implements IObserver {
             btnSearch: document.querySelector('#btn_search') as HTMLInputElement,
             imgIcon: document.querySelector('#img_division i') as HTMLElement
         },
-
-        asideContainer: document.querySelector('#aside-container') as HTMLElement,
-        originImg: document.querySelector('#origin-img') as HTMLDivElement,
-        hwBar: document.querySelector('.hw-bar') as HTMLDivElement,
+        others: {
+            hwBar: document.querySelector('.hw-bar') as HTMLDivElement,
+            originImg: document.querySelector('#origin-img') as HTMLDivElement,
+            template: document.querySelector('#card-template') as HTMLTemplateElement,
+        }
 
     }
 
@@ -178,7 +180,6 @@ class GarbageStationClient implements IObserver {
 
     }
     update(args) {
-        console.log('ppp')
         if (args && args.selectedItems) {
             let selectedItems = [...args.selectedItems]
             let ids = selectedItems.map(item => {
@@ -195,9 +196,9 @@ class GarbageStationClient implements IObserver {
     }
     init() {
         this.loadData().then(() => {
+            this.resetBar()
             this.createAside();
             this.createChartAside();
-            this.resetBar()
             this.createContent();
             this.createNumberList();
 
@@ -223,17 +224,9 @@ class GarbageStationClient implements IObserver {
         this.numberList = await this.dataController.getGarbageStationStatisticNumberListInToday(roles);
         console.log('今日统计数据', this.numberList)
 
-        this.roleList = await this.dataController.getResourceRoleList()
+        this.roleList = await this.dataController.getResourceRoleList();
 
-
-
-        // this.dataController.getGarbageStationNumberStatistic("310109011002002000", new Date(),).then((res) => {
-        //     console.log('小包垃圾:', res)
-        //     this.fillCandlestickOption(res);
-        //     this.drawChart()
-        // }).catch((err) => {
-        //     console.log('error', err)
-        // })
+        console.log('筛选数据', this.roleList)
 
 
     }
@@ -245,10 +238,10 @@ class GarbageStationClient implements IObserver {
     createContent() {
         let _this = this;
         // 清空容器内容
-        this.elements.doms.container.innerHTML = "";
+        this.elements.container.hwContainer.innerHTML = "";
 
         // 模板内容
-        let tempContent = this.elements.doms.template?.content as DocumentFragment;
+        let tempContent = this.elements.others.template?.content as DocumentFragment;
 
         let len = this.garbageStations.length
         for (let i = 0; i < len; i++) {
@@ -263,6 +256,7 @@ class GarbageStationClient implements IObserver {
             let content_card = info.querySelector('.hw-content__card') as HTMLDivElement;
             content_card.setAttribute('id', v.Id)
             content_card.setAttribute('divisionid', v.DivisionId)
+            content_card.dataset['cardname'] = v.Name;
 
 
             // 标题
@@ -342,8 +336,7 @@ class GarbageStationClient implements IObserver {
             })
             content_card.addEventListener('click', function (e) {
                 let target = e.target as HTMLElement;
-                // 如果点击图片，则传递图片index和父元素id
-                // 小窗口的时候才会全屏显示功能
+                let currentTarget = e.currentTarget as HTMLDivElement;
                 if (target.tagName.toString().toLowerCase() == 'img') {
                     let ev = new CustomEvent('cat', {
                         detail: {
@@ -353,36 +346,19 @@ class GarbageStationClient implements IObserver {
                     })
                     _this.customElement.dispatchEvent(ev)
                 } else {
+                    _this.myChartAside.id = currentTarget.id;
+                    // let date = new Date();
+                    // _this.dataController.getGarbageStationNumberStatistic(currentTarget.id, date).then(res => {
 
-                    let date = new Date();
-                    _this.dataController.getGarbageStationNumberStatistic((e.currentTarget as HTMLDivElement).id, date).then(res => {
-                        _this.myChartOptions = {
-                            date: date,
-                            data: res
-                        };
-
-                        // _this.myChartAside.title = res[0].Name;
-                        // _this.myChartAside.date = date;
-                        // _this.myChartAside.data = res;
-
-                        Object.assign(_this.myChartAside,{
-                            title:res[0].Name,
-                            date,
-                            data:res
-                        })
-                        _this.showChart = true;
-                    })
-
-
-
-                    // this.dataController.getGarbageStationNumberStatistic("310109011002002000", new Date(),).then((res) => {
-                    //     console.log('小包垃圾:', res)
-                    //     this.fillCandlestickOption(res);
-                    //     this.drawChart()
-                    // }).catch((err) => {
-                    //     console.log('error', err)
+                    //     Object.assign(_this.myChartAside, {
+                    //         title: currentTarget.dataset['cardname'],
+                    //         date,
+                    //         data: res,
+                    //         garbageStations:_this.garbageStations
+                    //     })
+                    //     _this.showChart = true;
                     // })
-
+                    _this.showChart = true;
                 }
 
             })
@@ -394,7 +370,7 @@ class GarbageStationClient implements IObserver {
                 imageUrls: imageUrls
             })
 
-            this.elements.doms.container?.appendChild(info)
+            this.elements.container.hwContainer?.appendChild(info)
         }
     }
     bindEvents() {
@@ -462,7 +438,7 @@ class GarbageStationClient implements IObserver {
     }
     createAside() {
         this.myAside = null;
-        this.myAside = new MyAside(this.elements.asideContainer, {
+        this.myAside = new MyAside(this.elements.container.asideContainer, {
             title: Language.ResourceType(type),
             data: this.roleList
         }, SelectionMode.multiple).init()
@@ -471,11 +447,11 @@ class GarbageStationClient implements IObserver {
     }
     createChartAside() {
         this.myChartAside = null;
-        this.myChartAside = new EchartsAside(this.elements.doms.chartContainer, {
-            title: '广中一村8号厢房',
+        this.myChartAside = new EchartsAside(this.elements.container.chartContainer).init({
+            data: this.garbageStations,
             date: new Date(),
-            data: []
-        }).init();
+            dataController
+        });
         this.myChartAside.add(this)
     }
     resetSelected() {
@@ -597,13 +573,13 @@ class GarbageStationClient implements IObserver {
         let imgs = element.imageUrls
 
 
-        $(this.elements.originImg).fadeIn(() => {
+        $(this.elements.others.originImg).fadeIn(() => {
             this.originStatus = true;
 
 
             // Swiper初始化时，元素 display不能为 none
             if (!this.swiper) {
-                this.swiper = new Swiper(this.elements.originImg, {
+                this.swiper = new Swiper(this.elements.others.originImg, {
                     virtual: true,
                     pagination: {
                         el: '.swiper-pagination',
@@ -611,13 +587,13 @@ class GarbageStationClient implements IObserver {
                     },
                     on: {
                         click: () => {
-                            $(this.elements.originImg).fadeOut(() => {
+                            $(this.elements.others.originImg).fadeOut(() => {
                                 this.originStatus = false;
                                 this.swiper.virtual.removeAllSlides()
                                 this.swiper.virtual.cache = [];
 
                             })
-                            $(this.elements.hwBar).fadeIn()
+                            $(this.elements.others.hwBar).fadeIn()
                         },
                     },
 
@@ -634,7 +610,7 @@ class GarbageStationClient implements IObserver {
             this.swiper.slideTo(info.index, 0);
 
         })
-        $(this.elements.hwBar).fadeOut()
+        $(this.elements.others.hwBar).fadeOut()
     }
 
     fillCandlestickOption(lineDataSource: Array<GarbageStationGarbageCountStatistic>
@@ -764,7 +740,7 @@ class GarbageStationClient implements IObserver {
         console.log(this.candlestickOption)
     }
     drawChart() {
-        let myChart = echarts.init(this.elements.doms.chartContainer)
+        let myChart = echarts.init(this.elements.container.chartContainer)
         let options = {
             xAxis: {
                 type: 'category',

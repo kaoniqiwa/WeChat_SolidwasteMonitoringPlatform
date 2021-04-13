@@ -97,7 +97,6 @@ export namespace EventInformationPage {
             if (index != undefined) {
                 index += 1;
             }
-            debugger;
             const data = await this.getData(index, this.day);
             if (data) {
                 this.fillDetail(data, element);

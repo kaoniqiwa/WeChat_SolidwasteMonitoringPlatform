@@ -380,7 +380,7 @@ namespace GarbageCondition {
 
 	const user = new SessionUser();
 
-	console.log(user)
+	// console.log(user)
 	if (user.WUser.Resources) {
 		const type = user.WUser.Resources![0].ResourceType;
 

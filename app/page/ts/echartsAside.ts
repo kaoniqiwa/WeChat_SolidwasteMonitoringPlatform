@@ -2,7 +2,9 @@ import { CandlestickOption } from "./echart";
 import IAside from "./IAside"
 import { dateFormat, getAllDay } from "../../common/tool";
 
+import Swiper, { Virtual, Pagination } from 'swiper';
 
+Swiper.use([Virtual, Pagination])
 
 import * as echarts from 'echarts/core';
 import {
@@ -20,6 +22,12 @@ import { LineChart, LineSeriesOption, BarChart, BarSeriesOption } from 'echarts/
 
 import { CanvasRenderer } from "echarts/renderers";
 import { GarbageStationGarbageCountStatistic } from "../../data-core/model/waste-regulation/garbage-station-number-statistic";
+import { GarbageStationViewModel } from "./data-controllers/ViewModels";
+import { NavigationWindow } from ".";
+import { Service } from "../../data-core/repuest/service";
+import { ControllerFactory } from "./data-controllers/ControllerFactory";
+import { DataController } from "./data-controllers/DataController";
+import { EventType } from "../../data-core/model/waste-regulation/event-number";
 
 echarts.use([
     GridComponent,
@@ -31,19 +39,27 @@ echarts.use([
     DataZoomComponent
 ])
 
+/**
+ * 
+ */
 
 interface EchartsAsideOptions {
-    title?: string;
-    date?: Date,
-    data?: GarbageStationGarbageCountStatistic[]
-
+    date?: Date;
+    data?: GarbageStationViewModel[];
+    dataController: DataController
 }
+
+// const user = (window.parent as NavigationWindow).User;
+
+
 export default class EchartsAside extends IAside {
     candlestickOption: CandlestickOption = new CandlestickOption()
-
+    myChart: echarts.ECharts
 
     outterContainer: HTMLElement;
     innerContainer: HTMLDivElement = document.createElement("div");
+
+    dataController: DataController;
 
     _title: string = "";
 
@@ -52,7 +68,7 @@ export default class EchartsAside extends IAside {
     }
     set title(val) {
         this._title = val;
-        this.elements.doms.title.textContent = val;
+        // this.elements.doms.title.textContent = val;
     }
     _date: Date = new Date();
 
@@ -61,20 +77,38 @@ export default class EchartsAside extends IAside {
     }
     set date(val) {
         this._date = val;
-        this.elements.doms.date.textContent =  dateFormat(val, "yyyy年MM月dd日")
+        // this.elements.doms.date.textContent = dateFormat(val, "yyyy年MM月dd日")
     }
+    data: GarbageStationViewModel[];
 
-    _data: GarbageStationGarbageCountStatistic[];
+    statistic: Map<string, GarbageStationGarbageCountStatistic[]> = new Map()
 
-    get data() {
-        return this._data;
+    _id: string = '';
+
+    get id() {
+        return this._id;
+    }
+    set id(val) {
+        this._id = val;
+
+        let index = this.data.findIndex(item => {
+            return item.Id == val;
+        })
+        index = index == -1 ? 0 : index
+        if (index == 0) {
+            this.draw();
+        } else {
+
+            this.swiper.slideTo(index);
+        }
+
+        console.log('set id')
+
+
 
     }
-    set data(val: GarbageStationGarbageCountStatistic[]) {
-        this._data = val;
-        this.fillCandlestickOption(val);
-        this.drawChart()
-    }
+    swiper: Swiper;
+
 
 
     elements: {
@@ -92,19 +126,18 @@ export default class EchartsAside extends IAside {
            </div>
         </div>
         <div class='inner-main'>
-            <div class='inner-txt'>
-                <div class='inner-title'></div>
-                <div class='inner-date'></div>
-            </div>
-            <div class="inner-chart"></div>
+              <div class="swiper-container">
+                 <div class="swiper-wrapper">
+                 </div>
+
+             </div>
         </div>
-        <div class='inner-footer'>
+        <div class='inner-footer' style='display:none'>
             <div class='inner-btn'>返回</div>
         </div>
     </div>
     `
-
-    constructor(selector: HTMLElement | string, private options?: EchartsAsideOptions) {
+    constructor(selector: HTMLElement | string) {
         super();
         this.outterContainer = typeof selector == "string" ? document.querySelector(selector) as HTMLElement : selector;
 
@@ -112,9 +145,11 @@ export default class EchartsAside extends IAside {
         this.innerContainer.classList.add("echart-inner-container");
         this.innerContainer.innerHTML = this.template;
 
+
+
         return this;
     }
-    init() {
+    init(options: EchartsAsideOptions) {
         this.outterContainer.innerHTML = '';
         this.outterContainer.appendChild(this.innerContainer);
 
@@ -123,25 +158,97 @@ export default class EchartsAside extends IAside {
             mask: this.innerContainer.querySelector('.inner-mask') as HTMLDivElement,
             doms: {
                 innerBack: this.innerContainer.querySelector('.inner-back') as HTMLDivElement,
-                title: this.innerContainer.querySelector('.inner-title'),
-                date: this.innerContainer.querySelector('.inner-date'),
-                chartContainer: this.innerContainer.querySelector('.inner-chart') as HTMLDivElement,
             },
             footer: {
                 backBtn: this.innerContainer.querySelector('.inner-btn') as HTMLDivElement,
             }
         }
+        Object.assign(this, options);
 
-        this.title = this.options?.title;
-        this.date = this.options?.date;
-        this.data = this.options?.data;
 
-        this.bindEvents()
+        this.bindEvents();
+
+        this.swiper = new Swiper('.echart-inner-container .swiper-container', {
+            virtual: {
+                slides: (() => {
+                    var slides = [];
+                    for (let i = 0; i < this.data.length; i++) {
+
+                        let { Name, GarbageRatio, AvgGarbageTime, MaxGarbageTime, GarbageDuration, TodayEventNumbers } = this.data[i].NumberStatistic;
+
+                        GarbageRatio = Number(GarbageRatio.toFixed(2));
+                        AvgGarbageTime = Math.round(AvgGarbageTime);
+                        MaxGarbageTime = Math.round(MaxGarbageTime);
+                        GarbageDuration = Math.round(GarbageDuration);
+                        let maxHour = Math.floor(MaxGarbageTime / 60);
+                        let maxMinute = MaxGarbageTime - maxHour * 60;
+                        let totalHour = Math.floor(GarbageDuration / 60);
+                        let totalMinute = GarbageDuration - totalHour * 60;
+                        let illegalDrop = 0;
+                        let mixIntoDrop = 0;
+
+                        TodayEventNumbers.forEach(eventNumber => {
+                            if (eventNumber.EventType == EventType.IllegalDrop) {
+                                illegalDrop = eventNumber.DayNumber
+                            } else if (eventNumber.EventType == EventType.MixedInto) {
+                                mixIntoDrop = eventNumber.DayNumber
+                            }
+                        })
+
+                        slides.push(`
+                            <div data-id='${this.data[i].Id}' style="padding:0 10px;">
+                                <div class='inner-txt'>
+                                    <div class='inner-title'>${this.data[i].Name}</div>
+                                     <div class='inner-date'>${dateFormat(this.date, "yyyy年MM月dd日")}</div>
+                                </div>
+                                <div class='inner-statisic'>
+                                    <div class='head'>
+                                        <div class='head-num'>${GarbageRatio}</div>
+                                        <div class='head-suffix'>分</div>
+                                    </div>
+                                    <div class='item'>
+                                        <div class='item-title'>最大落地:</div>
+                                        <div class='item-content'>
+                                            ${maxHour == 0 ? maxMinute + "分钟" : maxHour + "小时" + maxMinute + "分钟"}
+                                        </div>
+                                    </div>
+                                    <div class='item'> 
+                                        <div class='item-title'> 总落地:</div>
+                                        <div class='item-content'>
+                                            ${totalHour == 0 ? totalMinute + "分钟" : totalHour + "小时" + totalMinute + "分钟"}
+                                        </div>
+                                    </div>
+
+                                    <div class='item'>
+                                        <div class='item-title'> 乱丢垃圾:</div>
+                                        <div class='item-content'>${illegalDrop}起</div>
+                                    </div>
+
+                                    <div class='item'>
+                                        <div class='item-title'> 混合投放:</div>
+                                        <div class='item-content'>${mixIntoDrop}起</div>
+                                    </div>
+                                </div>
+                                <div class="inner-chart"></div>
+                            </div>
+                        `)
+                    }
+                    return slides
+                })(),
+            },
+            on: {
+                transitionEnd: () => {
+                    console.log('transitionEnd')
+                    this.draw()
+                }
+            }
+        })
 
 
         return this;
     }
     bindEvents() {
+        // window.addEventListener("resize", () => this.myChart.resize());
         if (this.elements.doms && this.elements.doms.innerBack) {
             this.elements.doms.innerBack.addEventListener("click", () => {
                 this.notify({
@@ -154,6 +261,26 @@ export default class EchartsAside extends IAside {
                 this.notify({
                     showChart: false
                 })
+            })
+        }
+    }
+    draw() {
+
+        let activeSlide = this.innerContainer.querySelector('.swiper-slide-active') as HTMLElement;
+        let echart = activeSlide.querySelector('.inner-chart') as HTMLElement;
+        let id = (activeSlide.firstElementChild as HTMLElement).dataset['id'];
+        console.log('draw', id)
+        if (this.statistic.has(id)) {
+            // 该id已经请求过数据，使用缓存
+            console.log('使用缓存');
+
+        } else {
+            //this.date
+            this.dataController.getGarbageStationNumberStatistic(id,new Date(new Date().getTime() - 24*3600*1000*3)).then(res => {
+                console.log('画图',res);
+                this.statistic.set(id, res)
+                this.fillCandlestickOption(res);
+                this.drawChart(echarts.init(echart))
             })
         }
     }
@@ -281,23 +408,9 @@ export default class EchartsAside extends IAside {
             this.candlestickOption.lineDataB[g] = 0;
         });
 
-        console.log(this.candlestickOption)
     }
-    drawChart() {
-        let myChart = echarts.init(this.elements.doms.chartContainer)
-        let options = {
-            xAxis: {
-                type: 'category',
-                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: [{
-                data: [150, 230, 224, 218, 135, 147, 260],
-                type: 'line'
-            }]
-        }
+    drawChart(echart: echarts.ECharts) {
+
         const options1 = {
             animation: false,
 
@@ -328,17 +441,22 @@ export default class EchartsAside extends IAside {
             dataZoom: [
                 {
                     type: 'inside',
-                    xAxisIndex: [0, 1],
                     start: 0,
                     end: 100
-                }
-            ],
-            grid: [
-                {
-                    top: '20%',
-                    bottom: '10px',
-                    containLabel: true
                 },
+                {
+                    show: true,
+                    type: 'slider',
+                    top: '84%',
+                    start: 0,
+                    end: 100,
+                    fillerColor: 'rgb(117,134,224,0.5)',
+                    borderColor: '#5e6ebf',
+                    textStyle: {
+                        color: '#CFD7FE',
+                        fontSize: "16",
+                    }
+                }
             ],
             xAxis: [
                 {
@@ -370,36 +488,36 @@ export default class EchartsAside extends IAside {
                         }
                     },
                 },
-            ],
-            yAxis: [
-                {
-                    scale: true,
-                    splitArea: {
-                        show: false
-                    },
-                    axisTick: {        //刻度线
-                        show: false
-                    },
 
-                    axisLine: {
-                        show: false,
-                        onZero: false,//y轴
-                        lineStyle: {
-                            color: '#7d90bc'
-                        }
-                    },
-                    axisLabel: {
-                        color: '#CFD7FE',
-                        fontSize: "16",
-                        show: false,
-                    },
-                    splitLine: {
-                        lineStyle: {
-                            color: 'rgb(117,134,224,0.3)'
-                        }
+            ],
+            yAxis: {
+                boundaryGap: false,
+                scale: true,
+                splitArea: {
+                    show: false
+                },
+                axisTick: {        //刻度线
+                    show: false
+                },
+
+                axisLine: {
+                    show: false,
+                    onZero: false,//y轴
+                    lineStyle: {
+                        color: '#7d90bc'
                     }
                 },
-            ],
+                axisLabel: {
+                    color: '#CFD7FE',
+                    fontSize: "16",
+                    show: false,
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: 'rgb(117,134,224,0.3)'
+                    }
+                }
+            },
             series: [{
                 name: 'theLine',
                 type: 'line',
@@ -417,6 +535,6 @@ export default class EchartsAside extends IAside {
             },
             ]
         }
-        myChart.setOption(options1)
+        echart.setOption(options1)
     }
 }

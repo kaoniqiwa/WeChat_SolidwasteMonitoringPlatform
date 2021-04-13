@@ -187,7 +187,7 @@ export class CountDivisionController extends DataController implements IDataCont
 		// 获得0点至当前分钟的垃圾投放数量
 		let alldayCount = await this.getEventCount(day);
 
-		console.log('allDay', alldayCount)
+		// console.log('allDay', alldayCount)
 
 		// illegalDropResult 按小时为单位计算，超过小时部分投放的垃圾数量未计算在内
 		let illegalDropCount = illegalDropResult[illegalDropResult.length - 1].DayNumber;

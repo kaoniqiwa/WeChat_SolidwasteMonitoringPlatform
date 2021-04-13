@@ -161,7 +161,7 @@ export namespace EventHistoryPage {
 
         confirmSelect(selectedIds?: string[]) {
             this.selectedIds = selectedIds;
-            console.log("confirmSelect");
+            // console.log("confirmSelect");
             this.clean();
             this.miniRefresh[this.eventType].resetUpLoading();
         }
@@ -273,7 +273,7 @@ export namespace EventHistoryPage {
             }
             else {
 
-                console.log("Page", list.Page);
+                // console.log("Page", list.Page);
                 element.recordCount.innerHTML = (list.Page.PageSize * (list.Page.PageIndex - 1) + list.Page.RecordCount).toString();
             }
 
@@ -282,7 +282,7 @@ export namespace EventHistoryPage {
         eventType: EventType = EventType.IllegalDrop;
         selectedIds?: string[]
         async refresh(page: Paged, eventType: EventType) {
-            console.log("current page", page);
+            // console.log("current page", page);
             const day = getAllDay(date);
 
             let data = await this.dataController.getEventList(day, page, eventType, this.selectedIds);
@@ -336,7 +336,7 @@ export namespace EventHistoryPage {
 
             // 下拉事件
             this.clean();
-            console.log("miniRefreshDown");
+            // console.log("miniRefreshDown");
 
             r.endDownLoading();
             // r.resetUpLoading();      
@@ -484,7 +484,7 @@ export namespace EventHistoryPage {
         loadData() {
             if (this.record) {
                 this.record.clean();
-                console.log("loadData");
+                // console.log("loadData");
                 this.record.miniRefresh[this.record.eventType].resetUpLoading();
             }
         }
@@ -509,7 +509,7 @@ export namespace EventHistoryPage {
 
         SwiperControlChanged(index: number) {
             if (this.record) {
-                console.log("SwiperControlChanged")
+                // console.log("SwiperControlChanged")
                 this.record.eventType = this.getEventTypeByIndex(index);
                 this.record.clean();
                 this.record.miniRefresh[this.record.eventType].resetUpLoading();
@@ -535,9 +535,9 @@ export namespace EventHistoryPage {
         initSwiper() {
 
             let eventType = EventType.IllegalDrop;
-            console.log(window.location.href);
+            // console.log(window.location.href);
             let strEventType = getQueryVariable("eventtype");
-            console.log(strEventType)
+            // console.log(strEventType)
             if (strEventType) {
                 eventType = parseInt(strEventType);
             }
@@ -577,7 +577,7 @@ export namespace EventHistoryPage {
 
             const user = (window.parent as NavigationWindow).User;
             const http = (window.parent as NavigationWindow).Authentication;
-            console.log(http);
+            // console.log(http);
             const type = user.WUser.Resources![0].ResourceType;
             const service = new Service(http)
             const dataController = ControllerFactory.Create(service, type, user.WUser.Resources!)
@@ -591,8 +591,8 @@ export namespace EventHistoryPage {
         }
     }
 }
-console.log("User", (window.parent as NavigationWindow).User);
-console.log("Auth", (window.parent as NavigationWindow).Authentication);
+// console.log("User", (window.parent as NavigationWindow).User);
+// console.log("Auth", (window.parent as NavigationWindow).Authentication);
 
 const page = new EventHistoryPage.Page();
 page.viewDatePicker(new Date());

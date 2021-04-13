@@ -257,7 +257,6 @@ export abstract class DataController implements IDataController, IGarbageStation
     GetEventRecord(type: EventType, eventId: string): Promise<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | undefined>;
     GetEventRecord(type: EventType, index: number, day?: OneDay): Promise<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | undefined>;
     async GetEventRecord(type: EventType, index: string | number, day?: OneDay) {
-        debugger;
         if (typeof index === "string") {
             return await this.GetEventRecordById(type, index);
         }
@@ -311,7 +310,6 @@ export abstract class DataController implements IDataController, IGarbageStation
         return response;
     }
     async getGarbageDropEventList(day: OneDay, page: Paged, type: EventType, ids?: string[]): Promise<PagedList<GarbageDropEventRecord>> {
-        debugger;
         let params: GetGarbageDropEventRecordsParams = this.getEventListParams(day, page, type, ids);
         params.IsHandle = false;
         params.IsTimeout = false;
