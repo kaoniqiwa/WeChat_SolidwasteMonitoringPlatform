@@ -71,7 +71,7 @@ body {
   padding-right: 32px;
   position: relative;
   background-color: #ededed;
-  width: calc(100% - 150px);
+  width: calc(100% - 170px);
 }
 
 .bar.header #searchBar input[type=search] {
