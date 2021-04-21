@@ -181,6 +181,7 @@ namespace GarbageCondition {
 			// 数量接口
 			let eventCountPromise = this.dataController.getEventCount(day)
 			eventCountPromise.then(data => {
+				console.log('数量:',data)
 				this.count.view(data);
 			})
 
@@ -227,7 +228,7 @@ namespace GarbageCondition {
 				this.getGarbageStationNumberStatisticList()
 			]).then(([listData, statisticData]) => {
 
-				// console.log('居委会信息', listData)
+				console.log('居委会信息', listData)
 				const items = listData.sort((a, b) => {
 					return b.illegalDropNumber - a.illegalDropNumber;
 				})
@@ -255,7 +256,7 @@ namespace GarbageCondition {
 				this.dropOrder.view(viewModel2, this.element.list.mixIntoRank);
 
 
-				// console.log('统计信息', statisticData)
+				console.log('统计信息', statisticData)
 
 
 				const viewModel3 = statisticData.map(x => {
