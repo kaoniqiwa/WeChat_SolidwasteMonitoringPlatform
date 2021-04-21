@@ -125,7 +125,6 @@ export class CommitteesDivisionController extends DataController {
 		let result = new Array<ResourceRole>();
 		for (let i = 0; i < this.roles.length; i++) {
 			const role = this.roles[i];
-			debugger;
 			let promise = await this.service.garbageStation.list({ DivisionId: role.Id });
 			let current = promise.Data.map(x => {
 				let role = new ResourceRole();
