@@ -122,7 +122,9 @@ export namespace EventHistoryPage {
 
         }
         loadAside() {
-            this.createAside(this.type);
+            element.aside.iframe.addEventListener('load', () => {
+                this.createAside(this.type);
+            })
         }
         async createAside(type: ResourceType) {
 

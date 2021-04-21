@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>生活垃圾监管平台</title>
+    <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
+
+    <link
+      crossorigin="anonymous"
+      integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+      href="https://lib.baomitu.com/weui/2.4.1/style/weui.css"
+      rel="stylesheet"
+    />
+
+    <link href="../../minirefresh/minirefresh.css" rel="stylesheet" />
+    <link href="./css/index.css" rel="stylesheet" />
+
+    <link href="./css/garbage-drop.css" rel="stylesheet" />
+    <link href="./css/myAside.css" rel="stylesheet" />
+
+    <script src="../../minirefresh/minirefresh.js"></script>
+    <script src="https://res.wx.qq.com/open/libs/weuijs/1.2.1/weui.min.js"></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <div class="header-item" id="date">2020年12月31日</div>
+        <div class="header-item">
+          <div class="header-item__btn" id="filter">
+            <!-- 回车被当做一个空格处理 -->
+            <span> 筛选</span>
+            <i class="howell-icon-screen"></i>
+          </div>
+          <div class="header-item__btn" id="showDatePicker">
+            <i class="howell-icon-calendar" style="font-weight: bold"></i>
+          </div>
+        </div>
+      </header>
+      <main>
+      </main>
+    </div>
+    
+    <script src="./ts/garbage-drop.ts"></script>
+  </body>
+</html>
