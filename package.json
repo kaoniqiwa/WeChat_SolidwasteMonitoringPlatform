@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "parcel ./app/page/index.html --port 4200 --no-cache true",
+    "start": "parcel ./app/page/index.html --port 4200 --no-cache true --no-hmr",
     "old": "parcel ./app/page/map/map.html --port 4200 --no-cache true",
     "user": "parcel ./app/page/user.html --port 4200 --no-cache true",
     "data": "parcel ./app/page/data.html --port 4200",
