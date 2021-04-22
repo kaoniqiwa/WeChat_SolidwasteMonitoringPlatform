@@ -41,6 +41,7 @@ import {
 import { LineChart, LineSeriesOption, BarChart, BarSeriesOption } from 'echarts/charts';
 
 import { CanvasRenderer } from "echarts/renderers";
+import IObserver from "./IObserver";
 
 echarts.use([
     GridComponent,
@@ -325,8 +326,8 @@ class GarbageStationClient implements IObserver {
 
             this.dataController.getCameraList(v.Id, (cameraId: string, url?: string) => {
                 let img = document.getElementById(cameraId) as HTMLImageElement;
-                // img.setAttribute('index', index + '')                        
-                img.src = url!;
+                if (!img) return
+                img.src = url
 
                 img.onerror = () => {
                     img.src = DataController.defaultImageUrl;

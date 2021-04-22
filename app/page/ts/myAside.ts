@@ -25,7 +25,7 @@
 import { HttpResponse } from "../../data-core/model/response";
 import { Flags, StationState } from "../../data-core/model/waste-regulation/garbage-station";
 import { ResourceRole, ResourceType } from "../../data-core/model/we-chat";
-import IAside from "./IAside";
+import ISubject from "./ISubject";
 
 // 理论上应脱离html文档，动态导入 aside.css，受项目配置限制，无法实现
 //import "../css/aside.css"
@@ -40,7 +40,7 @@ export enum SelectionMode {
     multiple
 }
 
-export default class MyAside extends IAside {
+export default class MyAside extends ISubject {
     outterContainer: HTMLElement;// 装在侧边栏的外部容器
     elements: {
         [key: string]: any

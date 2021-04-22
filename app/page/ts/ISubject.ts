@@ -1,4 +1,6 @@
-export default abstract class IAside {
+import IObserver from "./IObserver";
+
+export default abstract class ISubject {
     private observerList: Set<IObserver> = new Set();
 
     add(observer: IObserver) {

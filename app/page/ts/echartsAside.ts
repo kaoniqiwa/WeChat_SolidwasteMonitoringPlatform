@@ -1,5 +1,5 @@
 import { CandlestickOption } from "./echart";
-import IAside from "./IAside"
+import IAside from "./ISubject"
 import { dateFormat, getAllDay } from "../../common/tool";
 
 import Swiper, { Virtual, Pagination } from 'swiper';
