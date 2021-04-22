@@ -72,6 +72,7 @@ body {
   position: relative;
   background-color: #ededed;
   width: calc(100% - 170px);
+  line-height: 8px;;
 }
 
 .bar.header #searchBar input[type=search] {
