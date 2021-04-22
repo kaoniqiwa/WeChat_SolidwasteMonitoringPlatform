@@ -20,7 +20,7 @@ export abstract class DataController implements IDataController, IGarbageStation
     constructor(protected service: Service, roles: ResourceRole[]) {
         this.roles = roles;
     }
-    GetUser(id:string): Promise<WeChatUser> {        
+    GetUser(id: string): Promise<WeChatUser> {
         return this.service.wechat.get(id);
     }
     SetUser(user: WeChatUser): void {
@@ -309,23 +309,26 @@ export abstract class DataController implements IDataController, IGarbageStation
         });
         return response;
     }
-    async getGarbageDropEventList(day: OneDay, page: Paged, type: EventType, ids?: string[]): Promise<PagedList<GarbageDropEventRecord>> {
+    async getGarbageDropEventList(day: OneDay, page: Paged, type?: EventType, ids?: string[]): Promise<PagedList<GarbageDropEventRecord>> {
         let params: GetGarbageDropEventRecordsParams = this.getEventListParams(day, page, type, ids);
-        params.IsHandle = false;
-        params.IsTimeout = false;
-        switch (type) {
-            case EventType.GarbageDrop:
+        if (type) {
+            switch (type) {
+                case EventType.GarbageDrop:
+                    params.IsTimeout = false;
+                    params.IsHandle = false;
+                    break;
+                case EventType.GarbageDropTimeout:
+                    params.IsTimeout = true;
+                    params.IsHandle = false;
+                    break;
+                case EventType.GarbageDropHandle:
+                    params.IsHandle = true;
+                    params.IsTimeout = false;
+                    break;
 
-                break;
-            case EventType.GarbageDropTimeout:
-                params.IsTimeout = true;
-                break;
-            case EventType.GarbageDropHandle:
-                params.IsHandle = true;
-                break;
-
-            default:
-                break;
+                default:
+                    break;
+            }
         }
         return await this.service.event.garbageDropList(params);
     }

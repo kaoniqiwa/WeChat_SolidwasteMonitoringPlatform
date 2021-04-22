@@ -361,7 +361,7 @@ export interface IGarbageDrop {
      * @returns {(Promise<PagedList<GarbageDropEventRecord> | undefined>)}
      * @memberof IGarbageDrop
      */
-    getGarbageDropEventList(day: OneDay, page: Paged, type: EventType, ids?: string[]): Promise<PagedList<GarbageDropEventRecord> | undefined>;
+    getGarbageDropEventList(day: OneDay, page: Paged, type?: EventType, ids?: string[]): Promise<PagedList<GarbageDropEventRecord> | undefined>;
     /**
      * 获取图片URL
      *
