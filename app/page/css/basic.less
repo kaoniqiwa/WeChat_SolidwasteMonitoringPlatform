@@ -1,6 +1,7 @@
+@h:40px;
 header {
   display: flex;
-  height: 40px;
+  height: @h;
   flex-shrink: 0;
   background-color: hsl(0, 0%, 100%);
   color: #b2b2b2;
@@ -15,4 +16,8 @@ header {
       margin-left: 10px;
     }
   }
+}
+main{
+  height:calc(100% - @h);
+  background: #f7f7f7;
 }
