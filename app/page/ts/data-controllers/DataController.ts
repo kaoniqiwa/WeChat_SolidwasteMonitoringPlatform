@@ -111,9 +111,24 @@ export abstract class DataController implements IDataController, IGarbageStation
             return x;
         });
     }
-    getImageUrl = (id: string) => {
+    getImageUrlBySingle = (id: string) => {
         return this.service.medium.getData(id);
     }
+    getImageUrlByArray = (ids: string[]) => {
+        for (let i = 0; i < ids.length; i++) {
+            return this.getImageUrlBySingle(ids[i]);
+        }
+    }
+    getImageUrl = (id: string | string[]) => {
+        if (Array.isArray(id)) {
+            return this.getImageUrlByArray(id);
+        }
+        else {
+            return this.getImageUrlBySingle(id);
+        }
+
+    }
+
     getGarbageStationEventCount = async (garbageStationIds: string[]) => {
         const promise = await this.service.garbageStation.statisticNumberList({ Ids: garbageStationIds });
         return promise.Data.map(x => {
