@@ -220,7 +220,8 @@ export interface IGarbageStationController {
      * @memberof IGarbageStationController
      */
     getImageUrl(id: string): string | undefined;
-    getImageUrl(id: string[]): string|[] | undefined;
+    getImageUrl(id: string[]): string[] | undefined;
+    getImageUrl(id:string | string[]): string | string[] | undefined;
 
 
     /**
@@ -271,7 +272,8 @@ export interface IEventHistory {
      * @memberof IGarbageStationController
      */
     getImageUrl(id: string): string | undefined;
-    getImageUrl(id: string[]): string|[] | undefined;
+    getImageUrl(id: string[]): string[] | undefined;    
+    getImageUrl(id:string | string[]): string | string[] | undefined;
 }
 export interface IDetailsEvent {
 
@@ -303,7 +305,8 @@ export interface IDetailsEvent {
          * @memberof IGarbageStationController
          */
     getImageUrl(id: string): string | undefined;
-    getImageUrl(id: string[]): string|[] | undefined;
+    getImageUrl(id: string[]): string[] | undefined;
+    getImageUrl(id:string | string[]): string | string[] | undefined;
 
     /**
      * 获取摄像机信息
@@ -373,7 +376,8 @@ export interface IGarbageDrop {
      * @memberof IGarbageDrop
      */
     getImageUrl(id: string): string | undefined;
-    getImageUrl(id: string[]): string|[] | undefined;
+    getImageUrl(id: string[]): string[] | undefined;
+    getImageUrl(id:string | string[]): string | string[] | undefined;
 }
 
 export interface IUserPushManager {

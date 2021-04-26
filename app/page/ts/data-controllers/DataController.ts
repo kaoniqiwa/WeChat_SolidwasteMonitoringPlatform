@@ -115,15 +115,20 @@ export abstract class DataController implements IDataController, IGarbageStation
         return this.service.medium.getData(id);
     }
     getImageUrlByArray = (ids: string[]) => {
+        const array = [];
         for (let i = 0; i < ids.length; i++) {
-            return this.getImageUrlBySingle(ids[i]);
+            const url = this.getImageUrlBySingle(ids[i]);
+            array.push(url);
         }
+        return array;
     }
-    getImageUrl = (id: string | string[]) => {
+    getImageUrl(id: string):string | undefined;
+    getImageUrl(id: string[]):string[];
+    getImageUrl(id: string | string[]): string | string[] | undefined {
         if (Array.isArray(id)) {
             return this.getImageUrlByArray(id);
         }
-        else {
+        else if (typeof (id) == "string") {
             return this.getImageUrlBySingle(id);
         }
 
