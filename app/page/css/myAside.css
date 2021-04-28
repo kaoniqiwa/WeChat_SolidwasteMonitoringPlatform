@@ -13,7 +13,7 @@
   background: rgba(0, 0, 0, 0.4);
 }
 
-.aside-inner-container .inner-content {
+.aside-inner-container .inner-page {
   width: 80%;
   height: 100%;
   position: absolute;
@@ -26,27 +26,39 @@
   transition: transform 0.3s;
 }
 
-.aside-inner-container .inner-content.slideIn {
+.aside-inner-container .inner-main {
+  height: calc(100% - 50px);
+  display: flex;
+  flex-direction: column;
+}
+.aside-inner-container .inner-page.slideIn {
   transform: translateX(0);
 }
 
-.aside-inner-container .inner-content .inner-title {
+.aside-inner-container .inner-page .inner-title {
   height: 30px;
-  margin-left: 20px;
   font-size: 14px;
   color: #b2b2b2;
   line-height: 30px;
-  margin-top: 10px;
 }
 
-.aside-inner-container .inner-content .inner-main {
-  margin: 15px 15px 0px;
+.aside-inner-container .inner-page .inner-card {
+  margin: 10px;
+  margin-bottom: 0px;
+  overflow: hidden;
+}
+.aside-inner-container .inner-page .inner-card.no-shrink {
+  flex-shrink: 0;
+}
+
+.aside-inner-container .inner-page .inner-content {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  height: calc(100% - 30px);
+  overflow: auto;
 }
-
-.aside-inner-container .inner-content .inner-item {
+.aside-inner-container .inner-page .inner-item {
   margin-top: 5px;
   margin-bottom: 5px;
   box-sizing: border-box;
@@ -60,26 +72,9 @@
   text-decoration: none;
   font-size: 12px;
   user-select: none;
-
-  /*
-        处理文字溢出
-    */
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-.aside-inner-container .inner-content .inner-item.normal {
-  background-color: rgba(51, 255, 102, 0.3);
-  color: #32b43e;
-}
-.aside-inner-container .inner-content .inner-item.full {
-  background-color: rgba(247, 204, 40, 0.3);
-  color: #ff9100;
-}
-.aside-inner-container .inner-content .inner-item.error {
-  background-color: #ff2e2e33;
-  background-color: rgba(255, 46, 46, 0.3);
-  color: #ec2b2b;
 }
 
 .aside-inner-container .inner-item.selected {
@@ -87,7 +82,7 @@
   color: #4097ff;
 }
 
-.aside-inner-container .inner-content .inner-footer {
+.aside-inner-container .inner-page .inner-footer {
   height: 50px;
   flex-shrink: 0;
   display: flex;
@@ -114,6 +109,6 @@
   color: #007aff;
   background-color: transparent;
 }
-#role-content {
+#role-page {
   overflow: auto;
 }

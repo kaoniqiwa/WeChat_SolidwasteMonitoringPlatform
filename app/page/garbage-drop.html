@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>生活垃圾监管平台</title>
+    <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
+
+    <link href="./css/index.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <!-- <div class="header-item" id="searchBar">
+          <input type="search" id="searchInput" placeholder="搜索当前内容" />
+          <i id="btn_search" class="howell-icon-search"></i>
+        </div> -->
+        <div class="header-item">
+          <div id="date"></div>
+        </div>
+        <div class="header-item">
+          <div class="header-item__btn" id="showDatePicker">
+            <i class="howell-icon-calendar" style="font-weight: bold"></i>
+          </div>
+          <div class="header-item__btn" id="filter">
+            <span>筛选<i class="howell-icon-screen"></i></span>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <header>
+          <div class="header-item">
+            <div>垃圾落地</div>
+          </div>
+          <div class="header-item">
+            <div id="count"></div>
+          </div>
+        </header>
+        <main style="margin-top: 2px">
+          <div id="miniRefresh" class="minirefresh-wrap">
+            <div class="minirefresh-scroll">
+              <div class="card-container">
+                <template id="GarbageDropTemplate">
+                  <div class="card">
+                    <div class="card-title">
+                      <div class="card-title__head station-name">
+                        三湘花城露天厢房
+                      </div>
+                      <div class="card-title__appendix status">正常</div>
+                    </div>
+                    <div class="card-img">
+                      <img src="" alt="" />
+                    </div>
+                    <div class="card-footer">
+                      <div class="card-footer__head division-name">
+                        三湘居委会
+                      </div>
+                      <div class="card-footer__appendix event-time">
+                        16:36:20
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </main>
+      </main>
+
+      <div id="aside-container"></div>
+    </div>
+
+    <script src="./ts/GarbageDropMain.ts"></script>
+  </body>
+</html>
