@@ -1,3 +1,6 @@
+/**
+ *  pmx
+ */
 export interface IEChartsData {
 
 }

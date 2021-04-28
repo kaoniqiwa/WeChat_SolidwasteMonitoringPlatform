@@ -1,3 +1,6 @@
+/**
+ * pmx
+ */
 import { CandlestickOption } from "./echart";
 import IAside from "./ISubject"
 import { dateFormat, getAllDay } from "../../common/tool";

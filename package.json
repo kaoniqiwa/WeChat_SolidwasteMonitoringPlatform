@@ -33,10 +33,13 @@
     "class-transformer": "^0.4.0",
     "echarts": "^5.0.2",
     "jquery": "^3.6.0",
+    "minirefresh": "^2.0.2",
     "parcel-bundler": "^1.12.4",
     "reflect-metadata": "^0.1.13",
     "swiper": "^6.4.11",
     "ts-md5": "^1.2.7",
-    "tslib": "^2.0.3"
+    "tslib": "^2.0.3",
+    "weui": "^2.4.1",
+    "weui.js": "^1.2.2"
   }
 }
