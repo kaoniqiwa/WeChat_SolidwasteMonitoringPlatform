@@ -1,27 +1,20 @@
 import { NavigationWindow } from ".";
-import { SessionUser } from "../../common/session-user";
-import { dateFormat, getAllDay } from "../../common/tool";
-import { ResponseData } from "../../data-core/model/response-data";
 import { OnlineStatus } from "../../data-core/model/waste-regulation/camera";
-import { Division, GetDivisionsParams } from "../../data-core/model/waste-regulation/division";
-import { EventType } from "../../data-core/model/waste-regulation/event-number";
-import { Flags, GarbageStation, GetGarbageStationsParams, StationState } from "../../data-core/model/waste-regulation/garbage-station";
+import { Flags, StationState } from "../../data-core/model/waste-regulation/garbage-station";
 import { GarbageStationGarbageCountStatistic, GarbageStationNumberStatistic, GetGarbageStationStatisticNumbersParams } from "../../data-core/model/waste-regulation/garbage-station-number-statistic";
 import { ResourceRole, ResourceType } from "../../data-core/model/we-chat";
-import { HowellAuthHttp } from "../../data-core/repuest/howell-auth-http";
-import { HowellHttpClient } from "../../data-core/repuest/http-client";
 import { Service } from "../../data-core/repuest/service";
 import { AsideControl } from "./aside";
 import { AsideListPage, AsideListPageWindow, SelectionMode } from "./aside-list";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import { DataController } from "./data-controllers/DataController";
 import { IGarbageStationController, StatisticNumber } from "./data-controllers/IController";
-import { ClassNameHelper, Language } from "./language";
+import { Language } from "./language";
 import Swiper, { Virtual, Pagination, } from 'swiper';
 import $ from 'jquery';
 import MyAside from './myAside';
 import EchartsAside from "./echartsAside";
-import { GarbageStationViewModel } from "./data-controllers/ViewModels";
+import { GarbageStationViewModel, IImageUrl } from "./data-controllers/ViewModels";
 import { CandlestickOption } from "./echart";
 
 import '../css/basic.less'
@@ -43,6 +36,8 @@ import { LineChart, LineSeriesOption, BarChart, BarSeriesOption } from 'echarts/
 
 import { CanvasRenderer } from "echarts/renderers";
 import IObserver from "./IObserver";
+import { VideoUrl } from "../../data-core/model/waste-regulation/video-model";
+import { VideoPlugin } from "./data-controllers/modules/VideoPlugin";
 
 echarts.use([
   GridComponent,
@@ -70,11 +65,13 @@ enum ZoomStatus {
   out = "zoomOut",
   in = "zoomIn"
 }
+
+
 interface IActiveElement {
   Element: HTMLDivElement,
   id: string,
   divisionId: string,
-  imageUrls: Array<string>,
+  imageUrls: Array<IImageUrl>,
   state: Flags<StationState>
   swiper?: Swiper
 }
@@ -327,7 +324,7 @@ class GarbageStationClient implements IObserver {
 
       let wrapper = info.querySelector('.content__img .swiper-wrapper') as HTMLDivElement;
       let slide = wrapper.querySelector('.swiper-slide') as HTMLDivElement;
-      let imageUrls: Array<string> = [];
+      let imageUrls: Array<IImageUrl> = [];
 
       this.dataController.getCameraList(v.Id, (cameraId: string, url?: string) => {
         let img = document.getElementById(cameraId) as HTMLImageElement;
@@ -341,7 +338,11 @@ class GarbageStationClient implements IObserver {
       }).then(cameras => {
         cameras.forEach((camera, index) => {
 
-          imageUrls.push(camera.ImageUrl!)
+          imageUrls.push({
+            url: camera.ImageUrl!,
+            cameraId: camera.Id,
+            preview: camera.getPreviewUrl()
+          })
           let div: HTMLDivElement;
 
           index != 0 ? div = slide?.cloneNode(true) as HTMLDivElement : div = slide;
@@ -428,6 +429,9 @@ class GarbageStationClient implements IObserver {
         index: e.detail.index
       }, Math.random() * 10 >> 0);
     })
+
+
+
     this.elements.others.originImg.addEventListener('click', function () {
 
       _this.activeIndex = _this.swiper.activeIndex;
@@ -657,24 +661,117 @@ class GarbageStationClient implements IObserver {
     $(this.elements.others.originImg).fadeIn()
     this.originStatus = true;
     if (!this.swiper) {
+      let inited = false;
       this.swiper = new Swiper(this.elements.others.originImg, {
         virtual: true,
         pagination: {
           el: '.swiper-pagination',
           type: 'fraction',
         },
-      })
+        on:{
+          init:(swiper:Swiper)=>{
+
+            if(this.video)
+    {
+      this.video.destory();
+      this.video = undefined;
+    }
+
+            setTimeout(()=>{
+              inited = true;
+            let btn = swiper.el.querySelector('.swiper-slide-active .video-control') as HTMLDivElement;
+            btn.addEventListener("click", (e)=>{
+              this.onPlayControlClicked(element.imageUrls[swiper.activeIndex] , btn);
+              e.stopPropagation();
+            });
+          }, 100);
+          },
+          slideChange:(swiper:Swiper)=>{
+            if(inited == false) return;
+
+            if(this.video)
+    {
+      this.video.destory();
+      this.video = undefined;
+    }
+
+
+            setTimeout(()=>{  
+            let btn = swiper.el.querySelector('.swiper-slide-active .video-control') as HTMLDivElement;
+            btn.addEventListener("click", (e)=>{
+              this.onPlayControlClicked(element.imageUrls[swiper.activeIndex], btn);
+              e.stopPropagation();
+            });
+          },100);
+            
+            // btn.addEventListener("click", (e)=>{
+            //   debugger;
+            //   e.stopPropagation();
+                // })
+          }
+        }
+      });
     }
     this.swiper.virtual.removeAllSlides()
     this.swiper.virtual.cache = [];
     for (let i = 0; i < imgs.length; i++) {
-      let url = this.dataController.getImageUrl(imgs[i]);
-      this.swiper.virtual.appendSlide('<div class="swiper-zoom-container"><img src="' + url +
-        '" /></div>');
+
+      let container = this.createSwiperContainer(imgs[i])
+
+      this.swiper.virtual.appendSlide(container.outerHTML);      
+
+      // this.swiper.virtual.appendSlide('<div class="swiper-zoom-container">' +
+      //   '<div><a onclick="return false"><i class="howell-icon-real-play"></i></a></div>'
+      //   + '<img src="' + url +
+      //   '" /></div>');
     }
     this.swiper.slideTo(info.index, 0);
 
   }
+
+  video?:VideoPlugin;
+
+
+  onPlayControlClicked(index:IImageUrl, div:HTMLDivElement){
+    if(this.video)
+    {
+      this.video.destory();
+      this.video = undefined;
+    }
+    let img = div.data as IImageUrl;
+    if(!img)
+    {
+      img = index;
+    }
+    img.preview.then(x=>{
+      this.video = new VideoPlugin("", x.Url, x.WebUrl);
+      this.video.autoSize();
+      div.parentElement.appendChild(this.video.getElement());
+    })
+  }
+
+
+  createSwiperContainer(imageUrl: IImageUrl) {
+    let container = document.createElement("div");
+    container.className = "swiper-zoom-container";
+
+    let img = document.createElement("img");
+    img.src = this.dataController.getImageUrl(imageUrl.url);
+    container.appendChild(img);
+
+    let control = document.createElement("div");
+    control.className = "video-control";
+    control.data = imageUrl;
+    let icon = document.createElement("i");
+    icon.className = "howell-icon-real-play"
+    control.appendChild(icon);
+
+    container.appendChild(control);
+
+    return container;
+  }
+
+
 
   fillCandlestickOption(lineDataSource: Array<GarbageStationGarbageCountStatistic>
   ) {

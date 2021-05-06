@@ -7,12 +7,13 @@ import { EventType } from "../../data-core/model/waste-regulation/event-number";
 import { NavigationWindow } from ".";
 import { ImageController } from "./data-controllers/modules/ImageControl";
 import { DataController } from "./data-controllers/DataController";
-import { GarbageCountsParams, IDetailsEvent, OneDay, Paged } from "./data-controllers/IController";
+import { GarbageCountsParams, IDetailsEvent, IImage, OneDay, Paged } from "./data-controllers/IController";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import { Service } from "../../data-core/repuest/service";
 import { LoopPageControl } from "./data-controllers/modules/LoopPageControl";
 import Swiper, { Pagination } from "swiper";
 import { CameraImageUrl, GarbageDropEventRecord, GarbageFullEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../../data-core/model/waste-regulation/event-record";
+import { IImageUrl } from "./data-controllers/ViewModels";
 
 Swiper.use([Pagination])
 
@@ -242,9 +243,17 @@ export namespace EventInformationPage {
                             imgId: "max-img"
                         }
 
+                        let time = new Date(item.EventTime);
+                        let interval = this.getEventTimeInterval(time);
 
 
-                        this.imageController.showDetail(selectors, [detail_img.src]);
+                        let url:IImageUrl = {
+                            url:detail_img.src,
+                            cameraId:item.ResourceId,
+                            playback:this.dataController.getVodUrl(item.ResourceId, interval.begin, interval.end)
+                        }
+
+                        this.imageController.showDetail(selectors, [url]);
                         let frame = document.getElementById(selectors.frameId) as HTMLImageElement;
                         let img = document.getElementById(selectors.imgId) as HTMLImageElement;
                         img.onload = () => {
@@ -273,6 +282,20 @@ export namespace EventInformationPage {
                 }
             }
         }
+
+        getEventTimeInterval(time:Date){
+            
+                time.setSeconds(time.getSeconds() - 15);
+                let begin = new Date(time.getTime());
+                time.setSeconds(time.getSeconds() + 30);
+                let end = new Date(time.getTime());
+                return {
+                    begin:begin,
+                    end:end
+                }
+        }
+
+
         fillGarbageFullEventRecord(item: GarbageFullEventRecord, element?: HTMLElement) {
             let source: HTMLElement | Document = element ? element : document;
 
@@ -332,7 +355,9 @@ export namespace EventInformationPage {
                 let container = source.querySelector(".swiper-container-img") as HTMLDivElement;
                 let wrapper = container.querySelector(".swiper-wrapper") as HTMLDivElement;
                 let template = wrapper.querySelector(".weui-form-preview__item") as HTMLDivElement;
-                let urls = new Array<string>();
+                let urls = new Array<IImageUrl>();
+                let time = new Date(item.EventTime);
+                let interval = this.getEventTimeInterval(time);
                 for (let i = 0; i < item.Data.CameraImageUrls.length; i++) {
                     let element = template;
                     if (i > 0) {
@@ -345,7 +370,11 @@ export namespace EventInformationPage {
 
                     const imageUrl = item.Data.CameraImageUrls[i];
                     url = this.dataController.getImageUrl(imageUrl.ImageUrl) as string;
-                    urls.push(url);
+                    urls.push({
+                        url:url,
+                        cameraId:imageUrl.CameraId,
+                        playback:this.dataController.getVodUrl(imageUrl.CameraId, interval.begin, interval.end),
+                    });
 
 
                     if (detail_img) {
@@ -515,7 +544,9 @@ export namespace EventInformationPage {
                 let container = source.querySelector(".swiper-container-img") as HTMLDivElement;
                 let wrapper = container.querySelector(".swiper-wrapper") as HTMLDivElement;
                 let template = wrapper.querySelector(".weui-form-preview__item") as HTMLDivElement;
-                let urls = new Array<string>();
+                let urls = new Array<IImageUrl>();
+                let time = new Date(item.EventTime);
+                let interval = this.getEventTimeInterval(time);
                 for (let i = 0; i < imgUrls.length; i++) {
                     let element = template;
                     if (i > 0) {
@@ -528,7 +559,11 @@ export namespace EventInformationPage {
 
                     const imageUrl = imgUrls[i];
                     url = this.dataController.getImageUrl(imageUrl.ImageUrl) as string;
-                    urls.push(url);
+                    urls.push({
+                        url:url,
+                        cameraId:imageUrl.CameraId,
+                        playback:this.dataController.getVodUrl(imageUrl.CameraId, interval.begin, interval.end)
+                    });
 
 
                     if (detail_img) {
