@@ -3,15 +3,40 @@ import { EventType } from "../../data-core/model/waste-regulation/event-number";
 import { GarbageDropEventRecord } from "../../data-core/model/waste-regulation/event-record";
 import { DataController } from "./data-controllers/DataController";
 import { GarbageDropData } from './GarbageDrop';
-import "../css/myTemplate.less"
+import "../css/myTemplate.less";
+
+(function () {
+  try {
+    // a : While a window.CustomEvent object exists, it cannot be called as a constructor.
+    // b : There is no window.CustomEvent object
+    new window.CustomEvent('T');
+  } catch (e) {
+    var CustomEvent = function (event, params) {
+      params = params || { bubbles: false, cancelable: false, detail: undefined };
+
+      var evt = document.createEvent('CustomEvent');
+
+      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+
+      return evt;
+    };
+
+    CustomEvent.prototype = window.Event.prototype;
+
+    Reflect.defineProperty(window, 'CustomEvent', {
+      value: CustomEvent
+    })
+  }
+})();
+
 /**
  * 
  *  pmx
  */
 enum GarbageDropStatus {
-  GarbageDrop = '已落地',
-  GarbageDropTimeout = '已超时',
-  GarbageDropHandle = '已处置'
+  GarbageDrop = '落地',
+  GarbageDropTimeout = '滞留',
+  GarbageDropHandle = '处置'
 }
 interface MyTemplateOption {
   data: GarbageDropEventRecord
@@ -59,15 +84,18 @@ export default class MyTemplate {
   }
 
   constructor(selector, options?: MyTemplateOption) {
+    // document 对象,这里是 <template>，也可以是 iframe.contentDocument
     this.templateDocument = (document.querySelector(selector) as HTMLTemplateElement).content;
     // 将外部文档的内容导入本文档中
     this.card = document.importNode(this.templateDocument.querySelector('.card'), true)
 
   }
   createContent(data: Array<GarbageDropData>) {
-    for (let v of data) {
+    for (let i = 0; i < data.length; i++) {
+      let v = data[i];
       let card = this.card.cloneNode(true) as HTMLDivElement;
 
+      card.setAttribute('index', v.index.toString())
       card.setAttribute('id', v.StationId);
       card.setAttribute('division-id', v.DivisionId);
       card.setAttribute('event-type', v.EventType + '');
@@ -100,6 +128,17 @@ export default class MyTemplate {
           card.querySelector('.card-img').appendChild(img)
         }
 
+      })
+      card.addEventListener('click', function () {
+        let event = new CustomEvent('click-card', {
+          detail: {
+            index: this.getAttribute('index'),
+            eventType: this.getAttribute('event-type')
+          },
+          bubbles: true,
+          cancelable: true
+        })
+        this.dispatchEvent(event);
       })
       this.fragment.appendChild(card)
     }

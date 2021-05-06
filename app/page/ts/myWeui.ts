@@ -8,7 +8,7 @@ import ISubject from './ISubject';
 
 interface MyWeuiOptions {
   type: string;
-  el: string;
+  el: string; // 触发功能的元素选择器
 }
 export default class MyWeui extends ISubject {
   selectors: Map<string, HTMLElement | null> = new Map(
