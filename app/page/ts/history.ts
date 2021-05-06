@@ -171,7 +171,7 @@ export namespace EventHistoryPage {
         convert(record: IllegalDropEventRecord | GarbageFullEventRecord | MixedIntoEventRecord | GarbageDropEventRecord, index: number, getImageUrl: (id: string) => string | undefined) {
             let template = new Template();
             if (record.ImageUrl) {
-                template.img.src = getImageUrl(record.ImageUrl) as string;
+                template.img.src =  getImageUrl(record.ImageUrl) as string;
             }
             if (record instanceof GarbageFullEventRecord) {
                 if (record.Data.CameraImageUrls && record.Data.CameraImageUrls.length > 0) {
@@ -265,7 +265,7 @@ export namespace EventHistoryPage {
             for (let i = 0; i < list.Data.length; i++) {
                 const data = list.Data[i];
                 this.datas[data.EventId!] = data;
-                let item = this.convert(data, (list.Page.PageIndex - 1) * list.Page.PageSize + i, this.dataController.getImageUrl);
+                let item = this.convert(data, (list.Page.PageIndex - 1) * list.Page.PageSize + i, this.dataController.getImageUrl.bind(this.dataController));
 
                 this.parentElement[data.EventType].appendChild(item);
             }

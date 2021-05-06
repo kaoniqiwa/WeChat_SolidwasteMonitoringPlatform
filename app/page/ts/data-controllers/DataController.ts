@@ -133,6 +133,7 @@ export abstract class DataController implements IDataController, IGarbageStation
         else if (typeof (id) == "string") {
             return this.getImageUrlBySingle(id);
         }
+        else{}
 
     }
 
