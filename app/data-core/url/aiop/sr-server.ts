@@ -1,6 +1,6 @@
 import { IUrl, BaseUrl } from "../IUrl";
 
-export class SRService extends BaseUrl implements IUrl {
+export class SRServiceUrl extends BaseUrl implements IUrl {
     create(): string {
         return this.gateway + 'SRServers';
     }

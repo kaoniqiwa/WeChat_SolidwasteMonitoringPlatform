@@ -1,4 +1,5 @@
 import Swiper,{Pagination,Virtual} from 'swiper';
+import { IImageUrl } from '../ViewModels';
 
 Swiper.use([Pagination,Virtual])
 
@@ -41,7 +42,7 @@ export class ImageController {
         });
     }
 
-    showDetail(selectors: { frameId?: string, imgId: string }, urls: string[], index: number = 0) {
+    showDetail(selectors: { frameId?: string, imgId: string }, urls: IImageUrl[], index: number = 0) {
         for (let i = 0; i < urls.length; i++) {
             this.swiper.virtual.appendSlide('<div class="swiper-zoom-container"><img id="' + selectors.imgId + '" src="' + urls[i] +
                 '" />' + (selectors.frameId ? '<img class="max-frame" id="' + selectors.frameId + '">' : '') + '</div>');

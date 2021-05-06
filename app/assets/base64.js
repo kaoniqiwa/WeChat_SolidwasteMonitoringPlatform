@@ -133,3 +133,5 @@ function utf8to16(str) {
 
 window.base64decode = base64decode;
 window.base64encode = base64encode;
+window.utf8to16 = utf8to16;
+window.utf16to8 = utf16to8;

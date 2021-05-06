@@ -220,7 +220,7 @@ export class GarbageStationController extends DataController implements IDataCon
 		let result = new Array<GarbageStationViewModel>()
 		for (let i = 0; i < promise.Data.length; i++) {
 			const item = promise.Data[i];
-			let vm = ViewModelConverter.Convert(item);
+			let vm = ViewModelConverter.Convert(this.service, item);
 			vm.NumberStatistic = statisic.Data.find(x => x.Id == vm.Id);
 			result.push(vm);
 		}

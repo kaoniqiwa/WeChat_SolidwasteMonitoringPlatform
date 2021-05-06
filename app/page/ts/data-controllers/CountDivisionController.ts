@@ -218,7 +218,7 @@ export class CountDivisionController extends DataController implements IDataCont
 		let result = new Array<GarbageStationViewModel>()
 		for (let i = 0; i < list.length; i++) {
 			const item = list[i];
-			let vm = ViewModelConverter.Convert(item);
+			let vm = ViewModelConverter.Convert(this.service, item);
 			vm.NumberStatistic = statisic.Data.find(x => x.Id == vm.Id);
 			result.push(vm);
 		}

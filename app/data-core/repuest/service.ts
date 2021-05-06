@@ -7,6 +7,7 @@ import { EventRequestService } from "./event-record";
 import { RoleRequestService } from "./role-service";
 import { UserRequestService } from "./user.service";
 import { WeChatRequestService } from "./we-chat.service";
+import { SRServersRequestService } from "./sr-service";
 
 export class Service {
 
@@ -84,6 +85,15 @@ export class Service {
             this._event = new EventRequestService(this.requestService);
         }
         return this._event;
+    }
+
+    private _sr?:SRServersRequestService;
+    get sr():SRServersRequestService{
+        if(!this._sr)
+        {
+            this._sr = new SRServersRequestService(this.requestService);
+        }
+        return this._sr;
     }
 
 }

@@ -7,10 +7,11 @@ import { GarbageDropEventRecord, GarbageFullEventRecord, IllegalDropEventRecord,
 import { GetEventRecordsParams, GetGarbageDropEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record-params";
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
 import { GarbageStationGarbageCountStatistic, GarbageStationNumberStatistic, GarbageStationNumberStatisticV2, GetGarbageStationStatisticGarbageCountsParams, GetGarbageStationStatisticNumbersParams, GetGarbageStationStatisticNumbersParamsV2 } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
+import { VideoUrl } from "../../../data-core/model/waste-regulation/video-model";
 import { ResourceRole, WeChatUser } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
 import { GarbageCountsParams, IDataController, IDetailsEvent, IEventHistory, IGarbageDrop, IGarbageStationController, IGarbageStationNumberStatistic, IUserPushManager, OneDay, Paged, StatisticNumber } from "./IController";
-import { GarbageStationViewModel } from "./ViewModels";
+import { CameraViewModel, GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
 
 export abstract class DataController implements IDataController, IGarbageStationController, IEventHistory, IDetailsEvent, IGarbageStationNumberStatistic, IGarbageDrop, IUserPushManager {
 
@@ -108,7 +109,8 @@ export abstract class DataController implements IDataController, IGarbageStation
                     loadImage(DataController.defaultImageUrl);
                 }, 0);
             }
-            return x;
+            let vm = ViewModelConverter.Convert(this.service, x);
+            return vm;
         });
     }
     getImageUrlBySingle = (id: string) => {
@@ -122,8 +124,8 @@ export abstract class DataController implements IDataController, IGarbageStation
         }
         return array;
     }
-    getImageUrl(id: string):string | undefined;
-    getImageUrl(id: string[]):string[];
+    getImageUrl(id: string): string | undefined;
+    getImageUrl(id: string[]): string[] | undefined;
     getImageUrl(id: string | string[]): string | string[] | undefined {
         if (Array.isArray(id)) {
             return this.getImageUrlByArray(id);
@@ -132,6 +134,16 @@ export abstract class DataController implements IDataController, IGarbageStation
             return this.getImageUrlBySingle(id);
         }
 
+    }
+
+    getVodUrl(cameraId: string, begin: Date, end: Date): Promise<VideoUrl> {
+        return this.service.sr.VodUrls({
+            CameraId: cameraId,
+            StreamType: 1,
+            Protocol: "ws-px",
+            BeginTime: begin.toISOString(),
+            EndTime: end.toISOString()
+        });
     }
 
     getGarbageStationEventCount = async (garbageStationIds: string[]) => {
@@ -226,7 +238,9 @@ export abstract class DataController implements IDataController, IGarbageStation
                 (params as GetGarbageDropEventRecordsParams).IsHandle = false;
                 (params as GetGarbageDropEventRecordsParams).IsTimeout = true;
                 promise = await this.service.event.garbageDropList(params);
-
+                break;
+            case EventType.GarbageDropAll:
+                promise = await this.service.event.garbageDropList(params);
                 break;
             default:
                 return undefined;
@@ -296,8 +310,10 @@ export abstract class DataController implements IDataController, IGarbageStation
     }
 
 
-    GetCamera(garbageStationId: string, cameraId: string): Promise<Camera> {
-        return this.service.camera.get(garbageStationId, cameraId)
+    async GetCamera(garbageStationId: string, cameraId: string): Promise<CameraViewModel> {
+        let x = await this.service.camera.get(garbageStationId, cameraId);
+        let vm = ViewModelConverter.Convert(this.service, x);
+        return vm;
     }
 
 

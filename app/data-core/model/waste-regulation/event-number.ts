@@ -38,4 +38,6 @@ export enum EventType {
     GarbageDropTimeout = 6,
     /** 小包垃圾处置完成事件 */
     GarbageDropHandle = 7,
+    /** 小包垃圾处置完成事件 */
+    GarbageDropAll = 0
 }
