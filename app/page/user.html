@@ -1,60 +1,63 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title></title>
-    <link rel="stylesheet" href="../assets/howell.font/howell.font.css">
-    <link crossorigin="anonymous"
-        integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
-        href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
-    <link href="./css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
+    <link
+      crossorigin="anonymous"
+      integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+      href="https://lib.baomitu.com/weui/2.4.1/style/weui.css"
+      rel="stylesheet"
+    />
+    <link href="./css/index.css" rel="stylesheet" />
 
-    <link href="./css/aside.css" rel="stylesheet">
-    <link href="./css/user-current.css" rel="stylesheet">
+    <link href="./css/aside.css" rel="stylesheet" />
+    <link href="./css/user-current.css" rel="stylesheet" />
     <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="current" id="btn-user-details">
-        <div class="left img">
-            <i class="howell-icon-user-anonymous" style="font-size: xx-large;color: gray;"></i>
+      <div class="left img">
+        <i
+          class="howell-icon-user-anonymous"
+          style="font-size: xx-large; color: gray"
+        ></i>
+      </div>
+      <div class="left content">
+        <div class="title" id="name">title</div>
+        <div class="footer">
+          <div class="left footer-title" id="resource-name">footer</div>
+          <div class="remark"><i class="howell-icon-arrow2right"></i></div>
         </div>
-        <div class="left content">
-            <div class="title" id="name">title</div>
-            <div class="footer">
-                <div class="left footer-title" id="resource-name">footer</div>
-                <div class="remark"><i class="howell-icon-arrow2right"></i></div>
-            </div>
-        </div>
+      </div>
     </div>
-    
-    <div id="btn-add-user" class="line-item" style="display: none;">
-        <div>添加用户</div>
-        <div><i class="howell-icon-arrow2right"></i></div>
+
+    <div id="btn-add-user" class="line-item" style="display: none">
+      <div>添加用户</div>
+      <div><i class="howell-icon-arrow2right"></i></div>
     </div>
-    <div id="btn-user-list" class="line-item" style="display: none;">
-        <div>用户列表</div>
-        <div><i class="howell-icon-arrow2right"></i></div>         
+    <div id="btn-user-list" class="line-item" style="display: none">
+      <div>用户列表</div>
+      <div><i class="howell-icon-arrow2right"></i></div>
     </div>
     <div id="btn-push-manager" class="line-item">
-        <div>消息推送管理</div>
-        <div><i class="howell-icon-arrow2right"></i></div>         
-    </div>
-   
-
-    <div style="display: none;">
-        <a id="link-details" href="./user/details1.html"></a>
-        <a id="link-list" href="./user/list.html"></a>
-        <a id="link-add" href="./user/add-user.html"></a>
-        <a id="link-push" href="./user/pushManager.html"></a>
+      <div>消息推送管理</div>
+      <div><i class="howell-icon-arrow2right"></i></div>
     </div>
 
+    <div style="display: none">
+      <a id="link-details" href="./user/details.html"></a>
+      <a id="link-list" href="./user/list.html"></a>
+      <a id="link-add" href="./user/add-user.html"></a>
+      <a id="link-push" href="./user/pushManager.html"></a>
+    </div>
 
     <aside id="aside" class="aside-content">
-        <iframe id="user-child-iframe" src=""></iframe>
+      <iframe id="user-child-iframe" src=""></iframe>
     </aside>
     <script src="./ts/user-current.ts"></script>
-</body>
+  </body>
 </html>

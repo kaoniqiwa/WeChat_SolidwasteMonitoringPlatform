@@ -1,81 +1,80 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title></title>
     <link rel="stylesheet" href="../../assets/howell.font/howell.font.css" />
-    <link crossorigin="anonymous"
-        integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
-        href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
+    <link
+      crossorigin="anonymous"
+      integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+      href="https://lib.baomitu.com/weui/2.4.1/style/weui.css"
+      rel="stylesheet"
+    />
     <link href="../css/index.css" rel="stylesheet" />
     <link href="../../../minirefresh/minirefresh.css" rel="stylesheet" />
     <link href="../css/aside.css" rel="stylesheet" />
-    <link rel="stylesheet" href="../css/user-list.css">
+    <link rel="stylesheet" href="../css/user-list.css" />
     <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
-</head>
+  </head>
 
-<body>
-    <div class='container'>
-        <div class='page' id="getPage">
-            <header class="bar header">
-                <div class='content'>
-                    <div class="left" id="back">
-                        <i class="howell-icon-arrow2left"></i>
-                        返回
-                    </div>
-                    <div class="left weui-search-bar" id="searchBar">
-                        <i id="btn_search"></i>
-                        <input type="search" id="searchInput" placeholder="搜索" />
-                    </div>
-                </div>
-            </header>
+  <body>
+    <div class="container">
+      <div class="page" id="getPage">
+        <header class="bar header">
+          <div class="content">
+            <div class="left" id="back">
+              <i class="howell-icon-arrow2left"></i>
+              返回
+            </div>
+            <div class="left weui-search-bar" id="searchBar">
+              <i id="btn_search"></i>
+              <input type="search" id="searchInput" placeholder="搜索" />
+            </div>
+          </div>
+        </header>
 
-            <main>
-                <div class="minirefresh-wrap" id="minirefresh">
-                    <div class="minirefresh-scroll">
-                        <div class='info-list' id='content'>
-                            <template id='infoTemplate'>
-                                <div class='info-item'>
-                                    <aside class="img">
-                                        <i class="howell-icon-user-anonymous"
-                                            style="font-size: xx-large;color: gray;"></i>
-                                    </aside>
-                                    <main>
-                                        <div class='detail'>
-                                            <div class='user-name'>张三</div>
-                                            <div class="user-source">
-                                                广中路居委
-                                            </div>
-
-                                        </div>
-                                        <div class='arrow'>
-                                            <span class='howell-icon-arrow2right'></span>
-                                        </div>
-                                    </main>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-                </div>
-            </main>
-            <footer></footer>
-        </div>
+        <main>
+          <div class="minirefresh-wrap" id="minirefresh">
+            <div class="minirefresh-scroll">
+              <div class="info-list" id="content">
+                <template id="infoTemplate">
+                  <div class="info-item">
+                    <aside class="img">
+                      <i
+                        class="howell-icon-user-anonymous"
+                        style="font-size: xx-large; color: gray"
+                      ></i>
+                    </aside>
+                    <main>
+                      <div class="detail">
+                        <div class="user-name">张三</div>
+                        <div class="user-source">广中路居委</div>
+                      </div>
+                      <div class="arrow">
+                        <span class="howell-icon-arrow2right"></span>
+                      </div>
+                    </main>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </main>
+        <footer></footer>
+      </div>
     </div>
 
     <aside id="aside" class="aside-content">
-        <iframe id="user-child-iframe" src=""></iframe>
+      <iframe id="user-child-iframe" src=""></iframe>
     </aside>
 
-    <div style="display: none;">
-    <a id="link-user-details" href="./details1.html"></a>
+    <div style="display: none">
+      <a id="link-user-details" href="./details.html"></a>
     </div>
-
 
     <script src="../../../minirefresh/minirefresh.js"></script>
 
     <script src="../ts/user-list.ts"></script>
-</body>
-
+  </body>
 </html>
