@@ -28,6 +28,7 @@ export interface GarbageDropData {
 }
 export default class GarbageDrop implements IObserver {
 
+  elements: { [key: string]: HTMLElement };// 页面html元素收集器
 
   dropListTotal: GarbageDropEventRecord[] = [];// 拉取到的所有数据
   dropListChunk: GarbageDropEventRecord[] = []; // 每次拉取到的数据
@@ -38,7 +39,7 @@ export default class GarbageDrop implements IObserver {
 
   eventType: EventType = void 0;// 筛选状态
   roleTypes: Array<string> = []; // 筛选区域
-  roleList: ResourceRole[];// 侧边栏数据
+  roleList: ResourceRole[] = [];// 侧边栏数据
 
   miniRefresh: MiniRefresh;
 
@@ -93,48 +94,7 @@ export default class GarbageDrop implements IObserver {
 
   }
 
-  elements = {
-    date: document.querySelector('#date') as HTMLDivElement,
-    count: document.querySelector('#count') as HTMLDivElement,
-    contentContainer: document.querySelector('.card-container'),
-    template: document.querySelector('template') as HTMLTemplateElement,
-    filterBtn: document.querySelector('#filter') as HTMLDivElement,
-    asideContainer: document.querySelector('#aside-container') as HTMLElement,
-  }
-  constructor(private dataController: IGarbageDrop, private openId: string, private type: ResourceType, private myTemplate: MyTemplate) {
 
-
-    this.elements.contentContainer.innerHTML = '';
-
-
-    this.miniRefresh = new MiniRefresh({
-      container: "#miniRefresh",
-      down: {
-        callback: () => {
-
-          console.log('refresh down');
-          this.miniRefreshDown();
-        }
-      },
-      up: {
-        isAuto: true,
-        callback: () => {
-          console.log('refresh up');
-          this.miniRefreshUp()
-        }
-      }
-    })
-
-    // 触发 set date()
-    this.date = new Date();
-
-    this.loadAsideData().then(() => {
-      this.createAside()
-    })
-
-    this.bindEvents();
-
-  }
   update(args: { type: string, [key: string]: any }) {
     console.log('通知:', args)
     if (args) {
@@ -176,6 +136,53 @@ export default class GarbageDrop implements IObserver {
 
     }
   }
+
+  // 构造函数只负责初始化
+  constructor(private dataController: IGarbageDrop, private openId: string, private type: ResourceType, private myTemplate: MyTemplate) {
+
+    this.elements = {
+      date: document.querySelector('#date') as HTMLDivElement,
+      count: document.querySelector('#count') as HTMLDivElement,
+      contentContainer: document.querySelector('.card-container'),
+      template: document.querySelector('template') as HTMLTemplateElement,
+      filterBtn: document.querySelector('#filter') as HTMLDivElement,
+      asideContainer: document.querySelector('#aside-container') as HTMLElement,
+    }
+    // 触发 set date()
+    this.date = new Date();
+
+
+  }
+  // 数据请求放入其他方法中
+  init() {
+    this.elements.contentContainer.innerHTML = '';
+
+    this.miniRefresh = new MiniRefresh({
+      container: "#miniRefresh",
+      down: {
+        callback: () => {
+          console.log('refresh down');
+          this.miniRefreshDown();
+        }
+      },
+      up: {
+        isAuto: true,// 自动触发callback回调
+        callback: () => {
+          console.log('refresh up');
+          this.miniRefreshUp()
+        }
+      }
+    })
+
+
+
+    this.loadAsideData().then(() => {
+      this.createAside()
+    })
+
+    this.bindEvents();
+  }
+
 
   bindEvents() {
     console.log('bind event')

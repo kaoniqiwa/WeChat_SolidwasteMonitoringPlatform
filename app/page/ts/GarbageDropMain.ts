@@ -45,6 +45,8 @@ if (user.WUser.Resources) {
     // 构造函数式依赖注入
     let garbageDrop = new GarbageDrop(dataController, openId, type, myTemplate);
 
+    garbageDrop.init();
+
     // 添加观察对象
     myWeui.add(garbageDrop)
 
