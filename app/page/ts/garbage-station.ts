@@ -17,7 +17,7 @@ import EchartsAside from "./echartsAside";
 import { GarbageStationViewModel, IImageUrl } from "./data-controllers/ViewModels";
 import { CandlestickOption } from "./echart";
 
-import '../css/basic.less'
+import '../css/header.less'
 
 
 import * as echarts from 'echarts/core';

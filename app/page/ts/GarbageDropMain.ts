@@ -6,7 +6,7 @@ import { Service } from "../../data-core/repuest/service";
 
 import 'minirefresh';
 import 'minirefresh/dist/debug/minirefresh.css'
-import "../css/basic.less"
+import "../css/header.less"
 import "../css/garbage-drop.less"
 
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
