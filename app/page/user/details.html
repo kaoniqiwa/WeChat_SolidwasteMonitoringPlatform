@@ -1,72 +1,86 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title></title>
     <link rel="stylesheet" href="../../assets/howell.font/howell.font.css" />
+    <link
+      crossorigin="anonymous"
+      integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+      href="https://lib.baomitu.com/weui/2.4.1/style/weui.css"
+      rel="stylesheet"
+    />
+
     <link href="../css/index.css" rel="stylesheet" />
-    <link href="../../../minirefresh/minirefresh.css" rel="stylesheet" />
-    <link rel="stylesheet" href="../css/details.css">
+    <link href="../css/aside.css" rel="stylesheet" />
+    <link href="../css/user-details.css" rel="stylesheet" />
+  </head>
 
-</head>
-
-<body>
-    <div class="page" id='details'>
-        <header>
-            <div class="content">
-                <div id="back">
-                    <i class="howell-icon-arrow2left"></i>
-                    返回
-                </div>
-            </div>
-        </header>
-        <main>
-            <div class='list'>
-                <div class='list-item'>
-                    <div class='item-key'>用户名</div>
-                    <div class='item-content'>张三</div>
-                </div>
-
-                <div class='list-item'>
-                    <div class='item-key'>手机号</div>
-                    <div class='item-content'>18221662092</div>
-                </div>
-
-                <div class='list-item'>
-                    <div class='item-key'>分配权限</div>
-                    <div class='item-content'>
-                        居委会管理员
-
-                        <i class='howell-icon-arrow2right'></i>
-                    </div>
-                </div>
-
-                <div class='list-item'>
-                    <div class='item-key'>管辖范围</div>
-                    <div class='item-content'>
-                        <span>3</span>
-                        <i class='howell-icon-arrow2right'></i>
-                    </div>
-                </div>
-               
-            </div>
-        </main>
-
-        <footer>
-            <div class='btn'>
-                删除用户
-            </div>
-        </footer>
-
-
+  <body>
+    <div class="bar header">
+      <div class="content">
+        <div class="left" id="back">
+          <i class="howell-icon-arrow2left"></i>
+          返回
+        </div>
+      </div>
     </div>
+    <div class="main">
+      <div class="line-item">
+        <div>姓名</div>
+        <div class="value">
+          <div id="user-name"></div>
+          <i class="howell-icon-arrow2right" style="visibility: visible"></i>
+        </div>
+      </div>
+      <div class="line-item">
+        <div>性别</div>
+        <div class="value">
+          <div id="user-gender"></div>
+          <i class="howell-icon-arrow2right" style="visibility: visible"></i>
+        </div>
+      </div>
+      <div class="line-item">
+        <div>手机号</div>
+        <div class="value">
+          <div id="user-mobileNo"></div>
+          <i class="howell-icon-arrow2right"></i>
+        </div>
+      </div>
+      <div class="line-item own">
+        <div>管理权限</div>
+        <div class="value">
+          <div id="user-resource-type"></div>
+          <i class="howell-icon-arrow2right"></i>
+        </div>
+      </div>
+      <div class="line-item own">
+        <div>管辖范围</div>
+        <div class="value">
+          <div id="user-resource">0</div>
+          <i class="howell-icon-arrow2right" style="visibility: visible"></i>
+        </div>
+      </div>
+      <div class="the-left">
+        <a class="weui-btn weui-btn_warn" style="display: none" id="delete"
+          >删除用户</a
+        >
+      </div>
+    </div>
+    <div class="backdrop"></div>
+    <aside class="aside-content" id="aside-divisions">
+      <iframe id="iframe" src="../aside-list.html"></iframe>
+    </aside>
+    <aside class="aside-content set-user" id="aside-set-user">
+      <iframe id="iframe-set-user" src="./set-user.html"></iframe>
+    </aside>
 
+    <aside class="aside-content"></aside>
 
-    <script src="../../../minirefresh/minirefresh.js"></script>
-
-    <script src="../ts/details.ts"></script>
-</body>
-
+    <div style="display: none">
+      <a id="link-set-user" href="./set-user.html"></a>
+    </div>
+  </body>
+  <script src="../ts/user-details.ts"></script>
 </html>

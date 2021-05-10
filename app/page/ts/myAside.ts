@@ -29,7 +29,7 @@ import { Flags, StationState } from "../../data-core/model/waste-regulation/garb
 import { ResourceRole, ResourceType } from "../../data-core/model/we-chat";
 import ISubject from "./ISubject";
 
-import "../css/myAside.css"
+import "../css/myAside.less"
 
 interface MyAsideOptions {
   title: string;

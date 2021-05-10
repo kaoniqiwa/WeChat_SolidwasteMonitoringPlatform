@@ -6,7 +6,7 @@ import { Service } from "../../data-core/repuest/service";
 
 import 'minirefresh';
 import 'minirefresh/dist/debug/minirefresh.css'
-import "../css/basic.less"
+import "../css/header.less"
 import "../css/garbage-drop.less"
 
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
@@ -44,6 +44,8 @@ if (user.WUser.Resources) {
 
     // 构造函数式依赖注入
     let garbageDrop = new GarbageDrop(dataController, openId, type, myTemplate);
+
+    garbageDrop.init();
 
     // 添加观察对象
     myWeui.add(garbageDrop)
