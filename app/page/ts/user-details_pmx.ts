@@ -15,8 +15,7 @@ import { Division } from "../../data-core/model/waste-regulation/division";
 import { GarbageStation } from "../../data-core/model/waste-regulation/garbage-station";
 import { PagedList } from "../../data-core/model/page";
 
-import weui from 'weui.js';
-import "weui";
+import "../css/user-details.css";
 
 
 type ResourceName = keyof typeof ResourceType;
@@ -52,12 +51,12 @@ class UserDetails implements IObserver {
 
   myAside!: MyAside;
 
-  _show = false;
-  get show() {
-    return this._show
+  _showAside = false;
+  get showAside() {
+    return this._showAside
   }
-  set show(val) {
-    this._show = val;
+  set showAside(val) {
+    this._showAside = val;
     if (val) {
       if (this.myAside) {
         $(this.element.asideContainer).show();
@@ -118,7 +117,7 @@ class UserDetails implements IObserver {
       if ('type' in args) {
         if (args.type == 'my-aside') {
           if ('show' in args) {
-            this.show = args.show;
+            this.showAside = args.show;
           }
           if ('filtered' in args) {
             console.log('filtered', args.filtered);
@@ -158,12 +157,16 @@ class UserDetails implements IObserver {
       (this.element.info.name.parentElement?.querySelector('.howell-icon-arrow2right') as HTMLElement).style.visibility = 'visible';
       (this.element.info.gender.parentElement?.querySelector('.howell-icon-arrow2right') as HTMLElement).style.visibility = 'visible';
 
+
       if (this.resourceType == ResourceType.GarbageStations)
         (this.element.info.count.parentElement?.querySelector('.howell-icon-arrow2right') as HTMLElement).style.visibility = 'visible';
 
     } else {
 
       (this.element.info.count.parentElement?.querySelector('.howell-icon-arrow2right') as HTMLElement).style.visibility = 'visible';
+
+      this.element.btn.delete.style.visibility = 'visible';
+
     }
 
     this.element.info.name.innerHTML = '';
@@ -204,8 +207,8 @@ class UserDetails implements IObserver {
     }
 
     this.element.info.count.parentElement?.parentElement?.addEventListener('click', () => {
-      console.log('click')
-      this.show = true;
+      // console.log('click')
+      this.showAside = true;
     })
 
     this.element.btn.back.addEventListener('click', () => {
