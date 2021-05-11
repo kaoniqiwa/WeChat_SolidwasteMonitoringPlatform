@@ -31,14 +31,14 @@
         <div>姓名</div>
         <div class="value">
           <div id="user-name"></div>
-          <i class="howell-icon-arrow2right" style="visibility: visible"></i>
+          <i class="howell-icon-arrow2right"></i>
         </div>
       </div>
       <div class="line-item">
         <div>性别</div>
         <div class="value">
           <div id="user-gender"></div>
-          <i class="howell-icon-arrow2right" style="visibility: visible"></i>
+          <i class="howell-icon-arrow2right"></i>
         </div>
       </div>
       <div class="line-item">
@@ -59,7 +59,7 @@
         <div>管辖范围</div>
         <div class="value">
           <div id="user-resource">0</div>
-          <i class="howell-icon-arrow2right" style="visibility: visible"></i>
+          <i class="howell-icon-arrow2right"></i>
         </div>
       </div>
       <div class="the-left">
@@ -69,9 +69,12 @@
       </div>
     </div>
     <div class="backdrop"></div>
+
     <aside class="aside-content" id="aside-divisions">
       <iframe id="iframe" src="../aside-list.html"></iframe>
     </aside>
+    <div id="aside-container"></div>
+
     <aside class="aside-content set-user" id="aside-set-user">
       <iframe id="iframe-set-user" src="./set-user.html"></iframe>
     </aside>
@@ -81,6 +84,13 @@
     <div style="display: none">
       <a id="link-set-user" href="./set-user.html"></a>
     </div>
+
+    <!-- <div id="textToast" style="display: none">
+      <div class="weui-mask_transparent"></div>
+      <div class="weui-toast weui-toast_text">
+        <p class="weui-toast__content">文字提示</p>
+      </div>
+    </div> -->
   </body>
-  <script src="../ts/user-details.ts"></script>
+  <script src="../ts/user-details_pmx.ts"></script>
 </html>

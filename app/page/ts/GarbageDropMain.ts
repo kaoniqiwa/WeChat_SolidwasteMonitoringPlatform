@@ -18,7 +18,7 @@ import MyTemplate from './myTemplate';
 const user = new SessionUser();
 if (user.WUser.Resources) {
   const type = user.WUser.Resources![0].ResourceType;
-  const openId = user.WUser.OpenId
+  const openId = user.WUser.OpenId || null
   /**
    *  pmx
    */
@@ -28,16 +28,16 @@ if (user.WUser.Resources) {
     const dataController = ControllerFactory.Create(service, type, user.WUser.Resources!);
 
 
-    let myWeui = new MyWeui([
-      {
-        type: 'datePicker',
-        el: "#showDatePicker",
-      },
-      {
-        type: "toast",
-        el: "#showToast"
-      }
-    ]);
+    // let myWeui = new MyWeui([
+    //   {
+    //     type: 'datePicker',
+    //     el: "#showDatePicker",
+    //   },
+    //   {
+    //     type: "toast",
+    //     el: "#showToast"
+    //   }
+    // ]);
 
 
     let myTemplate = new MyTemplate('#GarbageDropTemplate');
@@ -48,7 +48,7 @@ if (user.WUser.Resources) {
     garbageDrop.init();
 
     // 添加观察对象
-    myWeui.add(garbageDrop)
+    // myWeui.add(garbageDrop)
 
   });
 }

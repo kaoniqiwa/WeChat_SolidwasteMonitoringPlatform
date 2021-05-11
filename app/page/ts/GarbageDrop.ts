@@ -1,3 +1,28 @@
+/**
+        
+*　　┏┓　　　┏┓+ +
+*　┏┛┻━━━┛┻┓ + +
+*　┃　　　　　　　┃ 　
+*　┃　　　━　　　┃ ++ + + +
+*  |  ████━████┃+
+*　┃　　　　　　　┃ +
+*　┃　　　┻　　　┃
+*　┃　　　　　　　┃ + +
+*　┗━┓　　　┏━┛
+*　　　┃　　　┃　　　　　　　　　　　
+*　　　┃　　　┃ + + + +
+*　　　┃　　　┃
+*　　　┃　　　┃ +  神兽保佑
+*　　　┃　　　┃    代码无bug　　
+*　　　┃　　　┃　　+　　　　　　　　　
+*　　　┃　 　　┗━━━┓ + +
+*　　　┃ 　　　　　　　┣┓
+*　　　┃ 　　　　　　　┏┛
+*　　　┗┓┓┏━┳┓┏┛ + + + +
+*　　　　┃┫┫　┃┫┫
+*　　　　┗┻┛　┗┻┛+ + + +
+   pppmmmxxx
+*/
 import { dateFormat, getAllDay } from "../../common/tool";
 import { Page, PagedList } from "../../data-core/model/page";
 import { CameraImageUrl, GarbageDropEventRecord } from "../../data-core/model/waste-regulation/event-record";
@@ -12,6 +37,10 @@ import MyAside, { SelectionMode } from "./myAside";
 import { Language } from "./language";
 import { ResourceRole, ResourceType } from "../../data-core/model/we-chat";
 import { NavigationWindow } from ".";
+
+
+import weui from 'weui.js';
+import "weui";
 
 
 export interface GarbageDropData {
@@ -32,33 +61,33 @@ export default class GarbageDrop implements IObserver {
 
   dropListTotal: GarbageDropEventRecord[] = [];// 拉取到的所有数据
   dropListChunk: GarbageDropEventRecord[] = []; // 每次拉取到的数据
-  dropPage: Page = null;
+  dropPage: Page | null = null;
   parsedDropListTotal: Array<GarbageDropData> = [];
   parsedDropListChunk: Array<GarbageDropData> = [];
   appendType: string = 'chunk';
 
-  eventType: EventType = void 0;// 筛选状态
+  eventType?: EventType = void 0;// 筛选状态
   roleTypes: Array<string> = []; // 筛选区域
   roleList: ResourceRole[] = [];// 侧边栏数据
 
-  miniRefresh: MiniRefresh;
+  miniRefresh?: MiniRefresh;
 
-  myAside: MyAside;
+  myAside: MyAside | null = null;
 
   currentPage: Paged = {
     index: 1,
     size: 20,
   }
 
-  private _date: Date;
+  private _date: Date = new Date();
   get date() {
-    return this._date
+    return this._date as Date
   }
   set date(val) {
     if (this.date) {
       // 重复选择当前日期，则直接返回
-      console.log(dateFormat(val, 'yyyy-MM-dd'));
-      console.log(dateFormat(this.date, 'yyyy-MM-dd'));
+      // console.log(dateFormat(val, 'yyyy-MM-dd'));
+      // console.log(dateFormat(this.date, 'yyyy-MM-dd'));
       if (dateFormat(val, 'yyyy-MM-dd') == dateFormat(this.date, 'yyyy-MM-dd')) return
     }
 
@@ -66,7 +95,7 @@ export default class GarbageDrop implements IObserver {
 
     this.elements.date.innerHTML = dateFormat(val, "yyyy年MM月dd日");
 
-    console.log('change date')
+    // console.log('change date')
 
   }
 
@@ -99,36 +128,36 @@ export default class GarbageDrop implements IObserver {
     console.log('通知:', args)
     if (args) {
       if ('type' in args) {
-        if (args.type == 'weui-datePicker') {
-          this.date = args.value;
-          this.reset();
-          this.createAside();
-          this.miniRefresh.resetUpLoading()
-        }
+        // if (args.type == 'weui-datePicker') {
+        //   this.date = args.value;
+        //   this.reset();
+        //   this.createAside();
+        //   this.miniRefresh!.resetUpLoading()
+        // }
         if (args.type == 'my-aside') {
           if ('show' in args) {
             this.show = args.show;
           }
           if ('filtered' in args) {
-            console.log('filtered', args.filtered);
+            // console.log('filtered', args.filtered);
             this.reset();
 
             let data: Map<string, Array<string>> = new Map();
 
             let filtered = args.filtered as Map<string, Set<HTMLElement>>;
             for (let [k, v] of filtered) {
-              let ids = [...v].map(element => element.getAttribute('id'));
+              let ids = [...v].map(element => element.getAttribute('id') || '');
               data.set(k, ids);
             }
-            console.log('maped', data)
+            // console.log('maped', data)
             if (data.has('role')) {
-              this.roleTypes = data.get('role');
+              this.roleTypes = data.get('role')!;
 
             }
             if (data.has('state')) {
-              this.eventType = Number(data.get('state')[0]);
+              this.eventType = Number(data.get('state')![0]);
             }
-            this.miniRefreshUp()
+            // this.miniRefresh?.resetUpLoading();// 重置后会自动请求一次
 
           }
         }
@@ -138,44 +167,40 @@ export default class GarbageDrop implements IObserver {
   }
 
   // 构造函数只负责初始化
-  constructor(private dataController: IGarbageDrop, private openId: string, private type: ResourceType, private myTemplate: MyTemplate) {
+  constructor(private dataController: IGarbageDrop, private openId: string | null, private type: ResourceType, private myTemplate: MyTemplate) {
 
     this.elements = {
       date: document.querySelector('#date') as HTMLDivElement,
       count: document.querySelector('#count') as HTMLDivElement,
-      contentContainer: document.querySelector('.card-container'),
+      contentContainer: document.querySelector('.card-container') as HTMLDivElement
+      ,
       template: document.querySelector('template') as HTMLTemplateElement,
       filterBtn: document.querySelector('#filter') as HTMLDivElement,
+      showDatePicker: document.querySelector('#showDatePicker') as HTMLDivElement,
       asideContainer: document.querySelector('#aside-container') as HTMLElement,
     }
-    // 触发 set date()
-    this.date = new Date();
-
-
-  }
-  // 数据请求放入其他方法中
-  init() {
-    this.elements.contentContainer.innerHTML = '';
-
     this.miniRefresh = new MiniRefresh({
       container: "#miniRefresh",
       down: {
         callback: () => {
-          console.log('refresh down');
+          console.log('miniRefreshDown');
           this.miniRefreshDown();
         }
       },
       up: {
         isAuto: true,// 自动触发callback回调
         callback: () => {
-          console.log('refresh up');
+          console.log('miniRefreshUp');
           this.miniRefreshUp()
         }
       }
     })
+    this.elements.contentContainer.innerHTML = '';
+    this.elements.date.innerHTML = dateFormat(this.date, "yyyy年MM月dd日");
 
+  }
 
-
+  init() {
     this.loadAsideData().then(() => {
       this.createAside()
     })
@@ -185,28 +210,48 @@ export default class GarbageDrop implements IObserver {
 
 
   bindEvents() {
-    console.log('bind event')
-    let _this = this;
-    this.elements.filterBtn.addEventListener('click', () => {
-      console.log('clicked');
-      this.toggle()
+    this.elements.showDatePicker.addEventListener('click', () => {
+      this.showDatePicker()
     })
-    this.elements.contentContainer.addEventListener('click-card', (e: CustomEvent) => {
-      console.log(e)
+    this.elements.filterBtn.addEventListener('click', () => {
+      this.toggle()
+    });
+
+    (this.elements.contentContainer as any).addEventListener('click-card', (e: CustomEvent) => {
+      // console.log(e)
       let index = e.detail.index;
-      const url = `./event-details.html?openid=o5th-6js1-VRO7d1j7Jy9nkGZocg&pageindex=${index}&eventtype=${this.eventType ?? 0}`
+      const url = `./event-details.html?openid=${this.openId}&pageindex=${index}&eventtype=${this.eventType ?? 0}`
       console.log(url)
       window.parent.showOrHideAside(url);
 
-    })
+    });
+
+  }
+  showDatePicker() {
+    weui.datePicker({
+      start: new Date(2020, 12 - 1, 1),
+      end: new Date(),
+      onChange: (result: any) => {
+
+      },
+      onConfirm: (result: any) => {
+        let date = new Date(result[0].value, result[1].value - 1, result[2].value);
+        this.date = date;
+
+        this.reset();
+        this.createAside();
+      },
+      title: '请选择日期'
+    });
+
   }
   toggle() {
     this.show = !this.show;
   }
   createContent() {
     this.parseData();
-    console.log('解析后的本次数据', this.parsedDropListChunk)
-    console.log('解析后的所有数据', this.parsedDropListTotal)
+    // console.log('解析后的本次数据', this.parsedDropListChunk)
+    // console.log('解析后的所有数据', this.parsedDropListTotal)
 
     if (this.appendType == 'chunk') {
       this.myTemplate.dataChunk = this.parsedDropListChunk;
@@ -219,7 +264,7 @@ export default class GarbageDrop implements IObserver {
     this.elements.contentContainer.appendChild(this.myTemplate.fragment);
 
 
-    this.elements.count.textContent = this.dropListTotal.length + "/" + this.dropPage.TotalRecordCount;
+    this.elements.count.textContent = this.dropListTotal.length + "/" + this.dropPage!.TotalRecordCount;
   }
 
   /**
@@ -230,7 +275,7 @@ export default class GarbageDrop implements IObserver {
     await this.loadData();
     this.createContent();
     this.createAside()
-    this.miniRefresh.endDownLoading();
+    this.miniRefresh!.endDownLoading();
   }
   async miniRefreshUp() {
     let stop = false;
@@ -248,17 +293,18 @@ export default class GarbageDrop implements IObserver {
 
     }
     if (!stop) {
+      console.log('请求数据');
       await this.loadData();
       this.createContent();
     }
     console.log('stop', stop);
-    this.miniRefresh.endUpLoading(stop);
+    this.miniRefresh!.endUpLoading(stop);
   }
   /**
    *  切换日期/更改筛选条件/下拉 需要重置数据
    */
   reset() {
-    console.log('reset called')
+    console.log('reset调用')
     this.eventType = void 0;
     this.roleTypes = []
     this.dropPage = null;
@@ -266,27 +312,28 @@ export default class GarbageDrop implements IObserver {
     this.elements.contentContainer.innerHTML = '';
     this.parsedDropListTotal = [];
     this.dropListTotal = [];
+    this.miniRefresh!.resetUpLoading();// 会触发一次miniRefreshUp
   }
   async loadData() {
     const day = getAllDay(this.date);
-    console.log('current-page', this.currentPage);
-    console.log('event-type', this.eventType)
+    // console.log('current-page', this.currentPage);
+    // console.log('event-type', this.eventType)
 
     let data = await this.dataController.getGarbageDropEventList(day, this.currentPage, this.eventType, this.roleTypes);
-    this.dropListTotal = [...this.dropListTotal, ...data.Data]
-    this.dropListChunk = data.Data;
-    this.dropPage = data.Page;
-    console.log('本次请求的数据', this.dropListChunk)
-    console.log('本次请求的页面信息', this.dropPage);
-    console.log('至今请求到的所有数据', this.dropListTotal)
+    this.dropListTotal = [...this.dropListTotal, ...data!.Data]
+    this.dropListChunk = data!.Data;
+    this.dropPage = data!.Page;
+    // console.log('本次请求的数据', this.dropListChunk)
+    // console.log('本次请求的页面信息', this.dropPage);
+    // console.log('至今请求到的所有数据', this.dropListTotal)
 
 
     if (window.parent) {
       (window.parent as NavigationWindow).Day = getAllDay(this.date);
       (window.parent as NavigationWindow).RecordPage = {
-        index: data.Page.PageIndex,
-        size: data.Page.PageSize,
-        count: data.Page.TotalRecordCount
+        index: data!.Page.PageIndex,
+        size: data!.Page.PageSize,
+        count: data!.Page.TotalRecordCount
 
       }
     }
@@ -295,7 +342,7 @@ export default class GarbageDrop implements IObserver {
   }
   async loadAsideData() {
     this.roleList = await this.dataController.getResourceRoleList();
-    console.log('侧边栏筛选数据', this.roleList)
+    // console.log('侧边栏筛选数据', this.roleList)
   }
   parseData() {
     let data = this.dropListChunk;
@@ -307,16 +354,16 @@ export default class GarbageDrop implements IObserver {
       obj.EventId = v.EventId;
       obj.EventType = v.EventType;
       obj.EventName = Language.EventTypeFilter(v.EventType);
-      obj.index = (this.dropPage.PageIndex - 1) * this.dropPage.PageSize + i
+      obj.index = (this.dropPage!.PageIndex - 1) * this.dropPage!.PageSize + i
 
-      let imageUrls = [];
+      let imageUrls: CameraImageUrl[] = [];
       if (v.Data) {
         if (!v.Data.IsHandle && !v.Data.IsTimeout) {
-          imageUrls = v.Data.DropImageUrls
+          imageUrls = v.Data.DropImageUrls!
         } else if (v.Data.IsHandle && !v.Data.IsTimeout) {
-          imageUrls = v.Data.HandleImageUrls;
+          imageUrls = v.Data.HandleImageUrls!;
         } else if (!v.Data.IsHandle && v.Data.IsTimeout) {
-          imageUrls = v.Data.TimeoutImageUrls
+          imageUrls = v.Data.TimeoutImageUrls!
         }
         obj.StationName = v.Data.StationName;
         obj.StationId = v.Data.StationId;
@@ -326,7 +373,7 @@ export default class GarbageDrop implements IObserver {
 
         obj.EventTime = v.EventTime;
         obj.imageUrls = imageUrls.map(url => {
-          return this.dataController.getImageUrl(url.ImageUrl)
+          return this.dataController.getImageUrl(url.ImageUrl)!
         })
         // console.log(imageUrls, obj.imageUrls)
       }
@@ -335,7 +382,6 @@ export default class GarbageDrop implements IObserver {
     this.parsedDropListTotal = [...this.parsedDropListTotal, ...this.parsedDropListChunk];
   }
   createAside() {
-    this.myAside = null;
     let type = this.type + 1 > 3 ? 3 : this.type + 1;
     this.myAside = new MyAside(this.elements.asideContainer, [
       {
@@ -343,27 +389,27 @@ export default class GarbageDrop implements IObserver {
         data: [
           {
             Name: Language.EventTypeFilter(EventType.GarbageDrop),
-            Id: EventType.GarbageDrop
+            Id: EventType.GarbageDrop.toString()
           },
           {
             Name: Language.EventTypeFilter(EventType.GarbageDropTimeout),
-            Id: EventType.GarbageDropTimeout
+            Id: EventType.GarbageDropTimeout.toString()
           },
           {
             Name: Language.EventTypeFilter(EventType.GarbageDropHandle),
-            Id: EventType.GarbageDropHandle
+            Id: EventType.GarbageDropHandle.toString()
           },
-
         ],
         type: 'state',
         shrink: false,
         // mode: SelectionMode.single
       },
+
       {
         title: Language.ResourceType(type),
         data: this.roleList,
         type: "role",
-        mode: SelectionMode.multiple
+        mode: SelectionMode.multiple,
       },
 
     ]).init()

@@ -24,35 +24,50 @@
    pppmmmxxx
 */
 
-import { HttpResponse } from "../../data-core/model/response";
-import { Flags, StationState } from "../../data-core/model/waste-regulation/garbage-station";
-import { ResourceRole, ResourceType } from "../../data-core/model/we-chat";
 import ISubject from "./ISubject";
 
-import "../css/myAside.less"
+import "../css/myAside.less";
+import "weui";
+import $ from 'jquery'
+import MyWeui from './myWeui'
 
+export interface MyAsideData {
+  Id: string;
+  Name?: string;
+  isSelected?: boolean;
+  [key: string]: any;
+}
+// 构造函数参数类型
 interface MyAsideOptions {
   title: string;
-  data: any[];
-  type: string;
-  shrink?: boolean;
-  mode?: SelectionMode
+  data?: MyAsideData[];
+  type: string;// 每块数据有不同的类型
+  shrink?: boolean;// 显示完整内容而不是滚动条显示
+  mode?: SelectionMode; // 单选模式或多选模式
+  atLeastNum?: number;// 至少被选中个数
 }
-
+// 内部类使用的数据结构
+interface MyAsideObj {
+  mode: SelectionMode;
+  atLeastNum: number;
+  title: string;
+}
 export enum SelectionMode {
   single,
   multiple
 }
 
 export default class MyAside extends ISubject {
-  outterContainer: HTMLElement;// 装在侧边栏的外部容器
-  elements: {
-    [key: string]: any
-  } = {
+  outterContainer: HTMLElement;// 装载侧边栏的外部容器
+  elements: { [key: string]: any } = {}
 
-    }
-  filter: Map<string, Set<HTMLElement>> = new Map();
-  filterMode: Map<string, number> = new Map();
+  // 返回给外部
+  filterData: Map<string, Set<HTMLElement>> = new Map();
+
+  // 内部使用
+  filterObj: Map<string, MyAsideObj> = new Map()
+
+
 
   template: string = `
     <div class="inner-mask"></div>
@@ -64,6 +79,7 @@ export default class MyAside extends ISubject {
         </div>
     </div>
     `
+  // DOMParser
   innerContainer: HTMLDivElement = document.createElement("div");
 
   constructor(selector: HTMLElement | string, private options: Array<MyAsideOptions>) {
@@ -96,7 +112,20 @@ export default class MyAside extends ISubject {
       let card = document.createElement('div');
       card.className = 'inner-card';
 
-      card.setAttribute('select-mode', option.mode + '')
+      option.mode = option.mode ?? SelectionMode.single;
+      option.atLeastNum = option.atLeastNum ?? 0;
+
+      this.filterData.set(option.type, new Set());
+
+      this.filterObj.set(option.type, {
+        mode: option.mode,
+        atLeastNum: option.atLeastNum,
+        title: option.title
+      })
+
+
+      card.setAttribute('select-mode', option.mode + '');
+
       if (option.shrink === false)
         card.classList.add('no-shrink');
 
@@ -109,104 +138,151 @@ export default class MyAside extends ISubject {
       div_content.className = 'inner-content';
       card.appendChild(div_content);
 
-      option.data.forEach(val => {
-        let div_item = document.createElement('div');
-        div_item.setAttribute('type', option.type);
-        div_item.textContent = val.Name;
-        div_item.setAttribute('id', val.Id);
-        div_item.className = 'inner-item'
-        div_content.appendChild(div_item)
-      })
+      let fragment = document.createDocumentFragment();
+      if (option.data) {
+        option.data.forEach(val => {
+          let div_item = document.createElement('div');
+          div_item.setAttribute('type', option.type);
+          div_item.textContent = val.Name ?? '';
+          div_item.setAttribute('id', val.Id);
+          div_item.className = 'inner-item';
 
-      this.filter.set(option.type, new Set());
-      this.filterMode.set(option.type, option.mode ?? 0);
+          if (val.isSelected) {
+            div_item.classList.add('selected');
+            this.filterData.get(option.type)?.add(div_item);
+
+          }
+
+          fragment.appendChild(div_item)
+
+        })
+      }
+
+      div_content.appendChild(fragment)
+
+
       this.elements.content.innerMain.appendChild(card)
     })
+
     this.bindEvents()
 
     return this;
   }
   bindEvents() {
-    let _self = this;
     if (this.elements.content && this.elements.content.innerMain) {
 
-      this.elements.content.innerMain.addEventListener('click', function (e: MouseEvent) {
-        let target = e.target as HTMLDivElement;
-        // 点击的是 inner-item 项
-        if (target.classList.contains('inner-item')) {
-
-          let type = target.getAttribute('type');
-          let mode = _self.filterMode.get(type) ?? 0;
-          // 单选模式
-          if (mode == SelectionMode.single) {
-            if (_self.filter.has(type)) {
-              let mySet = _self.filter.get(type);
-
-
-              if (mySet.has(target)) {
-                mySet.clear();
-                target.classList.remove('selected');
-              } else {
-                // 虽然单选只有一个
-                for (let item of mySet.values()) {
-                  item.classList.remove('selected')
-                }
-                mySet.clear();
-                mySet.add(target)
-                target.classList.add('selected');
-              }
-            }
-          } else if (mode == SelectionMode.multiple) {
-            if (_self.filter.has(type)) {
-              let mySet = _self.filter.get(type);
-
-              if (mySet.has(target)) {
-                mySet.delete(target);
-              } else {
-                mySet.add(target);
-              }
-              if (!target.classList.contains('selected')) {
-                target.classList.add('selected');
-              } else {
-                target.classList.remove('selected')
-              }
-
-            }
-          }
-
-        }
+      this.elements.content.innerMain.addEventListener('click', (e: Event) => {
+        this.itemClick(e)
       })
     }
-    if (this.elements.footer && this.elements.footer.resetBtn) {
+    if (this.elements.footer?.resetBtn) {
       this.elements.footer.resetBtn.addEventListener('click', () => {
-        for (let [k, v] of this.filter) {
-          [...v].forEach(item => {
-            item.classList.remove('selected')
-          })
-          v.clear()
-        }
-
+        this.cancleClick()
       })
     }
-    if (this.elements.footer && this.elements.footer.confirmBtn) {
+    if (this.elements.footer?.confirmBtn) {
+
       this.elements.footer.confirmBtn.addEventListener('click', () => {
-        this.notify({
-          show: false,
-          filtered: this.filter,
-          type: 'my-aside',
-        })
-        this.slideOut()
+        this.confirmClick()
       })
     }
     if (this.elements.mask) {
       this.elements.mask.addEventListener('click', () => {
-        this.notify({
-          show: false,
-          type: 'my-aside',
-        })
-        this.slideOut()
+        this.maskClick()
       })
     }
+  }
+  itemClick(e: Event) {
+    let target = e.target as HTMLElement;
+    // 点击的是 inner-item 项
+    if (target.classList.contains('inner-item')) {
+
+      let type = target.getAttribute('type') ?? '';
+
+      let mode = this.filterObj.get(type)?.mode ?? SelectionMode.single;
+
+      // 单选模式
+      if (mode == SelectionMode.single) {
+        if (this.filterData.has(type)) {
+          let mySet = this.filterData.get(type)!;
+          if (mySet?.has(target)) {
+            mySet.clear();
+            target.classList.remove('selected');
+          } else {
+            // 虽然单选只有一个
+            for (let item of mySet.values()) {
+              item.classList.remove('selected')
+            }
+            mySet.clear();
+            mySet.add(target)
+            target.classList.add('selected');
+          }
+        }
+
+
+
+      } else if (mode == SelectionMode.multiple) {
+        if (this.filterData.has(type)) {
+          let mySet = this.filterData.get(type)!;
+
+          if (mySet.has(target)) {
+            mySet.delete(target);
+          } else {
+            mySet.add(target);
+          }
+          if (!target.classList.contains('selected')) {
+            target.classList.add('selected');
+          } else {
+            target.classList.remove('selected')
+          }
+
+        }
+      }
+
+    }
+  }
+  confirmClick() {
+    // console.log(this.filterObj)
+    for (let [k, v] of this.filterObj) {
+      // v.atLeastNum为0表示没有数量限制
+      if (v.atLeastNum > 0) {
+        // 选中个数小于要求的个数,则创建提示框
+        if (this.filterData.get(k)?.size! < v.atLeastNum) {
+          // debugger
+          let $textToast = $(MyWeui.warnToast());
+          $textToast.find('.weui-toast__content').get(0).textContent = `至少选择${v.atLeastNum}个${v.title}`;
+          if ($textToast.css('display') != 'none') return;
+          $textToast.fadeIn(100);
+
+          setTimeout(function () {
+            $textToast.fadeOut(100);
+          }, 1000);
+          return
+        }
+      }
+    }
+    this.notify({
+      show: false,
+      filtered: this.filterData,
+      type: 'my-aside',
+    })
+    this.slideOut()
+  }
+  cancleClick() {
+    for (let [k, v] of this.filterData) {
+      [...v].forEach(item => {
+        item.classList.remove('selected')
+      })
+      v.clear()
+    }
+
+  }
+  maskClick() {
+    this.notify({
+      show: false,
+      type: 'my-aside',
+    })
+    this.slideOut()
   }
   slideIn() {
     this.elements.content.innerPage.classList.add('slideIn')

@@ -13,7 +13,7 @@
   display: flex;
   align-items: center;
 }
-#addUser main {
+#addUser > main {
   margin-top: 1px;
   height: 100%;
   overflow: auto;

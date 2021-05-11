@@ -5,6 +5,7 @@ import { DataController } from "./data-controllers/DataController";
 import { GarbageDropData } from './GarbageDrop';
 import "../css/myTemplate.less";
 
+// CustomEvent 的 polyfill
 (function () {
   try {
     // a : While a window.CustomEvent object exists, it cannot be called as a constructor.

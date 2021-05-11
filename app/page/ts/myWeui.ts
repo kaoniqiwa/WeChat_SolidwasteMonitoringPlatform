@@ -1,6 +1,7 @@
 /**
  *  pmx
  */
+
 import weui from 'weui.js';
 import "weui";
 import "../css/myDatePicker.less"
@@ -11,31 +12,29 @@ interface MyWeuiOptions {
   el: string; // 触发功能的元素选择器
 }
 export default class MyWeui extends ISubject {
-  selectors: Map<string, HTMLElement | null> = new Map(
-    // [
-    //   ['datePicker', null],
-    //   ['toast', null],
-    //   ['alert', null]
-    // ]
-  );
+  static parser = new DOMParser();
 
-  date: Date;
+  // selectors: Map<string, HTMLElement | null> = new Map(
+  // );
+
+  // date: Date;
   options: Array<MyWeuiOptions> = []
   constructor(options: Array<MyWeuiOptions>) {
     super();
-    options.forEach(option => {
-      this.selectors.set(option.type, document.querySelector(option.el) as HTMLElement)
-    })
+    // options.forEach(option => {
+    //   this.selectors.set(option.type, document.querySelector(option.el) as HTMLElement)
+    // })
 
-    this.bindEvent()
+    // this.bindEvent()
   }
-  bindEvent() {
-    for (let [k, v] of this.selectors) {
-      if (v) {
-        v.addEventListener('click', this[k].bind(this))
-      }
-    }
-  }
+  // bindEvent() {
+  //   for (let [k, v] of this.selectors) {
+  //     if (v) {
+
+  //       v.addEventListener('click', Reflect.get(this, k).bind(this))
+  //     }
+  //   }
+  // }
   datePicker() {
     weui.datePicker({
       start: new Date(2020, 12 - 1, 1),
@@ -62,15 +61,51 @@ export default class MyWeui extends ISubject {
     })
 
   }
-  toast() {
-    weui.toast('操作成功', {
-      duration: 3000,
-      className: 'custom-classname',
-      callback: function () { console.log('close') }
-    });
-    this.notify({
-      type: 'weui-toast',
-      value: 'toast'
-    })
+  static toast() {
+    let html = `
+    <div id="toast" style="display: none">
+      <div class="weui-mask_transparent"></div>
+      <div class="weui-toast">
+        <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+        <p class="weui-toast__content">已完成</p>
+      </div>
+    </div>
+    `
+    return this.generate(html, '#toast');
+  }
+  static warnToast() {
+    let html = `
+      <div id="warnToast" style="display: none">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-warn weui-icon_toast"></i>
+          <p class="weui-toast__content">获取链接失败</p>
+        </div>
+      </div>
+    `
+
+    return this.generate(html, '#warnToast');
+
+  }
+  static textToast() {
+    let html = `
+    <div id="textToast" style = "display: none" >
+      <div class="weui-mask_transparent" > </div>
+      <div class="weui-toast weui-toast_text" >
+          <p class="weui-toast__content" > 文字提示 < /p>
+      </div>
+    </div>
+   `
+    return this.generate(html, '#textToast');
+
+  }
+  static generate(content: string, selector: string) {
+    let el = document.body.querySelector(selector) as HTMLElement;
+    if (!el) {
+      let htmlDoc = this.parser.parseFromString(content, 'text/html');
+      el = htmlDoc.querySelector(selector) as HTMLDivElement;
+      document.body.appendChild(el);
+    }
+    return el
   }
 }

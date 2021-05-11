@@ -479,6 +479,8 @@ class GarbageStationClient implements IObserver {
     this.show = !this.show;
   }
   createAside() {
+    let type = this.type + 1 > 3 ? 3 : this.type + 1;
+
     this.myAside = null;
     this.myAside = new MyAside(this.elements.container.asideContainer, [
       {
@@ -668,46 +670,44 @@ class GarbageStationClient implements IObserver {
           el: '.swiper-pagination',
           type: 'fraction',
         },
-        on:{
-          init:(swiper:Swiper)=>{
+        on: {
+          init: (swiper: Swiper) => {
 
-            if(this.video)
-    {
-      this.video.destory();
-      this.video = undefined;
-    }
+            if (this.video) {
+              this.video.destory();
+              this.video = undefined;
+            }
 
-            setTimeout(()=>{
+            setTimeout(() => {
               inited = true;
-            let btn = swiper.el.querySelector('.swiper-slide-active .video-control') as HTMLDivElement;
-            btn.addEventListener("click", (e)=>{
-              this.onPlayControlClicked(element.imageUrls[swiper.activeIndex] , btn);
-              e.stopPropagation();
-            });
-          }, 100);
+              let btn = swiper.el.querySelector('.swiper-slide-active .video-control') as HTMLDivElement;
+              btn.addEventListener("click", (e) => {
+                this.onPlayControlClicked(element.imageUrls[swiper.activeIndex], btn);
+                e.stopPropagation();
+              });
+            }, 100);
           },
-          slideChange:(swiper:Swiper)=>{
-            if(inited == false) return;
+          slideChange: (swiper: Swiper) => {
+            if (inited == false) return;
 
-            if(this.video)
-    {
-      this.video.destory();
-      this.video = undefined;
-    }
+            if (this.video) {
+              this.video.destory();
+              this.video = undefined;
+            }
 
 
-            setTimeout(()=>{  
-            let btn = swiper.el.querySelector('.swiper-slide-active .video-control') as HTMLDivElement;
-            btn.addEventListener("click", (e)=>{
-              this.onPlayControlClicked(element.imageUrls[swiper.activeIndex], btn);
-              e.stopPropagation();
-            });
-          },100);
-            
+            setTimeout(() => {
+              let btn = swiper.el.querySelector('.swiper-slide-active .video-control') as HTMLDivElement;
+              btn.addEventListener("click", (e) => {
+                this.onPlayControlClicked(element.imageUrls[swiper.activeIndex], btn);
+                e.stopPropagation();
+              });
+            }, 100);
+
             // btn.addEventListener("click", (e)=>{
             //   debugger;
             //   e.stopPropagation();
-                // })
+            // })
           }
         }
       });
@@ -718,7 +718,7 @@ class GarbageStationClient implements IObserver {
 
       let container = this.createSwiperContainer(imgs[i])
 
-      this.swiper.virtual.appendSlide(container.outerHTML);      
+      this.swiper.virtual.appendSlide(container.outerHTML);
 
       // this.swiper.virtual.appendSlide('<div class="swiper-zoom-container">' +
       //   '<div><a onclick="return false"><i class="howell-icon-real-play"></i></a></div>'
@@ -729,21 +729,19 @@ class GarbageStationClient implements IObserver {
 
   }
 
-  video?:VideoPlugin;
+  video?: VideoPlugin;
 
 
-  onPlayControlClicked(index:IImageUrl, div:HTMLDivElement){
-    if(this.video)
-    {
+  onPlayControlClicked(index: IImageUrl, div: HTMLDivElement) {
+    if (this.video) {
       this.video.destory();
       this.video = undefined;
     }
     let img = div.data as IImageUrl;
-    if(!img)
-    {
+    if (!img) {
       img = index;
     }
-    img.preview.then(x=>{
+    img.preview.then(x => {
       this.video = new VideoPlugin("", x.Url, x.WebUrl);
       this.video.autoSize();
       div.parentElement.appendChild(this.video.getElement());
