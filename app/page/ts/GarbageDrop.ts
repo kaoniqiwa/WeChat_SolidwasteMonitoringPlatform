@@ -100,12 +100,12 @@ export default class GarbageDrop implements IObserver {
   }
 
 
-  _show = false;
-  get show() {
-    return this._show
+  _showAside = false;
+  get showAside() {
+    return this._showAside
   }
-  set show(val) {
-    this._show = val;
+  set showAside(val) {
+    this._showAside = val;
     if (val) {
       if (this.myAside) {
         $(this.elements.asideContainer).show();
@@ -136,7 +136,7 @@ export default class GarbageDrop implements IObserver {
         // }
         if (args.type == 'my-aside') {
           if ('show' in args) {
-            this.show = args.show;
+            this.showAside = args.show;
           }
           if ('filtered' in args) {
             // console.log('filtered', args.filtered);
@@ -157,8 +157,6 @@ export default class GarbageDrop implements IObserver {
             if (data.has('state')) {
               this.eventType = Number(data.get('state')![0]);
             }
-            // this.miniRefresh?.resetUpLoading();// 重置后会自动请求一次
-
           }
         }
       }
@@ -246,7 +244,7 @@ export default class GarbageDrop implements IObserver {
 
   }
   toggle() {
-    this.show = !this.show;
+    this.showAside = !this.showAside;
   }
   createContent() {
     this.parseData();
@@ -306,7 +304,7 @@ export default class GarbageDrop implements IObserver {
   reset() {
     console.log('reset调用')
     this.eventType = void 0;
-    this.roleTypes = []
+    this.roleTypes = [];
     this.dropPage = null;
     this.currentPage.index = 1;
     this.elements.contentContainer.innerHTML = '';

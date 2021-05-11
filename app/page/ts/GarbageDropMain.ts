@@ -27,28 +27,12 @@ if (user.WUser.Resources) {
     const service = new Service(http);
     const dataController = ControllerFactory.Create(service, type, user.WUser.Resources!);
 
-
-    // let myWeui = new MyWeui([
-    //   {
-    //     type: 'datePicker',
-    //     el: "#showDatePicker",
-    //   },
-    //   {
-    //     type: "toast",
-    //     el: "#showToast"
-    //   }
-    // ]);
-
-
     let myTemplate = new MyTemplate('#GarbageDropTemplate');
 
     // 构造函数式依赖注入
     let garbageDrop = new GarbageDrop(dataController, openId, type, myTemplate);
 
     garbageDrop.init();
-
-    // 添加观察对象
-    // myWeui.add(garbageDrop)
 
   });
 }
