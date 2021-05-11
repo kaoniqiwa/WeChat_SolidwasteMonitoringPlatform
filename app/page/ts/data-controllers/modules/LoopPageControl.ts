@@ -34,7 +34,7 @@ export class LoopPageControl {
         on: {
           init: (sw: any) => {
             try {
-              console.log(sw);
+              // console.log(sw);
               if (this.loaded) {
                 this.loaded(sw.slides[sw.activeIndex]);
               }
