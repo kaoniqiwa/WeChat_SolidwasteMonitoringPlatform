@@ -22,3 +22,8 @@ declare interface HTMLDivElement{
 }
 
 declare function getAllPropertyNames<T>(t: T): string[];
+
+declare interface Event
+{
+    path:EventTarget[];
+}

@@ -14,7 +14,7 @@ import Swiper, { Virtual, Pagination, } from 'swiper';
 import $ from 'jquery';
 import MyAside from './myAside';
 import EchartsAside from "./echartsAside";
-import { GarbageStationViewModel, IImageUrl } from "./data-controllers/ViewModels";
+import { GarbageStationViewModel, IActiveElement, IImageUrl } from "./data-controllers/ViewModels";
 import { CandlestickOption } from "./echart";
 
 import '../css/header.less'
@@ -67,14 +67,7 @@ enum ZoomStatus {
 }
 
 
-interface IActiveElement {
-  Element: HTMLDivElement,
-  id: string,
-  divisionId: string,
-  imageUrls: Array<IImageUrl>,
-  state: Flags<StationState>
-  swiper: Swiper | null
-}
+
 // 使用简单的观察者模式，实现 GarbageStationClient 和 myAside 类的通信
 class GarbageStationClient implements IObserver {
   candlestickOption: CandlestickOption = new CandlestickOption()
@@ -765,11 +758,18 @@ class GarbageStationClient implements IObserver {
     if (!img) {
       img = index;
     }
-    img!.preview!.then(x => {
-      this.video = new VideoPlugin("", x.Url, x.WebUrl);
-      this.video.autoSize();
-      div.parentElement!.appendChild(this.video.getElement());
-    })
+    if (img.preview) {
+      img.preview.then(x => {
+        this.video = new VideoPlugin("", x.Url, x.WebUrl);
+        this.video.autoSize();
+        if (div.parentElement) {
+          let element = this.video.getElement();
+          if (element) {
+            div.parentElement.appendChild(element);
+          }
+        }
+      })
+    }
   }
 
 

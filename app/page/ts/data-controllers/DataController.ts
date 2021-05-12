@@ -141,7 +141,7 @@ export abstract class DataController implements IDataController, IGarbageStation
         return this.service.sr.VodUrls({
             CameraId: cameraId,
             StreamType: 1,
-            Protocol: "ws-px",
+            Protocol: "ws-ps",
             BeginTime: begin.toISOString(),
             EndTime: end.toISOString()
         });

@@ -249,8 +249,8 @@ export namespace EventInformationPage {
 
                         let url:IImageUrl = {
                             url:detail_img.src,
-                            cameraId:item.ResourceId,
-                            playback:this.dataController.getVodUrl(item.ResourceId, interval.begin, interval.end)
+                            cameraId:item.ResourceId!,
+                            playback:this.dataController.getVodUrl(item.ResourceId!, interval.begin, interval.end)
                         }
 
                         this.imageController.showDetail(selectors, [url]);
@@ -287,7 +287,7 @@ export namespace EventInformationPage {
             
                 time.setSeconds(time.getSeconds() - 15);
                 let begin = new Date(time.getTime());
-                time.setSeconds(time.getSeconds() + 30);
+                time.setSeconds(time.getSeconds() + 300);
                 let end = new Date(time.getTime());
                 return {
                     begin:begin,
@@ -658,7 +658,7 @@ export namespace EventInformationPage {
             if (item instanceof GarbageFullEventRecord) {
                 this.fillGarbageFullEventRecord(item, element);
             }
-            if (item instanceof GarbageDropEventRecord) {
+            else if (item instanceof GarbageDropEventRecord) {
                 this.fillGarbageDropEventRecord(item, element)
             }
             else {

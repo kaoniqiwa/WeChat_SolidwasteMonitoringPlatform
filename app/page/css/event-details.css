@@ -108,6 +108,7 @@ html,body{
     color: white;
     padding-right: 10px;
     /* display: none; */
+    pointer-events: none;
   }
   .swiper-pagination-img{
     color:white;
@@ -155,4 +156,24 @@ html,body{
   
   img[data-src] {
     opacity: 0;
+  }
+
+  .video-control{
+    color: white;
+    width:50px;
+    height: 50px;
+    z-index: 2;
+    position: absolute;
+    opacity: 0.3;
+    margin-top: -10%;
+  }
+  
+  .video-control > i{
+    font-size: 50px;
+    line-height: initial;
+  }
+
+  .swiper-slide-active
+  {
+    overflow: hidden;
   }

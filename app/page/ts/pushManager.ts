@@ -26,7 +26,7 @@ namespace PushManagerPage {
         user?: User;
 
         constructor(private session: SessionUser, private dataController: IUserPushManager) {
-            debugger;
+            
             this.bindEvents();
             this.setStatus();
         }
@@ -74,7 +74,7 @@ namespace PushManagerPage {
                 window.parent?.HideUserAside();
             });
             this.element.button.ok.addEventListener('click', () => {
-                debugger;
+                
                 this.submit();
                 window.parent?.HideUserAside();
             })

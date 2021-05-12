@@ -1,6 +1,7 @@
+import Swiper from "swiper";
 import { Camera } from "../../../data-core/model/waste-regulation/camera";
 import { CameraImageUrl, GarbageDropEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/event-record";
-import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
+import { Flags, GarbageStation, StationState } from "../../../data-core/model/waste-regulation/garbage-station";
 import { GarbageStationNumberStatistic } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
 import { VideoUrl } from "../../../data-core/model/waste-regulation/video-model";
 import { Service } from "../../../data-core/repuest/service";
@@ -13,6 +14,15 @@ export interface IImageUrl {
     preview?: Promise<VideoUrl>;
     playback?: Promise<VideoUrl>;
 }
+
+export interface IActiveElement {
+    Element: HTMLDivElement,
+    id: string,
+    divisionId: string,
+    imageUrls: Array<IImageUrl>,
+    state: Flags<StationState>
+    swiper?: Swiper
+  }
 
 
 export class GarbageStationViewModel extends GarbageStation {
@@ -47,7 +57,7 @@ export class CameraViewModel extends Camera {
         return this.service.sr.VodUrls({
             CameraId: this.Id,
             StreamType: 1,
-            Protocol: "ws-px",
+            Protocol: "ws-ps",
             BeginTime: begin.toISOString(),
             EndTime: end.toISOString()
         });

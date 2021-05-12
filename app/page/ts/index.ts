@@ -17,7 +17,7 @@ namespace Navigation {
 
     window.recordDetails = null;
     window.showOrHideAside = function (url) {
-        debugger;
+        
         if (index < -1) {
             index = 3;
             let garbageDropPage = (items[index] as HTMLLinkElement);
