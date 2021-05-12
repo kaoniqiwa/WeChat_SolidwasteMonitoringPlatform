@@ -12,12 +12,12 @@ import "../css/myTemplate.less";
     // b : There is no window.CustomEvent object
     new window.CustomEvent('T');
   } catch (e) {
-    var CustomEvent = function (event, params) {
+    var CustomEvent = function (event: string, params: CustomEventInit<any>) {
       params = params || { bubbles: false, cancelable: false, detail: undefined };
 
       var evt = document.createEvent('CustomEvent');
 
-      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+      evt.initCustomEvent(event, params.bubbles!, params.cancelable!, params.detail);
 
       return evt;
     };
@@ -44,7 +44,7 @@ interface MyTemplateOption {
 }
 export default class MyTemplate {
   templateDocument: DocumentFragment;
-  card: HTMLDivElement;
+  card?: HTMLElement;
 
   fragment: DocumentFragment = document.createDocumentFragment();
 
@@ -84,41 +84,42 @@ export default class MyTemplate {
     this.createContent(val)
   }
 
-  constructor(selector, options?: MyTemplateOption) {
+  constructor(selector: string, options?: MyTemplateOption) {
     // document 对象,这里是 <template>，也可以是 iframe.contentDocument
     this.templateDocument = (document.querySelector(selector) as HTMLTemplateElement).content;
     // 将外部文档的内容导入本文档中
-    this.card = document.importNode(this.templateDocument.querySelector('.card'), true)
+    this.card = document.importNode(this.templateDocument.querySelector('.card') as HTMLElement, true)
 
   }
   createContent(data: Array<GarbageDropData>) {
     for (let i = 0; i < data.length; i++) {
       let v = data[i];
-      let card = this.card.cloneNode(true) as HTMLDivElement;
+      let card = this.card?.cloneNode(true) as HTMLDivElement;
 
-      card.setAttribute('index', v.index.toString())
-      card.setAttribute('id', v.StationId);
-      card.setAttribute('division-id', v.DivisionId);
+      card.setAttribute('index', v.index!.toString())
+      card.setAttribute('id', v.StationId!);
+      card.setAttribute('division-id', v.DivisionId!);
       card.setAttribute('event-type', v.EventType + '');
 
-      card.querySelector('.station-name').textContent = v.StationName;
-      card.querySelector('.division-name').textContent = v.DivisionName;
+      (card.querySelector('.station-name') as HTMLElement).textContent = v.StationName!;
 
-      card.querySelector('.event-time').textContent = dateFormat(new Date(v.EventTime), 'yyyy-MM-dd HH:mm:ss')
+      (card.querySelector('.division-name') as HTMLElement).textContent = v.DivisionName!;
+
+      (card.querySelector('.event-time') as HTMLElement).textContent = dateFormat(new Date(v.EventTime!), 'yyyy-MM-dd HH:mm:ss')
 
       if (v.EventType == EventType.GarbageDrop) {
-        card.querySelector('.status').textContent = GarbageDropStatus.GarbageDrop;
-        card.querySelector('.status').className = 'card-title__appendix status drop';
+        card.querySelector<HTMLElement>('.status')!.textContent = GarbageDropStatus.GarbageDrop;
+        card.querySelector<HTMLElement>('.status')!.className = 'card-title__appendix status drop';
 
       } else if (v.EventType == EventType.GarbageDropTimeout) {
-        card.querySelector('.status').textContent = GarbageDropStatus.GarbageDropTimeout;
-        card.querySelector('.status').className = 'card-title__appendix status timeout';
+        card.querySelector<HTMLElement>('.status')!.textContent = GarbageDropStatus.GarbageDropTimeout;
+        card.querySelector<HTMLElement>('.status')!.className = 'card-title__appendix status timeout';
       } else if (v.EventType == EventType.GarbageDropHandle) {
-        card.querySelector('.status').textContent = GarbageDropStatus.GarbageDropHandle;
-        card.querySelector('.status').className = 'card-title__appendix status handle';
+        card.querySelector<HTMLElement>('.status')!.textContent = GarbageDropStatus.GarbageDropHandle;
+        card.querySelector<HTMLElement>('.status')!.className = 'card-title__appendix status handle';
       }
-      card.querySelector('.card-img').innerHTML = '';
-      v.imageUrls.forEach(url => {
+      card.querySelector<HTMLElement>('.card-img')!.innerHTML = '';
+      v.imageUrls!.forEach(url => {
         let img = new Image();
         img.src = url;
         img.onerror = function () {
@@ -126,7 +127,7 @@ export default class MyTemplate {
           img.src = DataController.defaultImageUrl;
         }
         img.onload = function () {
-          card.querySelector('.card-img').appendChild(img)
+          card.querySelector<HTMLElement>('.card-img')!.appendChild(img)
         }
 
       })

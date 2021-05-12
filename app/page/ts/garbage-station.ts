@@ -73,40 +73,35 @@ interface IActiveElement {
   divisionId: string,
   imageUrls: Array<IImageUrl>,
   state: Flags<StationState>
-  swiper?: Swiper
+  swiper: Swiper | null
 }
 // 使用简单的观察者模式，实现 GarbageStationClient 和 myAside 类的通信
 class GarbageStationClient implements IObserver {
   candlestickOption: CandlestickOption = new CandlestickOption()
 
 
-  content: HTMLElement | null;
-  template: HTMLTemplateElement | null;
-  asideTemplate: HTMLTemplateElement | null;
+  content: HTMLElement | null = null;
+  template: HTMLTemplateElement | null = null;
+  asideTemplate: HTMLTemplateElement | null = null;
   asideMain?: HTMLDivElement;
 
   GarbageStationNumberStatistic: Map<string, GarbageStationNumberStatistic> = new Map();
-  garbageElements: Map<string, IActiveElement> = new Map();
+  garbageElements: Map<string, any> = new Map();
   garbageElementsDivision: Map<string, any> = new Map();
 
-  btnDivision: HTMLDivElement;
-  imgDivision: HTMLDivElement;
-  searchInput: HTMLInputElement;
-  btnSearch: HTMLElement;
-  originImg: HTMLDivElement;
-  hwBar: HTMLDivElement
+  btnDivision?: HTMLDivElement;
+  imgDivision?: HTMLDivElement;
+  searchInput?: HTMLInputElement;
+  btnSearch?: HTMLElement;
+  originImg?: HTMLDivElement;
+  hwBar?: HTMLDivElement
 
   zoomStatus: ZoomStatus = ZoomStatus.out;
-  swiper: Swiper;
+  swiper: Swiper | null = null;
   swiperStatus: boolean = false;
   originStatus: boolean = false;
-  activeIndex: number;
-  activeElement: IActiveElement;
-
-  asideControl: AsideControl;
-  asidePage?: AsideListPage;
-  asideIframe: HTMLIFrameElement;
-
+  activeIndex?: number;
+  activeElement?: IActiveElement;
 
 
   selectedDivisions: Map<string, any> = new Map();
@@ -115,28 +110,32 @@ class GarbageStationClient implements IObserver {
 
   dataController: IGarbageStationController;
   type: ResourceType;
-  garbageStations: GarbageStationViewModel[];
-  numberList: StatisticNumber[];
-  roleList: ResourceRole[];
-  myAside: MyAside;
+  garbageStations: GarbageStationViewModel[] = [];
+  numberList: StatisticNumber[] = [];
+  roleList: ResourceRole[] = [];
+  myAside: MyAside | null = null;
 
-  myChartAside: EchartsAside;
-  myChartOptions: {
+  myChartAside: EchartsAside | null = null;
+  myChartOptions?: {
     date: Date,
     data: Array<GarbageStationGarbageCountStatistic>
   }
 
-  _show = false;
-  get show() {
-    return this._show
+
+  _showAside = false;
+  get showAside() {
+    return this._showAside
   }
-  set show(val) {
-    this._show = val;
+  set showAside(val) {
+    this._showAside = val;
     if (val) {
-      $(this.elements.container.asideContainer).show();
-      setTimeout(() => {
-        this.myAside.slideIn()
-      }, 1e2);
+      if (this.myAside) {
+        $(this.elements.container.asideContainer).show();
+        setTimeout(() => {
+          this.myAside?.slideIn()
+        }, 1e2);
+      }
+
     }
     else {
       setTimeout(() => {
@@ -145,6 +144,7 @@ class GarbageStationClient implements IObserver {
     }
 
   }
+
   _showChart: boolean = false;
 
   get showChart() {
@@ -163,7 +163,7 @@ class GarbageStationClient implements IObserver {
     container: {
       hwContainer: document.querySelector('#hw-container') as HTMLDivElement,
 
-      chartContainer: document.querySelector<HTMLElement>('#chart-container'),
+      chartContainer: document.querySelector<HTMLElement>('#chart-container') as HTMLDivElement,
 
       asideContainer: document.querySelector('#aside-container') as HTMLElement,
     },
@@ -190,10 +190,10 @@ class GarbageStationClient implements IObserver {
 
 
   }
-  update(args) {
+  update(args: any) {
     if (args) {
       if ('show' in args) {
-        this.show = args.show;
+        this.showAside = args.show;
       }
       if ('showChart' in args) {
         this.showChart = args.showChart
@@ -204,7 +204,7 @@ class GarbageStationClient implements IObserver {
 
         let filtered = args.filtered as Map<string, Set<HTMLElement>>;
         for (let [k, v] of filtered) {
-          let ids = [...v].map(element => element.getAttribute('id'));
+          let ids = [...v].map(element => element.getAttribute('id') || '');
           data.set(k, ids);
         }
         console.log(data)
@@ -291,16 +291,21 @@ class GarbageStationClient implements IObserver {
 
 
       // v.NumberStatistic.CurrentGarbageTime = 64;
-      let currentGarbageTime = v.NumberStatistic.CurrentGarbageTime >> 0;
+      let currentGarbageTime = v.NumberStatistic.CurrentGarbageTime! >> 0;
+      // currentGarbageTime = Math.random() * 90 >> 0;
+      // console.log('currentGarbageTime', currentGarbageTime)
       let hour = Math.floor(currentGarbageTime / 60);
       let minute = currentGarbageTime - hour * 60;
 
-      let hour2 = hour.toString().padStart(2, '0');
-      let minute2 = minute.toString().padStart(2, '0');
+      (info.querySelector('.constDrop') as HTMLElement).classList.remove('hidden')
+      if (currentGarbageTime == 0) {
+        (info.querySelector('.constDrop') as HTMLElement).classList.add('hidden');
+      }
+      // let hour2 = hour.toString().padStart(2, '0');
+      // let minute2 = minute.toString().padStart(2, '0');
 
-      // console.log(hour,minute);
 
-      info.querySelector('.constDrop-number').textContent = `${hour2}:${minute2}`
+      (info.querySelector('.constDrop-number') as HTMLElement).textContent = `${hour == 0 ? minute + "分钟" : hour + "小时" + minute + "分钟"}`;
 
       title_bandage.classList.remove('red');
       title_bandage.classList.remove('green');
@@ -329,7 +334,7 @@ class GarbageStationClient implements IObserver {
       this.dataController.getCameraList(v.Id, (cameraId: string, url?: string) => {
         let img = document.getElementById(cameraId) as HTMLImageElement;
         if (!img) return
-        img.src = url
+        img.src = url!
 
         img.onerror = () => {
           img.src = DataController.defaultImageUrl;
@@ -373,7 +378,7 @@ class GarbageStationClient implements IObserver {
           })
           _this.customElement.dispatchEvent(ev)
         } else {
-          _this.myChartAside.id = currentTarget.id;
+          _this.myChartAside!.id = currentTarget.id!;
           _this.showChart = true;
         }
 
@@ -384,7 +389,8 @@ class GarbageStationClient implements IObserver {
         id: v.Id,
         divisionId: v.DivisionId,
         imageUrls: imageUrls,
-        state: v.StationState
+        state: v.StationState,
+        currentGarbageTime: currentGarbageTime
       })
 
       this.elements.container.hwContainer?.appendChild(info)
@@ -434,11 +440,11 @@ class GarbageStationClient implements IObserver {
 
     this.elements.others.originImg.addEventListener('click', function () {
 
-      _this.activeIndex = _this.swiper.activeIndex;
-      if (_this.activeElement.swiper) {
-        _this.activeElement.swiper.slideTo(_this.activeIndex, 0)
+      _this.activeIndex = _this.swiper!.activeIndex;
+      if (_this.activeElement!.swiper) {
+        _this.activeElement!.swiper.slideTo(_this.activeIndex, 0)
       } else {
-        _this.activeElement.Element.querySelector(`.swiper-slide:nth-of-type(${_this.activeIndex + 1})`).scrollIntoView({
+        (_this.activeElement!.Element!.querySelector(`.swiper-slide:nth-of-type(${_this.activeIndex + 1})`) as HTMLElement).scrollIntoView({
           block: 'nearest',
           behavior: 'auto',
           inline: 'nearest'
@@ -476,7 +482,7 @@ class GarbageStationClient implements IObserver {
     }
   }
   toggle() {
-    this.show = !this.show;
+    this.showAside = !this.showAside;
   }
   createAside() {
     let type = this.type + 1 > 3 ? 3 : this.type + 1;
@@ -488,20 +494,25 @@ class GarbageStationClient implements IObserver {
         data: [
           {
             Name: Language.StationState(StationState.Normal),
-            Id: StationState.Normal
+            Id: StationState.Normal.toString()
           },
           {
             Name: Language.StationState(StationState.Full),
-            Id: StationState.Full
+            Id: StationState.Full.toString()
           },
           {
             Name: Language.StationState(StationState.Error),
-            Id: StationState.Error
+            Id: StationState.Error.toString()
           },
+          {
+            Name: '垃圾落地',
+            Id: '3'
+          }
 
         ],
         type: 'state',
-        shrink: false
+        shrink: false,
+        mode: SelectionMode.multiple
       },
       {
         title: Language.ResourceType(type),
@@ -546,20 +557,33 @@ class GarbageStationClient implements IObserver {
           }
         }
         if (key == 'state') {
-          if (val.length && !val.includes(v.state.value + "")) {
+
+          //剔除 垃圾落地 筛选项
+          let arr = val.filter(item => {
+            return item !== '3'
+          })
+
+          if (arr.length && !arr.includes(v.state.value + "")) {
             v.Element.style.display = 'none';
+          }
+
+          if (val.includes('3')) {
+            if (v.currentGarbageTime <= 0) {
+              v.Element.style.display = 'none';
+            }
           }
         }
       }
 
-      if (this.zoomStatus == ZoomStatus.out) {
+    }
 
-        this.zoomOut();
-      }
-      else if (this.zoomStatus == ZoomStatus.in) {
+    if (this.zoomStatus == ZoomStatus.out) {
 
-        this.zoomIn();
-      }
+      // this.zoomOut();
+    }
+    else if (this.zoomStatus == ZoomStatus.in) {
+
+      // this.zoomIn();
     }
   }
   filerContent() {
@@ -567,7 +591,7 @@ class GarbageStationClient implements IObserver {
     for (let [k, v] of this.garbageElements) {
       let div = v.Element;
       // console.log(div)
-      if (str && !div.textContent.includes(str)) {
+      if (str && !div.textContent!.includes(str)) {
         div.style.display = 'none';
       } else {
         div.style.display = '';
@@ -580,17 +604,17 @@ class GarbageStationClient implements IObserver {
     // console.log(this.garbageElements);
     for (let [k, v] of this.garbageElements) {
       let contentCard = v.Element;
-      contentCard.querySelectorAll('.content__img').forEach((element: HTMLElement) => {
+      (Array.from(contentCard.querySelectorAll('.content__img')) as HTMLElement[]).forEach((element: HTMLElement) => {
         element.classList.add(ZoomStatus.in);
       });
 
-      contentCard.querySelectorAll('.swiper-slide').forEach((element: HTMLElement) => {
+      (Array.from(contentCard.querySelectorAll('.swiper-slide')) as HTMLElement[]).forEach((element: HTMLElement) => {
         element.classList.add(ZoomStatus.in);
       });
-      contentCard.querySelectorAll('.content__title__badage').forEach((element: HTMLElement) => {
+      (Array.from(contentCard.querySelectorAll('.content__title__badage')) as HTMLElement[]).forEach((element: HTMLElement) => {
         element.classList.add(ZoomStatus.in);
       });
-      contentCard.querySelectorAll('.content__footer').forEach((element: HTMLElement) => {
+      (Array.from(contentCard.querySelectorAll('.content__footer')) as HTMLElement[]).forEach((element: HTMLElement) => {
         element.classList.add(ZoomStatus.in);
       });
 
@@ -741,10 +765,10 @@ class GarbageStationClient implements IObserver {
     if (!img) {
       img = index;
     }
-    img.preview.then(x => {
+    img!.preview!.then(x => {
       this.video = new VideoPlugin("", x.Url, x.WebUrl);
       this.video.autoSize();
-      div.parentElement.appendChild(this.video.getElement());
+      div.parentElement!.appendChild(this.video.getElement());
     })
   }
 
@@ -754,7 +778,7 @@ class GarbageStationClient implements IObserver {
     container.className = "swiper-zoom-container";
 
     let img = document.createElement("img");
-    img.src = this.dataController.getImageUrl(imageUrl.url);
+    img.src = this.dataController.getImageUrl(imageUrl.url)!;
     container.appendChild(img);
 
     let control = document.createElement("div");

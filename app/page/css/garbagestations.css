@@ -108,6 +108,13 @@ body {
 .hw-content .hw-content__card .content__title__head {
   font-size: 17px;
 }
+.hw-content .hw-content__card .content_title__footer {
+  display: flex;
+  align-items: center;
+}
+.constDrop.hidden {
+  display: none;
+}
 
 .hw-content .hw-content__card .content__title__badage {
   font-size: 12px;
@@ -118,6 +125,7 @@ body {
   border-radius: 2px;
   background-color: rgba(51, 255, 102, 0.3);
   vertical-align: middle;
+  margin: 0 5px;
 }
 
 .hw-content .hw-content__card .content__title__badage.green {
