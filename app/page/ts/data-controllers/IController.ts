@@ -167,7 +167,7 @@ export interface IGarbageStationStatistic {
 }
 
 
-export interface IDataController extends IGarbageStationList {
+export interface IDataController extends IGarbageStationList, IGarbageStationStatistic {
     roles: ResourceRole[]
     /**
      * 获取事件统计
