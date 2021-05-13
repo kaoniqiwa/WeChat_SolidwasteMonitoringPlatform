@@ -4,6 +4,8 @@
 import { CandlestickOption } from "./echart";
 import IAside from "./ISubject"
 import { dateFormat, getAllDay } from "../../common/tool";
+import "../css/myChartAside.less";
+
 
 import Swiper, { Virtual, Pagination } from 'swiper';
 
