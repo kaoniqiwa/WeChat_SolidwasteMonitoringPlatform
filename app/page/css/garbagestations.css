@@ -214,6 +214,7 @@ body {
   width: 100%;
   vertical-align: middle;
   z-index: 1;
+  margin-top: -9.5%;
 }
 
 #origin-img .swiper-zoom-container {
@@ -275,6 +276,7 @@ body {
   color: white;
   padding-right: 10px;
   display: none;
+  pointer-events: none;
 }
 
 .hw-content__card .swiper-container.zoomIn .swiper-pagination {
@@ -342,4 +344,7 @@ body {
 }
 .content {
   width: 100%;
+}
+.swiper-pagination{
+  pointer-events: none;
 }
