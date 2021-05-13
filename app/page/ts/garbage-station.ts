@@ -337,6 +337,7 @@ class GarbageStationClient implements IObserver {
         cameras.forEach((camera, index) => {
 
           imageUrls.push({
+            cameraName: camera.Name,
             url: camera.ImageUrl!,
             cameraId: camera.Id,
             preview: camera.getPreviewUrl()
@@ -431,7 +432,23 @@ class GarbageStationClient implements IObserver {
 
 
 
-    this.elements.others.originImg.addEventListener('click', function () {
+    this.elements.others.originImg.addEventListener('click', function (e) {
+
+      let path = ((e.composedPath && e.composedPath()) || e.path) as HTMLElement[];
+      if (path) {
+        for (let i = 0; i < path.length; i++) {
+          // if (path[i].className == "video-control") {
+          //   this.onPlayControlClicked(element.imageUrls![this.swiper!.activeIndex], path[i] as HTMLDivElement);
+          //   return;
+          // }
+          if (path[i].className == "tools") {
+            debugger;
+            e.stopPropagation();
+            return;
+          }
+        }
+      }
+
 
       _this.activeIndex = _this.swiper!.activeIndex;
       if (_this.activeElement!.swiper) {
@@ -704,6 +721,9 @@ class GarbageStationClient implements IObserver {
               });
             }, 100);
           },
+          click: (swiper: Swiper, e) => {
+
+          },
           slideChange: (swiper: Swiper) => {
             if (inited == false) return;
 
@@ -747,7 +767,7 @@ class GarbageStationClient implements IObserver {
   }
 
   video?: VideoPlugin;
-
+  tools?: PlayerTools;
 
   onPlayControlClicked(index: IImageUrl, div: HTMLDivElement) {
     if (this.video) {
@@ -760,13 +780,17 @@ class GarbageStationClient implements IObserver {
     }
     if (img.preview) {
       img.preview.then(x => {
-        this.video = new VideoPlugin("", x.Url, x.WebUrl);
-        this.video.autoSize();
+        this.video = new VideoPlugin(img.cameraName!, x.Url, x.WebUrl);
+        // this.video.iframeStyle = {
+        //   marginTop: "-28%"
+        // }
+        this.video.iframeStyle.left = -30;
+        if (this.video.iframe) {
+          this.video.autoSize();
+
+        }
         if (div.parentElement) {
-          let element = this.video.getElement();
-          if (element) {
-            div.parentElement.appendChild(element);
-          }
+          this.video.loadElement(div.parentElement, 'live');
         }
       })
     }
@@ -783,6 +807,7 @@ class GarbageStationClient implements IObserver {
 
     let control = document.createElement("div");
     control.className = "video-control";
+    control.style.marginTop = "-5%";
     control.data = imageUrl;
     let icon = document.createElement("i");
     icon.className = "howell-icon-real-play"
