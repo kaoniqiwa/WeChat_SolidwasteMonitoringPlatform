@@ -100,6 +100,7 @@ export default class EchartsAside extends IAside {
       return item.Id == val;
     })
     index = index == -1 ? 0 : index
+    // 显示第一个不会触发 transitionEnd事件
     if (index == 0) {
       this.draw();
     } else {
@@ -108,7 +109,6 @@ export default class EchartsAside extends IAside {
     }
 
     console.log('set id')
-
 
 
   }
@@ -202,15 +202,30 @@ export default class EchartsAside extends IAside {
 
             slides.push(`
                             <div data-id='${this.data![i].Id}' style="padding:0 10px;">
-                                <div class='inner-txt'>
+                                <div class='inner-head'>
                                     <div class='inner-title'>${this.data![i].Name}</div>
                                      <div class='inner-date'>${dateFormat(this.date, "yyyy年MM月dd日")}</div>
                                 </div>
+
+                                <div class='inner-info'>
+                                  <div class='item'>
+                                      <div class='name'>经霞敏</div>
+                                      <div class='note'>卫生干部</div>
+                                      <div class='phone'>13764296742</div>
+                                  </div>
+                                  <div class='item'>
+                                    <div class='name'>经霞敏</div>
+                                    <div class='note'>卫生干部</div>
+                                    <div class='phone'>13764296742</div>
+                                  </div>
+                                </div>
+
                                 <div class='inner-statisic'>
-                                    <div class='head'>
-                                        <div class='head-num'>${GarbageRatio}</div>
-                                        <div class='head-suffix'>%</div>
+                                    <div class='ratio'>
+                                        <div class='ratio-num'>${GarbageRatio}</div>
+                                        <div class='ratio-suffix'>%</div>
                                     </div>
+                                    
                                     <div class='item'>
                                         <div class='item-title'>最大落地:</div>
                                         <div class='item-content'>
@@ -282,7 +297,7 @@ export default class EchartsAside extends IAside {
     } else {
       //this.date
       this.dataController!.getGarbageStationNumberStatistic(id!, new Date(new Date().getTime() - 24 * 3600 * 1000 * 3)).then(res => {
-        console.log('画图', res);
+        // console.log('画图', res);
         this.statistic.set(id!, res)
         this.fillCandlestickOption(res);
         this.drawChart(echarts.init(echart))
@@ -542,4 +557,6 @@ export default class EchartsAside extends IAside {
     }
     echart.setOption(options1)
   }
+
 }
+
