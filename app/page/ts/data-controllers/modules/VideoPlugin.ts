@@ -1,3 +1,8 @@
+export interface VideoPluginIframeStyle {
+    marginTop?: string,
+    left: number
+}
+
 export class VideoPlugin {
     videoUrl: string;
     name: string;
@@ -44,6 +49,21 @@ export class VideoPlugin {
 
 
     iframe?: HTMLIFrameElement;
+    private _iframeStyle: VideoPluginIframeStyle = {
+        marginTop: "-33%",
+        left: 0
+    }
+    get iframeStyle() {
+        return this._iframeStyle;
+    }
+    set iframeStyle(val: VideoPluginIframeStyle) {
+        this._iframeStyle = val;
+        if (!this.iframe) return;
+        if (val.marginTop) {
+            this.iframe.style.marginTop = val.marginTop;
+        }
+    }
+
 
     isFullScreen: boolean = false;
 
@@ -74,7 +94,7 @@ export class VideoPlugin {
             this.proxy.destory();
             this.proxy = undefined;
         }
-
+        window.removeEventListener("onorientationchange" in window ? "orientationchange" : "resize", this.onorientationchange.bind(this), false);
     }
     autoSize() {
         this.videoAutoSize();
@@ -84,7 +104,7 @@ export class VideoPlugin {
     get isIOS() {
         const u = navigator.userAgent;
         const isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1; //android终端
-        const isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); 
+        const isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
         ///
         // ios终端
         // alert('是否是Android：'+isAndroid);
@@ -94,76 +114,119 @@ export class VideoPlugin {
 
 
     toolsAutoSize() {
-        if (!this.tools || !this.tools.element) return;
-        if (this.isFullScreen) {
-            this.tools.element.style.transform = "rotate(90deg)";
-            this.tools.element.style.webkitTransform = "rotate(90deg)";
-            // calc(50% - -24px)
-            this.tools.element.style.top = "calc(50% - " + (52 / 2) + "px)";
-            this.tools.element.style.marginTop = "0";
-            this.tools.element.style.left = "-" + (this.height - 52 / 2) + "px";
+        setTimeout(() => {
 
-            this.tools.element.style.width = this.width + "px";
+            if (!this.tools || !this.tools.element) return;
+            if (this.isOrientation) {
 
-            if(this.isIOS)
-            {
-                // -253
-                // this.height 375;
-                this.tools.element.style.left = "-" + (this.height / 2 + 52 * 2) + "px";
+                let left = document.body.offsetHeight / 2 - document.body.offsetWidth / 2;
+                let top = document.body.offsetHeight / 2 - document.body.offsetWidth / 2;
+
+                this.tools.element.style.top = "52px";
+                if (this.iframe) {
+                    this.tools.element.style.width = this.iframe.style.width;
+                    this.tools.element.style.height = this.iframe.style.height;
+                    this.tools.element.style.transform = this.iframe.style.transform;
+                }
 
             }
-        }
-        else {
-            this.tools.element.style.marginTop = this.height / 2 - 52 - 19 + "px";
-            this.tools.element.style.transform = "";
-            this.tools.element.style.webkitTransform = "";
-            this.tools.element.style.top = "50%";
-            this.tools.element.style.left = "";
-            this.tools.element.style.width = "";
-        }
+            else if (this.isFullScreen) {
+
+                let left = window.innerHeight / 2 - window.innerWidth / 2;
+                let top = window.innerHeight / 2 - window.innerWidth / 2;
+                this.tools.element.style.transform = "rotate(90deg) translate(" + left + "px, " + top + "px)";
+
+                // calc(50% - -24px)
+                this.tools.element.style.top = "0";
+                // this.tools.element.style.marginTop = "0";
+                // this.tools.element.style.left = "-" + (this.height - 52 / 2 + this.iframeStyle.left) + "px";
+
+                // this.tools.element.style.width = this.width + "px";
+
+
+
+                // if (this.isIOS) {
+                //     // -253
+                //     // this.height 375;
+                //     this.tools.element.style.left = "-" + (this.height / 2 + 52 * 2 + this.iframeStyle.left) + "px";
+
+                // }
+                if (this.iframe) {
+                    this.tools.element.style.top = "52px";
+                    this.tools.element.style.left = this.iframe.style.left;
+                    this.tools.element.style.transform = this.iframe.style.transform;
+                    this.tools.element.style.width = this.iframe.style.width;
+                    this.tools.element.style.height = this.iframe.style.height;
+                }
+            }
+            else {
+                this.tools.element.style.transform = "";
+                this.tools.element.style.webkitTransform = "";
+                this.tools.element.style.top = "calc(50% - " + (21 + 52) + "px)";
+                this.tools.element.style.left = "";
+                this.tools.element.style.width = this.iframe!.style.width;
+                this.tools.element.style.height = this.iframe!.style.height;
+            }
+
+        }, 11);
     }
 
     videoAutoSize() {
-        if (!this.iframe) return;
-        if (this.isFullScreen) {
-            this.iframe.style.transform = "rotate(90deg)";
-            this.iframe.style.webkitTransform = "rotate(90deg)";
-            this.iframe.style.marginTop = ""
-            this.height = window.innerWidth;
-            // this.iframe.style.top = "50%";
-            // this.iframe.style.left = "50%";
-            let height = window.innerHeight;
-            if (this.iframe.parentElement) {
-                height = this.iframe.parentElement.offsetHeight;
+        setTimeout(() => {
+            if (!this.iframe) return;
+
+
+            if (this.isOrientation) {
+
+                let width = Math.max(document.body.offsetHeight, document.body.offsetWidth);
+                let height = Math.min(document.body.offsetHeight, document.body.offsetWidth, window.innerWidth, window.innerHeight);
+                let left = width / 2 - height / 2;
+                let top = width / 2 - height / 2;
+                // alert(JSON.stringify({
+
+                //         width:width,
+                //         height:height
+
+                // }))
+                this.iframe.style.marginTop = ""
+                this.iframe.style.top = "0";
+                this.iframe.style.width = width + "px";
+                this.iframe.style.height = height + "px";
+                this.iframe.style.transform = "rotate(90deg) translate(" + left + "px, " + top + "px)";
+
             }
-            let min = Math.min(height, document.body.clientHeight);
-            this.width = min;
-            // transform-origin
-            this.iframe.style.transformOrigin = 'center'//this.width/2 +"px "+ this.height/2 +"px"
+            else if (this.isFullScreen) {
 
-            this.iframe.style.top = "calc(50% - " + this.height / 2 + "px)";
-            this.iframe.style.left = "-" + this.height / 2 + "px";
-            if(this.isIOS)
-            {
-                this.iframe.style.left = "-" + (this.height / 2 - 52) + "px";                
+                let left = window.innerHeight / 2 - window.innerWidth / 2;
+                let top = window.innerHeight / 2 - window.innerWidth / 2;
+                this.iframe.style.transform = "rotate(90deg) translate(" + left + "px, " + top + "px)";
+                this.iframe.style.top = "0";
+                this.iframe.style.marginTop = ""
+                this.height = window.innerWidth;
+                let height = this.background!.offsetHeight;
+                if (this.iframe.parentElement) {
+                    height = this.iframe.parentElement.offsetHeight;
+                }
+                let min = Math.min(height, document.body.clientHeight);
+                this.width = min;
+
+                this.iframe.style.width = this.width + "px";
+                this.iframe.style.height = this.height + "px";
             }
-        }
-        else {
-            this.iframe.style.top = "50%";
-            this.iframe.style.left = "";
-            this.iframe.style.marginTop = "-33%"
-            this.iframe.style.transform = "";
-            this.iframe.style.webkitTransform = "";
-            this.width = window.innerWidth;
-            this.height = this.width / 16 * 9;
-
-        }
-
-
-        this.iframe.style.width = this.width + "px";
-        this.iframe.style.height = this.height + "px";
+            else {
+                let width = Math.min(document.body.offsetWidth, document.body.offsetWidth)
+                this.iframe.style.top = "50%";
+                this.iframe.style.left = "";
+                this.iframe.style.marginTop = this.iframeStyle.marginTop!;
+                this.iframe.style.transform = "";
+                this.iframe.style.webkitTransform = "";
+                this.iframe.style.width = width + "px";
+                this.iframe.style.height = width / 16 * 9 + "px";
+            }
 
 
+
+        }, 10)
     }
 
 
@@ -172,7 +235,7 @@ export class VideoPlugin {
         this.iframe.style.top = "50%";
         this.iframe.style.width = this.width + "px";
         this.iframe.style.height = this.height + "px";
-        this.iframe.style.marginTop = "-33%"
+        this.iframe.style.marginTop = this.iframeStyle.marginTop!;
         this.iframe.src = `${this.webUrl}?url=${this.base64VideoUrl}&name=${this.base64Name}&tool_style=${this.base64ToolStyle}`;
         return this.background;
     }
@@ -186,15 +249,25 @@ export class VideoPlugin {
         }
 
         this.tools = new PlayerTools(element, mode);
-        this.tools.element.style.top = "50%";
+
         this.tools.element.style.position = "absolute";
-        this.tools.element.style.marginTop = this.height / 2 - 52 - 19 + "px";
+        this.tools.element.style.height = this.height + "px";
+        this.tools.element.style.top = "calc(50% - " + (21 + 52) + "px)";
+        //this.tools.element.style.marginTop = this.height / 2 - 52 - 19 + "px";
+
+        this.tools.control.content.style.height = "52px";
+        this.tools.control.content.style.bottom = "0";
+        this.tools.control.content.style.position = "absolute";
+
+
         this.tools.createElements();
         if (this.proxy) {
             this.proxy.mode = mode;
             this.proxy.toolsBinding(this.tools);
         }
 
+
+        this.setBodySize();
     }
 
     createElement(mode?: string) {
@@ -216,9 +289,12 @@ export class VideoPlugin {
 
     createBackground() {
         const background = document.createElement("div")
-        background.style.position = "absolute"
-        background.style.width = "100%"
-        background.style.height = "100%"
+        background.className = "video_background"
+        // background.style.position = "absolute"
+        // background.style.width = "100%"
+        // background.style.height = "100%"
+        // background.style.backgroundColor = "black";
+        // background.style.zIndex = "900";        
         return background;
     }
 
@@ -245,17 +321,113 @@ export class VideoPlugin {
         this.destory();
     }
 
+    get isOrientation() {
+        let orientation = window.orientation == undefined ? screen.orientation.angle : window.orientation;
+        if (orientation === 180 || orientation === 0) {
+            return false;
+        }
+        if (orientation === 90 || orientation === -90) {
+            return true;
+        }
+        return false;
+    }
+    onOrientationChanged?: () => void;
+    setBodySize() {
+
+        if(!this.background)return;
+
+
+        if (this.isOrientation) {
+            this.background.classList.add("fullscreen");
+            // let width = Math.max(window.innerWidth, window.innerHeight);
+            // let height = Math.min(window.innerWidth, window.innerHeight);
+            // let left = width / 2 - height / 2;
+            // let top = width / 2 - height / 2;
+            // document.body.style.width = height + "px";
+            // document.body.style.height = width + "px";
+            // document.body.style.transform = "rotate(-90deg) translate(" + left + "px, " + top + "px)";
+
+            // this.background.style.transform = "rotate(-90deg) scale(1.8) translate(10px, 17px)";
+        }
+        else {
+            this.background.classList.remove("fullscreen")
+            // document.body.style.transform = ""            
+        }
+        //this.autoSize();
+        // if (orientation === 180 || orientation === 0) {
+        //     document.body.style.transform = ""
+        //     document.body.style.width = window.innerWidth + "px";
+        //     document.body.style.height = window.innerHeight + "px";
+        //     if (this.iframe) {
+        //         this.iframe.style.width = document.body.style.width;
+        //         this.iframe.style.height = document.body.clientWidth / 16 * 9 + "px";
+        //         this.iframe.style.transform = "";
+        //         this.iframe.style.top = "50%";
+
+        //         if (this.tools) {
+        //             this.tools.element.style.top = "52px";
+        //             this.tools.element.style.width = this.iframe.style.width;
+        //             this.tools.element.style.height = this.iframe.style.height;
+        //             this.tools.element.style.transform = this.iframe.style.transform;
+        //         }
+        //     }
+        // }
+        // if (orientation === 90 || orientation === -90) {
+        //     let left = window.innerWidth / 2 - document.body.offsetHeight / 2;
+        //     let top = window.innerWidth / 2 - document.body.offsetHeight / 2;
+        //     document.body.style.width = document.body.offsetHeight + "px";
+        //     document.body.style.height = window.innerWidth + "px";
+        //     document.body.style.transform = "rotate(-90deg) translate(" + left + "px, " + top + "px)";
+        //     if (this.iframe) {
+        //         this.iframe.style.top = ""
+        //         this.iframe.style.width = document.body.style.height;
+        //         this.iframe.style.height = document.body.style.width;
+        //         this.iframe.style.transform = "rotate(90deg) translate(" + left + "px, " + top + "px)";
+        //         if (this.tools) {
+        //             this.tools.element.style.width = this.iframe.style.width;
+        //             this.tools.element.style.height = this.iframe.style.height;
+        //             this.tools.element.style.transform = this.iframe.style.transform;
+        //         }
+        //     }
+
+        // alert(JSON.stringify({
+        //     window:{
+        //         width:window.innerWidth,
+        //         height:window.innerHeight
+        //     },
+        //     body:{
+        //         client:{
+        //             width:document.body.clientWidth,
+        //             height: document.body.clientHeight
+        //         }
+        //     }
+        // }))
+        // }
+
+    }
+    onorientationchange() {
+        setTimeout(() => {
+            // console.log({
+            //     window: {
+            //         width: window.innerWidth,
+            //         height: window.innerHeight
+            //     },
+            //     body: {
+
+            //         width: document.body.clientWidth,
+            //         height: document.body.clientHeight
+
+            //     }
+            // })
+
+            this.setBodySize();
+            if (this.onOrientationChanged) {
+                this.onOrientationChanged();
+            }
+        }, 10);
+    }
     eventRegist() {
-        // window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", () => {
-        //     if (window.orientation === 180 || window.orientation === 0) {
-        //         this.landscape = false;
-        //     }
-        //     if (window.orientation === 90 || window.orientation === -90) {
-        //         this.landscape = true;
-        //     }
-
-
-        // }, false);
+        window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", this.onorientationchange.bind(this), false);
     }
 
 

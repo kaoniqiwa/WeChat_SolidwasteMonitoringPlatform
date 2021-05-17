@@ -32,14 +32,14 @@ export class ImageController {
       on: {
         click: (e, a) => {
 
-          let path = ((a.composedPath && a.composedPath()) || a.path) as HTMLElement[];          
+          let path = ((a.composedPath && a.composedPath()) || a.path) as HTMLElement[];
           if (path) {
             for (let i = 0; i < path.length; i++) {
               if (path[i].className == "video-control") {
                 this.onPlayControlClicked(this.imageUrls![this.swiper!.activeIndex], path[i] as HTMLDivElement);
                 return;
               }
-              if (path[i].className == "tools") {                
+              if (path[i].className == "tools") {
                 return;
               }
             }
@@ -98,7 +98,7 @@ export class ImageController {
     this.img = document.createElement("img");
     this.img.id = selector.imgId;
     this.img.src = imageUrl.url;
-    
+
     container.appendChild(this.img);
 
     if (selector.frameId) {
@@ -122,6 +122,7 @@ export class ImageController {
 
 
   video?: VideoPlugin;
+  
   onPlayControlClicked(index: IImageUrl, div: HTMLDivElement) {
     if (this.video) {
       this.video.destory();
@@ -131,13 +132,28 @@ export class ImageController {
     if (!img) {
       img = index;
     }
+
+    let width = (document.querySelector(".swiper-slide.page") as HTMLDivElement).style.width;
+    let wrapper_width = (document.querySelector(".swiper-wrapper.page") as HTMLDivElement).clientWidth;
     if (img.playback) {
       img.playback.then(x => {
         this.video = new VideoPlugin("", x.Url, x.WebUrl);
+        this.video.onOrientationChanged = () => {
+          // let acts = document.querySelectorAll(".swiper-slide.page");
+          // if (acts) {
+          //   if (width) {
+          //     for (let i = 0; i < acts.length; i++) {
+          //       const act = acts[i] as HTMLDivElement;
+          //       act.style.width = width;
+          //     }
+          //   }
+          // }
+          // alert(this.swiper!.width);
+        }
         if (this.video.iframe) {
           this.video.autoSize();
           if (div.parentElement) {
-            this.video.loadElement(div.parentElement, 'vod');            
+            this.video.loadElement(div.parentElement, 'vod');
           }
         }
       })

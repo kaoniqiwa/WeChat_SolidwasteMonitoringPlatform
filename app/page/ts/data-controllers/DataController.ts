@@ -174,7 +174,7 @@ export abstract class DataController implements IDataController, IGarbageStation
         });
     }
 
-    getEventListParams(day: OneDay, page: Paged, type: EventType, ids?: string[]) {
+    getEventListParams(day: OneDay, page: Paged, type?: EventType, ids?: string[]) {
         const params: GetEventRecordsParams = {
             BeginTime: day.begin.toISOString(),
             EndTime: day.end.toISOString(),

@@ -95,3 +95,7 @@
   border: 1px solid #007aff;
   background-color: #007aff;
 }
+
+.swiper-pagination{
+  pointer-events: none;
+}

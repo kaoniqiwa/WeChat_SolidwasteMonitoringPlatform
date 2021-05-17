@@ -28,7 +28,7 @@ export class Language {
       case EventType.GarbageDrop:
         return '小包垃圾落地';
       case EventType.GarbageDropHandle:
-        return '小包垃圾处置完成';
+        return '小包垃圾处置';
       case EventType.GarbageDropTimeout:
         return '小包垃圾滞留';
       default:

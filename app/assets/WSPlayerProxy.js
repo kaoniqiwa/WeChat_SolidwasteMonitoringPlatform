@@ -20,26 +20,28 @@ function WSPlayerProxy(iframe, mode) {
     this.status = WSPlayerState.ready;
     this.mode = mode;
     setInterval(function () {
-        switch (that.status) {
-            case WSPlayerState.pause:
-            case WSPlayerState.slow:
-            case WSPlayerState.fast:
-            case WSPlayerState.end:
-                that.tools.control.play.className = "play glyphicon glyphicon-play"
-                that.tools.control.play.title = "播放"
-                break;
-            case WSPlayerState.playing:
-                if (that.mode == WSPlayerMode.vod) {
-                    that.tools.control.play.className = "play glyphicon glyphicon-pause"
-                    that.tools.control.play.title = "暂停"
-                }
-                else {
-                    that.tools.control.play.className = "play glyphicon glyphicon-stop"
-                    that.tools.control.play.title = "停止"
-                }
-                break;
-            default:
-                break;
+        if (that.tools) {
+            switch (that.status) {
+                case WSPlayerState.pause:
+                case WSPlayerState.slow:
+                case WSPlayerState.fast:
+                case WSPlayerState.end:
+                    that.tools.control.play.className = "play glyphicon glyphicon-play"
+                    that.tools.control.play.title = "播放"
+                    break;
+                case WSPlayerState.playing:
+                    if (that.mode == WSPlayerMode.vod) {
+                        that.tools.control.play.className = "play glyphicon glyphicon-pause"
+                        that.tools.control.play.title = "暂停"
+                    }
+                    else {
+                        that.tools.control.play.className = "play glyphicon glyphicon-stop"
+                        that.tools.control.play.title = "停止"
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }, 0);
 
@@ -124,7 +126,7 @@ function WSPlayerProxy(iframe, mode) {
 
     function registevent(e) {
         if (e && e.data) {
-            console.log(e);
+            
             let data = JSON.parse(e.data)
 
             switch (data.command) {
@@ -138,8 +140,7 @@ function WSPlayerProxy(iframe, mode) {
                         that.onPlaying();
                     }
                     break;
-                case "getPosition":
-                    console.log("getPosition");
+                case "getPosition":                    
                     if (that.getPosition) {
                         that.getPosition(parseFloat(data.value));
                     }
@@ -153,8 +154,7 @@ function WSPlayerProxy(iframe, mode) {
                         })(data.value)
                     }
                     break;
-                case "getTimer":
-                    console.log("getTimer");
+                case "getTimer":                    
                     if (that.getTimer) {
                         that.getTimer(data.value);
                     }
@@ -278,32 +278,32 @@ function WSPlayerProxy(iframe, mode) {
                 that.resume();
             });
             that.tools.control.position.addEventListener("touchmove", function (evt) {
-                try{
-                if (that.status == WSPlayerState.ready)
-                    return;
-                debugger;
-                if (!evt || !evt.changedTouches || evt.changedTouches.length <= 0) return;
+                try {
+                    if (that.status == WSPlayerState.ready)
+                        return;
+                    debugger;
+                    if (!evt || !evt.changedTouches || evt.changedTouches.length <= 0) return;
 
-                debugger;
-                var width = evt.target.offsetWidth ;
-                var x = evt.changedTouches[0].clientX- evt.target.offsetLeft;
+                    debugger;
+                    var width = evt.target.offsetWidth;
+                    var x = evt.changedTouches[0].clientX - evt.target.offsetLeft;
 
-                var p = x / width;
-                if(p > 1 || p < 0)return;
+                    var p = x / width;
+                    if (p > 1 || p < 0) return;
 
-                var c = that.tools.control.position.max - that.tools.control.position.min;
-                var current = c * p;
-                if (current < 0)
-                    current = 0;
-                var date = new Date(current);
-                date.setUTCHours(date.getUTCHours() - 8);
-                this.title = date.format("HH:mm:ss");
-                if (that.tools.control.isMoudseDown)
-                    that.tools.control.begin_time.innerText = date.format("HH:mm:ss");
-                }finally{
+                    var c = that.tools.control.position.max - that.tools.control.position.min;
+                    var current = c * p;
+                    if (current < 0)
+                        current = 0;
+                    var date = new Date(current);
+                    date.setUTCHours(date.getUTCHours() - 8);
+                    this.title = date.format("HH:mm:ss");
+                    if (that.tools.control.isMoudseDown)
+                        that.tools.control.begin_time.innerText = date.format("HH:mm:ss");
+                } finally {
                     evt.stopPropagation();
                 }
-                
+
             });
         }
     }
@@ -315,7 +315,7 @@ window.WSPlayerProxy = WSPlayerProxy;
 function PlayerTools(element, mode) {
 
 
-    this.control = {        
+    this.control = {
         content: null,
         play: null,
         stop: null,
@@ -424,13 +424,13 @@ function PlayerTools(element, mode) {
 
 
         if (mode == WSPlayerMode.live) {
-            //that_tools.control.stop.style.display = "none";
-            that_tools.control.slow.style.display = "none";
-            that_tools.control.fast.style.display = "none";
-            //that_tools.control.forward.style.display = "none";
+            // //that_tools.control.stop.style.display = "none";
+            // that_tools.control.slow.style.display = "none";
+            // that_tools.control.fast.style.display = "none";
+            // //that_tools.control.forward.style.display = "none";
 
-            that_tools.control.jump_back.style.display = "none";
-            that_tools.control.jump_forward.style.display = "none";
+            // that_tools.control.jump_back.style.display = "none";
+            // that_tools.control.jump_forward.style.display = "none";
 
 
             that_tools.control.begin_time.style.display = "none";
@@ -453,13 +453,13 @@ function PlayerTools(element, mode) {
     this.binding = function (player) {
 
         player.getPosition = function (val) {
-            console.log(val);
+            
             //that_tools.control.position.value = val;
             var valStr = parseFloat(val) * 100 + "% 100%";
             that_tools.control.position.style.backgroundSize = valStr;
         }
         player.getTimer = function (val) {
-            console.log(val);
+            
             that_tools.control.position.min = val.min;
             that_tools.control.position.max = val.max;
             that_tools.control.end_time.innerText = new Date(val.max - val.min).format("HH:mm:ss");
