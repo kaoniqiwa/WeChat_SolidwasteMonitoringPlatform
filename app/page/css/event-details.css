@@ -163,9 +163,11 @@ html,body{
     width:50px;
     height: 50px;
     z-index: 2;
-    position: absolute;
-    opacity: 0.3;
+    position: absolute;    
     margin-top: -10%;
+    background-image: url(../../assets/play.png);
+    background-repeat: no-repeat;
+    background-position: center;
   }
   
   .video-control > i{

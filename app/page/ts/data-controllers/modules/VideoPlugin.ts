@@ -68,8 +68,7 @@ export class VideoPlugin {
         this.name = name;
         this.webUrl = webUrl;
         this.createElement();
-        this.eventRegist();
-        this.webUrl = "http://192.168.21.149:8116/wsplayer.html";
+        this.eventRegist();        
     }
 
     destory() {
@@ -118,7 +117,7 @@ export class VideoPlugin {
         if (!this.iframe || !this.background) return;
         const element = this.getElement();
         if (element) {
-            parent.classList.add('player')
+            element.classList.add('player')
             parent.appendChild(element);
         }
 
@@ -170,9 +169,13 @@ export class VideoPlugin {
             if (btn == "fullscreen") {
                 this.isFullScreen = !this.isFullScreen;
                 this.autoSize();
+                this.setBodySize();
                 // if (this.tools) {
                 //     this.tools.control
                 // }
+                if (this.onFullscreenChanged) {                    
+                    this.onFullscreenChanged(this.isOrientation||this.isFullScreen);
+                }
             }
         }
     }
@@ -191,15 +194,15 @@ export class VideoPlugin {
             return true;
         }
         return false;
-    }
-    onOrientationChanged?: () => void;
+    }    
+    onFullscreenChanged?: (bool:boolean) => void;
     setBodySize() {
 
         if(!this.background)return;
-
-
-        if (this.isOrientation) {
+        
+        if (this.isOrientation || this.isFullScreen) {
             this.background.classList.add("fullscreen");
+            
         }
         else {
             this.background.classList.remove("fullscreen")
@@ -222,8 +225,8 @@ export class VideoPlugin {
             // })
 
             this.setBodySize();
-            if (this.onOrientationChanged) {
-                this.onOrientationChanged();
+            if (this.onFullscreenChanged) {                
+                this.onFullscreenChanged(this.isOrientation||this.isFullScreen);
             }
         }, 10);
     }

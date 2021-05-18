@@ -37,16 +37,19 @@ namespace Navigation {
         }
         var asideContent = document.querySelector('.aside-content') as HTMLDivElement;
         var backdrop = document.querySelector('.backdrop') as HTMLDivElement;
+        
+        var details = document.getElementById("aside-details") as HTMLIFrameElement;
         if (asideContent.classList.contains('active')) {
-            asideContent.classList.remove('active');
+            asideContent.classList.remove('active');            
             backdrop.style.display = 'none'
+            // iframe.src = "about:blank";
+            if(details)
+            details.src =  "about:blank";
         } else {
             backdrop.style.display = 'block'
             asideContent.classList.add('active');
 
-            var details = document.getElementById("aside-details") as HTMLIFrameElement;
-            if (url) {
-
+            if (details && url) {
                 details.src = url;
             }
 

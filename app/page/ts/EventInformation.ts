@@ -253,7 +253,7 @@ export namespace EventInformationPage {
                             playback:this.dataController.getVodUrl(item.ResourceId!, interval.begin, interval.end)
                         }
 
-                        this.imageController.showDetail(selectors, [url]);
+                        this.imageController.showDetail(selectors, [url], true);
                         let frame = document.getElementById(selectors.frameId) as HTMLImageElement;
                         let img = document.getElementById(selectors.imgId) as HTMLImageElement;
                         img.onload = () => {
@@ -287,7 +287,7 @@ export namespace EventInformationPage {
             
                 time.setSeconds(time.getSeconds() - 15);
                 let begin = new Date(time.getTime());
-                time.setSeconds(time.getSeconds() + 300);
+                time.setSeconds(time.getSeconds() + 30);
                 let end = new Date(time.getTime());
                 return {
                     begin:begin,
@@ -396,7 +396,7 @@ export namespace EventInformationPage {
                             if (str) {
                                 index = parseInt(str);
                             }
-                            this.imageController.showDetail(selectors, urls, index);
+                            this.imageController.showDetail(selectors, urls, false, index);
                         });
 
 
@@ -585,7 +585,7 @@ export namespace EventInformationPage {
                             if (str) {
                                 index = parseInt(str);
                             }
-                            this.imageController.showDetail(selectors, urls, index);
+                            this.imageController.showDetail(selectors, urls, true, index);
                         });
 
                         detail_img.setAttribute("eventType", imageUrl.EventType.toString());

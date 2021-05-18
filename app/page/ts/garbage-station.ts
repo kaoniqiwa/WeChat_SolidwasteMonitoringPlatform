@@ -455,7 +455,6 @@ class GarbageStationClient implements IObserver {
           //   return;
           // }
           if (path[i].className == "tools") {
-            debugger;
             e.stopPropagation();
             return;
           }
@@ -794,10 +793,17 @@ class GarbageStationClient implements IObserver {
     if (img.preview) {
       img.preview.then(x => {
         this.video = new VideoPlugin(img.cameraName!, x.Url, x.WebUrl);
-        // this.video.iframeStyle = {
-        //   marginTop: "-28%"
-        // }
-        // this.video.iframeStyle.left = -30;
+        this.video.onFullscreenChanged = (is) => {
+          let pagination = document.querySelector(".swiper-pagination.swiper-pagination-fraction") as HTMLDivElement;
+          if (!pagination) return;
+
+          if (is) {
+            pagination.style.display = "none"
+          }
+          else {
+            pagination.style.display = "";
+          }
+        }
         if (this.video.iframe) {
           this.video.autoSize();
 
@@ -822,9 +828,9 @@ class GarbageStationClient implements IObserver {
     control.className = "video-control";
     control.style.marginTop = "-5%";
     control.data = imageUrl;
-    let icon = document.createElement("i");
-    icon.className = "howell-icon-real-play"
-    control.appendChild(icon);
+    // let icon = document.createElement("i");
+    // icon.className = "howell-icon-real-play"
+    // control.appendChild(icon);
 
     container.appendChild(control);
 

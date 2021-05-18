@@ -32,7 +32,7 @@ export class GarbageStationViewModel extends GarbageStation {
     }
     private service: Service;
 
-    NumberStatistic: GarbageStationNumberStatistic;
+    NumberStatistic?: GarbageStationNumberStatistic;
 
     getNumberStatistic() {
         return this.service.garbageStation.statisticNumber(this.Id);
@@ -72,7 +72,7 @@ export class ViewModelConverter {
         Camera ):
 
         GarbageStationViewModel |
-        CameraViewModel {
+        CameraViewModel|undefined {
         if (model instanceof GarbageStation) {
             return Object.assign(new GarbageStationViewModel(service), model);
         }

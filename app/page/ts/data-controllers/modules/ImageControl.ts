@@ -74,11 +74,11 @@ export class ImageController {
   imageUrls?: IImageUrl[];
 
 
-  showDetail(selectors: { frameId?: string, imgId: string }, urls: IImageUrl[], index: number = 0) {
+  showDetail(selectors: { frameId?: string, imgId: string }, urls: IImageUrl[], video: boolean, index: number = 0) {
     this.imageUrls = urls;
     for (let i = 0; i < urls.length; i++) {
 
-      let container = this.createSwiperContainer(selectors, urls[i]);
+      let container = this.createSwiperContainer(selectors, urls[i], video);
       this.swiper!.virtual.appendSlide(container.outerHTML);
       // this.swiper.virtual.appendSlide('<div class="swiper-zoom-container"><img id="' + selectors.imgId + '" src="' + urls[i].url +
       //     '" />' + (selectors.frameId ? '<img class="max-frame" id="' + selectors.frameId + '">' : '') + '</div>');
@@ -91,7 +91,7 @@ export class ImageController {
     this.swiperStatus = true;
   }
 
-  createSwiperContainer(selector: { frameId?: string, imgId: string }, imageUrl: IImageUrl) {
+  createSwiperContainer(selector: { frameId?: string, imgId: string }, imageUrl: IImageUrl, video: boolean) {
     let container = document.createElement("div");
     container.className = "swiper-zoom-container";
 
@@ -107,22 +107,21 @@ export class ImageController {
       frame.id = selector.frameId;
       container.appendChild(frame);
     }
-
-    let control = document.createElement("div");
-    control.className = "video-control";
-    control.data = imageUrl;
-    let icon = document.createElement("i");
-    icon.className = "howell-icon-real-play"
-    control.appendChild(icon);
-
-    container.appendChild(control);
-
+    if (video) {
+      let control = document.createElement("div");
+      control.className = "video-control";
+      control.data = imageUrl;
+      // let icon = document.createElement("img");
+      // icon.src = "/img/player.png"
+      // control.appendChild(icon);
+      container.appendChild(control);
+    }
     return container;
   }
 
 
   video?: VideoPlugin;
-  
+
   onPlayControlClicked(index: IImageUrl, div: HTMLDivElement) {
     if (this.video) {
       this.video.destory();
@@ -138,17 +137,17 @@ export class ImageController {
     if (img.playback) {
       img.playback.then(x => {
         this.video = new VideoPlugin("", x.Url, x.WebUrl);
-        this.video.onOrientationChanged = () => {
-          // let acts = document.querySelectorAll(".swiper-slide.page");
-          // if (acts) {
-          //   if (width) {
-          //     for (let i = 0; i < acts.length; i++) {
-          //       const act = acts[i] as HTMLDivElement;
-          //       act.style.width = width;
-          //     }
-          //   }
-          // }
-          // alert(this.swiper!.width);
+        this.video.onFullscreenChanged = (is) => {
+          let pagination = document.querySelector(".swiper-pagination.swiper-pagination-fraction") as HTMLDivElement;
+          if (!pagination) return;
+
+          if (is) {
+            pagination.style.display = "none";
+          }
+          else {
+
+            pagination.style.display = "";
+          }
         }
         if (this.video.iframe) {
           this.video.autoSize();

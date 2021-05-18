@@ -283,3 +283,7 @@
     border: 1px solid #007aff;
     background-color: #007aff;
 } */
+
+.main-bar__item.swiper-pagination{
+    pointer-events: initial;
+}

@@ -413,6 +413,9 @@ function PlayerTools(element, mode) {
             title: "00:00:00",
             type: "range"
         });
+        that_tools.control.position.min = 0;
+        that_tools.control.position.max = 1;
+        that_tools.control.position.value = 0;
         that_tools.control.end_time = createElement(ul, "label", { width: "60px" }, { className: "end_time", title: "结束时间", innerText: "00:00:00", });
 
 
