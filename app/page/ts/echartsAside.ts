@@ -296,7 +296,7 @@ export default class EchartsAside extends IAside {
 
     } else {
       //this.date
-      this.dataController!.getGarbageStationNumberStatistic(id!, new Date(new Date().getTime() - 24 * 3600 * 1000 * 3)).then(res => {
+      this.dataController!.getGarbageStationNumberStatistic(id!, new Date()).then(res => {
         // console.log('画图', res);
         this.statistic.set(id!, res)
         this.fillCandlestickOption(res);

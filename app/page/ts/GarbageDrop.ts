@@ -313,15 +313,44 @@ export default class GarbageDrop implements IObserver {
     this.miniRefresh!.resetUpLoading();// 会触发一次miniRefreshUp
   }
   async loadData() {
+
+
+
     const day = getAllDay(this.date);
     // console.log('current-page', this.currentPage);
     // console.log('event-type', this.eventType)
 
+
+    // this.garbageStations = await this.dataController.getGarbageStationList();
+
     let data = await this.dataController.getGarbageDropEventList(day, this.currentPage, this.eventType, this.roleTypes);
-    this.dropListTotal = [...this.dropListTotal, ...data!.Data]
     this.dropListChunk = data!.Data;
+
+    console.log('本次请求的数据', this.dropListChunk)
+
+
+
+    let arr: Array<string> = [];
+    let res: GarbageDropEventRecord[] = [];
+
+    this.dropListChunk.forEach(item => {
+      let id = item.ResourceId || '';
+      if (!arr.includes(id)) {
+        arr.push(id);
+        res.push(item)
+      }
+    })
+    let aa = this.dropListChunk.map(item => {
+      return item.ResourceName!
+    })
+    // console.log(aa)
+    // this.dropListChunk = res;
+
+
+
+    this.dropListTotal = [...this.dropListTotal, ...this.dropListChunk]
     this.dropPage = data!.Page;
-    // console.log('本次请求的数据', this.dropListChunk)
+    console.log('本次请求的数据筛选后', this.dropListChunk)
     // console.log('本次请求的页面信息', this.dropPage);
     // console.log('至今请求到的所有数据', this.dropListTotal)
 
