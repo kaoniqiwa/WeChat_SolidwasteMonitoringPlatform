@@ -114,7 +114,7 @@ export interface IVodUrl {
 export interface IImage {
 
     getImageUrl(id: string): string | undefined;
-    getImageUrl(id: string[]): string[] | undefined;
+    getImageUrl(id: string[]): Array<string|undefined> | undefined;
     /**
         * 获取图片URL
         *
@@ -122,7 +122,7 @@ export interface IImage {
         * @returns {(string | string[] | undefined)}
         * @memberof IImage
         */
-    getImageUrl(id: string | string[]): string | string[] | undefined;
+    getImageUrl(id: string | string[]): string | Array<string|undefined> | undefined;
 }
 export interface IResourceRoleList {
     getResourceRoleList(): Promise<Array<ResourceRole>>;
@@ -134,7 +134,7 @@ export interface IGarbageStationList {
          * @returns {Promise<Array<GarbageStationModel>>}
          * @memberof IGarbageStationList
          */
-    getGarbageStationList(): Promise<Array<GarbageStationViewModel>>;
+    getGarbageStationList(paged:Paged): Promise<Array<GarbageStationViewModel>>;
 }
 export interface IGarbageStationStatistic {
     /**

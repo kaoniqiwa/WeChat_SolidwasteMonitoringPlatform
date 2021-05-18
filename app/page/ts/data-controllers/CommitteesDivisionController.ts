@@ -6,7 +6,7 @@ import { ResourceRole, ResourceType } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
 import { CountDivisionController } from "./CountDivisionController";
 import { DataController } from "./DataController";
-import { OneDay, StatisticNumber } from "./IController";
+import { OneDay, Paged, StatisticNumber } from "./IController";
 import { GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
 
 export class CommitteesDivisionController extends DataController {
@@ -16,11 +16,11 @@ export class CommitteesDivisionController extends DataController {
 	}
 
 
-	getGarbageStationList = async () => {
+	getGarbageStationList = async (paged:Paged) => {
 		let list = new Array<GarbageStation>();
 		for (let i = 0; i < this.roles.length; i++) {
 			const role = this.roles[i];
-			let promise = await this.service.garbageStation.list({ DivisionId: role.Id });
+			let promise = await this.service.garbageStation.list({ DivisionId: role.Id, PageIndex:paged.index, PageSize:paged.size });
 			list = list.concat(promise.Data);
 		}
 		let statisic = await this.service.garbageStation.statisticNumberList({ Ids: list.map(x => x.Id) })
@@ -209,5 +209,19 @@ export class CommitteesDivisionController extends DataController {
 		};
 	}
 
+	getEventListParams(day: OneDay, page: Paged, type: EventType, ids?: string[]) {
+		const params = {
+			BeginTime: day.begin.toISOString(),
+			EndTime: day.end.toISOString(),
+			PageSize: page.size,
+			PageIndex: page.index,
+			Desc: true,
+			DivisionIds: this.roles.map(x => x.Id)
+		}
+		if (ids) {
+			params.DivisionIds = ids;
+		}
+		return params;
+	}
 
 }

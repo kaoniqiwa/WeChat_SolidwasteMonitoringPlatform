@@ -41,7 +41,7 @@ export abstract class DataController implements IDataController, IGarbageStation
 
     roles: ResourceRole[];
 
-    abstract getGarbageStationList: () => Promise<GarbageStationViewModel[]>;
+    abstract getGarbageStationList: (paged:Paged) => Promise<GarbageStationViewModel[]>;
     abstract getResourceRoleList: () => Promise<ResourceRole[]>;
     getEventCount = async (day: OneDay) => {
         let result: StatisticNumber = {
@@ -119,14 +119,14 @@ export abstract class DataController implements IDataController, IGarbageStation
     getImageUrlByArray = (ids: string[]) => {
         const array = [];
         for (let i = 0; i < ids.length; i++) {
-            const url = this.getImageUrlBySingle(ids[i]);
+            const url = this.getImageUrlBySingle(ids[i]);            
             array.push(url);
         }
         return array;
     }
     getImageUrl(id: string): string | undefined;
-    getImageUrl(id: string[]): string[] | undefined;
-    getImageUrl(id: string | string[]): string | string[] | undefined {
+    getImageUrl(id: string[]): Array<string|undefined> | undefined;
+    getImageUrl(id: string | string[]): string | Array<string|undefined> | undefined {
         if (Array.isArray(id)) {
             return this.getImageUrlByArray(id);
         }
