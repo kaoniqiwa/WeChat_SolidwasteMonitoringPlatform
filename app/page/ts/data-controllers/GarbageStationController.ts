@@ -212,9 +212,9 @@ export class GarbageStationController extends DataController implements IDataCon
 		return result;
 	}
 
-	getGarbageStationList = async (paged:Paged) => {
-		let promise = await this.service.garbageStation.list({ Ids: this.roles.map(x => x.Id), PageIndex:paged.index, PageSize:paged.size });
-
+	getGarbageStationList = async (paged?:Paged) => {
+		let promise = await this.service.garbageStation.list({ Ids: this.roles.map(x => x.Id), PageIndex:paged?.index, PageSize:paged?.size });
+		
 		let statisic = await this.service.garbageStation.statisticNumberList({ Ids: promise.Data.map(x => x.Id) })
 
 		let result = new Array<GarbageStationViewModel>()

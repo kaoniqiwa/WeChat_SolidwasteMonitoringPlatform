@@ -41,7 +41,7 @@ export abstract class DataController implements IDataController, IGarbageStation
 
     roles: ResourceRole[];
 
-    abstract getGarbageStationList: (paged:Paged) => Promise<GarbageStationViewModel[]>;
+    abstract getGarbageStationList: (paged?:Paged) => Promise<GarbageStationViewModel[]>;
     abstract getResourceRoleList: () => Promise<ResourceRole[]>;
     getEventCount = async (day: OneDay) => {
         let result: StatisticNumber = {

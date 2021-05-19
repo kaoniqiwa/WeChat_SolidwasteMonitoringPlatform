@@ -16,11 +16,11 @@ export class CommitteesDivisionController extends DataController {
 	}
 
 
-	getGarbageStationList = async (paged:Paged) => {
+	getGarbageStationList = async (paged?:Paged) => {
 		let list = new Array<GarbageStation>();
 		for (let i = 0; i < this.roles.length; i++) {
 			const role = this.roles[i];
-			let promise = await this.service.garbageStation.list({ DivisionId: role.Id, PageIndex:paged.index, PageSize:paged.size });
+			let promise = await this.service.garbageStation.list({ DivisionId: role.Id, PageIndex:paged?.index, PageSize:paged?.size });
 			list = list.concat(promise.Data);
 		}
 		let statisic = await this.service.garbageStation.statisticNumberList({ Ids: list.map(x => x.Id) })

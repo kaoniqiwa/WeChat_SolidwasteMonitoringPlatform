@@ -134,7 +134,7 @@ export interface IGarbageStationList {
          * @returns {Promise<Array<GarbageStationModel>>}
          * @memberof IGarbageStationList
          */
-    getGarbageStationList(paged:Paged): Promise<Array<GarbageStationViewModel>>;
+    getGarbageStationList(paged?:Paged): Promise<Array<GarbageStationViewModel>>;
 }
 export interface IGarbageStationStatistic {
     /**
