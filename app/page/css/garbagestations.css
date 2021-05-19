@@ -82,6 +82,7 @@ body {
   overflow: auto;
   position: relative;
   background: #f7f7f7;
+  margin-top: 10px;
 }
 
 .hw-content .hw-content__card {
@@ -94,6 +95,9 @@ body {
   font-size: 14px;
   margin: 10px 0;
   padding: 10px 0;
+}
+.hw-content .hw-content__card:first-child {
+  margin-top: 0px;
 }
 
 .hw-content .hw-content__card .content__title {
@@ -345,6 +349,6 @@ body {
 .content {
   width: 100%;
 }
-.swiper-pagination{
+.swiper-pagination {
   pointer-events: none;
 }

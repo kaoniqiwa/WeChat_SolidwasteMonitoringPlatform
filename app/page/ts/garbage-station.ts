@@ -8,7 +8,7 @@ import { AsideControl } from "./aside";
 import { AsideListPage, AsideListPageWindow, SelectionMode } from "./aside-list";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import { DataController } from "./data-controllers/DataController";
-import { IGarbageStationController, StatisticNumber } from "./data-controllers/IController";
+import { IGarbageStationController, Paged, StatisticNumber } from "./data-controllers/IController";
 import { Language } from "./language";
 import Swiper, { Virtual, Pagination, } from 'swiper';
 import $ from 'jquery';
@@ -25,7 +25,8 @@ import "weui";
 
 import 'minirefresh';
 import 'minirefresh/dist/debug/minirefresh.css'
-
+import "swiper/swiper.less";
+import "swiper/components/pagination/pagination.less"
 import * as echarts from 'echarts/core';
 import {
   GridComponent,
@@ -44,7 +45,7 @@ import { CanvasRenderer } from "echarts/renderers";
 import IObserver from "./IObserver";
 import { VideoUrl } from "../../data-core/model/waste-regulation/video-model";
 import { VideoPlugin } from "./data-controllers/modules/VideoPlugin";
-
+import { Page } from "../../data-core/model/page";
 echarts.use([
   GridComponent,
   LineChart,
@@ -159,6 +160,7 @@ class GarbageStationClient implements IObserver {
   }
 
   elements = {
+    count: document.querySelector('#count') as HTMLDivElement,
     container: {
       hwContainer: document.querySelector('#hw-container') as HTMLDivElement,
 
@@ -181,12 +183,36 @@ class GarbageStationClient implements IObserver {
 
   }
 
+  miniRefresh?: MiniRefresh;
+  dropPage: Page | null = null;
+  currentPage: Paged = {
+    index: 1,
+    size: 20,
+  }
   constructor(type: ResourceType, dataController: IGarbageStationController
   ) {
     this.type = type;
     this.dataController = dataController;
 
+    this.miniRefresh = new MiniRefresh({
+      container: '#minirefresh',
+      isLockX: false,
+      down: {
+        callback: () => {
+          // 下拉事件
+          this.miniRefreshDown();
+        }
+      },
+      up: {
+        isAuto: true,
+        callback: () => {
 
+          console.log('miniRefreshUp');
+          this.miniRefreshUp()
+
+        }
+      }
+    });
 
   }
   update(args: any) {
@@ -212,27 +238,69 @@ class GarbageStationClient implements IObserver {
       }
     }
   }
+  // init() {
+  //   this.loadAsideData().then(() => {
+  //     this.createAside();
+  //   })
+  //   this.loadData().then(() => {
+  //     this.resetBar()
+  //     this.createAside();
+  //     this.createChartAside();
+  //     this.createContent();
+  //     this.createNumberList();
+
+  //     if (!refreshed) {
+  //       this.bindEvents();
+  //     }
+  //   })
+
+  // }
   init() {
     this.loadAsideData().then(() => {
-      this.createAside();
+      this.createAside()
     })
-    this.loadData().then(() => {
-      this.resetBar()
-      this.createAside();
-      this.createChartAside();
-      this.createContent();
-      this.createNumberList();
 
-      if (!refreshed) {
-        this.bindEvents();
+    this.bindEvents();
+  }
+
+  async miniRefreshDown() {
+
+    // this.reset();
+    await this.loadData();
+    this.resetBar()
+    this.createAside();
+    this.createChartAside();
+    this.createContent();
+    this.createNumberList();
+    this.miniRefresh!.endDownLoading();
+  }
+  async miniRefreshUp() {
+    let stop = false;
+
+    console.log('drop page', this.dropPage)
+    // 不是第一次请求
+    if (this.dropPage) {
+      if (this.dropPage.PageIndex >= this.dropPage.PageCount) {
+        stop = true;
+
+      } else {
+        stop = false
+        this.currentPage.index++;
       }
-    })
 
+    }
+    if (!stop) {
+      console.log('请求数据');
+      await this.loadData();
+      this.createContent();
+    }
+    console.log('stop', stop);
+    this.miniRefresh!.endUpLoading(true);
   }
   async loadData() {
     // 拉取厢房数据
     this.garbageStations = await this.dataController.getGarbageStationList();
-
+    // this.garbageStations.length = 4;
 
     let ids = this.garbageStations.map(item => item.Id)
     console.log('厢房数据', this.garbageStations)
@@ -246,6 +314,7 @@ class GarbageStationClient implements IObserver {
     })
     this.numberList = await this.dataController.getGarbageStationStatisticNumberListInToday(roles);
     console.log('底部数量数据', this.numberList)
+    this.elements.count.textContent = 1 + "/" + 10;
 
 
 
@@ -297,7 +366,7 @@ class GarbageStationClient implements IObserver {
 
 
       // v.NumberStatistic.CurrentGarbageTime = 64;
-      let currentGarbageTime = v.NumberStatistic.CurrentGarbageTime! >> 0;
+      let currentGarbageTime = v.NumberStatistic!.CurrentGarbageTime! >> 0;
       // currentGarbageTime = Math.random() * 90 >> 0;
       // console.log('currentGarbageTime', currentGarbageTime)
       let hour = Math.floor(currentGarbageTime / 60);
@@ -854,30 +923,4 @@ const stationClient = new GarbageStationClient(type, dataController);
 
 stationClient.init();
 
-
-
-let MiniRefresh = Reflect.get(window, 'MiniRefresh')
-let miniRefresh = new MiniRefresh({
-  container: '#minirefresh',
-  isLockX: false,
-  down: {
-    callback: () => {
-      // 下拉事件
-
-      refreshed = true;
-      stationClient.init();
-      miniRefresh.endDownLoading();
-    }
-  },
-  up: {
-    isAuto: false,
-    isLock: true,
-    callback: function () {
-      // 上拉事件
-      miniRefresh.endUpLoading(true);
-
-
-    }
-  }
-});
 
