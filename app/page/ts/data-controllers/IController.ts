@@ -127,14 +127,14 @@ export interface IImage {
 export interface IResourceRoleList {
     getResourceRoleList(): Promise<Array<ResourceRole>>;
 }
-export interface IGarbageStationList {
+export interface IGarbageStationList {    
     /**
          * 获取垃圾厢房列表
          *
          * @returns {Promise<Array<GarbageStationModel>>}
          * @memberof IGarbageStationList
          */
-    getGarbageStationList(paged?:Paged): Promise<Array<GarbageStationViewModel>>;
+    getGarbageStationList(): Promise<Array<GarbageStationViewModel>>;
 }
 export interface IGarbageStationStatistic {
     /**

@@ -4,7 +4,6 @@ import { EventNumber, EventType } from "../../../data-core/model/waste-regulatio
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
 import { ResourceRole, ResourceType } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
-import { CountDivisionController } from "./CountDivisionController";
 import { DataController } from "./DataController";
 import { OneDay, Paged, StatisticNumber } from "./IController";
 import { GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
@@ -16,11 +15,14 @@ export class CommitteesDivisionController extends DataController {
 	}
 
 
-	getGarbageStationList = async (paged?:Paged) => {
+	getGarbageStationList = async () => {
+		if (this.GgarbageStations) {
+			return this.GgarbageStations;
+		}
 		let list = new Array<GarbageStation>();
 		for (let i = 0; i < this.roles.length; i++) {
 			const role = this.roles[i];
-			let promise = await this.service.garbageStation.list({ DivisionId: role.Id, PageIndex:paged?.index, PageSize:paged?.size });
+			let promise = await this.service.garbageStation.list({ DivisionId: role.Id });
 			list = list.concat(promise.Data);
 		}
 		let statisic = await this.service.garbageStation.statisticNumberList({ Ids: list.map(x => x.Id) })
@@ -37,7 +39,8 @@ export class CommitteesDivisionController extends DataController {
 				return a.DivisionId.localeCompare(a.DivisionId) || a.Name.localeCompare(b.Name);
 			return 0;
 		})
-		return result;
+		this.GgarbageStations = result;
+		return this.GgarbageStations;
 	}
 	getGarbageStationStatisticNumberListInToday = async (sources: ResourceRole[]): Promise<Array<StatisticNumber>> => {
 		return this.getStatisticNumberListInToday(sources);

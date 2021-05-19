@@ -165,7 +165,7 @@ export class GetGarbageStationsParams implements IPageParams {
     /**页码[1-n](可选) */
     PageIndex?: number;
     /**分页大小[1-100](可选) */
-    PageSize?: number;
+    PageSize?: number = 999;
     /**垃圾房ID(可选) */
     Ids?: string[];
     /**垃圾房名称(可选)，支持LIKE */

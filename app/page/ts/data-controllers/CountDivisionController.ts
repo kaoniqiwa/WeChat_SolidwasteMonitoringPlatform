@@ -205,12 +205,14 @@ export class CountDivisionController extends DataController implements IDataCont
 		};
 	}
 
-	getGarbageStationList = async (paged?:Paged) => {
-
+	getGarbageStationList = async () => {
+		if (this.GgarbageStations) {
+			return this.GgarbageStations;
+		}
 		let list = new Array<GarbageStation>();
 		for (let i = 0; i < this.roles.length; i++) {
 			const role = this.roles[i];			
-			const promise = await this.service.garbageStation.list({ DivisionId: role.Id, PageIndex:paged?.index, PageSize:paged?.size });
+			const promise = await this.service.garbageStation.list({ DivisionId: role.Id });
 			list = list.concat(promise.Data);
 		}
 		let statisic = await this.service.garbageStation.statisticNumberList({ Ids: list.map(x => x.Id) })
@@ -227,8 +229,8 @@ export class CountDivisionController extends DataController implements IDataCont
 				return a.DivisionId.localeCompare(a.DivisionId) || a.Name.localeCompare(b.Name);
 			return 0;
 		})
-
-		return result;
+		this.GgarbageStations = result;
+		return this.GgarbageStations;
 	}
 
 	private _ResourceRoleList?: Array<ResourceRole>;

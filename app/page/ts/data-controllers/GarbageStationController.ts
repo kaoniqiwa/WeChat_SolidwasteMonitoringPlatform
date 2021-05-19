@@ -212,12 +212,17 @@ export class GarbageStationController extends DataController implements IDataCon
 		return result;
 	}
 
-	getGarbageStationList = async (paged?:Paged) => {
-		let promise = await this.service.garbageStation.list({ Ids: this.roles.map(x => x.Id), PageIndex:paged?.index, PageSize:paged?.size });
-		
-		let statisic = await this.service.garbageStation.statisticNumberList({ Ids: promise.Data.map(x => x.Id) })
 
-		let result = new Array<GarbageStationViewModel>()
+
+	getGarbageStationList = async () => {
+		if (this.GgarbageStations) {
+			return this.GgarbageStations;
+		}
+		let promise = await this.service.garbageStation.list({ Ids: this.roles.map(x => x.Id)});
+
+		let statisic = await this.service.garbageStation.statisticNumberList({ Ids: promise.Data.map(x => x.Id) })
+		
+			let result = new Array<GarbageStationViewModel>()
 		for (let i = 0; i < promise.Data.length; i++) {
 			const item = promise.Data[i];
 			let vm = ViewModelConverter.Convert(this.service, item);
@@ -229,7 +234,8 @@ export class GarbageStationController extends DataController implements IDataCon
 				return a.DivisionId.localeCompare(a.DivisionId) || a.Name.localeCompare(b.Name);
 			return 0;
 		})
-		return result;
+		this.GgarbageStations = result;
+		return this.GgarbageStations;
 	}
 
 
