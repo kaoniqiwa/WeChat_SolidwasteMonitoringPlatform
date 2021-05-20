@@ -567,7 +567,11 @@ export default class GarbageStationClient implements IObserver {
 
       $(this).fadeOut();
       _this.originStatus = false;
-
+      if(_this.video)
+      {
+        _this.video.destory();
+        _this.video = undefined;
+      }
     })
   }
 

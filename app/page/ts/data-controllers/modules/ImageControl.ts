@@ -45,6 +45,11 @@ export class ImageController {
             }
           }
           $(this.originImg).fadeOut(() => {
+            if(this.video)
+            {
+              this.video.destory();
+              this.video = undefined;
+            }
             this.originStatus = false;
           })
 

@@ -40,8 +40,13 @@ export abstract class DataController implements IDataController, IGarbageStation
 
 
     roles: ResourceRole[];
-    GgarbageStations?:Array<GarbageStationViewModel>;
+    GgarbageStations?: Array<GarbageStationViewModel>;
     abstract getGarbageStationList: () => Promise<GarbageStationViewModel[]>;
+    async getGarbageStation(id: string) {
+        let item = await this.service.garbageStation.get(id);
+        let result = ViewModelConverter.Convert(this.service, item);
+        return result;
+    }
     abstract getResourceRoleList: () => Promise<ResourceRole[]>;
     getEventCount = async (day: OneDay) => {
         let result: StatisticNumber = {
@@ -119,21 +124,21 @@ export abstract class DataController implements IDataController, IGarbageStation
     getImageUrlByArray = (ids: string[]) => {
         const array = [];
         for (let i = 0; i < ids.length; i++) {
-            const url = this.getImageUrlBySingle(ids[i]);            
+            const url = this.getImageUrlBySingle(ids[i]);
             array.push(url);
         }
         return array;
     }
     getImageUrl(id: string): string | undefined;
-    getImageUrl(id: string[]): Array<string|undefined> | undefined;
-    getImageUrl(id: string | string[]): string | Array<string|undefined> | undefined {
+    getImageUrl(id: string[]): Array<string | undefined> | undefined;
+    getImageUrl(id: string | string[]): string | Array<string | undefined> | undefined {
         if (Array.isArray(id)) {
             return this.getImageUrlByArray(id);
         }
         else if (typeof (id) == "string") {
             return this.getImageUrlBySingle(id);
         }
-        else{}
+        else { }
 
     }
 

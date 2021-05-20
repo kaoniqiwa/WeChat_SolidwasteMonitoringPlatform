@@ -358,35 +358,35 @@ export class GarbageStationGarbageCountStatistic {
    * @type {string}
    * @memberof GarbageStationGarbageCountStatistic
    */
-  Id: string;
+  Id!: string;
   /**
    *	垃圾房名称	M
    *
    * @type {string}
    * @memberof GarbageStationGarbageCountStatistic
    */
-  Name: string;
+  Name!: string;
   /**
    *	开始时间	M
    *
    * @type {Date}
    * @memberof GarbageStationGarbageCountStatistic
    */
-  BeginTime: Date;
+  BeginTime!: Date;
   /**
    *	结束时间	M
    *
    * @type {Date}
    * @memberof GarbageStationGarbageCountStatistic
    */
-  EndTime: Date;
+  EndTime!: Date;
   /**
    *	垃圾堆数量	M
    *
    * @type {number}
    * @memberof GarbageStationGarbageCountStatistic
    */
-  GarbageCount: number;
+  GarbageCount!: number;
   /**
    *	有垃圾时长，单位：分钟	O
    *

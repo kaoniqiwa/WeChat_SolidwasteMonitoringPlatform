@@ -4,7 +4,7 @@ import { Division } from "../../../data-core/model/waste-regulation/division";
 import { EventNumber, EventType } from "../../../data-core/model/waste-regulation/event-number";
 import { GarbageDropEventRecord, GarbageFullEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/event-record";
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
-import { GarbageStationGarbageCountStatistic, GarbageStationNumberStatisticV2 } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
+import { GarbageStationGarbageCountStatistic, GarbageStationNumberStatistic, GarbageStationNumberStatisticV2 } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
 import { VideoUrl } from "../../../data-core/model/waste-regulation/video-model";
 import { ResourceRole, WeChatUser } from "../../../data-core/model/we-chat";
 import { CameraViewModel, GarbageStationViewModel } from "./ViewModels";
@@ -99,7 +99,7 @@ export interface StatisticNumber {
      */
     mixedIntoNumber: number;
     /**
-     * 垃圾满意数量
+     * 垃圾满溢数量
      *
      * @type {number}
      * @memberof StatisticNumber
@@ -136,6 +136,9 @@ export interface IGarbageStationList {
          */
     getGarbageStationList(): Promise<Array<GarbageStationViewModel>>;
 }
+export interface IGarbageStation{
+    getGarbageStation(id:string):Promise<GarbageStationViewModel>;
+}
 export interface IGarbageStationStatistic {
     /**
      * 获取垃圾厢房当天的统计数据
@@ -164,6 +167,7 @@ export interface IGarbageStationStatistic {
      * @memberof IGarbageStationStatistic
      */
     getGarbageStationNumberStatistic(id: string, date: Date): Promise<Array<GarbageStationGarbageCountStatistic>>
+    
 }
 
 
@@ -199,7 +203,7 @@ export interface IDataController extends IGarbageStationList, IGarbageStationSta
     }>;
 
 }
-export interface IGarbageStationController extends IGarbageStationList, IResourceRoleList, IGarbageStationStatistic, IImage, IVodUrl {
+export interface IGarbageStationController extends IGarbageStation, IGarbageStationList, IResourceRoleList, IGarbageStationStatistic, IImage, IVodUrl {
 
     /**
      * 获取区划

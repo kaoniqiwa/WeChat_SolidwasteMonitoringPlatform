@@ -68,7 +68,7 @@ export class VideoPlugin {
         this.name = name;
         this.webUrl = webUrl;
         this.createElement();
-        this.eventRegist();        
+        this.eventRegist();
     }
 
     destory() {
@@ -154,13 +154,26 @@ export class VideoPlugin {
 
     createBackground() {
         const background = document.createElement("div")
-        background.className = "video_background"      
+        background.className = "video_background"
         return background;
     }
+
+    soundOpened = false;
 
     createWSPlayerProxy(mode?: string) {
         if (!this.iframe) return;
         this.proxy = new WSPlayerProxy(this.iframe, mode);
+        this.proxy.onPlaying = () => {
+            setTimeout(() => {
+                if (!this.proxy) return;
+                if (!this.soundOpened) {
+                    
+                    this.proxy.openSound();                    
+                    this.soundOpened = true;
+
+                }
+            }, 3000)
+        }
         this.proxy.onStoping = () => {
 
             this.PlayerStoping();
@@ -173,8 +186,8 @@ export class VideoPlugin {
                 // if (this.tools) {
                 //     this.tools.control
                 // }
-                if (this.onFullscreenChanged) {                    
-                    this.onFullscreenChanged(this.isOrientation||this.isFullScreen);
+                if (this.onFullscreenChanged) {
+                    this.onFullscreenChanged(this.isOrientation || this.isFullScreen);
                 }
             }
         }
@@ -194,15 +207,15 @@ export class VideoPlugin {
             return true;
         }
         return false;
-    }    
-    onFullscreenChanged?: (bool:boolean) => void;
+    }
+    onFullscreenChanged?: (bool: boolean) => void;
     setBodySize() {
 
-        if(!this.background)return;
-        
+        if (!this.background) return;
+
         if (this.isOrientation || this.isFullScreen) {
             this.background.classList.add("fullscreen");
-            
+
         }
         else {
             this.background.classList.remove("fullscreen")
@@ -225,8 +238,8 @@ export class VideoPlugin {
             // })
 
             this.setBodySize();
-            if (this.onFullscreenChanged) {                
-                this.onFullscreenChanged(this.isOrientation||this.isFullScreen);
+            if (this.onFullscreenChanged) {
+                this.onFullscreenChanged(this.isOrientation || this.isFullScreen);
             }
         }, 10);
     }
