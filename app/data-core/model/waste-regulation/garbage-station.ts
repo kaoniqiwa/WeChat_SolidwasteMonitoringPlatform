@@ -18,24 +18,30 @@ export interface IFlags extends NumberConstructor {
 }
 
 export class Flags<T extends number | string>{
-    value: number;
-    constructor(val: number) {
+    value: number | string;
+    constructor(val: number | string) {
 
         this.value = val;
     }
     getValues(): T[] {
-        // 10
-        let str = this.value.toString(2);
         let result = new Array<T>()
-        for (let i = str.length - 1, x = 0; i >= 0; i--, x++) {
-            let value = parseInt(str[i]);
-            if (value) {
-                let v = Math.pow(2, x);
-                result.push(v as T);
-            }
+        if (typeof (this.value) === "number") {
+            let str = this.value.toString(2);
 
+            for (let i = str.length - 1, x = 0; i >= 0; i--, x++) {
+                let value = parseInt(str[i]);
+                if (value) {
+                    let v = Math.pow(2, x);
+                    result.push(v as T);
+                }
+
+            }
+        }
+        else {
+            result = this.value.split(',') as T[];
         }
         return result;
+
     }
     contains(t: T) {
         return this.getValues().indexOf(t) >= 0;

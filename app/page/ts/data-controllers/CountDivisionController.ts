@@ -226,7 +226,7 @@ export class CountDivisionController extends DataController implements IDataCont
 		}
 		result = result.sort((a, b) => {
 			if (a.DivisionId && b.DivisionId)
-				return a.DivisionId.localeCompare(a.DivisionId) || a.Name.localeCompare(b.Name);
+				return a.DivisionId.localeCompare(b.DivisionId) || a.Name.localeCompare(b.Name);
 			return 0;
 		})
 		this.GgarbageStations = result;

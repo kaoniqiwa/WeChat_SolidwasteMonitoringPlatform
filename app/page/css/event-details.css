@@ -76,7 +76,7 @@ html,body{
 #origin-img .swiper-slide img
 {
   position: absolute;
-  margin-top: -33%;
+  transform: translateY(-50%);
   top:50%;
 }
 
@@ -164,7 +164,7 @@ html,body{
     height: 50px;
     z-index: 2;
     position: absolute;    
-    margin-top: -10%;
+    /* margin-top: -10%; */
     background-image: url(../../assets/play.png);
     background-repeat: no-repeat;
     background-position: center;
