@@ -1,7 +1,7 @@
 /**
  * pmx
  */
-import { CandlestickOption } from "./echart";
+import { CandlestickOption } from "./Echart";
 import IAside from "./ISubject"
 import { dateFormat, getAllDay } from "../../common/tool";
 import "../css/myChartAside.less";
@@ -33,6 +33,7 @@ import { Service } from "../../data-core/repuest/service";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import { DataController } from "./data-controllers/DataController";
 import { EventType } from "../../data-core/model/waste-regulation/event-number";
+import { IDataController, IGarbageStationController } from "./data-controllers/IController";
 
 echarts.use([
   GridComponent,
@@ -44,18 +45,11 @@ echarts.use([
   DataZoomComponent
 ])
 
-/**
- * 
- */
-
 interface EchartsAsideOptions {
   date?: Date;
   data?: GarbageStationViewModel[];
-  dataController: DataController
+  dataController: IGarbageStationController
 }
-
-// const user = (window.parent as NavigationWindow).User;
-
 
 export default class EchartsAside extends IAside {
   candlestickOption: CandlestickOption = new CandlestickOption()

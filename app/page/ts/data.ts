@@ -9,7 +9,7 @@ import { ResourceType } from "../../data-core/model/we-chat";
 import { IDataController, StatisticNumber } from "./data-controllers/IController";
 import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import Swiper, { Pagination } from 'swiper';
-import { CandlestickOption } from './echart'
+import { CandlestickOption } from './Echart'
 import { GarbageStationGarbageCountStatistic } from "../../data-core/model/waste-regulation/garbage-station-number-statistic";
 
 

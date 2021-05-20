@@ -13,9 +13,9 @@ import { Language } from "./language";
 import Swiper, { Virtual, Pagination, } from 'swiper';
 import $ from 'jquery';
 import MyAside from './myAside';
-import EchartsAside from "./echartsAside";
+import EchartsAside from "./EchartsAside";
 import { GarbageStationViewModel, IActiveElement, IImageUrl } from "./data-controllers/ViewModels";
-import { CandlestickOption } from "./echart";
+import { CandlestickOption } from "./Echart";
 
 import '../css/header.less'
 
@@ -47,6 +47,7 @@ import { VideoUrl } from "../../data-core/model/waste-regulation/video-model";
 import { VideoPlugin } from "./data-controllers/modules/VideoPlugin";
 import { Page, PagedList } from "../../data-core/model/page";
 import { EventType } from "../../data-core/model/waste-regulation/event-number";
+import GarbageStationServer from "./GarbageStationServer";
 echarts.use([
   GridComponent,
   LineChart,
@@ -56,10 +57,6 @@ echarts.use([
   TooltipComponent,
   DataZoomComponent
 ])
-
-
-// 理论上应在ts中根据需求导入minirefresh，而不是写死在html中，受项目parcel-bundler版本限制，未实现
-// import "minirefresh";
 
 
 // 模块化方式使用 Swiper库
@@ -77,7 +74,7 @@ enum ZoomStatus {
 
 
 // 使用简单的观察者模式，实现 GarbageStationClient 和 myAside 类的通信
-class GarbageStationClient implements IObserver {
+export default class GarbageStationClient implements IObserver {
   candlestickOption: CandlestickOption = new CandlestickOption()
 
 
@@ -113,8 +110,9 @@ class GarbageStationClient implements IObserver {
   type: ResourceType;
   garbageStations: GarbageStationViewModel[] = [];//接口请求到的所有数据
 
-  garbageStationsChunk: GarbageStationViewModel[] = [];//按页请求的数据
-  garbageStationsTotal: GarbageStationViewModel[] = [];//按页请求的数据
+  garbageStationsChunk: GarbageStationViewModel[] = [];//当前请求到的分页数据
+  garbageStationsAcc: GarbageStationViewModel[] = [];//累计请求到的数据
+  garbageStationsTotal: GarbageStationViewModel[] = [];//满足条件的所有数据
   dropPage: Page | null = null;
 
 
@@ -206,7 +204,8 @@ class GarbageStationClient implements IObserver {
     index: 1,
     size: 20,
   }
-  constructor(type: ResourceType, dataController: IGarbageStationController
+  constructor(type: ResourceType, dataController: IGarbageStationController,
+    private server: GarbageStationServer
   ) {
     this.type = type;
     this.dataController = dataController;
@@ -265,17 +264,12 @@ class GarbageStationClient implements IObserver {
     }
   }
   init() {
-
-
     // 侧边栏数据仅请求一次
     this.loadAsideData().then(() => {
       this.createAside();
     })
-    this.loadAllData().then(async () => {
+    this.server.loadAllData().then(async () => {
       this.reset()
-      // this.loadData();
-      // this.createChartAside();
-      // this.createContent();
     })
     this.bindEvents();
 
@@ -284,10 +278,12 @@ class GarbageStationClient implements IObserver {
   // 下拉刷新重新创建整个页面
   async miniRefreshDown() {
 
-    await this.loadAllData();
-    this.reset()
+    // await this.loadAllData();
+    this.server.loadAllData().then(() => {
+      this.reset()
+    })
+
     this.createAside();
-    // this.createChartAside();
     this.miniRefresh!.endDownLoading();
   }
   async miniRefreshUp() {
@@ -309,18 +305,13 @@ class GarbageStationClient implements IObserver {
     if (!stop) {
       this.loadData();
       this.createContent();
+      this.createChartAside()
     }
     console.log('stop', stop);
     this.miniRefresh!.endUpLoading(stop);
 
     // this.miniRefresh!.endUpLoading(true);
   }
-  async loadAllData() {
-    // 拉取厢房数据,该接口只能拉取所有数据
-    this.garbageStations = await this.dataController.getGarbageStationList();
-    console.log('原始数据', this.garbageStations)
-  }
-
   async loadAsideData() {
     this.roleList = await this.dataController.getResourceRoleList();
     // console.log('侧边栏筛选数据', this.roleList)
@@ -334,7 +325,7 @@ class GarbageStationClient implements IObserver {
     this.elements.container.hwContainer.innerHTML = "";
     this.currentPage.index = 1;
     this.eventTypes = [];
-    this.garbageStationsTotal = []
+    this.garbageStationsAcc = []
     this.dropPage = null;
     this.miniRefresh!.resetUpLoading();
   }
@@ -490,115 +481,19 @@ class GarbageStationClient implements IObserver {
   }
   loadData() {
     console.log('load data')
-    let res = this.fetch(this.eventTypes, this.roleTypes, this.currentPage);
+    let res = this.server.fetch(this.eventTypes, this.roleTypes, this.currentPage);
 
     this.garbageStationsChunk = res.Data;
+    this.garbageStationsTotal = res.TotalData;
 
-    this.garbageStationsTotal = [...this.garbageStationsTotal, ...this.garbageStationsChunk]
+    this.garbageStationsAcc = [...this.garbageStationsAcc, ...this.garbageStationsChunk]
     this.dropPage = res.Page;
 
 
-    this.elements.count.textContent = this.garbageStationsTotal.length + "/" + this.dropPage!.TotalRecordCount;
+    this.elements.count.textContent = this.garbageStationsAcc.length + "/" + this.dropPage!.TotalRecordCount;
 
   }
-  // 这里模拟请求服务器数据
-  fetch(eventTypes: string[], roleTypes: string[], paged: Paged) {
 
-    console.log('eventTypes', eventTypes)
-    console.log('roltTypes', roleTypes)
-    /**
-     *   垃圾落地集合中包含 正常/异常/满溢状态
-     *   如果筛选的条件是垃圾落地和正常，那么筛选出垃圾落地后，再筛选正常会有重复的正常出现
-     * 
-     */
-    let size = paged.size;
-    let index = paged.index;
-
-    let eventData: GarbageStationViewModel[] = [];
-    if (eventTypes.length == 0) {
-      eventData = this.garbageStations;
-    }
-    else {
-      for (let i = 0; i < eventTypes.length; i++) {
-        let type = eventTypes[i];
-        let filtered = this.garbageStations.filter(item => {
-          let stationState = (item.StationState as Flags<StationState>);
-          // console.log(stationState, type)
-          // 垃圾落地筛选条件
-          if (type == this.garbageDropState) {
-            let currentGarbageTime = (item.NumberStatistic?.CurrentGarbageTime!) >> 0;
-            return currentGarbageTime > 0
-          } else {
-            // Flag<StationState>字段筛选
-            if (stationState.value == StationState.Normal) {
-              return stationState.value == Number(type)
-            } else {
-              return stationState.contains(Number(type))
-            }
-          }
-
-        })
-
-        eventData.push(...filtered)
-      }
-    }
-
-    let resData: GarbageStationViewModel[] = []
-
-    let roleData: GarbageStationViewModel[] = [];
-
-    if (roleTypes.length == 0) {
-      roleData = eventData;
-    } else {
-      // 居委会筛选是并集关系
-      for (let i = 0; i < roleTypes.length; i++) {
-        let type = roleTypes[i];
-        let filtered = eventData.filter(item => {
-          return item.DivisionId == type
-        })
-        roleData.push(...filtered)
-      }
-    }
-
-    resData = Array.from(new Set(roleData));// 去重
-    console.log('筛选后的数据', resData)
-
-    // 将数据按垃圾落地先排序，默认升序排序
-    resData.sort((a, b) => {
-      let a_time = a.NumberStatistic!.CurrentGarbageTime! >> 0;
-      let b_time = b.NumberStatistic!.CurrentGarbageTime! >> 0;
-      return (a_time - b_time)
-    })
-    resData.reverse();// 降序
-
-
-
-    // 数据筛选后，切割数据
-    let data: GarbageStationViewModel[] = [];
-    data = resData.slice((index - 1) * size, index * size)
-
-
-    let PageIndex = index;
-    let PageSize = size;
-    let PageCount = Math.ceil(resData.length / size)
-    let RecordCount = data.length
-    let TotalRecordCount = resData.length
-
-
-    let page: Page = {
-      PageIndex,
-      PageSize,
-      PageCount,
-      RecordCount,
-      TotalRecordCount
-    }
-    let res: PagedList<GarbageStationViewModel> = {
-      Page: page,
-      Data: data
-    }
-    console.log(res)
-    return res;
-  }
   bindEvents() {
     console.log('bind event');
     let _this = this;
@@ -731,66 +626,16 @@ class GarbageStationClient implements IObserver {
     this.myAside.add(this)
   }
   createChartAside() {
+    // this.dataController.getGarbageStationNumberStatisticList
     this.myChartAside = null;
     this.myChartAside = new EchartsAside(this.elements.container.chartContainer).init({
-      data: this.garbageStations,
+      data: this.garbageStationsTotal,
       date: new Date(),
-      dataController
+      dataController: this.dataController
     });
     this.myChartAside.add(this)
   }
-  resetSelected() {
-    for (let [k, v] of this.selectedDivisions) {
-      v.Element.classList.remove('selected')
-    }
-    this.selectedDivisions.clear();
 
-
-  }
-  confirmSelect(data: Map<string, Array<string>>) {
-
-
-    for (let [k, v] of this.garbageElements) {
-
-      // 默认显示
-      v.Element.style.display = 'block';
-
-      for (let [key, val] of data) {
-        if (key == 'role') {
-          if (val.length && !val.includes(v.divisionId)) {
-            v.Element.style.display = 'none';
-          }
-        }
-        if (key == 'state') {
-
-          //剔除 垃圾落地 筛选项
-          let arr = val.filter(item => {
-            return item !== '3'
-          })
-
-          if (arr.length && !arr.includes(v.state.value + "")) {
-            v.Element.style.display = 'none';
-          }
-
-          if (val.includes('3')) {
-            if (v.currentGarbageTime <= 0) {
-              v.Element.style.display = 'none';
-            }
-          }
-        }
-      }
-
-    }
-
-    if (this.zoomStatus == ZoomStatus.out) {
-
-      // this.zoomOut();
-    }
-    else if (this.zoomStatus == ZoomStatus.in) {
-
-      // this.zoomIn();
-    }
-  }
   filerContent() {
     let str = this.elements.btns.searchInput.value;
     for (let [k, v] of this.garbageElements) {
@@ -1020,21 +865,5 @@ class GarbageStationClient implements IObserver {
     return container;
   }
 
-
-
 }
-
-let refreshed = false;
-
-const user = (window.parent as NavigationWindow).User;
-const http = (window.parent as NavigationWindow).Authentication;
-
-console.log(user);
-const service = new Service(http);
-const type = user.WUser.Resources![0].ResourceType;
-const dataController = ControllerFactory.Create(service, type, user.WUser.Resources!);
-const stationClient = new GarbageStationClient(type, dataController);
-
-stationClient.init();
-
 
