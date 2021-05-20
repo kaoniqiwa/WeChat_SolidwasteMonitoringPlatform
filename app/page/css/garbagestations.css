@@ -78,10 +78,7 @@ body {
 }
 
 .hw-content {
-  height: calc(100% - 40px);
-  overflow: auto;
   position: relative;
-  background: #f7f7f7;
   margin-top: 10px;
 }
 

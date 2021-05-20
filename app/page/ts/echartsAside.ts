@@ -179,7 +179,7 @@ export default class EchartsAside extends IAside {
           var slides = [];
           for (let i = 0; i < this.data!.length; i++) {
 
-            let { Name, GarbageRatio, AvgGarbageTime, MaxGarbageTime, GarbageDuration, TodayEventNumbers } = this.data![i].NumberStatistic;
+            let { Name, GarbageRatio, AvgGarbageTime, MaxGarbageTime, GarbageDuration, TodayEventNumbers } = this.data![i].NumberStatistic!;
 
             GarbageRatio = Number(GarbageRatio!.toFixed(2));
             AvgGarbageTime = Math.round(AvgGarbageTime!);

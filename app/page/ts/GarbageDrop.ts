@@ -323,9 +323,10 @@ export default class GarbageDrop implements IObserver {
 
     // this.garbageStations = await this.dataController.getGarbageStationList();
 
+    // console.log('roletypes', this.roleTypes)
     let data = await this.dataController.getGarbageDropEventList(day, this.currentPage, this.eventType, this.roleTypes);
     this.dropListChunk = data!.Data;
-
+    console.log(data)
     console.log('本次请求的数据', this.dropListChunk)
 
 
@@ -385,13 +386,11 @@ export default class GarbageDrop implements IObserver {
 
       let imageUrls: CameraImageUrl[] = [];
       if (v.Data) {
-        if (!v.Data.IsHandle && !v.Data.IsTimeout) {
-          imageUrls = v.Data.DropImageUrls!
-        } else if (v.Data.IsHandle && !v.Data.IsTimeout) {
-          imageUrls = v.Data.HandleImageUrls!;
-        } else if (!v.Data.IsHandle && v.Data.IsTimeout) {
-          imageUrls = v.Data.TimeoutImageUrls!
-        }
+        v.Data.DropImageUrls && imageUrls.push(...v.Data.DropImageUrls)
+        v.Data.HandleImageUrls && imageUrls.push(...v.Data.HandleImageUrls)
+        v.Data.TimeoutImageUrls && imageUrls.push(...v.Data.TimeoutImageUrls)
+
+        // console.log(imageUrls)
         obj.StationName = v.Data.StationName;
         obj.StationId = v.Data.StationId;
 

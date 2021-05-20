@@ -45,7 +45,8 @@ import { CanvasRenderer } from "echarts/renderers";
 import IObserver from "./IObserver";
 import { VideoUrl } from "../../data-core/model/waste-regulation/video-model";
 import { VideoPlugin } from "./data-controllers/modules/VideoPlugin";
-import { Page } from "../../data-core/model/page";
+import { Page, PagedList } from "../../data-core/model/page";
+import { EventType } from "../../data-core/model/waste-regulation/event-number";
 echarts.use([
   GridComponent,
   LineChart,
@@ -110,8 +111,25 @@ class GarbageStationClient implements IObserver {
 
   dataController: IGarbageStationController;
   type: ResourceType;
-  garbageStations: GarbageStationViewModel[] = [];
-  numberList: StatisticNumber[] = [];
+  garbageStations: GarbageStationViewModel[] = [];//接口请求到的所有数据
+
+  garbageStationsChunk: GarbageStationViewModel[] = [];//按页请求的数据
+  garbageStationsTotal: GarbageStationViewModel[] = [];//按页请求的数据
+  dropPage: Page | null = null;
+
+
+  // 将筛选后的数据分页
+  start: number = 0;
+  end: number = 0;
+  offset: number = 20;
+
+  eventTypes: Array<string> = [];
+  roleTypes: Array<string> = []; // 筛选区域
+
+  garbageDropTitle = '垃圾落地';
+  garbageDropState = '999'
+
+
   roleList: ResourceRole[] = [];
   myAside: MyAside | null = null;
 
@@ -184,7 +202,6 @@ class GarbageStationClient implements IObserver {
   }
 
   miniRefresh?: MiniRefresh;
-  dropPage: Page | null = null;
   currentPage: Paged = {
     index: 1,
     size: 20,
@@ -204,7 +221,7 @@ class GarbageStationClient implements IObserver {
         }
       },
       up: {
-        isAuto: true,
+        isAuto: false,
         callback: () => {
 
           console.log('miniRefreshUp');
@@ -224,7 +241,9 @@ class GarbageStationClient implements IObserver {
         this.showChart = args.showChart
       }
       if ('filtered' in args) {
-        console.log('filtered', args.filtered)
+        this.reset();
+
+        // console.log('filtered', args.filtered)
         let data: Map<string, Array<string>> = new Map();
 
         let filtered = args.filtered as Map<string, Set<HTMLElement>>;
@@ -233,48 +252,46 @@ class GarbageStationClient implements IObserver {
           data.set(k, ids);
         }
         console.log(data)
-        this.confirmSelect(data);
+        // this.confirmSelect(data);
 
+        if (data.has('role')) {
+          this.roleTypes = data.get('role')!;
+
+        }
+        if (data.has('state')) {
+          this.eventTypes = data.get('state')!;
+        }
       }
     }
   }
-  // init() {
-  //   this.loadAsideData().then(() => {
-  //     this.createAside();
-  //   })
-  //   this.loadData().then(() => {
-  //     this.resetBar()
-  //     this.createAside();
-  //     this.createChartAside();
-  //     this.createContent();
-  //     this.createNumberList();
-
-  //     if (!refreshed) {
-  //       this.bindEvents();
-  //     }
-  //   })
-
-  // }
   init() {
-    this.loadAsideData().then(() => {
-      this.createAside()
-    })
 
+
+    // 侧边栏数据仅请求一次
+    this.loadAsideData().then(() => {
+      this.createAside();
+    })
+    this.loadAllData().then(async () => {
+      this.reset()
+      // this.loadData();
+      // this.createChartAside();
+      // this.createContent();
+    })
     this.bindEvents();
+
   }
 
+  // 下拉刷新重新创建整个页面
   async miniRefreshDown() {
 
-    // this.reset();
-    await this.loadData();
-    this.resetBar()
+    await this.loadAllData();
+    this.reset()
     this.createAside();
-    this.createChartAside();
-    this.createContent();
-    this.createNumberList();
+    // this.createChartAside();
     this.miniRefresh!.endDownLoading();
   }
   async miniRefreshUp() {
+
     let stop = false;
 
     console.log('drop page', this.dropPage)
@@ -290,58 +307,46 @@ class GarbageStationClient implements IObserver {
 
     }
     if (!stop) {
-      console.log('请求数据');
-      await this.loadData();
+      this.loadData();
       this.createContent();
     }
     console.log('stop', stop);
-    this.miniRefresh!.endUpLoading(true);
+    this.miniRefresh!.endUpLoading(stop);
+
+    // this.miniRefresh!.endUpLoading(true);
   }
-  async loadData() {
-    // 拉取厢房数据
+  async loadAllData() {
+    // 拉取厢房数据,该接口只能拉取所有数据
     this.garbageStations = await this.dataController.getGarbageStationList();
-    // this.garbageStations.length = 4;
-
-    let ids = this.garbageStations.map(item => item.Id)
-    console.log('厢房数据', this.garbageStations)
-
-    // 获取垃圾厢房当天的统计数据
-    let roles = ids.map(x => {
-      let role = new ResourceRole();
-      role.Id = x;
-      role.ResourceType = type;
-      return role;
-    })
-    this.numberList = await this.dataController.getGarbageStationStatisticNumberListInToday(roles);
-    console.log('底部数量数据', this.numberList)
-    this.elements.count.textContent = 1 + "/" + 10;
-
-
-
-
+    console.log('原始数据', this.garbageStations)
   }
 
   async loadAsideData() {
     this.roleList = await this.dataController.getResourceRoleList();
     // console.log('侧边栏筛选数据', this.roleList)
   }
-  resetBar() {
+  reset() {
     $(this.elements.others.originImg).hide();
     this.zoomStatus = ZoomStatus.out;
     this.elements.btns.imgIcon.className = "howell-icon-list";
     this.elements.btns.searchInput.value = "";
+
+    this.elements.container.hwContainer.innerHTML = "";
+    this.currentPage.index = 1;
+    this.eventTypes = [];
+    this.garbageStationsTotal = []
+    this.dropPage = null;
+    this.miniRefresh!.resetUpLoading();
   }
   createContent() {
+    console.log('createContent')
     let _this = this;
-    // 清空容器内容
-    this.elements.container.hwContainer.innerHTML = "";
-
     // 模板内容
     let tempContent = this.elements.others.template?.content as DocumentFragment;
 
-    let len = this.garbageStations.length
+    let len = this.garbageStationsChunk.length;
     for (let i = 0; i < len; i++) {
-      const v = this.garbageStations[i];
+      const v = this.garbageStationsChunk[i];
 
       // v.StationState = Math.random() * 3 >> 0;
 
@@ -379,6 +384,17 @@ class GarbageStationClient implements IObserver {
       // let hour2 = hour.toString().padStart(2, '0');
       // let minute2 = minute.toString().padStart(2, '0');
 
+      let illegalDrop = info.querySelector('.illegalDrop-number') as HTMLSpanElement;
+      let mixedInto = info.querySelector('.MixedInto-number') as HTMLSpanElement;
+
+      v.NumberStatistic?.TodayEventNumbers!.forEach(eventNumber => {
+        if (eventNumber.EventType == EventType.IllegalDrop) {
+          illegalDrop.textContent = eventNumber.DayNumber.toString()
+        } else if (eventNumber.EventType == EventType.MixedInto) {
+          mixedInto.textContent = eventNumber.DayNumber.toString()
+        }
+      });
+
 
       (info.querySelector('.constDrop-number') as HTMLElement).textContent = `${hour == 0 ? minute + "分钟" : hour + "小时" + minute + "分钟"}`;
 
@@ -386,18 +402,18 @@ class GarbageStationClient implements IObserver {
       title_bandage.classList.remove('green');
       title_bandage.classList.remove('orange');
       let states = v.StationState as Flags<StationState>;
-
+      title_bandage.textContent = "";//states.value.toString()
       if (states.contains(StationState.Error)) {
 
-        title_bandage.textContent = Language.StationState(StationState.Error);
+        title_bandage.textContent += Language.StationState(StationState.Error);
         title_bandage.classList.add('red');
       }
       else if (states.contains(StationState.Full)) {
-        title_bandage.textContent = Language.StationState(StationState.Full);
+        title_bandage.textContent += Language.StationState(StationState.Full);
         title_bandage.classList.add('orange');
       }
       else {
-        title_bandage.textContent = Language.StationState(StationState.Normal);
+        title_bandage.textContent += Language.StationState(StationState.Normal);
         title_bandage.classList.add('green');
       }
       this.createFooter(v.Id, v.DivisionId);
@@ -472,7 +488,119 @@ class GarbageStationClient implements IObserver {
       this.elements.container.hwContainer?.appendChild(info)
     }
   }
+  loadData() {
+    console.log('load data')
+    let res = this.fetch(this.eventTypes, this.roleTypes, this.currentPage);
+
+    this.garbageStationsChunk = res.Data;
+
+    this.garbageStationsTotal = [...this.garbageStationsTotal, ...this.garbageStationsChunk]
+    this.dropPage = res.Page;
+
+
+    this.elements.count.textContent = this.garbageStationsTotal.length + "/" + this.dropPage!.TotalRecordCount;
+
+  }
+  // 这里模拟请求服务器数据
+  fetch(eventTypes: string[], roleTypes: string[], paged: Paged) {
+
+    console.log('eventTypes', eventTypes)
+    console.log('roltTypes', roleTypes)
+    /**
+     *   垃圾落地集合中包含 正常/异常/满溢状态
+     *   如果筛选的条件是垃圾落地和正常，那么筛选出垃圾落地后，再筛选正常会有重复的正常出现
+     * 
+     */
+    let size = paged.size;
+    let index = paged.index;
+
+    let eventData: GarbageStationViewModel[] = [];
+    if (eventTypes.length == 0) {
+      eventData = this.garbageStations;
+    }
+    else {
+      for (let i = 0; i < eventTypes.length; i++) {
+        let type = eventTypes[i];
+        let filtered = this.garbageStations.filter(item => {
+          let stationState = (item.StationState as Flags<StationState>);
+          // console.log(stationState, type)
+          // 垃圾落地筛选条件
+          if (type == this.garbageDropState) {
+            let currentGarbageTime = (item.NumberStatistic?.CurrentGarbageTime!) >> 0;
+            return currentGarbageTime > 0
+          } else {
+            // Flag<StationState>字段筛选
+            if (stationState.value == StationState.Normal) {
+              return stationState.value == Number(type)
+            } else {
+              return stationState.contains(Number(type))
+            }
+          }
+
+        })
+
+        eventData.push(...filtered)
+      }
+    }
+
+    let resData: GarbageStationViewModel[] = []
+
+    let roleData: GarbageStationViewModel[] = [];
+
+    if (roleTypes.length == 0) {
+      roleData = eventData;
+    } else {
+      // 居委会筛选是并集关系
+      for (let i = 0; i < roleTypes.length; i++) {
+        let type = roleTypes[i];
+        let filtered = eventData.filter(item => {
+          return item.DivisionId == type
+        })
+        roleData.push(...filtered)
+      }
+    }
+
+    resData = Array.from(new Set(roleData));// 去重
+    console.log('筛选后的数据', resData)
+
+    // 将数据按垃圾落地先排序，默认升序排序
+    resData.sort((a, b) => {
+      let a_time = a.NumberStatistic!.CurrentGarbageTime! >> 0;
+      let b_time = b.NumberStatistic!.CurrentGarbageTime! >> 0;
+      return (a_time - b_time)
+    })
+    resData.reverse();// 降序
+
+
+
+    // 数据筛选后，切割数据
+    let data: GarbageStationViewModel[] = [];
+    data = resData.slice((index - 1) * size, index * size)
+
+
+    let PageIndex = index;
+    let PageSize = size;
+    let PageCount = Math.ceil(resData.length / size)
+    let RecordCount = data.length
+    let TotalRecordCount = resData.length
+
+
+    let page: Page = {
+      PageIndex,
+      PageSize,
+      PageCount,
+      RecordCount,
+      TotalRecordCount
+    }
+    let res: PagedList<GarbageStationViewModel> = {
+      Page: page,
+      Data: data
+    }
+    console.log(res)
+    return res;
+  }
   bindEvents() {
+    console.log('bind event');
     let _this = this;
     this.elements.btns.btnDivision.addEventListener('click', () => {
       this.toggle()
@@ -548,6 +676,7 @@ class GarbageStationClient implements IObserver {
     })
   }
 
+  // 创建居委会banner
   createFooter(id: string, divisionId: string) {
     let p = this.dataController.getDivision(divisionId);
     p.then(division => {
@@ -556,21 +685,6 @@ class GarbageStationClient implements IObserver {
       let content_footer = info.querySelector('.content__footer .division-name') as HTMLDivElement;
       content_footer.innerHTML = division.Name;
     });
-  }
-  createNumberList() {
-    let len = this.numberList.length;
-    for (let i = 0; i < len; i++) {
-      const numberStatic = this.numberList[i];
-      if (numberStatic) {
-        let info = document.getElementById(numberStatic.id) as HTMLDivElement;
-        if (info) {
-          let illegalDrop = info.querySelector('.illegalDrop-number') as HTMLSpanElement;
-          illegalDrop.innerHTML = numberStatic.illegalDropNumber.toString();
-          let mixedInto = info.querySelector('.MixedInto-number') as HTMLSpanElement;
-          mixedInto.innerHTML = numberStatic.mixedIntoNumber.toString();
-        }
-      }
-    }
   }
   toggle() {
     this.showAside = !this.showAside;
@@ -596,8 +710,8 @@ class GarbageStationClient implements IObserver {
             Id: StationState.Error.toString()
           },
           {
-            Name: '垃圾落地',
-            Id: '3'
+            Name: this.garbageDropTitle,
+            Id: this.garbageDropState
           }
 
         ],
