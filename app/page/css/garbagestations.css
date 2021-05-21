@@ -349,3 +349,7 @@ body {
 .swiper-pagination {
   pointer-events: none;
 }
+.no-camera {
+  font-size: 14px;
+  color: #b2b2b2;
+}

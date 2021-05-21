@@ -1,21 +1,15 @@
-import { NavigationWindow } from ".";
 import { OnlineStatus } from "../../data-core/model/waste-regulation/camera";
 import { Flags, StationState } from "../../data-core/model/waste-regulation/garbage-station";
 import { GarbageStationGarbageCountStatistic, GarbageStationNumberStatistic, GetGarbageStationStatisticNumbersParams } from "../../data-core/model/waste-regulation/garbage-station-number-statistic";
 import { ResourceRole, ResourceType } from "../../data-core/model/we-chat";
-import { Service } from "../../data-core/repuest/service";
-import { AsideControl } from "./aside";
-import { AsideListPage, AsideListPageWindow, SelectionMode } from "./aside-list";
-import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import { DataController } from "./data-controllers/DataController";
 import { IGarbageStationController, Paged, StatisticNumber } from "./data-controllers/IController";
 import { Language } from "./language";
 import Swiper, { Virtual, Pagination, } from 'swiper';
 import $ from 'jquery';
-import MyAside from './myAside';
+import MyAside, { SelectionMode } from './myAside';
 import EchartsAside from "./EchartsAside";
 import { GarbageStationViewModel, IActiveElement, IImageUrl } from "./data-controllers/ViewModels";
-import { CandlestickOption } from "./Echart";
 
 import '../css/header.less'
 
@@ -27,36 +21,12 @@ import 'minirefresh';
 import 'minirefresh/dist/debug/minirefresh.css'
 import "swiper/swiper.less";
 import "swiper/components/pagination/pagination.less"
-import * as echarts from 'echarts/core';
-import {
-  GridComponent,
-  GridComponentOption,
-  TooltipComponentOption,
-  TooltipComponent,
-  DataZoomComponent,
-  DataZoomComponentOption,
-  VisualMapComponent,
-  VisualMapComponentOption,
-} from 'echarts/components';
 
-import { LineChart, LineSeriesOption, BarChart, BarSeriesOption } from 'echarts/charts';
-
-import { CanvasRenderer } from "echarts/renderers";
 import IObserver from "./IObserver";
-import { VideoUrl } from "../../data-core/model/waste-regulation/video-model";
 import { VideoPlugin } from "./data-controllers/modules/VideoPlugin";
 import { Page, PagedList } from "../../data-core/model/page";
 import { EventType } from "../../data-core/model/waste-regulation/event-number";
 import GarbageStationServer from "./GarbageStationServer";
-echarts.use([
-  GridComponent,
-  LineChart,
-  BarChart,
-  VisualMapComponent,
-  CanvasRenderer,
-  TooltipComponent,
-  DataZoomComponent
-])
 
 
 // 模块化方式使用 Swiper库
@@ -64,7 +34,6 @@ Swiper.use([
   Virtual,
   Pagination
 ])
-
 
 enum ZoomStatus {
   out = "zoomOut",
@@ -75,51 +44,29 @@ enum ZoomStatus {
 
 // 使用简单的观察者模式，实现 GarbageStationClient 和 myAside 类的通信
 export default class GarbageStationClient implements IObserver {
-  candlestickOption: CandlestickOption = new CandlestickOption()
 
+  garbageElements: Map<string, any> = new Map(); // 保存创建的每个卡片
 
-  content: HTMLElement | null = null;
-  template: HTMLTemplateElement | null = null;
-  asideTemplate: HTMLTemplateElement | null = null;
-  asideMain?: HTMLDivElement;
+  zoomStatus: ZoomStatus = ZoomStatus.out;// 当前的缩放状态
 
-  GarbageStationNumberStatistic: Map<string, GarbageStationNumberStatistic> = new Map();
-  garbageElements: Map<string, any> = new Map();
-  garbageElementsDivision: Map<string, any> = new Map();
+  swiper: Swiper | null = null;// 全屏swiper
 
-  btnDivision?: HTMLDivElement;
-  imgDivision?: HTMLDivElement;
-  searchInput?: HTMLInputElement;
-  btnSearch?: HTMLElement;
-  originImg?: HTMLDivElement;
-  hwBar?: HTMLDivElement
-
-  zoomStatus: ZoomStatus = ZoomStatus.out;
-  swiper: Swiper | null = null;
-  swiperStatus: boolean = false;
   originStatus: boolean = false;
   activeIndex?: number;
   activeElement?: IActiveElement;
 
-
-  selectedDivisions: Map<string, any> = new Map();
-
   private customElement = document.createElement('div');
 
   dataController: IGarbageStationController;
-  type: ResourceType;
+
+  type: ResourceType;//当前账号的类型
+
   garbageStations: GarbageStationViewModel[] = [];//接口请求到的所有数据
 
   garbageStationsChunk: GarbageStationViewModel[] = [];//当前请求到的分页数据
   garbageStationsAcc: GarbageStationViewModel[] = [];//累计请求到的数据
   garbageStationsTotal: GarbageStationViewModel[] = [];//满足条件的所有数据
   dropPage: Page | null = null;
-
-
-  // 将筛选后的数据分页
-  start: number = 0;
-  end: number = 0;
-  offset: number = 20;
 
   eventTypes: Array<string> = [];
   roleTypes: Array<string> = []; // 筛选区域
@@ -128,14 +75,10 @@ export default class GarbageStationClient implements IObserver {
   garbageDropState = '999'
 
 
-  roleList: ResourceRole[] = [];
-  myAside: MyAside | null = null;
+  roleList: ResourceRole[] = []; // 侧边栏筛选数据
+  myAside: MyAside | null = null;// 侧边栏
 
-  myChartAside: EchartsAside | null = null;
-  myChartOptions?: {
-    date: Date,
-    data: Array<GarbageStationGarbageCountStatistic>
-  }
+  myChartAside: EchartsAside | null = null;// EChart页
 
 
   _showAside = false;
@@ -199,11 +142,13 @@ export default class GarbageStationClient implements IObserver {
 
   }
 
-  miniRefresh?: MiniRefresh;
+  miniRefresh!: MiniRefresh;
+
   currentPage: Paged = {
     index: 1,
     size: 20,
   }
+
   constructor(type: ResourceType, dataController: IGarbageStationController,
     private server: GarbageStationServer
   ) {
@@ -212,7 +157,7 @@ export default class GarbageStationClient implements IObserver {
 
     this.miniRefresh = new MiniRefresh({
       container: '#minirefresh',
-      isLockX: false,
+      isLockX: false,// 可以横向滑动图片
       down: {
         callback: () => {
           // 下拉事件
@@ -223,7 +168,7 @@ export default class GarbageStationClient implements IObserver {
         isAuto: false,
         callback: () => {
 
-          console.log('miniRefreshUp');
+
           this.miniRefreshUp()
 
         }
@@ -268,6 +213,7 @@ export default class GarbageStationClient implements IObserver {
     this.loadAsideData().then(() => {
       this.createAside();
     })
+    // 先请求服务器数据，然后本地筛选
     this.server.loadAllData().then(async () => {
       this.reset()
     })
@@ -277,7 +223,7 @@ export default class GarbageStationClient implements IObserver {
 
   // 下拉刷新重新创建整个页面
   async miniRefreshDown() {
-
+    console.log('miniRefreshDown');
     // await this.loadAllData();
     this.server.loadAllData().then(() => {
       this.reset()
@@ -287,7 +233,7 @@ export default class GarbageStationClient implements IObserver {
     this.miniRefresh!.endDownLoading();
   }
   async miniRefreshUp() {
-
+    console.log('miniRefreshUp');
     let stop = false;
 
     console.log('drop page', this.dropPage)
@@ -304,13 +250,15 @@ export default class GarbageStationClient implements IObserver {
     }
     if (!stop) {
       this.loadData();
+      // 在上拉请求更多数据时，不需要重新创建 EChart
+      if (!this.myChartAside) {
+        this.createChartAside()
+      }
       this.createContent();
-      this.createChartAside()
     }
     console.log('stop', stop);
     this.miniRefresh!.endUpLoading(stop);
 
-    // this.miniRefresh!.endUpLoading(true);
   }
   async loadAsideData() {
     this.roleList = await this.dataController.getResourceRoleList();
@@ -325,9 +273,107 @@ export default class GarbageStationClient implements IObserver {
     this.elements.container.hwContainer.innerHTML = "";
     this.currentPage.index = 1;
     this.eventTypes = [];
-    this.garbageStationsAcc = []
+    this.roleTypes = [];
+    this.garbageStationsAcc = [];
+    this.myChartAside = null;
     this.dropPage = null;
-    this.miniRefresh!.resetUpLoading();
+    this.miniRefresh!.resetUpLoading();// 会触发一次上拉回调
+  }
+
+  loadData() {
+    console.log('load data')
+    let res = this.server.fetch(this.eventTypes, this.roleTypes, this.currentPage);
+
+    this.garbageStationsChunk = res.Data;
+    this.garbageStationsTotal = res.TotalData;
+
+    this.garbageStationsAcc = [...this.garbageStationsAcc, ...this.garbageStationsChunk]
+    this.dropPage = res.Page;
+
+
+    this.elements.count.textContent = this.garbageStationsAcc.length + "/" + this.dropPage!.TotalRecordCount;
+
+  }
+
+  bindEvents() {
+    console.log('bind event');
+    let _this = this;
+    this.elements.btns.btnDivision.addEventListener('click', () => {
+      this.toggle()
+    })
+    this.elements.btns.imgDivision.addEventListener('click', () => {
+      // 在蒙版消失之前，所有按钮不能点击
+
+      if (this.originStatus) return
+
+      if (this.zoomStatus == ZoomStatus.in) {
+        this.elements.btns.imgIcon.classList.remove('howell-icon-list2')
+        this.elements.btns.imgIcon.classList.add('howell-icon-list')
+        this.zoomOut();
+      } else {
+
+        this.elements.btns.imgIcon.classList.remove('howell-icon-list')
+        this.elements.btns.imgIcon.classList.add('howell-icon-list2')
+
+        this.zoomIn();
+      }
+      console.log('当前状态', this.zoomStatus)
+
+
+    })
+    this.elements.btns.searchInput.addEventListener('search', (e) => {
+      this.filerContent();
+
+    })
+    this.elements.btns.btnSearch.addEventListener('click', () => {
+      this.filerContent();
+    })
+    // // 用私有变量监听事件
+    this.customElement.addEventListener('cat', (e: any) => {
+      this.showDetail({
+        id: e.detail.id,
+        index: e.detail.index
+      }, Math.random() * 10 >> 0);
+    })
+
+
+
+    this.elements.others.originImg.addEventListener('click', function (e) {
+
+      let path = ((e.composedPath && e.composedPath()) || e.path) as HTMLElement[];
+      if (path) {
+        for (let i = 0; i < path.length; i++) {
+          // if (path[i].className == "video-control") {
+          //   this.onPlayControlClicked(element.imageUrls![this.swiper!.activeIndex], path[i] as HTMLDivElement);
+          //   return;
+          // }
+          if (path[i].className == "tools") {
+            e.stopPropagation();
+            return;
+          }
+        }
+      }
+
+
+      _this.activeIndex = _this.swiper!.activeIndex;
+      if (_this.activeElement!.swiper) {
+        _this.activeElement!.swiper.slideTo(_this.activeIndex, 0)
+      } else {
+        (_this.activeElement!.Element!.querySelector(`.swiper-slide:nth-of-type(${_this.activeIndex + 1})`) as HTMLElement).scrollIntoView({
+          block: 'nearest',
+          behavior: 'auto',
+          inline: 'nearest'
+        });
+      }
+
+      $(this).fadeOut();
+      _this.originStatus = false;
+
+      if (_this.video) {
+        _this.video.destory();
+        _this.video = undefined;
+      }
+    })
   }
   createContent() {
     console.log('createContent')
@@ -423,6 +469,14 @@ export default class GarbageStationClient implements IObserver {
         }
 
       }).then(cameras => {
+        if (cameras.length == 0) {
+          console.log(v.Id + ":" + v.Name);
+          let div = slide as HTMLDivElement
+          div.innerHTML = '暂未布置摄像机';
+          div.className = 'no-camera'
+          wrapper.appendChild(div)
+          return;
+        }
         cameras.forEach((camera, index) => {
 
           imageUrls.push({
@@ -448,6 +502,7 @@ export default class GarbageStationClient implements IObserver {
 
           wrapper!.appendChild(div);
         })
+
       })
       content_card.addEventListener('click', function (e) {
         let target = e.target as HTMLElement;
@@ -479,102 +534,6 @@ export default class GarbageStationClient implements IObserver {
       this.elements.container.hwContainer?.appendChild(info)
     }
   }
-  loadData() {
-    console.log('load data')
-    let res = this.server.fetch(this.eventTypes, this.roleTypes, this.currentPage);
-
-    this.garbageStationsChunk = res.Data;
-    this.garbageStationsTotal = res.TotalData;
-
-    this.garbageStationsAcc = [...this.garbageStationsAcc, ...this.garbageStationsChunk]
-    this.dropPage = res.Page;
-
-
-    this.elements.count.textContent = this.garbageStationsAcc.length + "/" + this.dropPage!.TotalRecordCount;
-
-  }
-
-  bindEvents() {
-    console.log('bind event');
-    let _this = this;
-    this.elements.btns.btnDivision.addEventListener('click', () => {
-      this.toggle()
-    })
-    this.elements.btns.imgDivision.addEventListener('click', () => {
-      // 在蒙版消失之前，所有按钮不能点击
-
-      if (this.originStatus) return
-
-      if (this.zoomStatus == ZoomStatus.in) {
-        this.elements.btns.imgIcon.classList.remove('howell-icon-list2')
-        this.elements.btns.imgIcon.classList.add('howell-icon-list')
-        this.zoomOut();
-      } else {
-
-        this.elements.btns.imgIcon.classList.remove('howell-icon-list')
-        this.elements.btns.imgIcon.classList.add('howell-icon-list2')
-
-        this.zoomIn();
-      }
-      console.log('当前状态', this.zoomStatus)
-
-
-    })
-    this.elements.btns.searchInput.addEventListener('search', (e) => {
-      this.filerContent();
-
-    })
-    this.elements.btns.btnSearch.addEventListener('click', () => {
-      this.filerContent();
-    })
-    // // 用私有变量监听事件
-    this.customElement.addEventListener('cat', (e: any) => {
-      this.showDetail({
-        id: e.detail.id,
-        index: e.detail.index
-      }, Math.random() * 10 >> 0);
-    })
-
-
-
-    this.elements.others.originImg.addEventListener('click', function (e) {
-
-      let path = ((e.composedPath && e.composedPath()) || e.path) as HTMLElement[];
-      if (path) {
-        for (let i = 0; i < path.length; i++) {
-          // if (path[i].className == "video-control") {
-          //   this.onPlayControlClicked(element.imageUrls![this.swiper!.activeIndex], path[i] as HTMLDivElement);
-          //   return;
-          // }
-          if (path[i].className == "tools") {
-            e.stopPropagation();
-            return;
-          }
-        }
-      }
-
-
-      _this.activeIndex = _this.swiper!.activeIndex;
-      if (_this.activeElement!.swiper) {
-        _this.activeElement!.swiper.slideTo(_this.activeIndex, 0)
-      } else {
-        (_this.activeElement!.Element!.querySelector(`.swiper-slide:nth-of-type(${_this.activeIndex + 1})`) as HTMLElement).scrollIntoView({
-          block: 'nearest',
-          behavior: 'auto',
-          inline: 'nearest'
-        });
-      }
-
-      $(this).fadeOut();
-      _this.originStatus = false;
-      if(_this.video)
-      {
-        _this.video.destory();
-        _this.video = undefined;
-      }
-    })
-  }
-
   // 创建居委会banner
   createFooter(id: string, divisionId: string) {
     let p = this.dataController.getDivision(divisionId);
@@ -630,13 +589,15 @@ export default class GarbageStationClient implements IObserver {
     this.myAside.add(this)
   }
   createChartAside() {
-    // this.dataController.getGarbageStationNumberStatisticList
+    let ids = this.garbageStationsTotal.map(item => {
+      return item.Id
+    })
     this.myChartAside = null;
-    this.myChartAside = new EchartsAside(this.elements.container.chartContainer).init({
-      data: this.garbageStationsTotal,
-      date: new Date(),
-      dataController: this.dataController
-    });
+
+    console.log('create chart aside');
+    this.myChartAside = new EchartsAside(this.elements.container.chartContainer, this.dataController, ids, new Date());
+
+    this.myChartAside.init()
     this.myChartAside.add(this)
   }
 

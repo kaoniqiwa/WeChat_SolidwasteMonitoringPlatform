@@ -11,6 +11,7 @@ const http = (window.parent as NavigationWindow).Authentication;
 
 const service = new Service(http);
 const type = user.WUser.Resources![0].ResourceType;
+console.log(user)
 const dataController = ControllerFactory.Create(service, type, user.WUser.Resources!);
 
 const stationServer = new GarbageStationServer(dataController);
