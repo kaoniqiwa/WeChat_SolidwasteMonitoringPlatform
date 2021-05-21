@@ -312,7 +312,7 @@ export default class EchartsAside extends IAside {
    *  为了保证请求结果和 this.ids 顺序一致
    */
   loadAllData() {
-    console.log('loadAllData', this.ids)
+    // console.log('loadAllData', this.ids)
     let arr = [];
     for (let i = 0; i < this.ids.length; i++) {
       arr.push(this.loadData(this.ids[i]))

@@ -290,7 +290,7 @@ body {
 }
 
 .minirefresh-upwrap.minirefresh-hardware-speedup {
-  display: none;
+  /* display: none; */
 }
 
 .hw-content .minirefresh-scroll {

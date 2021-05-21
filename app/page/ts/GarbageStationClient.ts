@@ -80,6 +80,8 @@ export default class GarbageStationClient implements IObserver {
 
   myChartAside: EchartsAside | null = null;// EChart页
 
+  createFirstFive: boolean = true;
+
 
   _showAside = false;
   get showAside() {
@@ -146,7 +148,7 @@ export default class GarbageStationClient implements IObserver {
 
   currentPage: Paged = {
     index: 1,
-    size: 20,
+    size: 10,
   }
 
   constructor(type: ResourceType, dataController: IGarbageStationController,
@@ -165,10 +167,8 @@ export default class GarbageStationClient implements IObserver {
         }
       },
       up: {
-        isAuto: false,
+        isAuto: true,
         callback: () => {
-
-
           this.miniRefreshUp()
 
         }
@@ -375,15 +375,20 @@ export default class GarbageStationClient implements IObserver {
       }
     })
   }
-  createContent() {
+  async createContent() {
+    // await this.createCard(this.garbageStationsChunk.splice(0, 5));
+    await this.createCard(this.garbageStationsChunk)
+  }
+  private async createCard(data: GarbageStationViewModel[]) {
     console.log('createContent')
+
     let _this = this;
     // 模板内容
     let tempContent = this.elements.others.template?.content as DocumentFragment;
 
-    let len = this.garbageStationsChunk.length;
+    let len = data.length;
     for (let i = 0; i < len; i++) {
-      const v = this.garbageStationsChunk[i];
+      const v = data[i];
 
       // v.StationState = Math.random() * 3 >> 0;
 
@@ -393,6 +398,8 @@ export default class GarbageStationClient implements IObserver {
       if (!v.DivisionId)
         continue;
       let info = tempContent.cloneNode(true) as DocumentFragment;
+
+
       let content_card = info.querySelector('.hw-content__card') as HTMLDivElement;
       content_card.setAttribute('id', v.Id)
       content_card.setAttribute('divisionid', v.DivisionId)
@@ -453,22 +460,17 @@ export default class GarbageStationClient implements IObserver {
         title_bandage.textContent += Language.StationState(StationState.Normal);
         title_bandage.classList.add('green');
       }
+
+
       this.createFooter(v.Id, v.DivisionId);
 
       let wrapper = info.querySelector('.content__img .swiper-wrapper') as HTMLDivElement;
       let slide = wrapper.querySelector('.swiper-slide') as HTMLDivElement;
       let imageUrls: Array<IImageUrl> = [];
 
-      this.dataController.getCameraList(v.Id, (cameraId: string, url?: string) => {
-        let img = document.getElementById(cameraId) as HTMLImageElement;
-        if (!img) return
-        img.src = url!
-
-        img.onerror = () => {
-          img.src = DataController.defaultImageUrl;
-        }
-
-      }).then(cameras => {
+      this.dataController.getCameraList(v.Id, (cameraId: string, url?: string) => { }).then(cameras => {
+        // console.log(v.Id)
+        // console.log(cameras)
         if (cameras.length == 0) {
           console.log(v.Id + ":" + v.Name);
           let div = slide as HTMLDivElement
@@ -481,7 +483,7 @@ export default class GarbageStationClient implements IObserver {
 
           imageUrls.push({
             cameraName: camera.Name,
-            url: camera.ImageUrl!,
+            url: camera.getImageUrl()!,
             cameraId: camera.Id,
             preview: camera.getPreviewUrl()
           })
@@ -492,6 +494,7 @@ export default class GarbageStationClient implements IObserver {
           let img = div!.querySelector('img') as HTMLImageElement;
           img.id = camera.Id;
           img.setAttribute('index', index + '')
+          img.src = camera.getImageUrl()!
           // img!.src = camera.ImageUrl!;
 
           if (!camera.OnlineStatus == undefined || camera.OnlineStatus == OnlineStatus.Offline) {
@@ -502,7 +505,6 @@ export default class GarbageStationClient implements IObserver {
 
           wrapper!.appendChild(div);
         })
-
       })
       content_card.addEventListener('click', function (e) {
         let target = e.target as HTMLElement;
@@ -530,9 +532,13 @@ export default class GarbageStationClient implements IObserver {
         state: v.StationState,
         currentGarbageTime: currentGarbageTime
       })
-
       this.elements.container.hwContainer?.appendChild(info)
+
     }
+  }
+  private async loadCameraImage(id: string) {
+    let res = await this.dataController.getCameraList(id, (cameraId: string, url?: string) => { })
+    return res;
   }
   // 创建居委会banner
   createFooter(id: string, divisionId: string) {
