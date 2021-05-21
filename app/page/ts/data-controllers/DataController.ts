@@ -98,22 +98,7 @@ export abstract class DataController implements IDataController, IGarbageStation
         let promise = await this.service.camera.list(garbageStationId);
         return promise.sort((a, b) => {
             return a.CameraUsage - b.CameraUsage || a.Name.localeCompare(b.Name);
-        }).map(x => {
-            if (x.ImageUrl) {
-                (function (x, service) {
-                    setTimeout(() => {
-                        let url = service.medium.getData(x.ImageUrl!)
-                        loadImage(x.Id, url);
-                    }, 0);
-
-                })(x, this.service)
-
-            }
-            else {
-                setTimeout(() => {
-                    loadImage(DataController.defaultImageUrl);
-                }, 0);
-            }
+        }).map(x => {            
             let vm = ViewModelConverter.Convert(this.service, x);
             return vm;
         });

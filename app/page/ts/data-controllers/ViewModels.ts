@@ -41,11 +41,20 @@ export class GarbageStationViewModel extends GarbageStation {
 }
 
 export class CameraViewModel extends Camera {
+    static readonly defaultImageUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABIAAAAKIAQAAAAAgULygAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAd2KE6QAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAHdElNRQflAgIBCxpFwPH8AAAAcklEQVR42u3BMQEAAADCoPVPbQZ/oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+A28XAAEDwmj2AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIxLTAyLTAyVDAxOjExOjI2KzAwOjAwOo9+nAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMS0wMi0wMlQwMToxMToyNiswMDowMEvSxiAAAAAASUVORK5CYII=";
     constructor(service: Service) {
         super();
         this.service = service;
     }
     private service: Service;
+    getImageUrl(){
+        if (this.ImageUrl) {
+            return this.service.medium.getData(this.ImageUrl)
+        }
+        else {            
+            return CameraViewModel.defaultImageUrl;
+        }
+    }
     getPreviewUrl() {
         return this.service.sr.PreviewUrls({
             CameraId: this.Id,
