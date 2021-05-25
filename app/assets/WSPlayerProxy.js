@@ -108,12 +108,12 @@ function WSPlayerProxy(iframe, mode) {
 
     this.destory = function () {
         window.removeEventListener("message", registevent);
+        document.removeEventListener("webkitfullscreenchange", webkitfullscreenchange);
         if (that.tools) {
             that.tools.destory();
         }
     }
-
-
+    this.onFullScreenChanged;
     this.onStoping;
     this.getPosition;
     this.onPlaying;
@@ -126,7 +126,7 @@ function WSPlayerProxy(iframe, mode) {
 
     function registevent(e) {
         if (e && e.data) {
-            
+
             let data = JSON.parse(e.data)
 
             switch (data.command) {
@@ -140,7 +140,7 @@ function WSPlayerProxy(iframe, mode) {
                         that.onPlaying();
                     }
                     break;
-                case "getPosition":                    
+                case "getPosition":
                     if (that.getPosition) {
                         that.getPosition(parseFloat(data.value));
                     }
@@ -154,7 +154,7 @@ function WSPlayerProxy(iframe, mode) {
                         })(data.value)
                     }
                     break;
-                case "getTimer":                    
+                case "getTimer":
                     if (that.getTimer) {
                         that.getTimer(data.value);
                     }
@@ -198,6 +198,15 @@ function WSPlayerProxy(iframe, mode) {
 
 
     window.addEventListener("message", registevent);
+
+    function webkitfullscreenchange() {
+        if (that.onFullScreenChanged) {
+            that.onFullScreenChanged();
+        }
+    }
+
+
+    document.addEventListener('webkitfullscreenchange', webkitfullscreenchange);
 
     this.toolsBinding = function (tools) {
         that.tools = tools;
@@ -305,8 +314,63 @@ function WSPlayerProxy(iframe, mode) {
                 }
 
             });
+            var timer = 0;
+            that.tools.element.addEventListener("touchstart", function () {
+                if(timer)
+                {
+                    clearTimeout(timer);
+                }
+                that.tools.control.content.style.display = ""
+            })
+            that.tools.element.addEventListener("touchmove", function () {
+                if(timer)
+                {
+                    clearTimeout(timer);
+                }
+                that.tools.control.content.style.display = ""
+            })
+            that.tools.element.addEventListener("touchend", function () {
+                timer = setTimeout(function () {
+                    that.tools.control.content.style.display = "none";
+                }, 5 * 1000);
+            })
         }
     }
+
+    this.isFullScreen = false;
+
+    this.fullscreen = function (canvas) {
+        if (canvas.RequestFullScreen) {
+            canvas.RequestFullScreen();
+        } else if (canvas.webkitRequestFullScreen) {
+            canvas.webkitRequestFullScreen();
+        } else if (canvas.mozRequestFullScreen) {
+            canvas.mozRequestFullScreen();
+        } else if (canvas.msRequestFullscreen) {
+            canvas.msRequestFullscreen();
+        } else {
+            console.error("This browser doesn't supporter fullscreen");
+        }
+        this.isFullScreen = true;
+    }
+
+    this.exitfullscreen = function () {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        } else {
+            console.error("Exit fullscreen doesn't work");
+        }
+        this.isFullScreen = false;
+    }
+
+
+
 
 }
 window.WSPlayerProxy = WSPlayerProxy;
@@ -456,13 +520,13 @@ function PlayerTools(element, mode) {
     this.binding = function (player) {
 
         player.getPosition = function (val) {
-            
+
             //that_tools.control.position.value = val;
             var valStr = parseFloat(val) * 100 + "% 100%";
             that_tools.control.position.style.backgroundSize = valStr;
         }
         player.getTimer = function (val) {
-            
+
             that_tools.control.position.min = val.min;
             that_tools.control.position.max = val.max;
             that_tools.control.end_time.innerText = new Date(val.max - val.min).format("HH:mm:ss");

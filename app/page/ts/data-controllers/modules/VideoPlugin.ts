@@ -1,3 +1,4 @@
+
 export interface VideoPluginIframeStyle {
     marginTop?: string,
     left: number
@@ -163,16 +164,24 @@ export class VideoPlugin {
     createWSPlayerProxy(mode?: string) {
         if (!this.iframe) return;
         this.proxy = new WSPlayerProxy(this.iframe, mode);
-        this.proxy.onPlaying = () => {
-            setTimeout(() => {
-                if (!this.proxy) return;
-                if (!this.soundOpened) {
-                    
-                    this.proxy.openSound();                    
-                    this.soundOpened = true;
 
-                }
-            }, 3000)
+        this.proxy.onStatusChanged = (status: WSPlayerState) => {
+            switch (status) {
+                case WSPlayerState.playing:
+                    setTimeout(() => {
+                        if (!this.proxy) return;
+                        if (!this.soundOpened) {
+                            console.log("openSound")
+                            this.proxy.openSound();
+                            this.soundOpened = true;
+
+                        }
+                    }, 0)
+                    break;
+
+                default:
+                    break;
+            }
         }
         this.proxy.onStoping = () => {
 
@@ -180,15 +189,28 @@ export class VideoPlugin {
         }
         this.proxy.onButtonClicked = (btn) => {
             if (btn == "fullscreen") {
-                this.isFullScreen = !this.isFullScreen;
-                this.autoSize();
-                this.setBodySize();
+                if (this.proxy) {
+                    if (this.proxy.isFullScreen) {
+                        this.proxy.exitfullscreen();
+                    }
+                    else {
+                        this.proxy.fullscreen(this.background);
+                    }
+                }
+
                 // if (this.tools) {
                 //     this.tools.control
                 // }
-                if (this.onFullscreenChanged) {
-                    this.onFullscreenChanged(this.isOrientation || this.isFullScreen);
-                }
+
+            }
+        }
+        this.proxy.onFullScreenChanged = () => {
+            if (this.proxy)
+                this.isFullScreen = this.proxy.isFullScreen
+            this.autoSize();
+            this.setBodySize();
+            if (this.onFullscreenChanged) {
+                this.onFullscreenChanged(this.isOrientation || this.isFullScreen);
             }
         }
     }
@@ -215,7 +237,6 @@ export class VideoPlugin {
 
         if (this.isOrientation || this.isFullScreen) {
             this.background.classList.add("fullscreen");
-
         }
         else {
             this.background.classList.remove("fullscreen")
@@ -243,13 +264,38 @@ export class VideoPlugin {
             }
         }, 10);
     }
-    eventRegist() {
-        window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", this.onorientationchange.bind(this), false);
+
+
+
+    onFullScreenChanged() {
+        alert(this.isFullScreen)
+        this.autoSize();
+        this.setBodySize();
+        if (this.onFullscreenChanged) {
+            this.onFullscreenChanged(this.isOrientation || this.isFullScreen);
+        }
     }
 
 
+    eventRegist() {
+        window.addEventListener("onorientationchange" in window ? "orientationchange" : "resize", this.onorientationchange.bind(this), false);
 
 
+    }
+
+    hideToolsHandle?: number;    
+    hideTools() {
+        if(!this.hideToolsHandle)
+        {
+            clearTimeout(this.hideToolsHandle);
+            this.hideToolsHandle = undefined;
+        }
+        this.hideToolsHandle = setTimeout(() => {
+            if (this.tools) {
+                this.tools.element.style.display = "none";
+            }
+        }, 5 * 1000);
+    }
 
     toHtml() {
         let element = this.getElement();

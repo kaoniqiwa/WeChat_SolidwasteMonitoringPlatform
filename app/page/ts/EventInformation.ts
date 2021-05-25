@@ -517,27 +517,32 @@ export namespace EventInformationPage {
             camera__name.innerHTML = "";
             let imgUrls = new Array<GarbageDropImageUrl>();
 
-            if (item.Data.IsHandle) {
-                if (item.Data.HandleImageUrls) {
-                    imgUrls = item.Data.HandleImageUrls.map(x => {
-                        return new GarbageDropImageUrl(x, EventType.GarbageDropHandle);
-                    });
-                }
+            
+            if (item.Data.DropImageUrls) {
+                let url = item.Data.DropImageUrls.map(x => {
+                    return new GarbageDropImageUrl(x, EventType.GarbageDrop);
+                });
+                imgUrls = imgUrls.concat(url);
             }
-            else if (item.Data.IsTimeout) {
+            if (item.Data.IsTimeout) {
                 if (item.Data.TimeoutImageUrls) {
-                    imgUrls = item.Data.TimeoutImageUrls.map(x => {
+                    let url = item.Data.TimeoutImageUrls.map(x => {
                         return new GarbageDropImageUrl(x, EventType.GarbageDropTimeout);
                     });
+                    imgUrls = imgUrls.concat(url);
                 }
             }
-            else {
-                if (item.Data.DropImageUrls) {
-                    imgUrls = item.Data.DropImageUrls.map(x => {
-                        return new GarbageDropImageUrl(x, EventType.GarbageDrop);
+            if (item.Data.IsHandle) {
+                if (item.Data.HandleImageUrls) {
+                    let url = item.Data.HandleImageUrls.map(x => {
+                        return new GarbageDropImageUrl(x, EventType.GarbageDropHandle);
                     });
+                    imgUrls = imgUrls.concat(url);
                 }
             }
+            
+            
+            
 
             if (imgUrls.length > 0) {
                 console.log(imgUrls);

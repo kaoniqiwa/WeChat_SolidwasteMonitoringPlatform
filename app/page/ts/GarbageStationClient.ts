@@ -820,7 +820,7 @@ export default class GarbageStationClient implements IObserver {
     container.className = "swiper-zoom-container";
 
     let img = document.createElement("img");
-    img.src = this.dataController.getImageUrl(imageUrl.url)!;
+    img.src = imageUrl.url; //this.dataController.getImageUrl(imageUrl.url)!;
     container.appendChild(img);
 
     let control = document.createElement("div");
