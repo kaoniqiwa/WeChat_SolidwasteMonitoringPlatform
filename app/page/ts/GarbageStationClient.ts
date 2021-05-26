@@ -159,7 +159,6 @@ export default class GarbageStationClient implements IObserver {
 
     this.miniRefresh = new MiniRefresh({
       container: '#minirefresh',
-      isLockX: false,// 可以横向滑动图片
       down: {
         callback: () => {
           // 下拉事件
@@ -167,10 +166,9 @@ export default class GarbageStationClient implements IObserver {
         }
       },
       up: {
-        isAuto: true,
+        isAuto: false,
         callback: () => {
           this.miniRefreshUp()
-
         }
       }
     });
@@ -187,7 +185,7 @@ export default class GarbageStationClient implements IObserver {
       if ('filtered' in args) {
         this.reset();
 
-        // console.log('filtered', args.filtered)
+        //// console.log('filtered', args.filtered)
         let data: Map<string, Array<string>> = new Map();
 
         let filtered = args.filtered as Map<string, Set<HTMLElement>>;
@@ -195,7 +193,7 @@ export default class GarbageStationClient implements IObserver {
           let ids = [...v].map(element => element.getAttribute('id') || '');
           data.set(k, ids);
         }
-        console.log(data)
+        //console.log(data)
         // this.confirmSelect(data);
 
         if (data.has('role')) {
@@ -215,6 +213,7 @@ export default class GarbageStationClient implements IObserver {
     })
     // 先请求服务器数据，然后本地筛选
     this.server.loadAllData().then(async () => {
+      // 触发 minirefreshup
       this.reset()
     })
     this.bindEvents();
@@ -223,7 +222,7 @@ export default class GarbageStationClient implements IObserver {
 
   // 下拉刷新重新创建整个页面
   async miniRefreshDown() {
-    console.log('miniRefreshDown');
+    //console.log('miniRefreshDown');
     // await this.loadAllData();
     this.server.loadAllData().then(() => {
       this.reset()
@@ -236,7 +235,7 @@ export default class GarbageStationClient implements IObserver {
     console.log('miniRefreshUp');
     let stop = false;
 
-    console.log('drop page', this.dropPage)
+    //console.log('drop page', this.dropPage)
     // 不是第一次请求
     if (this.dropPage) {
       if (this.dropPage.PageIndex >= this.dropPage.PageCount) {
@@ -256,13 +255,13 @@ export default class GarbageStationClient implements IObserver {
       }
       this.createContent();
     }
-    console.log('stop', stop);
+    //console.log('stop', stop);
     this.miniRefresh!.endUpLoading(stop);
 
   }
   async loadAsideData() {
     this.roleList = await this.dataController.getResourceRoleList();
-    // console.log('侧边栏筛选数据', this.roleList)
+    //// console.log('侧边栏筛选数据', this.roleList)
   }
   reset() {
     $(this.elements.others.originImg).hide();
@@ -281,7 +280,7 @@ export default class GarbageStationClient implements IObserver {
   }
 
   loadData() {
-    console.log('load data')
+    //console.log('load data')
     let res = this.server.fetch(this.eventTypes, this.roleTypes, this.currentPage);
 
     this.garbageStationsChunk = res.Data;
@@ -296,7 +295,7 @@ export default class GarbageStationClient implements IObserver {
   }
 
   bindEvents() {
-    console.log('bind event');
+    //console.log('bind event');
     let _this = this;
     this.elements.btns.btnDivision.addEventListener('click', () => {
       this.toggle()
@@ -317,7 +316,7 @@ export default class GarbageStationClient implements IObserver {
 
         this.zoomIn();
       }
-      console.log('当前状态', this.zoomStatus)
+      //console.log('当前状态', this.zoomStatus)
 
 
     })
@@ -380,7 +379,7 @@ export default class GarbageStationClient implements IObserver {
     await this.createCard(this.garbageStationsChunk)
   }
   private async createCard(data: GarbageStationViewModel[]) {
-    console.log('createContent')
+    //console.log('createContent')
 
     let _this = this;
     // 模板内容
@@ -417,7 +416,7 @@ export default class GarbageStationClient implements IObserver {
       // v.NumberStatistic.CurrentGarbageTime = 64;
       let currentGarbageTime = v.NumberStatistic!.CurrentGarbageTime! >> 0;
       // currentGarbageTime = Math.random() * 90 >> 0;
-      // console.log('currentGarbageTime', currentGarbageTime)
+      //// console.log('currentGarbageTime', currentGarbageTime)
       let hour = Math.floor(currentGarbageTime / 60);
       let minute = currentGarbageTime - hour * 60;
 
@@ -469,10 +468,10 @@ export default class GarbageStationClient implements IObserver {
       let imageUrls: Array<IImageUrl> = [];
 
       this.dataController.getCameraList(v.Id, (cameraId: string, url?: string) => { }).then(cameras => {
-        // console.log(v.Id)
-        // console.log(cameras)
+        //// console.log(v.Id)
+        //// console.log(cameras)
         if (cameras.length == 0) {
-          console.log(v.Id + ":" + v.Name);
+          //console.log(v.Id + ":" + v.Name);
           let div = slide as HTMLDivElement
           div.innerHTML = '暂未布置摄像机';
           div.className = 'no-camera'
@@ -518,8 +517,13 @@ export default class GarbageStationClient implements IObserver {
           })
           _this.customElement.dispatchEvent(ev)
         } else {
-          _this.myChartAside!.id = currentTarget.id!;// 触发绘图
-          _this.showChart = true;
+          if (_this.myChartAside && _this.myChartAside.contentLoaded) {
+            _this.myChartAside.pickerId = new Date().getTime()
+            _this.myChartAside.id = currentTarget.id!;
+            _this.myChartAside.manualSlide();
+            _this.showChart = true;
+          }
+
         }
 
       })
@@ -598,9 +602,8 @@ export default class GarbageStationClient implements IObserver {
     let ids = this.garbageStationsTotal.map(item => {
       return item.Id
     })
-    this.myChartAside = null;
 
-    console.log('create chart aside');
+    //console.log('create chart aside');
     this.myChartAside = new EchartsAside(this.elements.container.chartContainer, this.dataController, ids, new Date());
 
     this.myChartAside.init()
@@ -611,7 +614,7 @@ export default class GarbageStationClient implements IObserver {
     let str = this.elements.btns.searchInput.value;
     for (let [k, v] of this.garbageElements) {
       let div = v.Element;
-      // console.log(div)
+      //// console.log(div)
       if (str && !div.textContent!.includes(str)) {
         div.style.display = 'none';
       } else {
@@ -622,7 +625,7 @@ export default class GarbageStationClient implements IObserver {
   // 放大
   zoomIn() {
     let _this = this;
-    // console.log(this.garbageElements);
+    //// console.log(this.garbageElements);
     for (let [k, v] of this.garbageElements) {
       let contentCard = v.Element;
       (Array.from(contentCard.querySelectorAll('.content__img')) as HTMLElement[]).forEach((element: HTMLElement) => {

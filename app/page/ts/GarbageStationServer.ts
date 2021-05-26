@@ -31,8 +31,8 @@ export default class GarbageStationServer {
 
   }
   private filter() {
-    console.log('eventTypes', this.eventTypes)
-    console.log('roltTypes', this.roleTypes)
+    //console.log('eventTypes', this.eventTypes)
+    //console.log('roltTypes', this.roleTypes)
     /**
      *   垃圾落地集合中包含 正常/异常/满溢状态
      *   如果筛选的条件是垃圾落地和正常，那么筛选出垃圾落地后，再筛选正常会有重复的正常出现
@@ -132,7 +132,7 @@ export default class GarbageStationServer {
       Data: data,
       TotalData: resData
     }
-    console.log(res)
+    // console.log(res)
     return res;
   }
 }

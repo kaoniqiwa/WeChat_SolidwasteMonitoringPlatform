@@ -5,6 +5,10 @@ import { CandlestickOption } from "./Echart";
 import IAside from "./ISubject"
 import { dateFormat, getAllDay } from "../../common/tool";
 import "../css/myChartAside.less";
+import '../css/header.less'
+
+import weui from 'weui.js/dist/weui.js';
+import "weui";
 
 
 import Swiper, { Virtual, Pagination } from 'swiper';
@@ -59,39 +63,35 @@ export default class EchartsAside extends IAside {
   outterContainer: HTMLElement;
   innerContainer: HTMLDivElement = document.createElement("div");
 
+  private _originalDate!: Date;// 外部传入的日期
+
   private _date!: Date;
   get date() {
     return this._date;
   }
   set date(val) {
     this._date = val;
-    this.day = getAllDay(val)
-    // this.elements.date.textContent = dateFormat(val, "yyyy年MM月dd日")
+    this.day = getAllDay(val);
   }
   data?: GarbageStationViewModel[];
 
   statistic: Map<string, GarbageStationGarbageCountStatistic[]> = new Map()
 
-  _id: string = '';
+  private activeIndex: number = 0;
+  private activeSlide!: HTMLDivElement;
+  private isClosed: boolean = false;
+  public pickerId?: number;// 页面打开时的时间戳
 
+  private _id: string = '';
   get id() {
     return this._id;
   }
   set id(val) {
     this._id = val;
-    let index = this.ids.findIndex(id => {
-      return id == val
-    })
-    if (index == -1) return
-    // 展示第一个slide时，不会触发transitionEnd事件，所以要手动draw()
-    if (index == 0) {
-      this.draw();
-    }
-    this.swiper.slideTo(index)
-
   }
   swiper!: Swiper;
 
+  contentLoaded: boolean = false;
 
 
   elements!: {
@@ -100,13 +100,22 @@ export default class EchartsAside extends IAside {
   template = `
   <div class="inner-mask"></div>
   <div class="inner-content">
-    <div class="inner-bar">
-      <div class="inner-back"><i class="howell-icon-arrow2left"></i>返回</div>
-    </div>
+    <header class='inner-bar'>
+      <div class="header-item">
+        <div class="inner-back">
+          <i class="howell-icon-arrow2left"></i>返回
+        </div>
+      </div>
+      <div class="header-item">
+        <div class="header-item__btn" id="showDatePicker">
+          <i class="howell-icon-calendar" style="font-weight: bold"></i>
+        </div>
+      </div>
+    </header>
     <div class="inner-main">
       <div class="swiper-container">
         <div class="swiper-wrapper">
-          <div class="swiper-slide">
+         <!-- <div class="swiper-slide">
             <div data-id="310110019025001000" style="padding: 0 10px">
               <div class="inner-head">
                 <div class="inner-title">吉浦路395弄1号</div>
@@ -159,12 +168,11 @@ export default class EchartsAside extends IAside {
               <div class="inner-chart"></div>
             </div>
           </div>
+          -->
         </div>
       </div>
     </div>
-    <div class="inner-footer" style="display: none">
-      <div class="inner-btn">返回</div>
-    </div>
+    
   </div>
   
     `
@@ -175,56 +183,141 @@ export default class EchartsAside extends IAside {
 
     this.innerContainer.classList.add("echart-inner-container");
     this.innerContainer.innerHTML = this.template;
-    this.date = date;
+    this.date = this._originalDate = date;
 
   }
   init() {
+
+
+
+
     this.outterContainer.innerHTML = '';
     this.outterContainer.appendChild(this.innerContainer);
 
     this.swiper = new Swiper('.echart-inner-container .swiper-container', {
-      virtual: true,
+      init: true,
+      virtual: {
+        cache: true// 一定要缓存
+      },
       on: {
-        transitionEnd: () => {
+        transitionEnd: (swiper) => {
           console.log('transitionEnd')
-          this.draw()
+          this.activeIndex = swiper.activeIndex;
+          let activeSlide = this.innerContainer.querySelector('.swiper-slide-active') as HTMLDivElement
+
+          if (activeSlide) {
+            let id = (activeSlide.firstElementChild as HTMLElement).dataset['id']!;
+            this.id = id;
+            this.draw()
+          }
+
+        },
+        init(swiper) {
+          // console.log('swiper init')
         }
-      }
+      },
     })
 
     this.elements = {
       mask: this.innerContainer.querySelector('.inner-mask') as HTMLDivElement,
       innerBack: this.innerContainer.querySelector('.inner-back') as HTMLDivElement,
-      backBtn: this.innerContainer.querySelector('.inner-btn') as HTMLDivElement,
-      date: this.innerContainer.querySelector('.inner-date') as HTMLDivElement
+      date: this.innerContainer.querySelector('.inner-date') as HTMLDivElement,
+      showDatePicker: document.querySelector('#showDatePicker') as HTMLDivElement,
+
     }
 
-
     this.bindEvents();
-    this.loadAllData()
+    this.loadAllData().then((res) => {
+      // console.log('load all data')
+      // console.log(res)
+      this.statisticAllData = res;
+      this.createContent()
+    })
+  }
+  /**
+   * 手动控制swiper
+   */
+  manualSlide() {
+    let id = this.id;
+    let index = this.ids.findIndex(val => {
+      return val == id
+    })
+    if (index == -1) return
+    if (index == this.activeIndex) {
+      console.log('绘制第一个slide')
+      this.draw()
+    }
+
+    this.swiper.slideTo(index);
+    this.activeIndex = index;
+
   }
   private bindEvents() {
-    // window.addEventListener("resize", () => this.myChart.resize());
     if (this.elements.innerBack) {
       this.elements.innerBack.addEventListener("click", () => {
         this.notify({
           showChart: false
         })
+        this.date = this._originalDate
+        this.changeDate()
       })
     }
-    if (this.elements.backBtn) {
-      this.elements.backBtn.addEventListener("click", () => {
-        this.notify({
-          showChart: false
-        })
+
+    if (this.elements.showDatePicker) {
+      this.elements.showDatePicker.addEventListener('click', () => {
+        this.showDatePicker()
       })
     }
   }
+  /**
+   *  日期更改后，重新加载数据，且定位当当前 activeIndex
+   */
+  changeDate() {
+    this.reset();
+    this.loadAllData().then((res) => {
+      console.log('load all data')
+      // console.log(res)
+      this.statisticAllData = res;
+      this.createContent();
+      console.log(dateFormat(this.date, "yyyy年MM月dd日"))
+      this.manualSlide();
+    })
+  }
+  showDatePicker() {
+    if (this.pickerId) {
+      weui.datePicker({
+        start: new Date(2020, 12 - 1, 1),
+        end: new Date(),
+        onChange: (result: any) => {
+
+        },
+        onConfirm: (result: any) => {
+          let date = new Date(result[0].value, result[1].value - 1, result[2].value);
+          this.date = date;
+          this.changeDate()
+
+        },
+        title: '请选择日期',
+        id: this.pickerId
+      });
+
+    }
+
+
+  }
+  reset() {
+    //console.log('reset')
+    this.statistic.clear()
+    this.statisticAllData = [];
+    this.contentLoaded = false;
+  }
   private createContent() {
+
+    this.swiper.virtual.slides = []
+    this.swiper.virtual.cache = {};
+
+    // console.log('create contentd')
     let len = this.statisticAllData.length;
-
-    let slides = [];
-
     for (let i = 0; i < len; i++) {
       let data = this.statisticAllData[i][0];
       let { Name, GarbageRatio, AvgGarbageTime, MaxGarbageTime, GarbageDuration, EventNumbers } = data;
@@ -247,81 +340,73 @@ export default class EchartsAside extends IAside {
           mixIntoDrop = eventNumber.DayNumber
         }
       })
+      let slide = `
+      <div data-id='${data.Id}' style="padding:0 10px;">
+          <div class='inner-head'>
+              <div class='inner-title'>${data.Name}</div>
+                <div class='inner-date'>${dateFormat(this.date, "yyyy年MM月dd日")}</div>
+          </div>
 
-      slides.push(`
-                  <div data-id='${data.Id}' style="padding:0 10px;">
-                      <div class='inner-head'>
-                          <div class='inner-title'>${data.Name}</div>
-                            <div class='inner-date'>${dateFormat(this.date, "yyyy年MM月dd日")}</div>
-                      </div>
+          <div class='inner-info'>
+            <div class='item'>
+                <div class='name'>经霞敏</div>
+                <div class='note'>卫生干部</div>
+                <div class='phone'>13764296742</div>
+            </div>
+            <div class='item'>
+              <div class='name'>经霞敏</div>
+              <div class='note'>卫生干部</div>
+              <div class='phone'>13764296742</div>
+            </div>
+          </div>
 
-                      <div class='inner-info'>
-                        <div class='item'>
-                            <div class='name'>经霞敏</div>
-                            <div class='note'>卫生干部</div>
-                            <div class='phone'>13764296742</div>
-                        </div>
-                        <div class='item'>
-                          <div class='name'>经霞敏</div>
-                          <div class='note'>卫生干部</div>
-                          <div class='phone'>13764296742</div>
-                        </div>
-                      </div>
+          <div class='inner-statisic'>
+              <div class='ratio'>
+                  <div class='ratio-num'>${GarbageRatio}</div>
+                  <div class='ratio-suffix'>%</div>
+              </div>
 
-                      <div class='inner-statisic'>
-                          <div class='ratio'>
-                              <div class='ratio-num'>${GarbageRatio}</div>
-                              <div class='ratio-suffix'>%</div>
-                          </div>
-
-                          <div class='item'>
-                              <div class='item-title'>最大落地:</div>
-                              <div class='item-content'>
-                                  ${maxHour == 0 ? maxMinute + "分钟" : maxHour + "小时" + maxMinute + "分钟"}
-                              </div>
-                          </div>
-                          <div class='item'> 
-                              <div class='item-title'> 总落地:</div>
-                              <div class='item-content'>
-                                  ${totalHour == 0 ? totalMinute + "分钟" : totalHour + "小时" + totalMinute + "分钟"}
-                              </div>
-                          </div>
-
-                          <div class='item'>
-                              <div class='item-title'> 乱丢垃圾:</div>
-                              <div class='item-content'>${illegalDrop}起</div>
-                          </div>
-
-                          <div class='item'>
-                              <div class='item-title'> 混合投放:</div>
-                              <div class='item-content'>${mixIntoDrop}起</div>
-                          </div>
-                      </div>
-                      <div class="inner-chart"></div>
+              <div class='item'>
+                  <div class='item-title'>最大落地:</div>
+                  <div class='item-content'>
+                      ${maxHour == 0 ? maxMinute + "分钟" : maxHour + "小时" + maxMinute + "分钟"}
                   </div>
-                  `
-      )
-    }
-    this.swiper.removeAllSlides();
-    this.swiper.virtual.slides = []
-    this.swiper.virtual.appendSlide(slides)
-    // console.log(this.swiper.virtual.slides)
+              </div>
+              <div class='item'> 
+                  <div class='item-title'> 总落地:</div>
+                  <div class='item-content'>
+                      ${totalHour == 0 ? totalMinute + "分钟" : totalHour + "小时" + totalMinute + "分钟"}
+                  </div>
+              </div>
 
+              <div class='item'>
+                  <div class='item-title'> 乱丢垃圾:</div>
+                  <div class='item-content'>${illegalDrop}起</div>
+              </div>
+
+              <div class='item'>
+                  <div class='item-title'> 混合投放:</div>
+                  <div class='item-content'>${mixIntoDrop}起</div>
+              </div>
+          </div>
+          <div class="inner-chart"></div>
+      </div>
+      `
+      this.swiper.virtual.appendSlide(slide)
+    }
+
+    this.contentLoaded = true;
   }
   /**
    *  为了保证请求结果和 this.ids 顺序一致
    */
-  loadAllData() {
+  async loadAllData() {
     // console.log('loadAllData', this.ids)
     let arr = [];
     for (let i = 0; i < this.ids.length; i++) {
       arr.push(this.loadData(this.ids[i]))
     }
-    Promise.all(arr).then((res) => {
-      // console.log('allData', res)
-      this.statisticAllData = res;
-      this.createContent();
-    })
+    return Promise.all(arr)
   }
   private async loadData(id: string) {
     let res = await this.dataController.getGarbageStationNumberStatisticList([id], this.day)
@@ -329,10 +414,12 @@ export default class EchartsAside extends IAside {
   }
 
   private draw() {
-    let activeSlide = this.innerContainer.querySelector('.swiper-slide-active') as HTMLElement;
+    // console.log('%cdraw()', "color:green")
+    let activeSlide = this.innerContainer.querySelector('.swiper-slide-active') as HTMLDivElement
+    if (activeSlide == null) return
     let echart = activeSlide.querySelector('.inner-chart') as HTMLElement;
-    let id = (activeSlide.firstElementChild as HTMLElement).dataset['id'];
-    console.log('绘制', activeSlide.querySelector('.inner-title')?.textContent)
+    let id = this.id
+    // console.log('绘制', activeSlide.querySelector('.inner-title')?.textContent)
     if (id) {
       if (this.statistic.has(id)) {
         // 该id已经请求过数据，使用缓存
