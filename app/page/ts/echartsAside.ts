@@ -390,7 +390,7 @@ export default class EchartsAside extends IAside {
           <div class="inner-chart"></div>
       </div>
       `
-      this.swiper.virtual.appendSlide(slide)
+      this.swiper.virtual.appendSlide(slide);// 不要append数组
     }
 
     this.contentLoaded = true;

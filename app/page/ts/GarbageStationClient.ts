@@ -113,11 +113,15 @@ export default class GarbageStationClient implements IObserver {
   }
   set showChart(val) {
     this._showChart = val;
-    if (val) {
-      this.elements.container.chartContainer.classList.add('slideIn')
-    } else {
-      this.elements.container.chartContainer.classList.remove('slideIn')
+    if (this.myChartAside) {
+      if (val) {
+        this.elements.container.chartContainer.classList.add('slideIn')
+      } else {
+        this.elements.container.chartContainer.classList.remove('slideIn');
+        this.myChartAside.date = new Date();
+      }
     }
+
   }
 
   elements = {
@@ -413,10 +417,7 @@ export default class GarbageStationClient implements IObserver {
       let title_bandage = info.querySelector('.content__title__badage') as HTMLDivElement;
 
 
-      // v.NumberStatistic.CurrentGarbageTime = 64;
       let currentGarbageTime = v.NumberStatistic!.CurrentGarbageTime! >> 0;
-      // currentGarbageTime = Math.random() * 90 >> 0;
-      //// console.log('currentGarbageTime', currentGarbageTime)
       let hour = Math.floor(currentGarbageTime / 60);
       let minute = currentGarbageTime - hour * 60;
 
@@ -424,8 +425,6 @@ export default class GarbageStationClient implements IObserver {
       if (currentGarbageTime == 0) {
         (info.querySelector('.constDrop') as HTMLElement).classList.add('hidden');
       }
-      // let hour2 = hour.toString().padStart(2, '0');
-      // let minute2 = minute.toString().padStart(2, '0');
 
       let illegalDrop = info.querySelector('.illegalDrop-number') as HTMLSpanElement;
       let mixedInto = info.querySelector('.MixedInto-number') as HTMLSpanElement;
