@@ -7,7 +7,7 @@ import { ResourceRole, ResourceType } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
 import { DataController } from "./DataController";
 import { IDataController, IGarbageStationController, OneDay, Paged, StatisticNumber } from "./IController";
-import { GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
+import { DataCache, GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
 
 export class GarbageStationController extends DataController implements IDataController, IGarbageStationController {
 
@@ -215,8 +215,8 @@ export class GarbageStationController extends DataController implements IDataCon
 
 
 	getGarbageStationList = async () => {
-		if (this.GgarbageStations) {
-			return this.GgarbageStations;
+		if (DataCache.GarbageStations) {
+			return DataCache.GarbageStations;
 		}
 		let promise = await this.service.garbageStation.list({ Ids: this.roles.map(x => x.Id)});
 
@@ -229,13 +229,13 @@ export class GarbageStationController extends DataController implements IDataCon
 			vm.NumberStatistic = statisic.Data.find(x => x.Id == vm.Id);
 			result.push(vm);
 		}
-		result = result.sort((a, b) => {
-			if (a.DivisionId && b.DivisionId)
-				return a.DivisionId.localeCompare(a.DivisionId) || a.Name.localeCompare(b.Name);
-			return 0;
-		})
-		this.GgarbageStations = result;
-		return this.GgarbageStations;
+		// result = result.sort((a, b) => {
+		// 	if (a.DivisionId && b.DivisionId)
+		// 		return a.DivisionId.localeCompare(a.DivisionId) || a.Name.localeCompare(b.Name);
+		// 	return 0;
+		// })
+		DataCache.GarbageStations = result;
+		return DataCache.GarbageStations;
 	}
 
 

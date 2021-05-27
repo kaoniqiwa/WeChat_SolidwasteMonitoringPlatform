@@ -7,7 +7,7 @@ import { Service } from "../../../data-core/repuest/service";
 import { IDataController, IGarbageStationController, OneDay, Paged, StatisticNumber } from "./IController";
 import { DataController } from "./DataController";
 import { GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record-params";
-import { GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
+import { DataCache, GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
 
 
 export class CountDivisionController extends DataController implements IDataController, IGarbageStationController {
@@ -206,8 +206,8 @@ export class CountDivisionController extends DataController implements IDataCont
 	}
 
 	getGarbageStationList = async () => {
-		if (this.GgarbageStations) {
-			return this.GgarbageStations;
+		if (DataCache.GarbageStations) {
+			return DataCache.GarbageStations;
 		}
 		let list = new Array<GarbageStation>();
 		for (let i = 0; i < this.roles.length; i++) {
@@ -228,13 +228,13 @@ export class CountDivisionController extends DataController implements IDataCont
 			vm.NumberStatistic = statisic.Data.find(x => x.Id == vm.Id);
 			result.push(vm);
 		}
-		result = result.sort((a, b) => {
-			if (a.DivisionId && b.DivisionId)
-				return a.DivisionId.localeCompare(b.DivisionId) || a.Name.localeCompare(b.Name);
-			return 0;
-		})
-		this.GgarbageStations = result;
-		return this.GgarbageStations;
+		// result = result.sort((a, b) => {
+		// 	if (a.DivisionId && b.DivisionId)
+		// 		return a.DivisionId.localeCompare(b.DivisionId) || a.Name.localeCompare(b.Name);
+		// 	return 0;
+		// })
+		DataCache.GarbageStations = result;
+		return DataCache.GarbageStations;
 	}
 
 	private _ResourceRoleList?: Array<ResourceRole>;
