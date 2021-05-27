@@ -39,7 +39,7 @@ import { ResourceRole, ResourceType } from "../../data-core/model/we-chat";
 import { NavigationWindow } from ".";
 
 
-import weui from 'weui.js';
+import weui from 'weui.js/dist/weui.js';
 import "weui";
 
 

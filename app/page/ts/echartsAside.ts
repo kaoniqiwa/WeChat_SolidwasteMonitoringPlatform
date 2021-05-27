@@ -72,6 +72,13 @@ export default class EchartsAside extends IAside {
   set date(val) {
     this._date = val;
     this.day = getAllDay(val);
+
+    this.reset();
+    this.loadAllData().then(() => {
+      // console.log(this.statisticAllData);
+      this.createContent();
+      this.manualSlide()
+    })
   }
   data?: GarbageStationViewModel[];
 
@@ -183,12 +190,10 @@ export default class EchartsAside extends IAside {
 
     this.innerContainer.classList.add("echart-inner-container");
     this.innerContainer.innerHTML = this.template;
-    this.date = this._originalDate = date;
+    this.date = this._originalDate = date;// 在设置日期时提前下载好数据
 
   }
   init() {
-
-
 
 
     this.outterContainer.innerHTML = '';
@@ -212,9 +217,6 @@ export default class EchartsAside extends IAside {
           }
 
         },
-        init(swiper) {
-          // console.log('swiper init')
-        }
       },
     })
 
@@ -227,12 +229,6 @@ export default class EchartsAside extends IAside {
     }
 
     this.bindEvents();
-    this.loadAllData().then((res) => {
-      // console.log('load all data')
-      // console.log(res)
-      this.statisticAllData = res;
-      this.createContent()
-    })
   }
   /**
    * 手动控制swiper
@@ -243,8 +239,11 @@ export default class EchartsAside extends IAside {
       return val == id
     })
     if (index == -1) return
+    /**
+     *  选中第一个slide或者在当前slide上重新绘制
+     */
     if (index == this.activeIndex) {
-      console.log('绘制第一个slide')
+      console.log('手动绘制echart')
       this.draw()
     }
 
@@ -258,8 +257,6 @@ export default class EchartsAside extends IAside {
         this.notify({
           showChart: false
         })
-        this.date = this._originalDate
-        this.changeDate()
       })
     }
 
@@ -268,20 +265,6 @@ export default class EchartsAside extends IAside {
         this.showDatePicker()
       })
     }
-  }
-  /**
-   *  日期更改后，重新加载数据，且定位当当前 activeIndex
-   */
-  changeDate() {
-    this.reset();
-    this.loadAllData().then((res) => {
-      console.log('load all data')
-      // console.log(res)
-      this.statisticAllData = res;
-      this.createContent();
-      console.log(dateFormat(this.date, "yyyy年MM月dd日"))
-      this.manualSlide();
-    })
   }
   showDatePicker() {
     if (this.pickerId) {
@@ -294,8 +277,6 @@ export default class EchartsAside extends IAside {
         onConfirm: (result: any) => {
           let date = new Date(result[0].value, result[1].value - 1, result[2].value);
           this.date = date;
-          this.changeDate()
-
         },
         title: '请选择日期',
         id: this.pickerId
@@ -304,13 +285,30 @@ export default class EchartsAside extends IAside {
     }
 
 
+
   }
   reset() {
-    //console.log('reset')
+    // console.log('reset')
     this.statistic.clear()
     this.statisticAllData = [];
     this.contentLoaded = false;
   }
+  /**
+  *  为了保证请求结果和 this.ids 顺序一致
+  */
+  async loadAllData() {
+    // console.log('loadAllData', this.ids)
+    let arr = [];
+    for (let i = 0; i < this.ids.length; i++) {
+      arr.push(this.loadData(this.ids[i]))
+    }
+    this.statisticAllData = await Promise.all(arr);
+  }
+  private async loadData(id: string) {
+    let res = await this.dataController.getGarbageStationNumberStatisticList([id], this.day)
+    return res
+  }
+
   private createContent() {
 
     this.swiper.virtual.slides = []
@@ -397,22 +395,6 @@ export default class EchartsAside extends IAside {
 
     this.contentLoaded = true;
   }
-  /**
-   *  为了保证请求结果和 this.ids 顺序一致
-   */
-  async loadAllData() {
-    // console.log('loadAllData', this.ids)
-    let arr = [];
-    for (let i = 0; i < this.ids.length; i++) {
-      arr.push(this.loadData(this.ids[i]))
-    }
-    return Promise.all(arr)
-  }
-  private async loadData(id: string) {
-    let res = await this.dataController.getGarbageStationNumberStatisticList([id], this.day)
-    return res
-  }
-
   private draw() {
     // console.log('%cdraw()', "color:green")
     let activeSlide = this.innerContainer.querySelector('.swiper-slide-active') as HTMLDivElement
