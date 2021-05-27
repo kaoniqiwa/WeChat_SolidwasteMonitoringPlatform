@@ -1,5 +1,6 @@
 import Swiper from "swiper";
 import { Camera } from "../../../data-core/model/waste-regulation/camera";
+import { Division } from "../../../data-core/model/waste-regulation/division";
 import { CameraImageUrl, GarbageDropEventRecord, IllegalDropEventRecord, MixedIntoEventRecord } from "../../../data-core/model/waste-regulation/event-record";
 import { Flags, GarbageStation, StationState } from "../../../data-core/model/waste-regulation/garbage-station";
 import { GarbageStationNumberStatistic } from "../../../data-core/model/waste-regulation/garbage-station-number-statistic";
@@ -94,4 +95,10 @@ export class ViewModelConverter {
 
 
 
+}
+
+export class DataCache{
+    static GarbageStations?:Array<GarbageStationViewModel>;
+    static Divisions?:Array<Division>;
+    static Cameras?:Array<CameraViewModel>;
 }

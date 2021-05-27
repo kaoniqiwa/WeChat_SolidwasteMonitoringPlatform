@@ -40,7 +40,7 @@ export abstract class DataController implements IDataController, IGarbageStation
 
 
     roles: ResourceRole[];
-    GgarbageStations?: Array<GarbageStationViewModel>;
+    
     abstract getGarbageStationList: () => Promise<GarbageStationViewModel[]>;
     async getGarbageStation(id: string) {
         let item = await this.service.garbageStation.get(id);
