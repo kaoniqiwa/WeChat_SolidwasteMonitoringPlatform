@@ -49,7 +49,7 @@ export class CameraViewModel extends Camera {
     private service: Service;
     getImageUrl(){
         if (this.ImageUrl) {
-            return this.service.medium.getData(this.ImageUrl)
+            return this.service.picture(this.ImageUrl)
         }
         else {            
             return CameraViewModel.defaultImageUrl;

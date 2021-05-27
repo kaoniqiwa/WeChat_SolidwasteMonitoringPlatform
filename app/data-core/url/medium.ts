@@ -9,7 +9,7 @@ export class Mediume extends BaseUrl {
     getData(id:string){
         const u =new SessionUser();
         if(u.WUser)
-           return this.gateway+`Pictures/${id}.jpg?pictureId=${id}&ServerId=${u.WUser.ServerId}`;
+           return this.gateway+`Pictures/${id}.jpg?ServerId=${u.WUser.ServerId}`;
     }
 
     getJPG(jpg:string){

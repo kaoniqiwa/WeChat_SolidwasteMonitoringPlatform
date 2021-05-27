@@ -290,10 +290,9 @@ function WSPlayerProxy(iframe, mode) {
                 try {
                     if (that.status == WSPlayerState.ready)
                         return;
-                    debugger;
+                    
                     if (!evt || !evt.changedTouches || evt.changedTouches.length <= 0) return;
-
-                    debugger;
+                    
                     var width = evt.target.offsetWidth;
                     var x = evt.changedTouches[0].clientX - evt.target.offsetLeft;
 
@@ -314,40 +313,44 @@ function WSPlayerProxy(iframe, mode) {
                 }
 
             });
-            var timer = 0;
-            that.tools.element.addEventListener("touchstart", function () {
-                if(timer)
-                {
-                    clearTimeout(timer);
-                }
-                that.tools.control.content.style.display = ""
-            })
-            that.tools.element.addEventListener("touchmove", function () {
-                if(timer)
-                {
-                    clearTimeout(timer);
-                }
-                that.tools.control.content.style.display = ""
-            })
-            that.tools.element.addEventListener("touchend", function () {
-                timer = setTimeout(function () {
-                    that.tools.control.content.style.display = "none";
-                }, 5 * 1000);
-            })
         }
+        
+        var timer = 0;
+        that.tools.element.addEventListener("touchstart", function () {
+            if(timer)
+            {
+                clearTimeout(timer);
+            }
+            that.tools.control.content.style.display = ""
+        })
+        that.tools.element.addEventListener("touchmove", function () {
+            if(timer)
+            {
+                clearTimeout(timer);
+            }
+            that.tools.control.content.style.display = ""
+        })
+        that.tools.element.addEventListener("touchend", function () {
+            timer = setTimeout(function () {
+                that.tools.control.content.style.display = "none";
+            }, 5 * 1000);
+        })
+        timer = setTimeout(function () {
+            that.tools.control.content.style.display = "none";
+        }, 5 * 1000);
     }
 
     this.isFullScreen = false;
 
-    this.fullscreen = function (canvas) {
-        if (canvas.RequestFullScreen) {
-            canvas.RequestFullScreen();
-        } else if (canvas.webkitRequestFullScreen) {
-            canvas.webkitRequestFullScreen();
-        } else if (canvas.mozRequestFullScreen) {
-            canvas.mozRequestFullScreen();
-        } else if (canvas.msRequestFullscreen) {
-            canvas.msRequestFullscreen();
+    this.fullscreen = function (element) {        
+        if (element.RequestFullScreen) {
+            element.RequestFullScreen();
+        } else if (element.webkitRequestFullScreen) {
+            element.webkitRequestFullScreen();
+        } else if (element.mozRequestFullScreen) {
+            element.mozRequestFullScreen();
+        } else if (element.msRequestFullscreen) {
+            element.msRequestFullscreen();
         } else {
             console.error("This browser doesn't supporter fullscreen");
         }

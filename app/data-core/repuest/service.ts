@@ -1,5 +1,3 @@
-import { MediumPicture } from "../url/aiop/medium";
-import { Mediume } from "../url/medium";
 import { DivisionRequestService } from "./division.service";
 import { CameraRequestService, GarbageStationRequestService } from "./garbage-station.service";
 import { HowellAuthHttp } from "./howell-auth-http";
@@ -8,11 +6,13 @@ import { RoleRequestService } from "./role-service";
 import { UserRequestService } from "./user.service";
 import { WeChatRequestService } from "./we-chat.service";
 import { SRServersRequestService } from "./sr-service";
+import { ServerRequestService } from "./servers.service";
+import { SessionUser } from "../../common/session-user";
 
 export class Service {
-
+    session:SessionUser;
     constructor(private requestService: HowellAuthHttp) {
-
+        this.session = new SessionUser();
     }
 
     private _user?: UserRequestService;
@@ -67,18 +67,6 @@ export class Service {
         }
         return this._camera;
     }
-
-    private _medium?: Mediume;
-    /** 媒体服务 */
-    get medium(): Mediume {
-        if (!this._medium) {
-            this._medium = new Mediume();
-        }
-        return this._medium;
-
-        // this._medium为 null或者undefined，则返回new Medium(),否则返回 this._medium;
-        // return this._medium ?? new Mediume()
-    }
     private _event?: EventRequestService;
     get event(): EventRequestService {
         if (!this._event) {
@@ -94,6 +82,20 @@ export class Service {
             this._sr = new SRServersRequestService(this.requestService);
         }
         return this._sr;
+    }
+
+    private _server?: ServerRequestService;
+    get server(): ServerRequestService {
+        if (!this._server) {
+            this._server = new ServerRequestService(this.requestService);
+        }
+        return this._server;
+    }
+
+    
+    
+    picture(id:string)  {
+        return this.server.Pictures(this.session.WUser.ServerId!, id)
     }
 
 }

@@ -229,6 +229,9 @@ export namespace EventInformationPage {
                 for (let i = 0; i < detail_imgs.length; i++) {
                     let detail_img = detail_imgs[i] as HTMLImageElement;
                     detail_img.src = url;
+                    if (i > 3) {
+                        detail_img.loading = "lazy";
+                    }
                     detail_img.onload = () => {
                         detail_img.removeAttribute("data-src");
                         const frame = detail_img.parentElement!.querySelector(".frame") as HTMLDivElement
@@ -247,10 +250,11 @@ export namespace EventInformationPage {
                         let interval = this.getEventTimeInterval(time);
 
 
-                        let url:IImageUrl = {
-                            url:detail_img.src,
-                            cameraId:item.ResourceId!,
-                            playback:this.dataController.getVodUrl(item.ResourceId!, interval.begin, interval.end)
+                        let url: IImageUrl = {
+                            url: detail_img.src,
+                            cameraName: item.ResourceName,
+                            cameraId: item.ResourceId!,
+                            playback: this.dataController.getVodUrl(item.ResourceId!, interval.begin, interval.end)
                         }
 
                         this.imageController.showDetail(selectors, [url], true);
@@ -283,16 +287,16 @@ export namespace EventInformationPage {
             }
         }
 
-        getEventTimeInterval(time:Date){
-            
-                time.setSeconds(time.getSeconds() - 15);
-                let begin = new Date(time.getTime());
-                time.setSeconds(time.getSeconds() + 30);
-                let end = new Date(time.getTime());
-                return {
-                    begin:begin,
-                    end:end
-                }
+        getEventTimeInterval(time: Date) {
+
+            time.setSeconds(time.getSeconds() - 15);
+            let begin = new Date(time.getTime());
+            time.setSeconds(time.getSeconds() + 30);
+            let end = new Date(time.getTime());
+            return {
+                begin: begin,
+                end: end
+            }
         }
 
 
@@ -371,14 +375,18 @@ export namespace EventInformationPage {
                     const imageUrl = item.Data.CameraImageUrls[i];
                     url = this.dataController.getImageUrl(imageUrl.ImageUrl) as string;
                     urls.push({
-                        url:url,
-                        cameraId:imageUrl.CameraId,
-                        playback:this.dataController.getVodUrl(imageUrl.CameraId, interval.begin, interval.end),
+                        url: url,
+                        cameraName: imageUrl.CameraName,
+                        cameraId: imageUrl.CameraId,
+                        playback: this.dataController.getVodUrl(imageUrl.CameraId, interval.begin, interval.end),
                     });
 
 
                     if (detail_img) {
                         detail_img.src = url;
+                        if (i > 3) {
+                            detail_img.loading = "lazy";
+                        }
 
                         detail_img.onload = () => {
                             detail_img.removeAttribute("data-src");
@@ -517,7 +525,7 @@ export namespace EventInformationPage {
             camera__name.innerHTML = "";
             let imgUrls = new Array<GarbageDropImageUrl>();
 
-            
+
             if (item.Data.DropImageUrls) {
                 let url = item.Data.DropImageUrls.map(x => {
                     return new GarbageDropImageUrl(x, EventType.GarbageDrop);
@@ -540,9 +548,9 @@ export namespace EventInformationPage {
                     imgUrls = imgUrls.concat(url);
                 }
             }
-            
-            
-            
+
+
+
 
             if (imgUrls.length > 0) {
                 console.log(imgUrls);
@@ -565,14 +573,18 @@ export namespace EventInformationPage {
                     const imageUrl = imgUrls[i];
                     url = this.dataController.getImageUrl(imageUrl.ImageUrl) as string;
                     urls.push({
-                        url:url,
-                        cameraId:imageUrl.CameraId,
-                        playback:this.dataController.getVodUrl(imageUrl.CameraId, interval.begin, interval.end)
+                        url: url,
+                        cameraName: imageUrl.CameraName,
+                        cameraId: imageUrl.CameraId,
+                        playback: this.dataController.getVodUrl(imageUrl.CameraId, interval.begin, interval.end)
                     });
 
 
                     if (detail_img) {
                         detail_img.src = url;
+                        if (i > 3) {
+                            detail_img.loading = "lazy";
+                        }
 
                         detail_img.onload = () => {
                             detail_img.removeAttribute("data-src");

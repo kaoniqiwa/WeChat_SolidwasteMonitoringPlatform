@@ -103,8 +103,8 @@ export abstract class DataController implements IDataController, IGarbageStation
             return vm;
         });
     }
-    getImageUrlBySingle = (id: string) => {
-        return this.service.medium.getData(id);
+    getImageUrlBySingle = (id: string) => {        
+        return this.service.picture(id);
     }
     getImageUrlByArray = (ids: string[]) => {
         const array = [];
@@ -237,11 +237,6 @@ export abstract class DataController implements IDataController, IGarbageStation
                 return undefined;
         }
 
-        // promise.Data.forEach(x => {
-        //     if (x.ImageUrl) {
-        //         x.ImageUrl = this.service.medium.getData(x.ImageUrl) as string;
-        //     }
-        // });
         return promise;
 
     }

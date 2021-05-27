@@ -211,9 +211,13 @@ export class CountDivisionController extends DataController implements IDataCont
 		}
 		let list = new Array<GarbageStation>();
 		for (let i = 0; i < this.roles.length; i++) {
-			const role = this.roles[i];			
-			const promise = await this.service.garbageStation.list({ DivisionId: role.Id });
-			list = list.concat(promise.Data);
+			const role = this.roles[i];
+			try {
+				const promise = await this.service.garbageStation.list({ DivisionId: role.Id });
+				list = list.concat(promise.Data);
+			} catch (e) {
+				console.error("getGarbageStationList error:", e);
+			}
 		}
 		let statisic = await this.service.garbageStation.statisticNumberList({ Ids: list.map(x => x.Id) })
 

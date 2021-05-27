@@ -194,7 +194,12 @@ export class VideoPlugin {
                         this.proxy.exitfullscreen();
                     }
                     else {
-                        this.proxy.fullscreen(this.background);
+                        if (this.background)
+                            this.proxy.fullscreen(this.background.parentElement);
+
+                    }
+                    if (this.isIOS) {
+                        this.proxy.onFullScreenChanged();
                     }
                 }
 
@@ -206,7 +211,7 @@ export class VideoPlugin {
         }
         this.proxy.onFullScreenChanged = () => {
             if (this.proxy)
-                this.isFullScreen = this.proxy.isFullScreen
+                this.isFullScreen = this.proxy.isFullScreen;
             this.autoSize();
             this.setBodySize();
             if (this.onFullscreenChanged) {
@@ -283,10 +288,9 @@ export class VideoPlugin {
 
     }
 
-    hideToolsHandle?: number;    
+    hideToolsHandle?: number;
     hideTools() {
-        if(!this.hideToolsHandle)
-        {
+        if (!this.hideToolsHandle) {
             clearTimeout(this.hideToolsHandle);
             this.hideToolsHandle = undefined;
         }

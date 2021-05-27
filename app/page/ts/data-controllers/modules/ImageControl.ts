@@ -30,8 +30,7 @@ export class ImageController {
         type: 'fraction',
       },
       on: {
-        click: (e, a) => {
-
+        touchEnd: (e, a) => {
           let path = ((a.composedPath && a.composedPath()) || a.path) as HTMLElement[];
           if (path) {
             for (let i = 0; i < path.length; i++) {
@@ -42,11 +41,13 @@ export class ImageController {
               if (path[i].className == "tools") {
                 return;
               }
+              if (path[i].tagName == "IMG") {
+                return;
+              }
             }
           }
           $(this.originImg).fadeOut(() => {
-            if(this.video)
-            {
+            if (this.video) {
               this.video.destory();
               this.video = undefined;
             }
@@ -101,6 +102,9 @@ export class ImageController {
     container.className = "swiper-zoom-container";
 
     this.img = document.createElement("img");
+    if (imageUrl.cameraName) {
+      this.img.alt = imageUrl.cameraName;
+    }
     this.img.id = selector.imgId;
     this.img.src = imageUrl.url;
 
