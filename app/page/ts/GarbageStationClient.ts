@@ -9,7 +9,7 @@ import Swiper, { Virtual, Pagination, } from 'swiper';
 import $ from 'jquery';
 import MyAside, { SelectionMode } from './myAside';
 import EchartsAside from "./EchartsAside";
-import { GarbageStationViewModel, IActiveElement, IImageUrl } from "./data-controllers/ViewModels";
+import { CameraViewModel, GarbageStationViewModel, IActiveElement, IImageUrl } from "./data-controllers/ViewModels";
 
 import '../css/header.less'
 
@@ -493,6 +493,9 @@ export default class GarbageStationClient implements IObserver {
           img.id = camera.Id;
           img.setAttribute('index', index + '')
           img.src = camera.getImageUrl()!
+          img.onerror = function () {
+            img.src = CameraViewModel.defaultImageUrl
+          }
           // img!.src = camera.ImageUrl!;
 
           if (!camera.OnlineStatus == undefined || camera.OnlineStatus == OnlineStatus.Offline) {
