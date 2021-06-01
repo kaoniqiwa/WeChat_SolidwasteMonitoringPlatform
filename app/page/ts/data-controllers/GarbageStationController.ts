@@ -5,9 +5,10 @@ import { EventNumber, EventType } from "../../../data-core/model/waste-regulatio
 import { GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record-params";
 import { ResourceRole, ResourceType } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
+import { DataCache } from "./Cache";
 import { DataController } from "./DataController";
 import { IDataController, IGarbageStationController, OneDay, Paged, StatisticNumber } from "./IController";
-import { DataCache, GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
+import { GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
 
 export class GarbageStationController extends DataController implements IDataController, IGarbageStationController {
 

@@ -45,6 +45,7 @@
 }
 
 @media screen and (orientation: landscape) {
+
   .video_background {
     width: 100vh;
     height: 100vw;
@@ -56,4 +57,76 @@
     height: 100vh;
     transform: rotate(0deg);
   }
+
+
+
+  .video_background+.capturePicture {
+    width: 100vh;
+    height: 100vw;
+    transform: rotate(-90deg) translate(calc((100vw - 100vh) / 2), calc((100vw - 100vh) / 2));
+  }
+
+
+  .video_background.fullscreen+.capturePicture {
+    width: 100vw;
+    height: 100vh;
+    transform: rotate(0deg);
+  }
+
+
+}
+
+
+@keyframes capture {
+  0% {
+    background-color: white;
+  }
+
+  100% {
+    background-color: black;
+  }
+}
+
+
+.capturePicture {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  animation: capture 1s;
+  z-index: 1001;
+  top: 0;
+  left: 0;
+  background-color: black;
+}
+
+.capturePicture>img {
+  width: 100%;
+  height: calc(100vw / 16 * 9);
+  position: absolute;
+  top: 50%;
+  left: 0;
+  border: none;
+
+  transform: translate(-50%, -50%);
+
+}
+
+.capturePicture .description {
+  position: absolute;
+  width: 100vw;
+  height: 50px;
+  font-size: 28px;
+  color: rgba(255, 255, 255, 0.9);
+  top: 70%;
+}
+
+.video_background.fullscreen+.capturePicture>img {
+  width: 50% !important;
+  height: 50% !important;
+  transform: translate(50%, -50%) !important;
+}
+
+.video_background.fullscreen+.capturePicture>.description {
+  top: auto;
+  bottom: 20px;
 }

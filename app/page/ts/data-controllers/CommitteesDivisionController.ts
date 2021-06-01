@@ -4,9 +4,10 @@ import { EventNumber, EventType } from "../../../data-core/model/waste-regulatio
 import { GarbageStation } from "../../../data-core/model/waste-regulation/garbage-station";
 import { ResourceRole, ResourceType } from "../../../data-core/model/we-chat";
 import { Service } from "../../../data-core/repuest/service";
+import { DataCache } from "./Cache";
 import { DataController } from "./DataController";
 import { OneDay, Paged, StatisticNumber } from "./IController";
-import { DataCache, GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
+import { GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
 
 export class CommitteesDivisionController extends DataController {
 
@@ -38,8 +39,7 @@ export class CommitteesDivisionController extends DataController {
 		// 	if (a.DivisionId && b.DivisionId)
 		// 		return a.DivisionId.localeCompare(a.DivisionId) || a.Name.localeCompare(b.Name);
 		// 	return 0;
-		// })
-		Cache
+		// })		
 		DataCache.GarbageStations = result;
 		return DataCache.GarbageStations;
 	}

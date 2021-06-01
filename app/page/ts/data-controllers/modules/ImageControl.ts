@@ -1,5 +1,5 @@
 import Swiper, { Pagination, Virtual } from 'swiper';
-import { IImageUrl } from '../ViewModels';
+import { IImageUrl, IPictureController } from '../ViewModels';
 import { VideoPlugin } from './VideoPlugin';
 
 Swiper.use([Pagination, Virtual])
@@ -38,7 +38,7 @@ export class ImageController {
                 this.onPlayControlClicked(this.imageUrls![this.swiper!.activeIndex], path[i] as HTMLDivElement);
                 return;
               }
-              if (path[i].className == "tools") {
+              if (path[i].className == "tools" || path[i].className == "capturePicture") {
                 return;
               }
               if (path[i].tagName == "IMG") {
@@ -131,7 +131,7 @@ export class ImageController {
 
   video?: VideoPlugin;
 
-  onPlayControlClicked(index: IImageUrl, div: HTMLDivElement) {
+  onPlayControlClicked(index: IImageUrl, div: HTMLDivElement, picture: IPictureController) {
     if (this.video) {
       this.video.destory();
       this.video = undefined;
@@ -145,7 +145,7 @@ export class ImageController {
     let wrapper_width = (document.querySelector(".swiper-wrapper.page") as HTMLDivElement).clientWidth;
     if (img.playback) {
       img.playback.then(x => {
-        this.video = new VideoPlugin("", x.Url, x.WebUrl);
+        this.video = new VideoPlugin("", x.Url, x.WebUrl, picture);
         this.video.onFullscreenChanged = (is) => {
           let pagination = document.querySelector(".swiper-pagination.swiper-pagination-fraction") as HTMLDivElement;
           if (!pagination) return;

@@ -7,7 +7,8 @@ import { Service } from "../../../data-core/repuest/service";
 import { IDataController, IGarbageStationController, OneDay, Paged, StatisticNumber } from "./IController";
 import { DataController } from "./DataController";
 import { GetEventRecordsParams } from "../../../data-core/model/waste-regulation/event-record-params";
-import { DataCache, GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
+import { GarbageStationViewModel, ViewModelConverter } from "./ViewModels";
+import { DataCache } from "./Cache";
 
 
 export class CountDivisionController extends DataController implements IDataController, IGarbageStationController {
