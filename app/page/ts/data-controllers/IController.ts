@@ -249,7 +249,7 @@ export interface IEventHistory extends IResourceRoleList, IImage, IVodUrl {
 
 }
 export interface IDetailsEvent extends IImage, IVodUrl {
-
+  picture: IPictureController;
 
   /**
    * 获取事件记录

@@ -315,12 +315,35 @@ export abstract class DataController implements IDataController, IGarbageStation
     }
   }
 
-  GetEventRecordByGarbageStation(garbageStationId: string, type: EventType, day: OneDay): Promise<PagedList<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord> | undefined> {
+  async GetEventRecordByGarbageStation(garbageStationId: string, type?: EventType, day: OneDay = { begin: new Date(), end: new Date() })
+    : Promise<PagedList<IllegalDropEventRecord | MixedIntoEventRecord | GarbageFullEventRecord | GarbageDropEventRecord> | undefined> {
     let params = this.getEventListParams(day, { size: 999, index: 1 }, type);
     params.DivisionIds = undefined;
     params.ResourceIds = undefined;
     params.StationIds = [garbageStationId];
-    return this.getEventListByParams(type, params);
+    if (type) {
+      switch (type) {
+        case EventType.GarbageDrop:
+          (params as GetGarbageDropEventRecordsParams).IsTimeout = false;
+          (params as GetGarbageDropEventRecordsParams).IsHandle = false;
+          return await this.service.event.garbageDropList(params);
+        case EventType.GarbageDropTimeout:
+          (params as GetGarbageDropEventRecordsParams).IsTimeout = true;
+          (params as GetGarbageDropEventRecordsParams).IsHandle = false;
+          return await this.service.event.garbageDropList(params);
+        case EventType.GarbageDropHandle:
+          (params as GetGarbageDropEventRecordsParams).IsHandle = true;
+          (params as GetGarbageDropEventRecordsParams).IsTimeout = false;
+          return await this.service.event.garbageDropList(params);
+
+        default:
+          return this.getEventListByParams(type, params);
+      }
+    }
+    else {
+      return await this.service.event.garbageDropList(params);
+
+    }
   }
 
   async GetCamera(garbageStationId: string, cameraId: string): Promise<CameraViewModel> {
