@@ -2,10 +2,10 @@
  *  pmx
  */
 
-import weui from 'weui.js';
+import weui from 'weui.js/dist/weui.js';
 import "weui";
 import "../css/myDatePicker.less"
-import ISubject from './ISubject';
+import ISubject from './IAside';
 
 interface MyWeuiOptions {
   type: string;
@@ -107,5 +107,10 @@ export default class MyWeui extends ISubject {
       document.body.appendChild(el);
     }
     return el
+  }
+  notify(args: any) {
+    this.observerList.forEach(observer => {
+      observer.update(args)
+    })
   }
 }

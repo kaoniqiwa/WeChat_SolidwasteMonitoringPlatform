@@ -57,7 +57,7 @@ export default class GarbageStationClient implements IObserver {
 
   private customElement = document.createElement('div');
 
-  dataController: IGarbageStationController;
+  dataController: DataController;
 
   type: ResourceType;//当前账号的类型
 
@@ -155,7 +155,7 @@ export default class GarbageStationClient implements IObserver {
     size: 10,
   }
 
-  constructor(type: ResourceType, dataController: IGarbageStationController,
+  constructor(type: ResourceType, dataController: DataController,
     private server: GarbageStationServer
   ) {
     this.type = type;
@@ -331,7 +331,7 @@ export default class GarbageStationClient implements IObserver {
     this.elements.btns.btnSearch.addEventListener('click', () => {
       this.filerContent();
     })
-    // // 用私有变量监听事件
+    // 用私有变量监听事件
     this.customElement.addEventListener('cat', (e: any) => {
       this.showDetail({
         id: e.detail.id,
@@ -496,6 +496,9 @@ export default class GarbageStationClient implements IObserver {
           img.onerror = function () {
             img.src = CameraViewModel.defaultImageUrl
           }
+          img.onload = (el) => {
+            img.removeAttribute('data-src')
+          }
           // img!.src = camera.ImageUrl!;
 
           if (!camera.OnlineStatus == undefined || camera.OnlineStatus == OnlineStatus.Offline) {
@@ -514,7 +517,7 @@ export default class GarbageStationClient implements IObserver {
           let ev = new CustomEvent('cat', {
             detail: {
               index: target.getAttribute('index'),
-              id: v.Id
+              id: currentTarget.id!
             }
           })
           _this.customElement.dispatchEvent(ev)
@@ -601,12 +604,11 @@ export default class GarbageStationClient implements IObserver {
     this.myAside.add(this)
   }
   createChartAside() {
-    let ids = this.garbageStationsTotal.map(item => {
-      return item.Id
-    })
+    let ids = this.garbageStationsTotal.map(item => item.Id)
+    let names = this.garbageStationsTotal.map(item => item.Name)
 
     //console.log('create chart aside');
-    this.myChartAside = new EchartsAside(this.elements.container.chartContainer, this.dataController, ids, new Date());
+    this.myChartAside = new EchartsAside(this.elements.container.chartContainer, this.dataController, ids, names, new Date());
 
     this.myChartAside.init()
     this.myChartAside.add(this)
@@ -796,7 +798,7 @@ export default class GarbageStationClient implements IObserver {
     }
     if (img.preview) {
       img.preview.then(x => {
-        this.video = new VideoPlugin(img.cameraName!, x.Url, x.WebUrl);
+        this.video = new VideoPlugin(img.cameraName!, x.Url, x.WebUrl, this.dataController.picture);
         this.video.onFullscreenChanged = (is) => {
           let pagination = document.querySelector(".swiper-pagination.swiper-pagination-fraction") as HTMLDivElement;
           if (!pagination) return;

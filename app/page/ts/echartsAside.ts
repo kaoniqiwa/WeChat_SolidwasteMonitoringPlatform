@@ -2,13 +2,15 @@
  * pmx
  */
 import { CandlestickOption } from "./Echart";
-import IAside from "./ISubject"
+import IAside from "./IAside"
 import { dateFormat, getAllDay } from "../../common/tool";
 import "../css/myChartAside.less";
 import '../css/header.less'
 
 import weui from 'weui.js/dist/weui.js';
 import "weui";
+
+import echartAsideTemplate from '../EchartAside.html';
 
 
 import Swiper, { Virtual, Pagination } from 'swiper';
@@ -38,6 +40,8 @@ import { ControllerFactory } from "./data-controllers/ControllerFactory";
 import { DataController } from "./data-controllers/DataController";
 import { EventType } from "../../data-core/model/waste-regulation/event-number";
 import { IDataController, IGarbageStationController, OneDay } from "./data-controllers/IController";
+import EchartsDetailAside from "./EchartsDetailAside";
+import IObserver from "./IObserver";
 
 echarts.use([
   GridComponent,
@@ -49,12 +53,7 @@ echarts.use([
   DataZoomComponent
 ])
 
-interface EchartsAsideOptions {
-  date: Date;
-  ids: string[]
-}
-
-export default class EchartsAside extends IAside {
+export default class EchartsAside extends IAside implements IObserver {
   candlestickOption: CandlestickOption = new CandlestickOption()
   myChart?: echarts.ECharts;
   statisticAllData: Array<Array<GarbageStationNumberStatisticV2>> = [];
@@ -62,8 +61,6 @@ export default class EchartsAside extends IAside {
 
   outterContainer: HTMLElement;
   innerContainer: HTMLDivElement = document.createElement("div");
-
-  private _originalDate!: Date;// 外部传入的日期
 
   private _date!: Date;
   get date() {
@@ -75,7 +72,7 @@ export default class EchartsAside extends IAside {
 
     this.reset();
     this.loadAllData().then(() => {
-      // console.log(this.statisticAllData);
+      console.log(this.statisticAllData);
       this.createContent();
       this.manualSlide()
     })
@@ -85,8 +82,6 @@ export default class EchartsAside extends IAside {
   statistic: Map<string, GarbageStationGarbageCountStatistic[]> = new Map()
 
   private activeIndex: number = 0;
-  private activeSlide!: HTMLDivElement;
-  private isClosed: boolean = false;
   public pickerId?: number;// 页面打开时的时间戳
 
   private _id: string = '';
@@ -96,6 +91,35 @@ export default class EchartsAside extends IAside {
   set id(val) {
     this._id = val;
   }
+  update(args: any) {
+    if (args) {
+
+      if ('showDetail' in args) {
+        this.showDetail = args.showDetail
+      }
+
+    }
+  }
+
+  myEchartsDetailAside: EchartsDetailAside | null = null;
+
+  private _showDetail: boolean = false;
+
+  get showDetail() {
+    return this._showDetail;
+  }
+  set showDetail(val) {
+    this._showDetail = val;
+    if (this.myEchartsDetailAside) {
+      if (val) {
+        this.elements.detailContainer.classList.add('slideIn')
+      } else {
+        this.elements.detailContainer.classList.remove('slideIn');
+      }
+    }
+
+  }
+
   swiper!: Swiper;
 
   contentLoaded: boolean = false;
@@ -104,100 +128,32 @@ export default class EchartsAside extends IAside {
   elements!: {
     [key: string]: HTMLElement
   }
-  template = `
-  <div class="inner-mask"></div>
-  <div class="inner-content">
-    <header class='inner-bar'>
-      <div class="header-item">
-        <div class="inner-back">
-          <i class="howell-icon-arrow2left"></i>返回
-        </div>
-      </div>
-      <div class="header-item">
-        <div class="header-item__btn" id="showDatePicker">
-          <i class="howell-icon-calendar" style="font-weight: bold"></i>
-        </div>
-      </div>
-    </header>
-    <div class="inner-main">
-      <div class="swiper-container">
-        <div class="swiper-wrapper">
-         <!-- <div class="swiper-slide">
-            <div data-id="310110019025001000" style="padding: 0 10px">
-              <div class="inner-head">
-                <div class="inner-title">吉浦路395弄1号</div>
-                <div class="inner-date">
-                2021年05月20日
-                </div>
-              </div>
-              <div class="inner-info">
-                <div class="item">
-                  <div class="name">经霞敏</div>
-                  <div class="note">卫生干部</div>
-                  <div class="phone">13764296742</div>
-                </div>
-                <div class="item">
-                  <div class="name">经霞敏</div>
-                  <div class="note">卫生干部</div>
-                  <div class="phone">13764296742</div>
-                </div>
-              </div>
-  
-              <div class="inner-statisic">
-                <div class="ratio">
-                  <div class="ratio-num">100</div>
-                  <div class="ratio-suffix">%</div>
-                </div>
-  
-                <div class="item">
-                  <div class="item-title">最大落地:</div>
-                  <div class="item-content">
-                   0分钟
-                  </div>
-                </div>
-                <div class="item">
-                  <div class="item-title">总落地:</div>
-                  <div class="item-content">
-                    0分钟
-                  </div>
-                </div>
-  
-                <div class="item">
-                  <div class="item-title">乱丢垃圾:</div>
-                  <div class="item-content">0起</div>
-                </div>
-  
-                <div class="item">
-                  <div class="item-title">混合投放:</div>
-                  <div class="item-content">0起</div>
-                </div>
-              </div>
-              <div class="inner-chart"></div>
-            </div>
-          </div>
-          -->
-        </div>
-      </div>
-    </div>
-    
-  </div>
-  
-    `
-  constructor(selector: HTMLElement | string, private dataController: IGarbageStationController, private ids: string[], date: Date) {
+  template = echartAsideTemplate;
+
+
+  constructor(selector: HTMLElement | string, private dataController: DataController, private ids: string[], private names: string[], date: Date) {
     super();
     this.outterContainer = typeof selector == "string" ? document.querySelector(selector) as HTMLElement : selector;
 
 
     this.innerContainer.classList.add("echart-inner-container");
     this.innerContainer.innerHTML = this.template;
-    this.date = this._originalDate = date;// 在设置日期时提前下载好数据
+    this.date = date;// 在设置日期时提前下载好数据
+
 
   }
   init() {
 
-
     this.outterContainer.innerHTML = '';
     this.outterContainer.appendChild(this.innerContainer);
+    this.elements = {
+      mask: this.innerContainer.querySelector('.inner-mask') as HTMLDivElement,
+      innerBack: this.innerContainer.querySelector('.inner-back') as HTMLDivElement,
+      date: this.innerContainer.querySelector('.inner-date') as HTMLDivElement,
+      showDatePicker: document.querySelector('#showDatePicker') as HTMLDivElement,
+      detailContainer: document.querySelector('#detail-container') as HTMLDivElement
+    }
+
 
     this.swiper = new Swiper('.echart-inner-container .swiper-container', {
       init: true,
@@ -205,6 +161,9 @@ export default class EchartsAside extends IAside {
         cache: true// 一定要缓存
       },
       on: {
+        init: () => {
+          this.createDetailAside()
+        },
         transitionEnd: (swiper) => {
           console.log('transitionEnd')
           this.activeIndex = swiper.activeIndex;
@@ -217,18 +176,76 @@ export default class EchartsAside extends IAside {
           }
 
         },
+        click: (swiper, event) => {
+          // console.log(swiper);
+          // console.log(event);
+
+          // 事件冒泡经过的节点
+          let path = event.path || (event.composedPath && event.composedPath());
+          // console.log(path);
+
+          // 当前点击的 slide
+          let clickedSlide = swiper.clickedSlide;
+
+          // 判断 staticItem 是否在 path 数组中
+          let staticItem = clickedSlide.querySelector('.inner-statisic');
+          if (staticItem) {
+            if (path.includes(staticItem as EventTarget)) {
+              console.log('点击了信息统计区');
+
+              let index = path.indexOf(staticItem);
+              console.log('序号', index)
+              if (index !== 0) {
+                // 第一个元素不是 staticItem,说明事件是从子元素冒泡上来的
+                let child = path[index - 1] as HTMLElement;
+                if (child.classList?.contains('item')) {
+                  // 点击是四大按钮
+                  console.log('定位成功', child, this.id)
+                  if (child.textContent?.includes('暂无数据')) return;
+
+                  const day = getAllDay(this.date);
+
+                  if (this.myEchartsDetailAside) {
+                    // 0,1,2,3
+                    let detailType = child.getAttribute('detail-type');
+                    let type: EventType | undefined;
+                    if (!detailType) {
+                      type = undefined;
+                    } else {
+                      type = Number(detailType)
+                    }
+
+                    console.log(type)
+                    this.myEchartsDetailAside.id = this.id;
+                    this.myEchartsDetailAside.date = this.date
+                    this.myEchartsDetailAside.type = type
+                    this.myEchartsDetailAside.render();
+                    this.showDetail = true;
+                  }
+                }
+
+              }
+            }
+          }
+
+        }
+
       },
     })
 
-    this.elements = {
-      mask: this.innerContainer.querySelector('.inner-mask') as HTMLDivElement,
-      innerBack: this.innerContainer.querySelector('.inner-back') as HTMLDivElement,
-      date: this.innerContainer.querySelector('.inner-date') as HTMLDivElement,
-      showDatePicker: document.querySelector('#showDatePicker') as HTMLDivElement,
-
-    }
 
     this.bindEvents();
+  }
+  createDetailAside() {
+    this.myEchartsDetailAside = new EchartsDetailAside(this.elements.detailContainer, this.dataController)
+
+    this.myEchartsDetailAside.init()
+    this.myEchartsDetailAside.add(this)
+  }
+  notify(args: any) {
+    this.observerList.forEach(observer => {
+      observer.update(args)
+    })
   }
   /**
    * 手动控制swiper
@@ -314,34 +331,67 @@ export default class EchartsAside extends IAside {
     this.swiper.virtual.slides = []
     this.swiper.virtual.cache = {};
 
-    // console.log('create contentd')
+    // for (let i = 0; i < this.ids.length; i++) {
+    //   let id = this.ids[i];
+    //   let name = this.symb.get(id)?.name
+    //   console.log(name)
+
+    // }
+
     let len = this.statisticAllData.length;
     for (let i = 0; i < len; i++) {
-      let data = this.statisticAllData[i][0];
-      let { Name, GarbageRatio, AvgGarbageTime, MaxGarbageTime, GarbageDuration, EventNumbers } = data;
+      let obj = {
+        Id: this.ids[i],
+        Name: this.names[i],
+        GarbageRatio: 0,
+        maxDrop: '暂无数据',
+        totalDrop: '暂无数据',
+        illegalDrop: '暂无数据',
+        mixIntoDrop: '暂无数据'
+      }
+      if (this.statisticAllData[i].length != 0) {
+        let data = this.statisticAllData[i][0];
 
-      GarbageRatio = Number(GarbageRatio!.toFixed(2));
-      AvgGarbageTime = Math.round(AvgGarbageTime!);
-      MaxGarbageTime = Math.round(MaxGarbageTime!);
-      GarbageDuration = Math.round(GarbageDuration!);
-      let maxHour = Math.floor(MaxGarbageTime / 60);
-      let maxMinute = MaxGarbageTime - maxHour * 60;
-      let totalHour = Math.floor(GarbageDuration / 60);
-      let totalMinute = GarbageDuration - totalHour * 60;
-      let illegalDrop = 0;
-      let mixIntoDrop = 0;
+        let { GarbageRatio, AvgGarbageTime, MaxGarbageTime, GarbageDuration, EventNumbers } = data;
 
-      EventNumbers!.forEach(eventNumber => {
-        if (eventNumber.EventType == EventType.IllegalDrop) {
-          illegalDrop = eventNumber.DayNumber
-        } else if (eventNumber.EventType == EventType.MixedInto) {
-          mixIntoDrop = eventNumber.DayNumber
+        obj.GarbageRatio = Number(GarbageRatio!.toFixed(2));
+
+        AvgGarbageTime = Math.round(AvgGarbageTime!);
+        MaxGarbageTime = Math.round(MaxGarbageTime!);
+        GarbageDuration = Math.round(GarbageDuration!);
+
+        let maxHour = Math.floor(MaxGarbageTime / 60);
+        let maxMinute = MaxGarbageTime - maxHour * 60;
+        let totalHour = Math.floor(GarbageDuration / 60);
+        let totalMinute = GarbageDuration - totalHour * 60;
+
+        if (maxHour == 0) {
+          obj.maxDrop = maxMinute + '分钟';
+
+        } else {
+          obj.maxDrop = maxHour + "小时" + maxMinute + "分钟";
         }
-      })
+        if (totalHour == 0) {
+          obj.totalDrop = totalMinute + '分钟';
+        } else {
+          obj.totalDrop = totalHour + "小时" + totalMinute + "分钟";
+        }
+
+        EventNumbers!.forEach(eventNumber => {
+          if (eventNumber.EventType == EventType.IllegalDrop) {
+            obj.illegalDrop = eventNumber.DayNumber + '起'
+          } else if (eventNumber.EventType == EventType.MixedInto) {
+            obj.mixIntoDrop = eventNumber.DayNumber + '起'
+          }
+        })
+      }
+
+
+
       let slide = `
-      <div data-id='${data.Id}' style="padding:0 10px;">
+      <div data-id='${obj.Id}' style="padding:0 10px;">
           <div class='inner-head'>
-              <div class='inner-title'>${data.Name}</div>
+              <div class='inner-title'>${obj.Name}</div>
                 <div class='inner-date'>${dateFormat(this.date, "yyyy年MM月dd日")}</div>
           </div>
 
@@ -360,31 +410,31 @@ export default class EchartsAside extends IAside {
 
           <div class='inner-statisic'>
               <div class='ratio'>
-                  <div class='ratio-num'>${GarbageRatio}</div>
+                  <div class='ratio-num'>${obj.GarbageRatio}</div>
                   <div class='ratio-suffix'>%</div>
               </div>
 
               <div class='item'>
                   <div class='item-title'>最大落地:</div>
                   <div class='item-content'>
-                      ${maxHour == 0 ? maxMinute + "分钟" : maxHour + "小时" + maxMinute + "分钟"}
+                     ${obj.maxDrop}
                   </div>
               </div>
               <div class='item'> 
                   <div class='item-title'> 总落地:</div>
                   <div class='item-content'>
-                      ${totalHour == 0 ? totalMinute + "分钟" : totalHour + "小时" + totalMinute + "分钟"}
+                  ${obj.totalDrop}
                   </div>
               </div>
 
-              <div class='item'>
+              <div class='item' detail-type='${EventType.IllegalDrop}'>
                   <div class='item-title'> 乱丢垃圾:</div>
-                  <div class='item-content'>${illegalDrop}起</div>
+                  <div class='item-content'>${obj.illegalDrop}</div>
               </div>
 
-              <div class='item'>
+              <div class='item' detail-type='${EventType.MixedInto}'>
                   <div class='item-title'> 混合投放:</div>
-                  <div class='item-content'>${mixIntoDrop}起</div>
+                  <div class='item-content'>${obj.mixIntoDrop}</div>
               </div>
           </div>
           <div class="inner-chart"></div>
@@ -400,6 +450,7 @@ export default class EchartsAside extends IAside {
     let activeSlide = this.innerContainer.querySelector('.swiper-slide-active') as HTMLDivElement
     if (activeSlide == null) return
     let echart = activeSlide.querySelector('.inner-chart') as HTMLElement;
+
     let id = this.id
     // console.log('绘制', activeSlide.querySelector('.inner-title')?.textContent)
     if (id) {

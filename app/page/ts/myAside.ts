@@ -24,7 +24,7 @@
    pppmmmxxx
 */
 
-import ISubject from "./ISubject";
+import ISubject from "./IAside";
 
 import "../css/myAside.less";
 import "weui";
@@ -167,6 +167,11 @@ export default class MyAside extends ISubject {
     this.bindEvents()
 
     return this;
+  }
+  notify(args: any) {
+    this.observerList.forEach(observer => {
+      observer.update(args)
+    })
   }
   bindEvents() {
     if (this.elements.content && this.elements.content.innerMain) {

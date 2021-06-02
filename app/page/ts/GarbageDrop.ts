@@ -29,7 +29,7 @@ import { CameraImageUrl, GarbageDropEventRecord } from "../../data-core/model/wa
 import { IGarbageDrop, Paged } from "./data-controllers/IController";
 import IObserver from "./IObserver";
 
-import MyTemplate from "./myTemplate";
+import MyTemplate, { GarbageDropData } from "./myTemplate";
 import { EventType } from "../../data-core/model/waste-regulation/event-number";
 
 import $ from 'jquery';
@@ -41,20 +41,6 @@ import { NavigationWindow } from ".";
 
 import weui from 'weui.js/dist/weui.js';
 import "weui";
-
-
-export interface GarbageDropData {
-  EventType?: EventType;
-  EventName?: string;
-  imageUrls?: string[];
-  StationName?: string;
-  StationId?: string;
-  DivisionName?: string;
-  DivisionId?: string;
-  EventTime?: string | Date;
-  EventId?: string;
-  index?: number
-}
 export default class GarbageDrop implements IObserver {
 
   elements: { [key: string]: HTMLElement };// 页面html元素收集器
@@ -330,25 +316,6 @@ export default class GarbageDrop implements IObserver {
     console.log('本次请求的数据', this.dropListChunk)
 
 
-
-    let arr: Array<string> = [];
-    let res: GarbageDropEventRecord[] = [];
-
-    this.dropListChunk.forEach(item => {
-      let id = item.ResourceId || '';
-      if (!arr.includes(id)) {
-        arr.push(id);
-        res.push(item)
-      }
-    })
-    let aa = this.dropListChunk.map(item => {
-      return item.ResourceName!
-    })
-    // console.log(aa)
-    // this.dropListChunk = res;
-
-
-
     this.dropListTotal = [...this.dropListTotal, ...this.dropListChunk]
     this.dropPage = data!.Page;
     console.log('本次请求的数据筛选后', this.dropListChunk)
@@ -379,7 +346,7 @@ export default class GarbageDrop implements IObserver {
     for (let i = 0; i < data.length; i++) {
       let v = data[i];
       let obj: GarbageDropData = Object.create(null, {});
-      obj.EventId = v.EventId;
+      obj.EventId = v.EventId!;
       obj.EventType = v.EventType;
       obj.EventName = Language.EventTypeFilter(v.EventType);
       obj.index = (this.dropPage!.PageIndex - 1) * this.dropPage!.PageSize + i
@@ -394,12 +361,12 @@ export default class GarbageDrop implements IObserver {
         obj.StationName = v.Data.StationName;
         obj.StationId = v.Data.StationId;
 
-        obj.DivisionName = v.Data.DivisionName;
-        obj.DivisionId = v.Data.DivisionId;
+        obj.DivisionName = v.Data.DivisionName!;
+        obj.DivisionId = v.Data.DivisionId!;
 
-        obj.EventTime = v.EventTime;
+        obj.EventTime = dateFormat(new Date(v.EventTime), "'yyyy-MM-dd HH:mm:ss'")
         obj.imageUrls = imageUrls.map(url => {
-          return this.dataController.getImageUrl(url.ImageUrl)!
+          return this.dataController.getImageUrl(url.ImageUrl) as string
         })
         // console.log(imageUrls, obj.imageUrls)
       }

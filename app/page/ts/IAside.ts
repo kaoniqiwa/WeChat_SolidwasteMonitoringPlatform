@@ -3,8 +3,8 @@
  */
 import IObserver from "./IObserver";
 
-export default abstract class ISubject {
-  private observerList: Set<IObserver> = new Set();
+export default abstract class IAside {
+  protected observerList: Set<IObserver> = new Set();
 
   add(observer: IObserver) {
     this.observerList.add(observer)
@@ -12,9 +12,5 @@ export default abstract class ISubject {
   remove(observer: IObserver) {
     this.observerList.delete(observer);
   }
-  notify(args: any) {
-    this.observerList.forEach(observer => {
-      observer.update(args)
-    })
-  }
+  abstract notify(args: any): void
 }

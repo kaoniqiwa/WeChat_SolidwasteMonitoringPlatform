@@ -1,0 +1,68 @@
+<div class="inner-mask"></div>
+<div class="inner-content">
+  <header class="inner-bar">
+    <div class="header-item">
+      <div class="inner-back"><i class="howell-icon-arrow2left"></i>返回</div>
+    </div>
+
+    <div class="header-item">
+      <div class="header-item__btn" id="date">2021年06月01日</div>
+      <div class="header-item__btn" id="showDatePicker">
+        <i class="howell-icon-calendar" style="font-weight: bold"></i>
+      </div>
+    </div>
+  </header>
+  <main>
+    <header>
+      <div class="header-item">
+        <div id="desc"></div>
+      </div>
+      <div class="header-item">
+        <div id="count"></div>
+      </div>
+    </header>
+
+    <main style="margin-top: 5px; position: relative">
+      <div id="miniRefresh" class="minirefresh-wrap">
+        <div class="minirefresh-scroll">
+          <div class="card-container"></div>
+        </div>
+      </div>
+    </main>
+  </main>
+</div>
+
+<!--垃圾落地模板-->
+<template id="GarbageDropTemplate">
+  <div class="card">
+    <div class="card-title">
+      <div class="card-title__head station-name">三湘花城露天厢房</div>
+      <div class="card-title__appendix status">正常</div>
+    </div>
+    <div class="card-img">
+      <img src="" alt="" />
+    </div>
+    <div class="card-footer">
+      <div class="card-footer__head division-name">三湘居委会</div>
+      <div class="card-footer__appendix event-time">16:36:20</div>
+    </div>
+  </div>
+</template>
+
+<!-- 报警记录模板-->
+<template id="HistoryDropTemplate">
+  <div class="record-item card">
+    <div class="left card-img">
+      <img
+        src="http://wechat.51hws.com/api/howell/ver10/aiop_service/garbage_gateway/Servers/1/Pictures/60b71bfe00000002e80068a9.jpg"
+      />
+    </div>
+    <div class="left content">
+      <div class="title station-name">邯郸路20弄6号</div>
+      <div class="footer">
+        <div class="left footer-title division-name">邯郸路居委会</div>
+        <div class="remark event-time">13:49:09</div>
+      </div>
+    </div>
+  </div>
+</template>

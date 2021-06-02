@@ -27,7 +27,8 @@ if (user.WUser.Resources) {
     const service = new Service(http);
     const dataController = ControllerFactory.Create(service, type, user.WUser.Resources!);
 
-    let myTemplate = new MyTemplate('#GarbageDropTemplate');
+    let myTemplate = new MyTemplate();
+    myTemplate.bindTo('#GarbageDropTemplate')
 
     // 构造函数式依赖注入
     let garbageDrop = new GarbageDrop(dataController, openId, type, myTemplate);
