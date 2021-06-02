@@ -244,8 +244,15 @@ export default class GarbageDrop implements IObserver {
       this.myTemplate.dataTotal = this.parsedDropListTotal;
     }
 
+
+    let templateId: string = ''
+    let div = document.createElement('div');
+    div.id = 'GarbageDropTemplate';
+
+    this.elements.contentContainer.appendChild(div);
+
     // 剪切 fragment 的子节点，导致fragment.childNode = []
-    this.elements.contentContainer.appendChild(this.myTemplate.fragment);
+    div.appendChild(this.myTemplate.fragment);
 
 
     this.elements.count.textContent = this.dropListTotal.length + "/" + this.dropPage!.TotalRecordCount;
