@@ -104,6 +104,7 @@ export default class MyTemplate {
       card.setAttribute('id', v.StationId);
       card.setAttribute('division-id', v.DivisionId);
       card.setAttribute('event-type', v.EventType + '');
+      card.setAttribute('event-id', v.EventId);
 
       (card.querySelector('.station-name') as HTMLElement).textContent = v.StationName;
 
@@ -146,7 +147,7 @@ export default class MyTemplate {
           detail: {
             index: this.getAttribute('index'),
             eventType: this.getAttribute('event-type'),
-            id: this.getAttribute('id')
+            eventId: this.getAttribute('event-id')
           },
           bubbles: true,
           cancelable: true

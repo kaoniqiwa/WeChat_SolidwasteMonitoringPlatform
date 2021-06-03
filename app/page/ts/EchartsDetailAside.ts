@@ -135,18 +135,13 @@ export default class EchartAsideDetail extends IAside {
       // console.log(openId)
       // console.log(e)
       let index = e.detail.index;
-      let id = e.detail.id;
+      let eventId = e.detail.eventId;
       let eventType = e.detail.eventType;
 
-      // 垃圾落地事件统一为0
-      if (eventType == EventType.GarbageDrop || eventType == EventType.GarbageDropHandle || eventType == EventType.GarbageDropTimeout) {
-        eventType = 0;
-      }
-
-      const url = `./event-details.html?openid=${openId}&eventtype=${eventType ?? 0}&id=${id}`
+      const url = `./event-details.html?openid=${openId}&eventtype=${eventType}&eventId=${eventId}`
       // const url = './event-details.html?openid=o5th-6js1-VRO7d1j7Jy9nkGZocg&pageindex=0&eventtype=0'
       console.log(url)
-      // window.parent.showOrHideAside(url);
+      window.parent.showOrHideAside(url);
 
     });
 
