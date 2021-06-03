@@ -82,6 +82,9 @@ export default class EchartAsideDetail extends IAside {
     size: 20,
   }
 
+  eventType?: EventType = void 0;// 筛选状态
+
+
 
   constructor(selector: HTMLElement | string, private dataController: DataController) {
     super();
@@ -120,11 +123,33 @@ export default class EchartAsideDetail extends IAside {
       })
     }
 
-    if (this.elements.showDatePicker) {
-      this.elements.showDatePicker.addEventListener('click', () => {
-        // this.showDatePicker()
-      })
-    }
+    // if (this.elements.showDatePicker) {
+    //   this.elements.showDatePicker.addEventListener('click', () => {
+    //     // this.showDatePicker()
+    //   })
+    // }
+
+    (this.elements.contentContainer as any).addEventListener('click-card', (e: CustomEvent) => {
+      const user = (window.parent as NavigationWindow).User;
+      let openId = user.WUser.OpenId;
+      // console.log(openId)
+      // console.log(e)
+      let index = e.detail.index;
+      let id = e.detail.id;
+      let eventType = e.detail.eventType;
+
+      // 垃圾落地事件统一为0
+      if (eventType == EventType.GarbageDrop || eventType == EventType.GarbageDropHandle || eventType == EventType.GarbageDropTimeout) {
+        eventType = 0;
+      }
+
+      const url = `./event-details.html?openid=${openId}&eventtype=${eventType ?? 0}&id=${id}`
+      // const url = './event-details.html?openid=o5th-6js1-VRO7d1j7Jy9nkGZocg&pageindex=0&eventtype=0'
+      console.log(url)
+      // window.parent.showOrHideAside(url);
+
+    });
+
   }
   async render() {
     await this.loadData();
@@ -222,7 +247,7 @@ export default class EchartAsideDetail extends IAside {
       if (this.type == EventType.IllegalDrop || this.type == EventType.MixedInto) {
         obj.EventTime = dateFormat(new Date(v.EventTime), "HH:mm:ss")
       } else {
-        obj.EventTime = dateFormat(new Date(v.EventTime), "'yyyy-MM-dd HH:mm:ss'")
+        obj.EventTime = dateFormat(new Date(v.EventTime), "yyyy-MM-dd HH:mm:ss")
       }
 
       obj.imageUrls = imageUrls.map(url => {

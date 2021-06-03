@@ -16,7 +16,9 @@ export default class GarbageStationServer {
 
   }
   async loadAllData() {
+    console.time();
     this.garbageStations = await this.dataController.getGarbageStationList();
+    console.timeEnd();
     // console.log('原始数据', this.garbageStations)
   }
   // 这里模拟请求服务器数据

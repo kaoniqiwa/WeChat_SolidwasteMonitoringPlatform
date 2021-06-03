@@ -145,7 +145,8 @@ export default class MyTemplate {
         let event = new CustomEvent('click-card', {
           detail: {
             index: this.getAttribute('index'),
-            eventType: this.getAttribute('event-type')
+            eventType: this.getAttribute('event-type'),
+            id: this.getAttribute('id')
           },
           bubbles: true,
           cancelable: true
