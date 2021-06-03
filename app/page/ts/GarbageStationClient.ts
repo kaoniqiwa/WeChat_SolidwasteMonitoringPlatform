@@ -253,11 +253,12 @@ export default class GarbageStationClient implements IObserver {
     }
     if (!stop) {
       this.loadData();
+      this.createContent();
       // 在上拉请求更多数据时，不需要重新创建 EChart
       if (!this.myChartAside) {
         this.createChartAside()
       }
-      this.createContent();
+
     }
     //console.log('stop', stop);
     this.miniRefresh!.endUpLoading(stop);
