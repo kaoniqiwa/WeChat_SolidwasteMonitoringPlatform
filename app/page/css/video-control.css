@@ -60,18 +60,18 @@
 
 
 
-  .video_background+.capturePicture {
+  /* .video_background+.capturePicture {
     width: 100vh;
     height: 100vw;
     transform: rotate(-90deg) translate(calc((100vw - 100vh) / 2), calc((100vw - 100vh) / 2));
-  }
+  } */
 
 
-  .video_background.fullscreen+.capturePicture {
+  /* .video_background.fullscreen+.capturePicture {
     width: 100vw;
     height: 100vh;
     transform: rotate(0deg);
-  }
+  } */
 
 
 }
@@ -115,12 +115,12 @@
   position: absolute;
   width: 100vw;
   height: 50px;
-  font-size: 28px;
+  font-size: 22px;
   color: rgba(255, 255, 255, 0.9);
   top: 70%;
 }
 
-.video_background.fullscreen+.capturePicture>img {
+/* .video_background.fullscreen+.capturePicture>img {
   width: 50% !important;
   height: 50% !important;
   transform: translate(50%, -50%) !important;
@@ -129,4 +129,4 @@
 .video_background.fullscreen+.capturePicture>.description {
   top: auto;
   bottom: 20px;
-}
+} */

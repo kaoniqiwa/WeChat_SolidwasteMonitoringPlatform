@@ -18,7 +18,7 @@ export class Language {
   static EventType(type: EventType) {
     switch (type) {
       case EventType.IllegalDrop:
-        return '乱扔垃圾事件';
+        return '乱丢垃圾事件';
       case EventType.MixedInto:
         return '混合投放事件';
       case EventType.GarbageVolume:
@@ -38,7 +38,7 @@ export class Language {
   static EventTypeFilter(type: EventType) {
     switch (type) {
       case EventType.IllegalDrop:
-        return '乱扔垃圾事件';
+        return '乱丢垃圾事件';
       case EventType.MixedInto:
         return '混合投放事件';
       case EventType.GarbageVolume:

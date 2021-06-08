@@ -1,7 +1,7 @@
 console.log("hello")
 
 declare var Swiper: any;
-// let navBar = ["乱扔垃圾", "满溢情况", "混合投放"]
+// let navBar = ["乱丢垃圾", "满溢情况", "混合投放"]
 // new Swiper(".swiper-container", {
 //     on: {
 //         slideChangeTransitionEnd: function (this: any) {

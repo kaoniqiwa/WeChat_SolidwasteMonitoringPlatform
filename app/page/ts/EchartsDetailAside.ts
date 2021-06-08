@@ -40,7 +40,7 @@ export default class EchartAsideDetail extends IAside {
           txtContent = '垃圾落地';
           break;
         case EventType.IllegalDrop:
-          txtContent = '乱扔垃圾';
+          txtContent = '乱丢垃圾';
           break;
         case EventType.MixedInto:
           txtContent = '混合投放';

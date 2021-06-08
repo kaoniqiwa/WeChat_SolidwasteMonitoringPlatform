@@ -41,7 +41,7 @@ export class GarbageFullEventData extends EventData {
 }
 
 
-/**乱扔垃圾事件数据 */
+/**乱丢垃圾事件数据 */
 export class IllegalDropEventData extends EventData {
     /**垃圾的目标(可选) */
     Objects?: EventDataObject[];

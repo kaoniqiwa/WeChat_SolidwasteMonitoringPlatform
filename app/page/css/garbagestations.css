@@ -93,6 +93,7 @@ body {
   margin: 10px 0;
   padding: 10px 0;
 }
+
 .hw-content .hw-content__card:first-child {
   margin-top: 0px;
 }
@@ -109,10 +110,12 @@ body {
 .hw-content .hw-content__card .content__title__head {
   font-size: 17px;
 }
+
 .hw-content .hw-content__card .content_title__footer {
   display: flex;
   align-items: center;
 }
+
 .constDrop {
   background-color: rgba(247, 204, 40, 0.3);
   color: #ff9100;
@@ -126,6 +129,7 @@ body {
   vertical-align: middle;
   /* margin: 0 5px; */
 }
+
 .constDrop.hidden {
   display: none;
 }
@@ -346,13 +350,20 @@ body {
   transform: translateX(0%);
   opacity: 1;
 }
+
 .content {
   width: 100%;
 }
+
 .swiper-pagination {
   pointer-events: none;
 }
+
 .no-camera {
   font-size: 14px;
   color: #b2b2b2;
+}
+
+.capturePicture>img {
+  transform: translate(0, -50%) !important;
 }

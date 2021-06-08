@@ -13,7 +13,7 @@ export class ImageController {
   swiperStatus: boolean = false;
   originStatus: boolean = false;
   private img?: HTMLImageElement;
-  constructor(selectors: string) {
+  constructor(selectors: string, private picture: IPictureController) {
     this.originImg = document.querySelector(selectors) as HTMLDivElement;
     this.init();
   }
@@ -35,7 +35,7 @@ export class ImageController {
           if (path) {
             for (let i = 0; i < path.length; i++) {
               if (path[i].className == "video-control") {
-                this.onPlayControlClicked(this.imageUrls![this.swiper!.activeIndex], path[i] as HTMLDivElement);
+                this.onPlayControlClicked(this.imageUrls![this.swiper!.activeIndex], path[i] as HTMLDivElement, this.picture);
                 return;
               }
               if (path[i].className == "tools" || path[i].className == "capturePicture") {

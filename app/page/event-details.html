@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="max-age=7200" >
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="max-age=7200" />
     <title>生活垃圾监管平台</title>
     <link rel="stylesheet" href="../assets/howell.font/howell.font.css" />
-    <link rel="stylesheet" href="./css/swiper.min.css" type='text/css'>
-    <link crossorigin="anonymous"
-        integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
-        href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/swiper.min.css" type="text/css" />
+    <link
+      crossorigin="anonymous"
+      integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+      href="https://lib.baomitu.com/weui/2.4.1/style/weui.css"
+      rel="stylesheet"
+    />
 
     <link href="../../minirefresh/minirefresh.css" rel="stylesheet" />
     <link href="./css/event-details.css" rel="stylesheet" />
@@ -20,85 +22,88 @@
     <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="../assets/base64.js"></script>
     <script src="../assets/ext.js"></script>
-    <script src="../assets/WSPlayerProxy.js"></script>
+    <script src="../assets/WSPlayerProxy1.js"></script>
     <!-- <script type="text/javascript" src="../assets/swiper.js"></script> -->
 
-<style>
-#origin-img div
-{
-    overflow: visible;
-}
-</style>
+    <style>
+      #origin-img div {
+        overflow: visible;
+      }
+    </style>
+  </head>
 
-</head>
-
-<body>    
+  <body>
     <template id="template">
-        <div class="weui-form-preview">
-            <div class="weui-form-preview__hd pic">
-                <div class="swiper-container swiper-container-img">
-                    <div class="swiper-wrapper">
-                        <div class="weui-form-preview__item fill-width fill-height swiper-slide"
-                            style="height: 0; padding-bottom: 58.25%;">
-                            <img class="weui-media-box__thumb detail_img"
-                                data-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII="
-                                width="100%" id="" alt="">
-                            <div class="frame" id="frame"></div>
-                        </div>
-                    </div>
-                    <div class="swiper-pagination swiper-pagination-img"></div>
-                </div>
+      <div class="weui-form-preview">
+        <div class="weui-form-preview__hd pic">
+          <div class="swiper-container swiper-container-img">
+            <div class="swiper-wrapper">
+              <div
+                class="
+                  weui-form-preview__item
+                  fill-width fill-height
+                  swiper-slide
+                "
+                style="height: 0; padding-bottom: 58.25%"
+              >
+                <img
+                  class="weui-media-box__thumb detail_img"
+                  data-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQYV2NgAAIAAAUAAarVyFEAAAAASUVORK5CYII="
+                  width="100%"
+                  id=""
+                  alt=""
+                />
+                <div class="frame" id="frame"></div>
+              </div>
             </div>
-            <div class="weui-form-preview__bd">
-                <div class="weui-form-preview__item">
-                    <label class="weui-form-preview__label">报警类型</label>
-                    <span class="weui-form-preview__value red-text police__type"></span>
-                </div>
-                <div class="weui-form-preview__item">
-                    <label class="weui-form-preview__label">摄像机</label>
-                    <span class="weui-form-preview__value sky-blue-text camera__name"></span>
-                </div>
-                <div class="weui-form-preview__item">
-                    <label class="weui-form-preview__label">垃圾厢房</label>
-                    <span class="weui-form-preview__value station__name"></span>
-                </div>
-                <div class="weui-form-preview__item">
-                    <label class="weui-form-preview__label">所属居委</label>
-                    <span class="weui-form-preview__value rc__name"></span>
-                </div>
-                <div class="weui-form-preview__item">
-                    <label class="weui-form-preview__label">报警时间</label>
-                    <span class="weui-form-preview__value police__time"></span>
-                </div>
-            </div>
+            <div class="swiper-pagination swiper-pagination-img"></div>
+          </div>
         </div>
+        <div class="weui-form-preview__bd">
+          <div class="weui-form-preview__item">
+            <label class="weui-form-preview__label">报警类型</label>
+            <span class="weui-form-preview__value red-text police__type"></span>
+          </div>
+          <div class="weui-form-preview__item">
+            <label class="weui-form-preview__label">摄像机</label>
+            <span
+              class="weui-form-preview__value sky-blue-text camera__name"
+            ></span>
+          </div>
+          <div class="weui-form-preview__item">
+            <label class="weui-form-preview__label">垃圾厢房</label>
+            <span class="weui-form-preview__value station__name"></span>
+          </div>
+          <div class="weui-form-preview__item">
+            <label class="weui-form-preview__label">所属居委</label>
+            <span class="weui-form-preview__value rc__name"></span>
+          </div>
+          <div class="weui-form-preview__item">
+            <label class="weui-form-preview__label">报警时间</label>
+            <span class="weui-form-preview__value police__time"></span>
+          </div>
+        </div>
+      </div>
 
-        <div class="page__ft item-content-center">
-            <div class="weui-btn back__btn">返回报警记录</div>
-        </div>
+      <div class="page__ft item-content-center">
+        <div class="weui-btn back__btn">返回报警记录</div>
+      </div>
     </template>
 
-
     <div class="mui-page mui-page-center" id="detail">
-        <div class="mui-page-content full">
-            <div class="page__bd full">
-                <div class="swiper-container page full" id="swiper-page">
-                    <div class="swiper-wrapper page">
-                    </div>
-                </div>
-            </div>
+      <div class="mui-page-content full">
+        <div class="page__bd full">
+          <div class="swiper-container page full" id="swiper-page">
+            <div class="swiper-wrapper page"></div>
+          </div>
         </div>
-
+      </div>
     </div>
-
 
     <div class="swiper-container max" id="origin-img">
-        <div class="swiper-wrapper"></div>
-        <div class="swiper-pagination"></div>
+      <div class="swiper-wrapper"></div>
+      <div class="swiper-pagination"></div>
     </div>
-
-
-</body>
-<script src="./ts/EventInformation.ts"></script>
-
+  </body>
+  <script src="./ts/EventInformation.ts"></script>
 </html>

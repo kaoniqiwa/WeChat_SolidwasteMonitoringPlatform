@@ -28,15 +28,21 @@ function WSPlayerProxy (iframe, mode) {
         case WSPlayerState.end:
           that.tools.control.play.className = "play glyphicon glyphicon-play"
           that.tools.control.play.title = "播放"
+          if (that.tools.control.center.control)
+            that.tools.control.center.control.a.className = "play glyphicon glyphicon-play";
           break;
         case WSPlayerState.playing:
           if (that.mode == WSPlayerMode.vod) {
             that.tools.control.play.className = "play glyphicon glyphicon-pause"
             that.tools.control.play.title = "暂停"
+            if (that.tools.control.center.control)
+              that.tools.control.center.control.a.className = "play glyphicon glyphicon-pause";
           }
           else {
             that.tools.control.play.className = "play glyphicon glyphicon-stop"
             that.tools.control.play.title = "停止"
+            if (that.tools.control.center.control)
+              that.tools.control.center.control.a.className = "play glyphicon glyphicon-stop";
           }
           break;
         default:
@@ -267,8 +273,38 @@ function WSPlayerProxy (iframe, mode) {
     initTools();
   }
   function initTools () {
-    if (that.tools.control.play) {
-      that.tools.control.play.addEventListener("click", function () {
+    that.tools.event.onPlayControlClciked = function (e) {
+      switch (that.status) {
+        case WSPlayerState.ready:
+          that.play();
+          break;
+        case WSPlayerState.end:
+          that.seek(0);
+          that.resume();
+          break;
+        case WSPlayerState.fast:
+        case WSPlayerState.slow:
+          //that.play();
+          that.speedResume();
+          break;
+        case WSPlayerState.pause:
+          that.resume();
+          break;
+        case WSPlayerState.playing:
+          if (that.mode == WSPlayerMode.vod) {
+            that.pause();
+          }
+          else {
+            that.stop();
+          }
+
+          break;
+        default:
+          break;
+      }
+    }
+    if (that.tools.control.center.control) {
+      that.tools.control.center.control.a.addEventListener("click", function () {
         switch (that.status) {
           case WSPlayerState.ready:
             that.play();
@@ -300,6 +336,7 @@ function WSPlayerProxy (iframe, mode) {
 
       });
     }
+
     if (that.tools.control.stop) {
       that.tools.control.stop.addEventListener("click", function () {
         if (that.status == WSPlayerState.ready)
@@ -327,6 +364,10 @@ function WSPlayerProxy (iframe, mode) {
 
       });
     }
+
+
+
+
     if (that.tools.control.position) {
       that.tools.control.position.addEventListener("touchstart", function (e) {
         if (that.status == WSPlayerState.ready)
@@ -343,35 +384,43 @@ function WSPlayerProxy (iframe, mode) {
         that.resume();
       });
       that.tools.control.position.addEventListener("touchmove", function (evt) {
-        try {
-          if (that.status == WSPlayerState.ready)
-            return;
 
-          if (!evt || !evt.changedTouches || evt.changedTouches.length <= 0) return;
+        if (that.status == WSPlayerState.ready)
+          return;
 
-          var width = evt.target.offsetWidth;
-          var x = evt.changedTouches[0].clientX - evt.target.offsetLeft;
-
-          var p = x / width;
-          if (p > 1 || p < 0) return;
-
-          var c = that.tools.control.position.max - that.tools.control.position.min;
-          var current = c * p;
-          if (current < 0)
-            current = 0;
-          var date = new Date(current);
-          date.setUTCHours(date.getUTCHours() - 8);
-          this.title = date.format("HH:mm:ss");
-          if (that.tools.control.isMoudseDown)
-            that.tools.control.begin_time.innerText = date.format("HH:mm:ss");
-        } finally {
-          evt.stopPropagation();
-        }
+        onPositionMove(evt);
 
       });
     }
 
   }
+
+  function onPositionMove (evt) {
+    try {
+
+      if (!evt || !evt.changedTouches || evt.changedTouches.length <= 0) return;
+
+      var width = evt.target.offsetWidth;
+      var x = evt.changedTouches[0].clientX - evt.target.offsetLeft;
+
+      var p = x / width;
+      if (p > 1 || p < 0) return;
+
+      var c = that.tools.control.position.max - that.tools.control.position.min;
+      var current = c * p;
+      if (current < 0)
+        current = 0;
+      var date = new Date(current);
+      date.setUTCHours(date.getUTCHours() - 8);
+      this.title = date.format("HH:mm:ss");
+      if (that.tools.control.isMoudseDown)
+        that.tools.control.begin_time.innerText = date.format("HH:mm:ss");
+    } finally {
+      evt.stopPropagation();
+    }
+  }
+
+
 
   this.isFullScreen = false;
 
@@ -461,6 +510,21 @@ function PlayerTools (element, mode) {
   });
 
   this.control = {
+    center_play: null,
+    top: null,
+    center: {
+      div: null,
+      control: {
+        background: null,
+        a: null
+      },
+      position: {
+        background: null,
+        begin: null,
+        end: null
+      }
+    },
+    bottom: null,
     content: null,
     play: null,
     stop: null,
@@ -542,8 +606,24 @@ function PlayerTools (element, mode) {
 
 
   this.createElements = function () {
+
+    that_tools.control.up = document.createElement("div")
+    that_tools.control.up.className = "up";
+    that_tools.control.content.appendChild(that_tools.control.up);
+
+    that_tools.control.center.div = document.createElement("div")
+    that_tools.control.center.div.className = "center";
+    that_tools.control.content.appendChild(that_tools.control.center.div);
+
+
+
+
+    that_tools.control.bottom = document.createElement("div");
+    that_tools.control.bottom.className = "bottom";
+    that_tools.control.content.appendChild(that_tools.control.bottom);
+
     var ul = document.createElement("ul");
-    that_tools.control.content.appendChild(ul);
+    that_tools.control.bottom.appendChild(ul);
 
 
     that_tools.control.play = createElement(ul, "a", { width: "40px" }, { className: "play glyphicon glyphicon-play", title: "播放" });
@@ -586,43 +666,95 @@ function PlayerTools (element, mode) {
       that_tools.control.position.style.display = "none";
       that_tools.control.end_time.style.display = "none";
 
+    } else {
+      that_tools.control.center.control.background = document.createElement("div");
+      that_tools.control.center.control.a = document.createElement("i")
+      that_tools.control.center.control.a.className = "play glyphicon glyphicon-play";
+      that_tools.control.center.control.background.appendChild(that_tools.control.center.control.a);
+      that_tools.control.center.div.appendChild(that_tools.control.center.control.background);
+
+
+      that_tools.control.center.position.background = document.createElement("div");
+      that_tools.control.center.position.background.style.display = "none";
+      that_tools.control.center.position.begin = document.createElement("label");
+      that_tools.control.center.position.begin.innerText = that_tools.control.begin_time.innerText;
+      that_tools.control.center.position.background.appendChild(that_tools.control.center.position.begin);
+      that_tools.control.center.position.background.innerHTML += "&nbsp;/&nbsp;";
+      that_tools.control.center.position.end = document.createElement("label");
+      that_tools.control.center.position.end.innerText = that_tools.control.end_time.innerText;
+      that_tools.control.center.position.background.appendChild(that_tools.control.center.position.end);
+
+      that_tools.control.center.div.appendChild(that_tools.control.center.position.background);
+
+
+
     }
 
+    registEvent();
 
 
-    that_tools.control.position.addEventListener("input", function () {
-      var value = (this.value - this.min) / (this.max - this.min);
-
-      var valStr = value * 100 + "% 100%";
-      this.style.backgroundSize = valStr;
-    });
-
-
-
-    that_tools.element.addEventListener("touchstart", function () {
-
-      that_tools.visibility = !that_tools.visibility;
-      console.log("touchstart:", that_tools.visibility)
-    })
-    that_tools.element.addEventListener("touchmove", function () {
-      that_tools.visibility = true;
-      console.log("touchmove:", that_tools.visibility)
-    })
-    that_tools.element.addEventListener("touchend", function () {
-      timer.visibility = setTimeout(() => {
-        that_tools.visibility = false;
-        console.log("touchend:", that_tools.visibility)
-      }, 5 * 1000);
-    })
     timer.visibility = setTimeout(() => {
       that_tools.visibility = false;
       console.log("init:", that_tools.visibility)
-    }, 5 * 1000);
+    }, 0);
 
   };
 
+  function registEvent () {
+    if (that_tools.control.position) {
+      that_tools.control.position.addEventListener("input", function () {
+        var value = (this.value - this.min) / (this.max - this.min);
+
+        var valStr = value * 100 + "% 100%";
+        this.style.backgroundSize = valStr;
+      });
+    }
+
+    if (that_tools.element) {
+      that_tools.element.addEventListener("touchstart", function () {
+
+        that_tools.visibility = !that_tools.visibility;
+        console.log("touchstart:", that_tools.visibility)
+      });
+      that_tools.element.addEventListener("touchmove", function (evt) {
+        that_tools.visibility = true;
+        that_tools.control.center.position.background.display = "";
+        onPositionMove(evt);
+      });
+      that_tools.element.addEventListener("touchend", function () {
+        that_tools.control.center.position.background.display = "none";
+        timer.visibility = setTimeout(() => {
+          that_tools.visibility = false;
+          console.log("touchend:", that_tools.visibility)
+        }, 5 * 1000);
+      });
+    }
+
+    if (that_tools.control.play) {
+      that_tools.control.play.addEventListener("click", function (e) {
+        if (that_tools.event.onPlayControlClciked) {
+          that_tools.event.onPlayControlClciked(e);
+        }
+      });
+    }
+    if (that_tools.control.center.control) { }
 
 
+  }
+
+  this.event = {
+    onPlayControlClciked: function (e) { },
+    onStopControlClicked: function (e) { },
+    onFullscreenControlClicked: function (e) { },
+    onCapturepictureControlClicked: function (e) { },
+    onPositionControlTouchstart: function (e) { },
+    onPositionControlTouchend: function (e) { },
+    onPositionControlTouchmove: function (e) { },
+    onCenterPlayControlClicked: function (e) { },
+    onCenterPositionControlTouchstart: function (e) { },
+    onCenterPositionControlTouchend: function (e) { },
+    onCenterPositionControlTouchmove: function (e) { },
+  }
 
 
 

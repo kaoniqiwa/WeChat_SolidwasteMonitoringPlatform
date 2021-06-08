@@ -13,7 +13,7 @@ export class VideoPlugin {
   tools?: PlayerTools;
   background?: HTMLDivElement;
   capturePicture?: CapturePicture;
-  picture: PictureController;
+  picture: IPictureController;
 
   get base64VideoUrl() {
     return base64encode(this.videoUrl)
@@ -206,18 +206,31 @@ export class VideoPlugin {
 
 
 
-    this.proxy.onCapturePicture = (url) => {
-      let promise = this.picture.post(url);
-      promise.then((id) => {
-        let url = this.picture.get(id);
-        if (this.capturePicture) {
-          this.capturePicture.panel.style.display = "block";
-          this.capturePicture.img.src = url;
-          if (this.proxy && this.proxy.mode == "vod") {
-            this.proxy.pause()
-          }
+    this.proxy.onCapturePicture = (data) => {
+
+      if (this.capturePicture) {
+        this.capturePicture.panel.style.display = "block";
+        this.capturePicture.img.src = data;
+        if (this.proxy && this.proxy.mode == "vod") {
+          this.proxy.pause()
         }
-      });
+      }
+
+      // console.log("CapturePicture Length:", data.length)
+
+
+      // let promise = this.picture.post('\\\\"' + data + '\\\\"');
+      // promise.then((res: any) => {
+
+      //   let src = this.picture.get(res.id);
+      //   if (this.capturePicture) {
+      //     this.capturePicture.panel.style.display = "block";
+      //     this.capturePicture.img.src = src;
+      //     if (this.proxy && this.proxy.mode == "vod") {
+      //       this.proxy.pause()
+      //     }
+      //   }
+      // });
 
 
 
@@ -339,6 +352,7 @@ export class CapturePicture {
   panel: HTMLDivElement;
   img: HTMLImageElement;
   description: HTMLDivElement;
+  destoried = false;
   constructor(private parent: HTMLElement) {
     this.panel = document.createElement("div");
     this.panel.className = "capturePicture"
@@ -350,7 +364,7 @@ export class CapturePicture {
 
     this.description = document.createElement("div");
     this.description.className = "description"
-    this.description.innerHTML = this.isIOS ? '长按图片“添加到照片”' : '长按图片“发送给朋友”或“保存到手机”';
+    this.description.innerHTML = '长按图片“分享”';
     this.panel.appendChild(this.description);
 
 
@@ -375,19 +389,13 @@ export class CapturePicture {
     });
   }
 
-  destory() {
-    this.parent.removeChild(this.panel);
-  }
 
-  get isIOS() {
-    const u = navigator.userAgent;
-    const isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1; //android终端
-    const isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-    ///
-    // ios终端
-    // alert('是否是Android：'+isAndroid);
-    // alert('是否是iOS：'+isiOS);
-    return isiOS;
+
+  destory() {
+    if (this.parent && this.panel && !this.destoried) {
+      this.parent.removeChild(this.panel);
+      this.destoried = true;
+    }
   }
 }
 
