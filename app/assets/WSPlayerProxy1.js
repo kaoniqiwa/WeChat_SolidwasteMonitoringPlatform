@@ -225,11 +225,11 @@ function WSPlayerProxy (iframe, mode) {
                 that.tools.control.position.max = val.max;
                 let end = new Date(val.max - val.min);
                 end.setUTCHours(end.getUTCHours() - 8);
-                that.tools.control.end_time.innerText = end.format("HH:mm:ss");
+                that.tools.control.end_time.innerText = end.format("mm:ss");
                 that.tools.control.position.value = val.current;
                 let current = new Date(val.current - val.min);
                 current.setUTCHours(current.getUTCHours() - 8);
-                that.tools.control.begin_time.innerText = current.format("HH:mm:ss");
+                that.tools.control.begin_time.innerText = current.format("mm:ss");
               });
             })(data.value)
           }
@@ -303,94 +303,56 @@ function WSPlayerProxy (iframe, mode) {
           break;
       }
     }
-    if (that.tools.control.center.control) {
-      that.tools.control.center.control.a.addEventListener("click", function () {
-        switch (that.status) {
-          case WSPlayerState.ready:
-            that.play();
-            break;
-          case WSPlayerState.end:
-            that.seek(0);
-            that.resume();
-            break;
-          case WSPlayerState.fast:
-          case WSPlayerState.slow:
-            //that.play();
-            that.speedResume();
-            break;
-          case WSPlayerState.pause:
-            that.resume();
-            break;
-          case WSPlayerState.playing:
-            if (that.mode == WSPlayerMode.vod) {
-              that.pause();
-            }
-            else {
-              that.stop();
-            }
+    that.tools.event.onCenterPlayControlClicked = that.tools.event.onPlayControlClciked;
 
-            break;
-          default:
-            break;
-        }
+    that.tools.event.onStopControlClicked = function (e) {
+      if (that.status == WSPlayerState.ready)
+        return;
+      that.stop();
+    }
+    that.tools.event.onFullscreenControlClicked = function (e) {
+      if (that.status == WSPlayerState.ready)
+        return;
+      if (that.onButtonClicked) {
+        that.onButtonClicked("fullscreen")
+      }
+    }
+    that.tools.event.onFullscreenControlClicked = function (e) {
+      if (that.status == WSPlayerState.ready)
+        return;
 
-      });
+      that.getCapturePictureData();
+      //that.capturePicture();
     }
 
-    if (that.tools.control.stop) {
-      that.tools.control.stop.addEventListener("click", function () {
-        if (that.status == WSPlayerState.ready)
-          return;
-        that.stop();
-      });
+    that.tools.event.onPositionControlTouchStart = function (e) {
+      if (that.status == WSPlayerState.ready)
+        return;
+      that.pause();
+      that.tools.control.isMoudseDown = true;
     }
-    if (that.tools.control.fullscreen) {
-      that.tools.control.fullscreen.addEventListener("click", function () {
-        if (that.status == WSPlayerState.ready)
-          return;
-        if (that.onButtonClicked) {
-          that.onButtonClicked("fullscreen")
-        }
-      });
+    that.tools.event.onPositionControlTouchEnd = function (e) {
+      if (that.status == WSPlayerState.ready)
+        return;
+
+      that.tools.control.isMoudseDown = false;
+      var value = that.tools.control.position.value - that.tools.control.position.min;
+      that.seek(value);
+      that.resume();
     }
-
-    if (that.tools.control.capturepicture) {
-      that.tools.control.capturepicture.addEventListener("click", function () {
-        if (that.status == WSPlayerState.ready)
-          return;
-
-        that.getCapturePictureData();
-        //that.capturePicture();
-
-      });
+    that.tools.event.onPositionControlTouchMove = function (e) {
+      if (that.status == WSPlayerState.ready)
+        return;
+      onPositionMove(e);
     }
 
-
-
-
-    if (that.tools.control.position) {
-      that.tools.control.position.addEventListener("touchstart", function (e) {
-        if (that.status == WSPlayerState.ready)
-          return;
-        that.pause();
+    that.tools.event.onCenterPositionControlTouchMove = function (e) {
+      if (that.tools.control.isMoudseDown == false) {
         that.tools.control.isMoudseDown = true;
-      });
-      that.tools.control.position.addEventListener("touchend", function (e) {
-        if (that.status == WSPlayerState.ready)
-          return;
-        that.tools.control.isMoudseDown = false;
-        var value = that.tools.control.position.value - that.tools.control.position.min;
-        that.seek(value);
-        that.resume();
-      });
-      that.tools.control.position.addEventListener("touchmove", function (evt) {
-
-        if (that.status == WSPlayerState.ready)
-          return;
-
-        onPositionMove(evt);
-
-      });
+      }
+    }
+    that.tools.event.onCenterPositionControlTouchEnd = function (e) {
+      that.tools.control.isMoudseDown = false;
     }
 
   }
@@ -412,9 +374,18 @@ function WSPlayerProxy (iframe, mode) {
         current = 0;
       var date = new Date(current);
       date.setUTCHours(date.getUTCHours() - 8);
-      this.title = date.format("HH:mm:ss");
-      if (that.tools.control.isMoudseDown)
-        that.tools.control.begin_time.innerText = date.format("HH:mm:ss");
+      this.title = date.format("mm:ss");
+      if (that.tools.control.isMoudseDown) {
+        that.tools.control.begin_time.innerText = date.format("mm:ss");
+
+        that.tools.control.center.position.begin.innerHTML = that.tools.control.begin_time.innerText;
+      }
+      that.tools.control.position.value = parseInt(that.tools.control.position.min) + parseInt(current);
+      var value = (that.tools.control.position.value - that.tools.control.position.min) / (that.tools.control.position.max - that.tools.control.position.min);
+      var valStr = value * 100 + "% 100%";
+      that.tools.control.position.style.backgroundSize = valStr;
+
+
     } finally {
       evt.stopPropagation();
     }
@@ -630,18 +601,18 @@ function PlayerTools (element, mode) {
 
     that_tools.control.begin_time = createElement(ul, "label", { width: "60px" }, {
       className: "begin_time",
-      innerText: "00:00:00",
+      innerText: "00:00",
       title: "当前时间"
     });
     that_tools.control.position = createElement(ul, "input", { width: "calc(100% - 231px)" }, {
       className: "position",
-      title: "00:00:00",
+      title: "00:00",
       type: "range"
     });
     that_tools.control.position.min = 0;
     that_tools.control.position.max = 1;
     that_tools.control.position.value = 0;
-    that_tools.control.end_time = createElement(ul, "label", { width: "60px" }, { className: "end_time", title: "结束时间", innerText: "00:00:00", });
+    that_tools.control.end_time = createElement(ul, "label", { width: "60px" }, { className: "end_time", title: "结束时间", innerText: "00:00", });
 
 
 
@@ -677,11 +648,14 @@ function PlayerTools (element, mode) {
       that_tools.control.center.position.background = document.createElement("div");
       that_tools.control.center.position.background.style.display = "none";
       that_tools.control.center.position.begin = document.createElement("label");
-      that_tools.control.center.position.begin.innerText = that_tools.control.begin_time.innerText;
+      that_tools.control.center.position.begin.style.color = "#3283E5";
+      that_tools.control.center.position.begin.innerText = "";
       that_tools.control.center.position.background.appendChild(that_tools.control.center.position.begin);
-      that_tools.control.center.position.background.innerHTML += "&nbsp;/&nbsp;";
+      let _ = document.createElement("label")
+      _.innerHTML = "&nbsp;/&nbsp;";
+      that_tools.control.center.position.background.appendChild(_);
       that_tools.control.center.position.end = document.createElement("label");
-      that_tools.control.center.position.end.innerText = that_tools.control.end_time.innerText;
+      that_tools.control.center.position.end.innerText = "";
       that_tools.control.center.position.background.appendChild(that_tools.control.center.position.end);
 
       that_tools.control.center.div.appendChild(that_tools.control.center.position.background);
@@ -702,7 +676,7 @@ function PlayerTools (element, mode) {
 
   function registEvent () {
     if (that_tools.control.position) {
-      that_tools.control.position.addEventListener("input", function () {
+      that_tools.control.position.addEventListener("input", function (e) {
         var value = (this.value - this.min) / (this.max - this.min);
 
         var valStr = value * 100 + "% 100%";
@@ -711,22 +685,32 @@ function PlayerTools (element, mode) {
     }
 
     if (that_tools.element) {
-      that_tools.element.addEventListener("touchstart", function () {
+      that_tools.element.addEventListener("touchstart", function (e) {
 
         that_tools.visibility = !that_tools.visibility;
-        console.log("touchstart:", that_tools.visibility)
+        if (that_tools.event.onCenterPositionControlTouchStart) {
+          that_tools.event.onCenterPositionControlTouchStart(e);
+        }
       });
-      that_tools.element.addEventListener("touchmove", function (evt) {
+      that_tools.element.addEventListener("touchmove", function (e) {
         that_tools.visibility = true;
-        that_tools.control.center.position.background.display = "";
-        onPositionMove(evt);
+        that_tools.control.center.control.background.style.display = "none";
+        that_tools.control.center.position.background.style.display = "";
+        that_tools.control.center.position.end.innerText = that_tools.control.end_time.innerText;
+        if (that_tools.event.onCenterPositionControlTouchMove) {
+          that_tools.event.onCenterPositionControlTouchMove(e);
+        }
       });
-      that_tools.element.addEventListener("touchend", function () {
-        that_tools.control.center.position.background.display = "none";
-        timer.visibility = setTimeout(() => {
-          that_tools.visibility = false;
-          console.log("touchend:", that_tools.visibility)
-        }, 5 * 1000);
+      that_tools.element.addEventListener("touchend", function (e) {
+        that_tools.control.center.control.background.style.display = "";
+        that_tools.control.center.position.background.style.display = "none";
+        // timer.visibility = setTimeout(() => {
+        //   that_tools.visibility = false;
+        //   console.log("touchend:", that_tools.visibility)
+        // }, 5 * 1000);
+        if (that_tools.event.onCenterPositionControlTouchEnd) {
+          that_tools.event.onCenterPositionControlTouchEnd(e);
+        }
       });
     }
 
@@ -737,8 +721,52 @@ function PlayerTools (element, mode) {
         }
       });
     }
-    if (that_tools.control.center.control) { }
-
+    if (that_tools.control.center.control) {
+      that_tools.control.center.control.a.addEventListener("click", function (e) {
+        debugger;
+        if (that_tools.event.onCenterPlayControlClicked) {
+          that_tools.event.onCenterPlayControlClicked(e);
+        }
+      });
+    }
+    if (that_tools.control.stop) {
+      that_tools.control.stop.addEventListener("click", function (e) {
+        if (that_tools.event.onStopControlClicked) {
+          that_tools.event.onStopControlClicked(e);
+        }
+      });
+    }
+    if (that_tools.control.fullscreen) {
+      that_tools.control.fullscreen.addEventListener("click", function (e) {
+        if (that_tools.event.onFullscreenControlClicked) {
+          that_tools.event.onFullscreenControlClicked(e);
+        }
+      });
+    }
+    if (that_tools.control.capturepicture) {
+      that_tools.control.capturepicture.addEventListener("click", function (e) {
+        if (that_tools.event.onCapturepictureControlClicked) {
+          that_tools.event.onCapturepictureControlClicked(e);
+        }
+      });
+    }
+    if (that_tools.control.position) {
+      that_tools.control.position.addEventListener("touchstart", function (e) {
+        if (that_tools.event.onPositionControlTouchStart) {
+          that_tools.event.onPositionControlTouchStart(e);
+        }
+      });
+      that_tools.control.position.addEventListener("touchend", function (e) {
+        if (that_tools.event.onPositionControlTouchEnd) {
+          that_tools.event.onPositionControlTouchEnd(e);
+        }
+      });
+      that_tools.control.position.addEventListener("touchmove", function (e) {
+        if (that_tools.event.onPositionControlTouchMove) {
+          that_tools.event.onPositionControlTouchMove(e);
+        }
+      });
+    }
 
   }
 
@@ -747,13 +775,13 @@ function PlayerTools (element, mode) {
     onStopControlClicked: function (e) { },
     onFullscreenControlClicked: function (e) { },
     onCapturepictureControlClicked: function (e) { },
-    onPositionControlTouchstart: function (e) { },
-    onPositionControlTouchend: function (e) { },
-    onPositionControlTouchmove: function (e) { },
+    onPositionControlTouchStart: function (e) { },
+    onPositionControlTouchEnd: function (e) { },
+    onPositionControlTouchMove: function (e) { },
     onCenterPlayControlClicked: function (e) { },
-    onCenterPositionControlTouchstart: function (e) { },
-    onCenterPositionControlTouchend: function (e) { },
-    onCenterPositionControlTouchmove: function (e) { },
+    onCenterPositionControlTouchStart: function (e) { },
+    onCenterPositionControlTouchEnd: function (e) { },
+    onCenterPositionControlTouchMove: function (e) { },
   }
 
 
@@ -772,9 +800,9 @@ function PlayerTools (element, mode) {
 
       that_tools.control.position.min = val.min;
       that_tools.control.position.max = val.max;
-      that_tools.control.end_time.innerText = new Date(val.max - val.min).format("HH:mm:ss");
+      that_tools.control.end_time.innerText = new Date(val.max - val.min).format("mm:ss");
       that_tools.control.position.value = val.current;
-      that_tools.control.begin_time.innerText = new Date(val.current - val.min).format("HH:mm:ss");
+      that_tools.control.begin_time.innerText = new Date(val.current - val.min).format("mm:ss");
     }
   }
 

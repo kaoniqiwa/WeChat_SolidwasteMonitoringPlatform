@@ -13,6 +13,7 @@
     "history": "parcel ./app/page/history.html --port 4200",
     "garbage": "parcel ./app/page/garbage-stations.html --port 4200",
     "map": "parcel ./app/page/map.html --port 4200",
+    "test_player": "parcel ./app/page/test_player.html --port 4200",
     "debug": "parcel build ./app/page/index.html --out-dir dist --public-url /",
     "build": "parcel build ./app/page/index.html --out-dir dist/WeChat --public-url /WeChat/",
     "test": "parcel build ./app/page/index.html --out-dir dist/wechat/test --public-url /WeChat/test/",

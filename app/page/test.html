@@ -5,75 +5,67 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>base list</title>
-    <link rel="stylesheet" href="../../minirefresh/minirefresh.css" />
+    <title>base list</title>    
+    
+    <link rel="stylesheet" href="./test.css" type="text/css" />
+    <style>
+    
+html,
+body {
+    border: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.video {
+    width: 100vw;
+    height: calc(100vw / 16 * 9);
+    background-color: gray;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%)
+}
+
+.video_background {
+    background-color: black;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}</style>
 </head>
 
 <body>
-
-    <nav class="navbar-header">
-        <!-- <a class="nav-btn-left" href="../index.html">dashboard</a> -->
-        最基础的新闻列表
-    </nav>
-    <div class="content">
-        <div id="minirefresh" class="minirefresh-wrap">
-
-            <div class="minirefresh-scroll">
-
-                <ul class="data-list" id="listdata">
-
-                </ul>
+    <div class="video_background player">
+    <div class="video"></div>
+    <div class="tools">
+    <div class="tools-content">
+        <div class="top">
+        <
+        </div>
+        <div class="center">
+            <div class="play glyphicon glyphicon-play"></div>
+        </div>
+        <div class="bottom">
+            <div class="left" style="width:calc(100% - 40px)">
+                <label class="begin_time" title="当前时间">00:00</label>/<label class="end_time" title="结束时间">00:00</label>
+                <div style="width:calc(100% - 80px)">
+                    <input class="position" title="00:00:00" type="range" value="0" min="0" max="1">
+                </div>
+            </div>
+        
+        
+            <div class="right" style="width:25px">
+                <a class="fullscreen glyphicon glyphicon-resize-full" title="全屏">
+                </a>
             </div>
         </div>
+    
     </div>
-
-    <script type="text/javascript" src="../../minirefresh/minirefresh.js"></script>
-
-    <script>
-        var
-            // 记录一个最新
-            maxDataSize = 30,
-            listDom = document.querySelector('#listdata'),
-            requestDelayTime = 600;
-
-        function refresh(i) {
-            var li = document.createElement("li");
-            li.innerHTML = "test:" + i;
-            li.style.width = "100%";
-            listDom.appendChild(li);
-        }
-
-
-        var miniRefresh = new MiniRefresh({
-            container: '#minirefresh',
-            down: {
-                callback: function () {
-                    setTimeout(function () {
-                        // 每次下拉刷新后，上拉的状态会被自动重置
-
-                        for (let i = 0; i < 100; i++) {
-                            refresh(i);
-                        }
-
-
-                        miniRefresh.endDownLoading(true);
-                    }, requestDelayTime);
-                }
-            },
-            up: {
-                isAuto: true,
-                callback: function () {
-                    setTimeout(function () {
-                        for (let i = 0; i < 100; i++) {
-                            refresh(i);
-                        }
-                        miniRefresh.endUpLoading(listDom.children.length >= maxDataSize ? true : false);
-                    }, requestDelayTime);
-                }
-            }
-        });
-
-    </script>
+    </div>
+    <!-- <iframe></iframe> -->
+   <!-- <script src="./test.ts"></script> -->
 </body>
 
 </html>

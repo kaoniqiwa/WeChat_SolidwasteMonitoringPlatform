@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>base list</title>
+
+    <link rel="stylesheet" href="./player.css" type="text/css" />
+    <style>
+      html,
+      body {
+        border: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+      }
+      iframe,
+      img {
+        width: 100vw;
+        height: calc(100vw / 16 * 9);
+        border: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        transform: translate(0, -50%);
+      }
+    </style>
+    <script src="../assets/ext.js"></script>
+    <script src="../assets/wsplayerproxy1.js"></script>
+  </head>
+
+  <body>
+    <div class="video_background player">
+      <!-- http://garbage01.51hws.com/video/wsplayer/WSPlayer.html?url=d3M6Ly9nYXJiYWdlMDEuNTFod3MuY29tOjg4MDAvd3MvdmlkZW8vaG93ZWxscHMvbGl2ZS8wMDMxMDEwMTAzMTExMTExMTAwMDExOTAwMDAwMDAwMC8xLzIvbGl2ZS5IMjY1P3VzZXI9aG93ZWxsJnBhc3N3b3JkPTEyMzQ1Ng==&name=5Zu95a6a5LiAX+aUv+erizU4MF8xLTE=&tool_style=eyJkaXNwbGF5Ijoibm9uZSJ9 -->
+
+      <!-- http://192.168.21.149:8116/WSPlayer.html?url=d3M6Ly9nYXJiYWdlMDEuNTFod3MuY29tOjg4MDAvd3MvdmlkZW8vaG93ZWxscHMvdm9kLzAwMzEwMTAxMDMxMTExMTExMDAwNDM5MDAwMDAwMDAwLzEvMS8yMDIxLTA2LTA4VDA3OjIzOjI0LjYyMFpfMjAyMS0wNi0wOFQwNzoyMzo1NC42MjBaL3ZvZC5IMjY1P3VzZXI9aG93ZWxsJnBhc3N3b3JkPTEyMzQ1Ng==&name=&tool_style=eyJkaXNwbGF5Ijoibm9uZSJ9 -->
+      <iframe
+        src="http://192.168.21.149:8116/WSPlayer.html?url=d3M6Ly9nYXJiYWdlMDEuNTFod3MuY29tOjg4MDAvd3MvdmlkZW8vaG93ZWxscHMvdm9kLzAwMzEwMTAxMDMxMTExMTExMDAwNDM5MDAwMDAwMDAwLzEvMS8yMDIxLTA2LTA4VDA3OjIzOjI0LjYyMFpfMjAyMS0wNi0wOFQwNzoyMzo1NC42MjBaL3ZvZC5IMjY1P3VzZXI9aG93ZWxsJnBhc3N3b3JkPTEyMzQ1Ng==&name=&tool_style=eyJkaXNwbGF5Ijoibm9uZSJ9"
+      ></iframe>
+    </div>
+    <script>
+      var iframe = document.querySelector('iframe')
+      var parent = document.querySelector('.player')
+      onload = function () {
+        let proxy = new WSPlayerProxy(iframe, WSPlayerMode.vod)
+        let tools = new PlayerTools(parent, WSPlayerMode.vod)
+        tools.createElements()
+        proxy.toolsBinding(tools)
+      }
+    </script>
+  </body>
+</html>
