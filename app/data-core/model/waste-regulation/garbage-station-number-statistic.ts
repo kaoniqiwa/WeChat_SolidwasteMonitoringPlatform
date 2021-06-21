@@ -1,5 +1,5 @@
-import { IIntervalParams, IPageParams, StatisticTime, TimeUnit } from "../page";
-import { EventNumber } from "./event-number";
+import { IIntervalParams, IPageParams, StatisticTime, TimeUnit } from '../page'
+import { EventNumber } from './event-number'
 /**垃圾房数量统计 */
 export class GarbageStationNumberStatistic {
   /**
@@ -8,192 +8,192 @@ export class GarbageStationNumberStatistic {
    * @type {string}
    * @memberof GarbageStationNumberStatistic
    */
-  Id!: string;
+  Id!: string
   /**
    *	垃圾房名称	M
    *
    * @type {string}
    * @memberof GarbageStationNumberStatistic
    */
-  Name!: string;
+  Name!: string
   /**
    *	摄像机数量	M
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  CameraNumber!: number;
+  CameraNumber!: number
   /**
    *	离线摄像机数量	M
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  OfflineCameraNumber!: number;
+  OfflineCameraNumber!: number
   /**
    *	垃圾桶数量	M
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  TrashCanNumber!: number;
+  TrashCanNumber!: number
   /**
    *	干垃圾满溢垃圾桶数量	M
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  DryTrashCanNumber!: number;
+  DryTrashCanNumber!: number
   /**
    *	湿垃圾满溢垃圾桶数量	M
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  WetTrashCanNumber!: number;
+  WetTrashCanNumber!: number
   /**
    *	干垃圾满溢	O
    *
    * @type {boolean}
    * @memberof GarbageStationNumberStatistic
    */
-  DryFull?: boolean;
+  DryFull?: boolean
   /**
    *	湿垃圾满溢	O
    *
    * @type {boolean}
    * @memberof GarbageStationNumberStatistic
    */
-  WetFull?: boolean;
+  WetFull?: boolean
   /**
    *	当日事件数量	O
    *
    * @type {EventNumber[]}
    * @memberof GarbageStationNumberStatistic
    */
-  TodayEventNumbers?: EventNumber[];
+  TodayEventNumbers?: EventNumber[]
   /**
    *	当天总数量，单位：L	M
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  DayVolume!: number;
+  DayVolume!: number
   /**
    *	当天干垃圾容量，单位：L	M
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  DayDryVolume!: number;
+  DayDryVolume!: number
   /**
    *	当天湿垃圾容量，单位：L	M
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  DayWetVolume!: number;
+  DayWetVolume!: number
   /**
    *	垃圾房状态	M
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  StationState!: number;
+  StationState!: number
   /**
    *	评级	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  Garde?: number;
+  Garde?: number
   /**
    *	满溢时间，单位：分钟	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  FullDuration?: number;
+  FullDuration?: number
   /**
    *	当前垃圾堆数量	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  GarbageCount?: number;
+  GarbageCount?: number
   /**
    *	当前垃圾堆滞留时间	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  CurrentGarbageTime?: number;
+  CurrentGarbageTime?: number
   /**
    *	当日垃圾滞留比值      有垃圾时长/没有垃圾的时长	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  GarbageRatio?: number;
+  GarbageRatio?: number
   /**
    *	当日垃圾堆平均滞留时间，单位：分钟	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  AvgGarbageTime?: number;
+  AvgGarbageTime?: number
   /**
    *	当日垃圾堆最大滞留时间，单位：分钟	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  MaxGarbageTime?: number;
+  MaxGarbageTime?: number
   /**
    *	当日最大滞留堆数量	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  MaxGarbageCount?: number;
+  MaxGarbageCount?: number
   /**
    *	有垃圾时长，单位：分钟	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  GarbageDuration?: number;
+  GarbageDuration?: number
   /**
    *	无垃圾时长，单位：分钟	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatistic
    */
-  CleanDuration?: number;
-
+  CleanDuration?: number
+  GarbageDropStationNumber?: number
 }
 
 /**获取垃圾房数量参数 */
 export class GetGarbageStationStatisticNumbersParams implements IPageParams {
   /**页码[1-n](可选) */
-  PageIndex?: number;
+  PageIndex?: number
   /**分页大小[1-100](可选) */
-  PageSize?: number;
+  PageSize?: number
   /**区划ID(可选) */
-  Ids?: string[];
+  Ids?: string[]
   /**区划名称(可选)，支持LIKE */
-  Name?: string;
+  Name?: string
 }
 
-export interface GetGarbageStationStatisticNumbersParamsV2 extends IIntervalParams {
-
+export interface GetGarbageStationStatisticNumbersParamsV2
+  extends IIntervalParams {
   /**
    * 垃圾房ID列表	M
    *
    * @type {string[]}
    * @memberof GetGarbageStationStatisticNumbersParamsV2
    */
-  GarbageStationIds: string[];
+  GarbageStationIds: string[]
 
   /**
    * 统计时间单位：2 - Day, 3 - Week, 4 - Month	M
@@ -201,7 +201,7 @@ export interface GetGarbageStationStatisticNumbersParamsV2 extends IIntervalPara
    * @type {TimeUnit}
    * @memberof GetGarbageStationStatisticNumbersParamsV2
    */
-  TimeUnit: TimeUnit;
+  TimeUnit: TimeUnit
 
   /**
    * 升序排列的属性名称	O
@@ -209,7 +209,7 @@ export interface GetGarbageStationStatisticNumbersParamsV2 extends IIntervalPara
    * @type {string[]}
    * @memberof GetGarbageStationStatisticNumbersParamsV2
    */
-  Asc?: string[];
+  Asc?: string[]
 
   /**
    * 降序排列的属性名称	O
@@ -217,7 +217,7 @@ export interface GetGarbageStationStatisticNumbersParamsV2 extends IIntervalPara
    * @type {string[]}
    * @memberof GetGarbageStationStatisticNumbersParamsV2
    */
-  Desc?: string[];
+  Desc?: string[]
 }
 
 export class GarbageStationNumberStatisticV2 {
@@ -227,63 +227,63 @@ export class GarbageStationNumberStatisticV2 {
    * @type {string}
    * @memberof GarbageStationNumberStatisticV2
    */
-  Id!: string;
+  Id!: string
   /**
    *	垃圾房名称	M
    *
    * @type {string}
    * @memberof GarbageStationNumberStatisticV2
    */
-  Name!: string;
+  Name!: string
   /**
    *	统计时间对象	M
    *
    * @type {StatisticTime}
    * @memberof GarbageStationNumberStatisticV2
    */
-  Time!: StatisticTime;
+  Time!: StatisticTime
   /**
    *	当日事件数量	O
    *
    * @type {EventNumber[]}
    * @memberof GarbageStationNumberStatisticV2
    */
-  EventNumbers?: EventNumber[];
+  EventNumbers?: EventNumber[]
   /**
    *	总数量，单位：L	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatisticV2
    */
-  Volume?: number;
+  Volume?: number
   /**
    *	干垃圾容量，单位：L	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatisticV2
    */
-  DryVolume?: number;
+  DryVolume?: number
   /**
    *	湿垃圾容量，单位：L	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatisticV2
    */
-  WetVolume?: number;
+  WetVolume?: number
   /**
    *	评级	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatisticV2
    */
-  Garde?: number;
+  Garde?: number
   /**
    *	满溢时间，单位：分钟	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatisticV2
    */
-  FullDuration?: number;
+  FullDuration?: number
 
   /**
    *	垃圾滞留比值有垃圾时长/没有垃圾的时长	O
@@ -291,42 +291,42 @@ export class GarbageStationNumberStatisticV2 {
    * @type {number}
    * @memberof GarbageStationNumberStatisticV2
    */
-  GarbageRatio?: number;
+  GarbageRatio?: number
   /**
    *	垃圾堆平均滞留时间，单位：分钟	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatisticV2
    */
-  AvgGarbageTime?: number;
+  AvgGarbageTime?: number
   /**
    *	垃圾堆最大滞留时间，单位：分钟	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatisticV2
    */
-  MaxGarbageTime?: number;
+  MaxGarbageTime?: number
   /**
    *	当日最大滞留堆数量	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatisticV2
    */
-  MaxGarbageCount?: number;
+  MaxGarbageCount?: number
   /**
    *	有垃圾时长，单位：分钟	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatisticV2
    */
-  GarbageDuration?: number;
+  GarbageDuration?: number
   /**
    *	无垃圾时长，单位：分钟	O
    *
    * @type {number}
    * @memberof GarbageStationNumberStatisticV2
    */
-  CleanDuration?: number;
+  CleanDuration?: number
 }
 
 export interface GetGarbageStationStatisticGarbageCountsParams {
@@ -336,7 +336,7 @@ export interface GetGarbageStationStatisticGarbageCountsParams {
    * @type {Date}
    * @memberof GetGarbageStationStatisticGarbageCountsParams
    */
-  Date: string;
+  Date: string
   /**
    *	垃圾房ID列表	M
    *
@@ -358,47 +358,47 @@ export class GarbageStationGarbageCountStatistic {
    * @type {string}
    * @memberof GarbageStationGarbageCountStatistic
    */
-  Id!: string;
+  Id!: string
   /**
    *	垃圾房名称	M
    *
    * @type {string}
    * @memberof GarbageStationGarbageCountStatistic
    */
-  Name!: string;
+  Name!: string
   /**
    *	开始时间	M
    *
    * @type {Date}
    * @memberof GarbageStationGarbageCountStatistic
    */
-  BeginTime!: Date;
+  BeginTime!: Date
   /**
    *	结束时间	M
    *
    * @type {Date}
    * @memberof GarbageStationGarbageCountStatistic
    */
-  EndTime!: Date;
+  EndTime!: Date
   /**
    *	垃圾堆数量	M
    *
    * @type {number}
    * @memberof GarbageStationGarbageCountStatistic
    */
-  GarbageCount!: number;
+  GarbageCount!: number
   /**
    *	有垃圾时长，单位：分钟	O
    *
    * @type {number}
    * @memberof GarbageStationGarbageCountStatistic
    */
-  GarbageDuration?: number;
+  GarbageDuration?: number
   /**
    *	无垃圾时长，单位：分钟	O
    *
    * @type {number}
    * @memberof GarbageStationGarbageCountStatistic
    */
-  CleanDuration?: number;
+  CleanDuration?: number
 }

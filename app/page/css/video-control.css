@@ -20,7 +20,6 @@
 
 .video_background .tools {
   z-index: 1000;
-  top: calc(50% + 52px);
 }
 
 .video_background.fullscreen iframe,

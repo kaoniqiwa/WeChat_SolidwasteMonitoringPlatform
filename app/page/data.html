@@ -48,19 +48,35 @@
       <div class="minirefresh-scroll">
         <div class="page">
           <div class="card count">
-            <div class="text title">乱丢垃圾</div>
-            <div class="content">
-              <span class="value" id="illegalDropCount">0</span>
-              <span class="text">起</span>
+            <div class="item">
+              <div class="text title">乱丢垃圾</div>
+              <div class="content">
+                <span class="value" id="illegalDropCount">0</span>
+                <span class="text">起</span>
+              </div>
+            </div>
+            <div class="item">
+              <div class="text title">混合投放</div>
+              <div class="content">
+                <span class="value" id="mixIntoCount">0</span>
+                <span class="text">起</span>
+              </div>
+            </div>
+            <div class="item">
+              <div class="text title">垃圾落地</div>
+              <div class="content">
+                <span class="value" id="garbageDropCount">0</span>
+                <span class="text">起</span>
+              </div>
             </div>
           </div>
-          <div class="card count">
+          <!-- <div class="card count">
             <div class="text title">混合投放</div>
             <div class="content">
               <span class="value" id="mixIntoCount">0</span>
               <span class="text">起</span>
             </div>
-          </div>
+          </div> -->
 
           <div class="swiper-container" id="rank">
             <div class="swiper-wrapper">
@@ -82,7 +98,7 @@
                 </div>
               </div>
 
-               <div class="swiper-slide">
+              <div class="swiper-slide">
                 <div class="card top" id="top3-div">
                   <div class="text title">垃圾落地排行榜</div>
                   <div class="content top_content">
@@ -90,7 +106,6 @@
                   </div>
                 </div>
               </div>
-
             </div>
             <div class="swiper-pagination" id="rank-pagination"></div>
           </div>

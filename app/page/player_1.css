@@ -907,13 +907,18 @@
 
 
 
-.player .parent-wnd {
-  z-index: 99;
+
+
+
+.player .tools {
+  background-color: transparent;
+  z-index: 1000;
 }
 
-
-
-
+.player .tools label {
+  font-size: 12px;
+  line-height: 50px;
+}
 
 
 .player a {
@@ -934,8 +939,24 @@
   box-shadow: 0px 0px 10px white;
 }
 
+.player .tools .tools-content {
+  padding: 3px 10px;
+  /* display: none; */
+  width: calc(100% - 20px);
+  height: calc(100% - 6px);
+  opacity: 0;
+  transition: opacity 2s;
+}
 
 
+.player .tools:hover .tools-content {
+
+  opacity: 1;
+
+
+  /* background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5)); */
+  /* animation: anim-in 1s; */
+}
 
 
 @keyframes anim-in {
@@ -964,86 +985,18 @@
 
 
 
-.player .tools {
-  width: 100vw;
-  height: calc(100vw / 16 * 9);
-  position: absolute;
-  top: 50%;
-  transform: translate(0, -50%);
-  z-index: 1000;
-}
-
-.player .tools .tools-content .bottom ul li label {
-  font-size: 12px;
-  line-height: 50px;
-}
-
-.player .tools .tools-content {
 
 
 
-  /* opacity: 0; */
-  transition: opacity 2s;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-content: space-between;
-  flex-wrap: wrap;
-}
-
-.player .tools:hover .tools-content {
-
-  opacity: 1;
-
-
-  /* background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5)); */
-  /* animation: anim-in 1s; */
-}
-
-.player .tools .tools-content>div {
-  width: 100%;
-}
-
-.player .tools .tools-content .center {
-  justify-content: center;
-  align-items: center;
-  display: flex;
-  height: calc(100% - 52px);
-}
-
-.player .tools .tools-content .center>div {
-  font-size: 30px;
-  vertical-align: middle;
-  text-align: center;
-  margin-top: 50px;
-}
-
-.player .tools .tools-content .center>div>a {
-  font-size: 40px;
-}
-
-
-.player .tools .tools-content .bottom {
-  padding: 3px 10px;
-  width: calc(100vw - 20px);
-  height: 45px;
-  /* background-color: rgba(0, 0, 0, 0.5); */
-  display: flex;
-  align-items: center;
-}
-
-.player .tools .tools-content .bottom ul {
+.player .tools ul {
   display: contents;
   width: 100%;
-  height: 100%;
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-around;
-  padding-inline-start: 0;
+  height: 52px;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
-.player .tools .tools-content .bottom ul li {
-
+.player .tools ul li {
+  float: left;
   list-style: none;
   margin-right: 3px;
   height: 100%;
@@ -1052,7 +1005,32 @@
   line-height: 46px;
 }
 
-.player .tools .tools-content .bottom ul li .play {
+
+
+.player a.glyphicon {
+  top: 3px;
+}
+
+.player a.glyphicon:empty {
+  width: 12px;
+}
+
+
+.player a.glyphicon-eject {
+  transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  /* Internet Explorer 9*/
+  -moz-transform: rotate(90deg);
+  /* Firefox */
+  -webkit-transform: rotate(90deg);
+  /* Safari 和 Chrome */
+  -o-transform: rotate(90deg);
+  /* Opera */
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
+}
+
+
+.player .tools ul .play {
   width: 32px !important;
   height: 32px;
   font-size: 16px;
@@ -1062,28 +1040,30 @@
   padding-left: 2px;
 }
 
-.player .tools .tools-content .bottom ul li .play.glyphicon-stop {
+.player .tools ul .play.glyphicon-stop {
   padding-left: 0;
   padding-right: 1px;
 }
 
-.player .tools .tools-content .bottom ul li .jump_back.glyphicon-share-alt {
+.player .tools .jump_back.glyphicon-share-alt {
   transform: rotateY(180deg);
   /* 水平镜像翻转 */
 }
 
-.player .tools .tools-content .bottom ul li .capturepicture {
+.player .tools .capturepicture {
   font-size: 16px;
 }
 
 
-.player .tools .tools-content .bottom ul li .play:hover {
+.player .tools ul .play:hover {
   border-color: white;
   box-shadow: 0px 0px 10px white;
 }
 
 
-.player .tools .tools-content input[type=range] {
+
+
+.player input[type=range] {
   vertical-align: middle;
 
   outline: none;
@@ -1099,7 +1079,7 @@
 }
 
 /*拖动块的样式*/
-.player .tools .tools-content input[type=range]::-webkit-slider-thumb {
+.player input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
   /*清除系统默认样式*/
   height: 10px;
@@ -1113,4 +1093,53 @@
   /* border: solid 5px rgba(50,131,229, 0.5); */
   /*设置边框*/
   box-shadow: 0px 0px 10px #3283E5;
+}
+
+
+
+.player .tools .volume {
+  height: 50px;
+  line-height: 40px;
+  font-size: 20px;
+  margin-top: -2px;
+}
+
+.player .tools .volume_panel {
+  width: 100px;
+  height: 40px;
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.5);
+  transform: rotate(-90deg);
+
+  bottom: 82px;
+  right: 32px;
+}
+
+.player .tools .volume_panel:hover+.tools-content {
+  display: block;
+}
+
+.player .tools .volume_panel .content {
+  margin-top: 17.5px;
+  width: 80% !important;
+  margin-left: 10px;
+  position: relative;
+  display: block;
+}
+
+.player .tools .volume_panel input[type=range] {
+  margin-top: 17.5px;
+  width: 80% !important;
+  margin-left: 10px;
+  position: relative;
+  display: block;
+}
+
+.player.table-cell .tools:hover .tools-content {
+  display: table-cell;
+
+}
+
+.player.absolute .tools:hover .tools-content {
+  position: absolute;
 }

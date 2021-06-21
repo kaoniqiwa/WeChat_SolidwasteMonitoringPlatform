@@ -205,7 +205,6 @@ export default class GarbageDrop implements IObserver {
       'click-card',
       (e: CustomEvent) => {
         // console.log(e)
-        debugger
         let str_filter = ''
 
         if (this.roleTypes && this.roleTypes.length > 0) {
@@ -215,7 +214,10 @@ export default class GarbageDrop implements IObserver {
         }
 
         let index = e.detail.index
-        const url = `./event-details.html?openid=${this.openId}&pageindex=${index}&eventtype=${this.eventType}${str_filter}`
+
+        const url = `./event-details.html?openid=${
+          this.openId
+        }&pageindex=${index}&eventtype=${this.eventType ?? ''}${str_filter}`
         console.log(url)
         window.parent.showOrHideAside(url)
       }
@@ -375,7 +377,7 @@ export default class GarbageDrop implements IObserver {
         obj.DivisionName = v.Data.DivisionName!
         obj.DivisionId = v.Data.DivisionId!
 
-        obj.EventTime = dateFormat(new Date(v.EventTime), 'yyyy-MM-dd HH:mm:ss')
+        obj.EventTime = v.EventTime.format('yyyy-MM-dd HH:mm:ss')
         obj.imageUrls = imageUrls.map((url) => {
           return this.dataController.getImageUrl(url.ImageUrl) as string
         })

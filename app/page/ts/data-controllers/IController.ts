@@ -1,4 +1,5 @@
 import { PagedList } from '../../../data-core/model/page'
+import { UserLabel, UserLabelType } from '../../../data-core/model/user-stystem'
 import { Division } from '../../../data-core/model/waste-regulation/division'
 import {
   EventNumber,
@@ -10,10 +11,8 @@ import {
   IllegalDropEventRecord,
   MixedIntoEventRecord,
 } from '../../../data-core/model/waste-regulation/event-record'
-import { GarbageStation } from '../../../data-core/model/waste-regulation/garbage-station'
 import {
   GarbageStationGarbageCountStatistic,
-  GarbageStationNumberStatistic,
   GarbageStationNumberStatisticV2,
 } from '../../../data-core/model/waste-regulation/garbage-station-number-statistic'
 import { VideoUrl } from '../../../data-core/model/waste-regulation/video-model'
@@ -118,6 +117,13 @@ export interface StatisticNumber {
    * @memberof StatisticNumber
    */
   garbageFullNumber: number
+  /**
+   * 垃圾落地数量
+   *
+   * @type {number}
+   * @memberof StatisticNumber
+   */
+  garbageDropNumber: number
 }
 
 export interface IVodUrl {
@@ -136,6 +142,15 @@ export interface IImage {
   getImageUrl(
     id: string | string[]
   ): string | Array<string | undefined> | undefined
+}
+export interface IUserLabelController {
+  getUserLabel(
+    garbageStationId: string,
+    labelType: UserLabelType
+  ): Promise<UserLabel>
+  createUserLabel(label: UserLabel): void
+  updateUserLabel(label: UserLabel): void
+  removeUserLabel(id: string): void
 }
 export interface IResourceRoleList {
   getResourceRoleList(): Promise<Array<ResourceRole>>
@@ -266,7 +281,7 @@ export interface IGarbageStationController
   GetEventRecordByGarbageStation(
     garbageStationId: string,
     paged: Paged,
-    type: EventType,
+    type: EventType | undefined,
     day: OneDay
   ): Promise<
     | PagedList<

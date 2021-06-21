@@ -207,10 +207,7 @@ export namespace EventHistoryPage {
         template.footer.innerHTML = record.Data.DivisionName
       }
 
-      template.remark.innerHTML = dateFormat(
-        new Date(record.EventTime),
-        'HH:mm:ss'
-      )
+      template.remark.innerHTML = record.EventTime.format('HH:mm:ss')
 
       let item = document.createElement('div')
       item.id = record.EventId!
@@ -238,7 +235,6 @@ export namespace EventHistoryPage {
         }
 
         let str_filter = ''
-        debugger
         if (this.selectedIds && this.selectedIds.length > 0) {
           let filter = { sourceIds: this.selectedIds }
 

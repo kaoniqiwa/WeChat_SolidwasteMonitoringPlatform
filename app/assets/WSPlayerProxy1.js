@@ -29,20 +29,26 @@ function WSPlayerProxy (iframe, mode) {
           that.tools.control.play.className = "play glyphicon glyphicon-play"
           that.tools.control.play.title = "播放"
           if (that.tools.control.center.control)
-            that.tools.control.center.control.a.className = "play glyphicon glyphicon-play";
+            if (that.tools.control.center.control.a) {
+              that.tools.control.center.control.a.className = "play glyphicon glyphicon-play";
+            }
           break;
         case WSPlayerState.playing:
           if (that.mode == WSPlayerMode.vod) {
             that.tools.control.play.className = "play glyphicon glyphicon-pause"
             that.tools.control.play.title = "暂停"
             if (that.tools.control.center.control)
-              that.tools.control.center.control.a.className = "play glyphicon glyphicon-pause";
+              if (that.tools.control.center.control.a) {
+                that.tools.control.center.control.a.className = "play glyphicon glyphicon-pause";
+              }
           }
           else {
             that.tools.control.play.className = "play glyphicon glyphicon-stop"
             that.tools.control.play.title = "停止"
             if (that.tools.control.center.control)
-              that.tools.control.center.control.a.className = "play glyphicon glyphicon-stop";
+              if (that.tools.control.center.control.a) {
+                that.tools.control.center.control.a.className = "play glyphicon glyphicon-stop";
+              }
           }
           break;
         default:
@@ -317,7 +323,7 @@ function WSPlayerProxy (iframe, mode) {
         that.onButtonClicked("fullscreen")
       }
     }
-    that.tools.event.onFullscreenControlClicked = function (e) {
+    that.tools.event.onCapturepictureControlClicked = function (e) {
       if (that.status == WSPlayerState.ready)
         return;
 
@@ -347,23 +353,33 @@ function WSPlayerProxy (iframe, mode) {
     }
 
     that.tools.event.onCenterPositionControlTouchMove = function (e) {
-      if (that.tools.control.isMoudseDown == false) {
+      if (!that.tools.control.isMoudseDown) {
         that.tools.control.isMoudseDown = true;
+        that.pause();
       }
+      onPositionMove(e);
     }
     that.tools.event.onCenterPositionControlTouchEnd = function (e) {
-      that.tools.control.isMoudseDown = false;
+      if (that.tools.control.isMoudseDown) {
+        that.tools.control.isMoudseDown = false;
+        var value = that.tools.control.position.value - that.tools.control.position.min;
+        that.seek(value);
+        that.resume();
+        setTimeout(function () {
+          that.tools.visibility = false;
+        }, 5 * 1000);
+      }
     }
 
   }
 
   function onPositionMove (evt) {
     try {
-
+      console.log(evt);
       if (!evt || !evt.changedTouches || evt.changedTouches.length <= 0) return;
 
       var width = evt.target.offsetWidth;
-      var x = evt.changedTouches[0].clientX - evt.target.offsetLeft;
+      var x = that.isFullScreen ? evt.changedTouches[0].clientY : evt.changedTouches[0].clientX - evt.target.offsetLeft;
 
       var p = x / width;
       if (p > 1 || p < 0) return;
@@ -436,6 +452,8 @@ function WSPlayerProxy (iframe, mode) {
 
 }
 window.WSPlayerProxy = WSPlayerProxy;
+
+
 
 
 function PlayerTools (element, mode) {
@@ -599,12 +617,12 @@ function PlayerTools (element, mode) {
 
     that_tools.control.play = createElement(ul, "a", { width: "40px" }, { className: "play glyphicon glyphicon-play", title: "播放" });
 
-    that_tools.control.begin_time = createElement(ul, "label", { width: "60px" }, {
+    that_tools.control.begin_time = createElement(ul, "label", { width: "40px" }, {
       className: "begin_time",
       innerText: "00:00",
       title: "当前时间"
     });
-    that_tools.control.position = createElement(ul, "input", { width: "calc(100% - 231px)" }, {
+    that_tools.control.position = createElement(ul, "input", { width: "calc(100% - 191px)" }, {
       className: "position",
       title: "00:00",
       type: "range"
@@ -612,13 +630,13 @@ function PlayerTools (element, mode) {
     that_tools.control.position.min = 0;
     that_tools.control.position.max = 1;
     that_tools.control.position.value = 0;
-    that_tools.control.end_time = createElement(ul, "label", { width: "60px" }, { className: "end_time", title: "结束时间", innerText: "00:00", });
+    that_tools.control.end_time = createElement(ul, "label", { width: "40px" }, { className: "end_time", title: "结束时间", innerText: "00:00", });
 
 
 
+    that_tools.control.capturepicture = createElement(ul, "a", {}, { className: "capturepicture glyphicon glyphicon-picture", title: "截图" });
+    that_tools.control.fullscreen = createElement(ul, "a", {}, { className: "fullscreen glyphicon glyphicon-fullscreen", title: "全屏" });
 
-    that_tools.control.fullscreen = createElement(ul, "a", { float: "right" }, { className: "fullscreen glyphicon glyphicon-fullscreen", title: "全屏" });
-    that_tools.control.capturepicture = createElement(ul, "a", { float: "right" }, { className: "capturepicture glyphicon glyphicon-picture", title: "截图" });
 
 
 
@@ -687,7 +705,7 @@ function PlayerTools (element, mode) {
     if (that_tools.element) {
       that_tools.element.addEventListener("touchstart", function (e) {
 
-        that_tools.visibility = !that_tools.visibility;
+        that_tools.visibility = true;
         if (that_tools.event.onCenterPositionControlTouchStart) {
           that_tools.event.onCenterPositionControlTouchStart(e);
         }
@@ -696,6 +714,7 @@ function PlayerTools (element, mode) {
         that_tools.visibility = true;
         that_tools.control.center.control.background.style.display = "none";
         that_tools.control.center.position.background.style.display = "";
+        that_tools.control.center.position.begin.innerText = that_tools.control.begin_time.innerText;
         that_tools.control.center.position.end.innerText = that_tools.control.end_time.innerText;
         if (that_tools.event.onCenterPositionControlTouchMove) {
           that_tools.event.onCenterPositionControlTouchMove(e);
@@ -711,7 +730,16 @@ function PlayerTools (element, mode) {
         if (that_tools.event.onCenterPositionControlTouchEnd) {
           that_tools.event.onCenterPositionControlTouchEnd(e);
         }
+
       });
+      that_tools.element.addEventListener("click", function (e) {
+        if (that_tools.event.onElementClicked) {
+          that_tools.event.onElementClicked(e);
+        }
+        setTimeout(function () {
+          that_tools.visibility = false;
+        }, 5 * 1000);
+      })
     }
 
     if (that_tools.control.play) {
@@ -722,12 +750,13 @@ function PlayerTools (element, mode) {
       });
     }
     if (that_tools.control.center.control) {
-      that_tools.control.center.control.a.addEventListener("click", function (e) {
-        debugger;
-        if (that_tools.event.onCenterPlayControlClicked) {
-          that_tools.event.onCenterPlayControlClicked(e);
-        }
-      });
+      if (that_tools.control.center.control.a) {
+        that_tools.control.center.control.a.addEventListener("click", function (e) {
+          if (that_tools.event.onCenterPlayControlClicked) {
+            that_tools.event.onCenterPlayControlClicked(e);
+          }
+        });
+      }
     }
     if (that_tools.control.stop) {
       that_tools.control.stop.addEventListener("click", function (e) {
@@ -771,6 +800,7 @@ function PlayerTools (element, mode) {
   }
 
   this.event = {
+    onElementClicked: function (e) { },
     onPlayControlClciked: function (e) { },
     onStopControlClicked: function (e) { },
     onFullscreenControlClicked: function (e) { },
@@ -808,4 +838,3 @@ function PlayerTools (element, mode) {
 
 }
 window.PlayerTools = PlayerTools;
-

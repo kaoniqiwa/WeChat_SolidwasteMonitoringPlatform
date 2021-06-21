@@ -109,12 +109,15 @@ export abstract class DataController
       illegalDropNumber: 0,
       mixedIntoNumber: 0,
       garbageFullNumber: 0,
+      garbageDropNumber: 0,
     }
     let list = await this.getStatisticNumberList(day)
+
     list.forEach((x) => {
       result.illegalDropNumber += x.illegalDropNumber
       result.mixedIntoNumber += x.mixedIntoNumber
       result.garbageFullNumber += x.garbageFullNumber
+      result.garbageDropNumber += x.garbageDropNumber
     })
     return result
   }
@@ -217,6 +220,7 @@ export abstract class DataController
     const promise = await this.service.garbageStation.statisticNumberList({
       Ids: garbageStationIds,
     })
+    debugger
     return promise.Data.map((x) => {
       let result: StatisticNumber = {
         id: x.Id,
@@ -224,7 +228,9 @@ export abstract class DataController
         illegalDropNumber: 0,
         mixedIntoNumber: 0,
         garbageFullNumber: 0,
+        garbageDropNumber: x.GarbageDropStationNumber ?? 0,
       }
+
       if (x.TodayEventNumbers) {
         let illegalDropNumber = x.TodayEventNumbers.find(
           (y) => y.EventType == EventType.IllegalDrop
@@ -479,8 +485,8 @@ export abstract class DataController
     day: OneDay
   ): Promise<GarbageStationNumberStatisticV2[]> {
     let params: GetGarbageStationStatisticNumbersParamsV2 = {
-      BeginTime: day.begin,
-      EndTime: day.end,
+      BeginTime: day.begin.toISOString(),
+      EndTime: day.end.toISOString(),
       GarbageStationIds: ids,
       TimeUnit: TimeUnit.Day,
     }

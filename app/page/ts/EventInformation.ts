@@ -29,6 +29,7 @@ import {
   MixedIntoEventRecord,
 } from '../../data-core/model/waste-regulation/event-record'
 import { IImageUrl } from './data-controllers/ViewModels'
+import { DateTime } from '../../data-core/model/date-time'
 
 Swiper.use([Pagination])
 
@@ -141,10 +142,9 @@ export namespace EventInformationPage {
       const eventId = getQueryVariable('eventid')
       const strEventType = getQueryVariable('eventtype')
       const str_filter = getQueryVariable('filter')
-      debugger
+
       let filter = { sourceIds: undefined }
       if (str_filter) {
-        debugger
         filter = JSON.parse(base64decode(str_filter))
       }
       let eventType = EventType.IllegalDrop
@@ -179,7 +179,6 @@ export namespace EventInformationPage {
         rc__name = source.getElementsByClassName('rc__name'),
         police__time = source.getElementsByClassName('police__time'),
         detail_imgs = source.getElementsByClassName('detail_img')
-
       let btn = source.getElementsByClassName('back__btn')
       if (btn) {
         for (let i = 0; i < btn.length; i++) {
@@ -218,10 +217,8 @@ export namespace EventInformationPage {
 
       if (police__time) {
         for (let i = 0; i < police__time.length; i++) {
-          ;(police__time[i] as HTMLSpanElement).innerText = dateFormat(
-            new Date(item.EventTime),
-            'yyyy-MM-dd HH:mm:ss'
-          )
+          ;(police__time[i] as HTMLSpanElement).innerText =
+            item.EventTime.format('yyyy-MM-dd HH:mm:ss')
         }
       }
 
@@ -265,8 +262,7 @@ export namespace EventInformationPage {
               imgId: 'max-img',
             }
 
-            let time = new Date(item.EventTime)
-            let interval = this.getEventTimeInterval(time)
+            let interval = this.getEventTimeInterval(item.EventTime)
 
             let url: IImageUrl = {
               url: detail_img.src,
@@ -314,7 +310,7 @@ export namespace EventInformationPage {
       }
     }
 
-    getEventTimeInterval(time: Date) {
+    getEventTimeInterval(time: Date | DateTime) {
       time.setSeconds(time.getSeconds() - 15)
       let begin = new Date(time.getTime())
       time.setSeconds(time.getSeconds() + 30)
@@ -374,10 +370,8 @@ export namespace EventInformationPage {
 
       if (police__time) {
         for (let i = 0; i < police__time.length; i++) {
-          ;(police__time[i] as HTMLSpanElement).innerText = dateFormat(
-            new Date(item.EventTime),
-            'yyyy-MM-dd HH:mm:ss'
-          )
+          ;(police__time[i] as HTMLSpanElement).innerText =
+            item.EventTime.format('yyyy-MM-dd HH:mm:ss')
         }
       }
 
@@ -396,8 +390,7 @@ export namespace EventInformationPage {
           '.weui-form-preview__item'
         ) as HTMLDivElement
         let urls = new Array<IImageUrl>()
-        let time = new Date(item.EventTime)
-        let interval = this.getEventTimeInterval(time)
+        let interval = this.getEventTimeInterval(item.EventTime)
         for (let i = 0; i < item.Data.CameraImageUrls.length; i++) {
           let element = template
           if (i > 0) {
@@ -564,10 +557,8 @@ export namespace EventInformationPage {
 
       if (police__time) {
         for (let i = 0; i < police__time.length; i++) {
-          ;(police__time[i] as HTMLSpanElement).innerText = dateFormat(
-            new Date(item.EventTime),
-            'yyyy-MM-dd HH:mm:ss'
-          )
+          ;(police__time[i] as HTMLSpanElement).innerText =
+            item.EventTime.format('yyyy-MM-dd HH:mm:ss')
         }
       }
 
@@ -611,8 +602,7 @@ export namespace EventInformationPage {
           '.weui-form-preview__item'
         ) as HTMLDivElement
         let urls = new Array<IImageUrl>()
-        let time = new Date(item.EventTime)
-        let interval = this.getEventTimeInterval(time)
+        let interval = this.getEventTimeInterval(item.EventTime)
         for (let i = 0; i < imgUrls.length; i++) {
           let element = template
           if (i > 0) {

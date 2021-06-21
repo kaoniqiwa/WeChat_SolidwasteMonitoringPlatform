@@ -150,6 +150,7 @@ body {
   background-color: #33ff6633;
   background-color: rgba(51, 255, 102, 0.3);
   color: #32b43e;
+  display: none;
 }
 
 .hw-content .hw-content__card .content__title__badage.red {
@@ -219,7 +220,7 @@ body {
   width: 100%;
   vertical-align: middle;
   z-index: 1;
-  margin-top: -9.5%;
+  /* margin-top: -9.5%; */
 }
 
 #origin-img .swiper-zoom-container {
@@ -328,7 +329,8 @@ body {
 }
 
 #aside-container,
-#chart-container {
+#chart-container,
+.inner-container {
   display: none;
   position: absolute;
   width: 100%;
@@ -338,14 +340,16 @@ body {
   z-index: 999;
 }
 
-#chart-container {
+#chart-container,
+.inner-container {
   display: block;
   transform: translateX(110%);
   transition: all 0.4s ease-in-out;
   opacity: 0;
 }
 
-#chart-container.slideIn {
+#chart-container.slideIn,
+.inner-container.slideIn {
   transition: all 0.4s ease-in-out;
   transform: translateX(0%);
   opacity: 1;
@@ -366,4 +370,9 @@ body {
 
 .capturePicture>img {
   transform: translate(0, -50%) !important;
+}
+
+.video-control {
+  top: 50%;
+  transform: translate(0, -50%);
 }
