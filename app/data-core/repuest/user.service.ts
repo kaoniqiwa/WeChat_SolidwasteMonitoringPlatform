@@ -1,7 +1,7 @@
 import { plainToClass } from 'class-transformer'
 import { DateTime } from '../model/date-time'
 import { PagedList } from '../model/page'
-import { ResponseBase, Response } from '../model/response'
+import { ResponseBase, Response, HttpResponse } from '../model/response'
 import { SaveModel } from '../model/save-model'
 import {
   GetUserLabelsParams,
@@ -75,30 +75,30 @@ export class UserRequestService extends SaveModel {
 class UserLabelRequestService {
   constructor(private requestService: HowellAuthHttp) {}
 
-  async getList(params: GetUserLabelsParams) {
+  async getList(params?: GetUserLabelsParams) {
+    if (!params) {
+      params = {}
+    }
+    params.PageSize = 999
     let response = await this.requestService.post<
       GetUserLabelsParams,
-      Response<PagedList<UserLabel>>
+      PagedList<UserLabel>
     >(UserUrl.label.list(), params)
-    response.Data.Data = plainToClass(UserLabel, response.Data.Data)
-    for (let i = 0; i < response.Data.Data.length; i++) {
-      const data = response.Data.Data[i]
-      data.CreateTime = plainToClass(DateTime, data.CreateTime)
-    }
-    return response.Data
-  }
-
-  async get(garbageStationId: string, type: UserLabelType) {
-    let response = await this.requestService.get<Response<UserLabel>>(
-      UserUrl.label.type(garbageStationId, type)
-    )
     return plainToClass(UserLabel, response.Data)
   }
 
-  delete(garbageStationId: string, type: UserLabelType) {
-    return this.requestService.delete<ResponseBase>(
+  async get(garbageStationId: string, type: UserLabelType) {
+    let response = await this.requestService.get<UserLabel>(
       UserUrl.label.type(garbageStationId, type)
     )
+    return plainToClass(UserLabel, response)
+  }
+
+  async delete(garbageStationId: string, type: UserLabelType) {
+    let response = await this.requestService.delete<HttpResponse<ResponseBase>>(
+      UserUrl.label.type(garbageStationId, type)
+    )
+    return response.data
   }
   post(garbageStationId: string, type: UserLabelType, label: UserLabel) {
     return this.requestService.post<UserLabel, ResponseBase>(
@@ -106,10 +106,11 @@ class UserLabelRequestService {
       label
     )
   }
-  put(garbageStationId: string, type: UserLabelType, label: UserLabel) {
-    return this.requestService.put<UserLabel, ResponseBase>(
-      UserUrl.label.type(garbageStationId, type),
-      label
-    )
+  async put(garbageStationId: string, type: UserLabelType, label: UserLabel) {
+    let response = await this.requestService.put<
+      UserLabel,
+      HttpResponse<ResponseBase>
+    >(UserUrl.label.type(garbageStationId, type), label)
+    return response.data
   }
 }

@@ -54,7 +54,7 @@ export class DateTime {
     return dateFormat(this.date, fmt)
   }
   toString(): string {
-    return this.date.toString()
+    return this.date.toISOString()
   }
   toDateString(): string {
     return this.date.toDateString()

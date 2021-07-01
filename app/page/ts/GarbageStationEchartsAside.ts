@@ -10,7 +10,7 @@ import '../css/header.less'
 import weui from 'weui.js/dist/weui.js'
 import 'weui'
 
-import echartAsideTemplate from '../garbage-station-details.html'
+import echartAsideTemplate from '../garbagestation/garbage-station-details.html'
 
 import Swiper, { Virtual, Pagination } from 'swiper'
 
@@ -56,6 +56,8 @@ import {
 } from './data-controllers/IController'
 import EchartsDetailAside from './GarbageStationEchartsDetailAside'
 import IObserver from './IObserver'
+import UserLabelAside from './GarbageStationUserLabel'
+import CreateUserLabelAside from './GarbageStationCreateUserLabel'
 
 echarts.use([
   GridComponent,
@@ -110,6 +112,29 @@ export default class EchartsAside extends IAside implements IObserver {
       if ('showDetail' in args) {
         this.showDetail = args.showDetail
       }
+      if ('showUserLabel' in args) {
+        this.showUserLabel = args.showUserLabel
+        if ('id' in args && 'mode' in args) {
+          let detail_a = document.querySelector(
+            `#detail-${args.id}`
+          ) as HTMLElement
+          let a = document.querySelector(`#${args.id}`) as HTMLElement
+          console.log('detail:', detail_a)
+          console.log('current:', a)
+          switch (args.mode) {
+            case 'remove':
+              detail_a.classList.remove('has')
+              a.classList.remove('has')
+              break
+            case 'create':
+              detail_a.classList.add('has')
+              a.classList.add('has')
+              break
+            default:
+              break
+          }
+        }
+      }
     }
   }
 
@@ -143,7 +168,7 @@ export default class EchartsAside extends IAside implements IObserver {
   constructor(
     selector: HTMLElement | string,
     private dataController: IGarbageStationController,
-    private ids: Array<{ id: string; name: string }>,
+    private stations: Array<GarbageStationViewModel>,
     date: Date
   ) {
     super()
@@ -170,6 +195,9 @@ export default class EchartsAside extends IAside implements IObserver {
       ) as HTMLDivElement,
       detailContainer: document.querySelector(
         '#detail-container'
+      ) as HTMLDivElement,
+      userLabelContainer: document.querySelector(
+        '#detail-user-label-container'
       ) as HTMLDivElement,
     }
 
@@ -207,6 +235,14 @@ export default class EchartsAside extends IAside implements IObserver {
 
           // 当前点击的 slide
           let clickedSlide = swiper.clickedSlide
+
+          let userLabel = clickedSlide.querySelector('.user-label')
+          if (userLabel) {
+            if (path.includes(userLabel as EventTarget)) {
+              this.onUserLabelClicked(event)
+              return
+            }
+          }
 
           // 判断 staticItem 是否在 path 数组中
           let staticItem = clickedSlide.querySelector('.inner-statisic')
@@ -257,6 +293,54 @@ export default class EchartsAside extends IAside implements IObserver {
 
     this.bindEvents()
   }
+
+  onUserLabelClicked(e: Event) {
+    if (!this.id) return
+    let data = this.stations.find((x) => x.Id === this.id)
+    if (!data) return
+    let promise = data.getUserLabel()
+
+    promise
+      .then((x) => {
+        let p = new UserLabelAside(
+          this.elements.userLabelContainer,
+          data!,
+          this.dataController
+        )
+
+        p.init()
+        p.add(this)
+        this.showUserLabel = true
+      })
+      .catch((x) => {
+        let p = new CreateUserLabelAside(
+          this.elements.userLabelContainer,
+          data!,
+          this.dataController
+        )
+
+        p.init()
+        p.add(this)
+
+        this.showUserLabel = true
+      })
+
+    e.stopPropagation()
+  }
+
+  private _showUserLabel: boolean = false
+  public get showUserLabel(): boolean {
+    return this._showUserLabel
+  }
+  public set showUserLabel(v: boolean) {
+    this._showUserLabel = v
+    if (v) {
+      this.elements.userLabelContainer.classList.add('slideIn')
+    } else {
+      this.elements.userLabelContainer.classList.remove('slideIn')
+    }
+  }
+
   createDetailAside() {
     this.myEchartsDetailAside = new EchartsDetailAside(
       this.elements.detailContainer,
@@ -276,8 +360,8 @@ export default class EchartsAside extends IAside implements IObserver {
    */
   manualSlide() {
     let id = this.id
-    let index = this.ids.findIndex((val) => {
-      return val.id == id
+    let index = this.stations.findIndex((val) => {
+      return val.Id == id
     })
     if (index == -1) return
     /**
@@ -290,12 +374,28 @@ export default class EchartsAside extends IAside implements IObserver {
 
     this.swiper.slideTo(index)
     this.activeIndex = index
+
+    this.stations[index]
+      .getUserLabel()
+      .then((x) => {
+        let detail = document.querySelector(`#detail-user-label-${x.LabelId}`)
+        if (detail) {
+          detail.classList.add('has')
+        }
+      })
+      .catch((x) => {
+        let detail = document.querySelector(`#detail-user-label-${id}`)
+        if (detail) {
+          detail.classList.remove('has')
+        }
+      })
   }
   private bindEvents() {
     if (this.elements.innerBack) {
       this.elements.innerBack.addEventListener('click', () => {
         this.notify({
           showChart: false,
+          showUserLabel: false,
         })
       })
     }
@@ -332,13 +432,13 @@ export default class EchartsAside extends IAside implements IObserver {
     this.contentLoaded = false
   }
   /**
-   *  为了保证请求结果和 this.ids 顺序一致
+   *  为了保证请求结果和 this.stations 顺序一致
    */
   async loadAllData() {
-    // console.log('loadAllData', this.ids)
+    // console.log('loadAllData', this.stations)
     let arr = []
-    for (let i = 0; i < this.ids.length; i++) {
-      arr.push(this.loadData(this.ids[i].id))
+    for (let i = 0; i < this.stations.length; i++) {
+      arr.push(this.loadData(this.stations[i].Id))
     }
     this.statisticAllData = await Promise.all(arr)
   }
@@ -354,8 +454,8 @@ export default class EchartsAside extends IAside implements IObserver {
     this.swiper.virtual.slides = []
     this.swiper.virtual.cache = {}
 
-    // for (let i = 0; i < this.ids.length; i++) {
-    //   let id = this.ids[i];
+    // for (let i = 0; i < this.stations.length; i++) {
+    //   let id = this.stations[i];
     //   let name = this.symb.get(id)?.name
     //   console.log(name)
 
@@ -364,13 +464,15 @@ export default class EchartsAside extends IAside implements IObserver {
     let len = this.statisticAllData.length
     for (let i = 0; i < len; i++) {
       let obj = {
-        Id: this.ids[i].id,
-        Name: this.ids[i].name,
+        Id: this.stations[i].Id,
+        Name: this.stations[i].Name,
         GarbageRatio: 0,
         maxDrop: '暂无数据',
         totalDrop: '暂无数据',
         illegalDrop: '暂无数据',
         mixIntoDrop: '暂无数据',
+        MaxGarbageTime: 0,
+        GarbageDuration: 0,
       }
       this.dataController.getImageUrl
       if (this.statisticAllData[i].length != 0) {
@@ -383,16 +485,20 @@ export default class EchartsAside extends IAside implements IObserver {
           GarbageDuration,
           EventNumbers,
         } = data
+
         obj.GarbageRatio = Number(GarbageRatio!.toFixed(2))
 
         AvgGarbageTime = Math.round(AvgGarbageTime!)
         MaxGarbageTime = Math.round(MaxGarbageTime!)
         GarbageDuration = Math.round(GarbageDuration!)
 
+        obj.MaxGarbageTime = MaxGarbageTime
+        obj.GarbageDuration = GarbageDuration
+
         let maxHour = Math.floor(MaxGarbageTime / 60)
-        let maxMinute = MaxGarbageTime - maxHour * 60
+        let maxMinute = Math.ceil(MaxGarbageTime & 60)
         let totalHour = Math.floor(GarbageDuration / 60)
-        let totalMinute = GarbageDuration - totalHour * 60
+        let totalMinute = Math.ceil(GarbageDuration & 60)
 
         if (maxHour == 0) {
           obj.maxDrop = maxMinute + '分钟'
@@ -417,7 +523,11 @@ export default class EchartsAside extends IAside implements IObserver {
       let slide = `
       <div data-id='${obj.Id}' style="padding:0 10px;">
           <div class='inner-head'>
-              <div class='inner-title'>${obj.Name}</div>
+              <div class='inner-title'><span>${
+                obj.Name
+              }</span><span><a id="detail-user-label-${
+        obj.Id
+      }" class="user-label glyphicon glyphicon-earphone"></a></span></div>
                 <div class='inner-date'>${dateFormat(
                   this.date,
                   'yyyy年MM月dd日'
@@ -431,13 +541,13 @@ export default class EchartsAside extends IAside implements IObserver {
                   <div class='ratio-suffix'>%</div>
               </div>
 
-              <div class='item'>
+              <div class='item${obj.MaxGarbageTime ? '' : ' disable'}'>
                   <div class='item-title'>最大落地:</div>
                   <div class='item-content'>
                      ${obj.maxDrop}
                   </div>
               </div>
-              <div class='item'> 
+              <div class='item${obj.GarbageDuration ? '' : ' disable'}'> 
                   <div class='item-title'> 总落地:</div>
                   <div class='item-content'>
                   ${obj.totalDrop}
@@ -459,7 +569,7 @@ export default class EchartsAside extends IAside implements IObserver {
               </div>
           </div>
           
-          <div class='inner-info' style='display:block'>
+          <div class='inner-info' style='display:none'>
             <div class='item'>
                 <div class='name'>经霞敏</div>
                 <div class='note'>卫生干部</div>

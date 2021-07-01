@@ -1,0 +1,47 @@
+<div class="weui-form set">
+  <div class="weui-form__text-area">
+    <div class="weui-form__title title">添加联系人</div>
+  </div>
+  <div class="weui-form__control-area">
+    <div class="weui-cells__group weui-cells__group_form">
+      <div class="weui-cells weui-cells_form">
+        <div class="weui-cell weui-cell_active">
+          <div class="weui-cell__hd">
+            <label class="weui-label">姓名</label>
+          </div>
+          <div class="weui-cell__bd">
+            <input
+              id="user-label-name"
+              class="weui-input"
+              placeholder="填写姓名"
+              onfocus='this.select()'
+            />
+          </div>
+        </div>
+        <div class="weui-cell weui-cell_active">
+          <div class="weui-cell__hd">
+            <label class="weui-label">联系电话</label>
+          </div>
+          <div class="weui-cell__bd">
+            <input
+              id="user-label-phone-number"
+              class="weui-input"
+              placeholder="填写手机号"
+              type="number"
+              pattern="[0-9]*"
+              onfocus='this.select()'
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="weui-form__opr-area">
+    <a
+      class="weui-btn weui-btn_primary weui-btn_disabled button"
+      href="javascript:"
+      id="user-label-ok"
+      >确定</i
+    ></a>
+  </div>
+</div>

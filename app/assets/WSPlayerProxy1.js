@@ -13,25 +13,46 @@ var WSPlayerState = {
   end: 5,
   opening: 6,
   closing: 7,
+  frame: 8,
   closed: 255
 }
 window.WSPlayerState = WSPlayerState;
 function WSPlayerProxy (iframe, mode) {
   this.status = WSPlayerState.ready;
   this.mode = mode;
-  setInterval(function () {
+
+  var _status = WSPlayerState.ready;
+  this.__defineGetter__("status", function () {
+    return _status;
+  });
+  this.__defineSetter__("status", function (val) {
+    if (_status === val) {
+      return;
+    }
+    _status = val;
     if (that.tools) {
       switch (that.status) {
         case WSPlayerState.pause:
-        case WSPlayerState.slow:
-        case WSPlayerState.fast:
-        case WSPlayerState.end:
-          that.tools.control.play.className = "play glyphicon glyphicon-play"
-          that.tools.control.play.title = "播放"
-          if (that.tools.control.center.control)
+          that.tools.control.play.className = "play glyphicon glyphicon-eject"
+          that.tools.control.play.title = "单帧进"
+          if (that.tools.control.center.control) {
             if (that.tools.control.center.control.a) {
               that.tools.control.center.control.a.className = "play glyphicon glyphicon-play";
             }
+          }
+          break;
+        case WSPlayerState.slow:
+        case WSPlayerState.fast:
+        case WSPlayerState.end:
+
+        case WSPlayerState.frame:
+          that.tools.control.play.className = "play glyphicon glyphicon-play"
+          that.tools.control.play.title = "播放"
+          if (that.tools.control.center.control) {
+            if (that.tools.control.center.control.a) {
+              that.tools.control.center.control.a.className = "play glyphicon glyphicon-eject";
+            }
+          }
           break;
         case WSPlayerState.playing:
           if (that.mode == WSPlayerMode.vod) {
@@ -51,11 +72,12 @@ function WSPlayerProxy (iframe, mode) {
               }
           }
           break;
+
         default:
           break;
       }
     }
-  }, 0);
+  });
 
 
   function postMessage (data) {
@@ -294,6 +316,9 @@ function WSPlayerProxy (iframe, mode) {
           that.speedResume();
           break;
         case WSPlayerState.pause:
+          that.frame();
+          break;
+        case WSPlayerState.frame:
           that.resume();
           break;
         case WSPlayerState.playing:
@@ -309,7 +334,39 @@ function WSPlayerProxy (iframe, mode) {
           break;
       }
     }
-    that.tools.event.onCenterPlayControlClicked = that.tools.event.onPlayControlClciked;
+    that.tools.event.onCenterPlayControlClicked = function (e) {
+      switch (that.status) {
+        case WSPlayerState.ready:
+          that.play();
+          break;
+        case WSPlayerState.end:
+          that.seek(0);
+          that.resume();
+          break;
+        case WSPlayerState.fast:
+        case WSPlayerState.slow:
+          //that.play();
+          that.speedResume();
+          break;
+        case WSPlayerState.pause:
+          that.resume();
+          break;
+        case WSPlayerState.frame:
+          that.frame();
+          break;
+        case WSPlayerState.playing:
+          if (that.mode == WSPlayerMode.vod) {
+            that.pause();
+          }
+          else {
+            that.stop();
+          }
+
+          break;
+        default:
+          break;
+      }
+    }
 
     that.tools.event.onStopControlClicked = function (e) {
       if (that.status == WSPlayerState.ready)
@@ -365,10 +422,11 @@ function WSPlayerProxy (iframe, mode) {
         var value = that.tools.control.position.value - that.tools.control.position.min;
         that.seek(value);
         that.resume();
-        setTimeout(function () {
-          that.tools.visibility = false;
-        }, 5 * 1000);
       }
+    }
+
+    that.tools.event.onForwardControlClicked = function (e) {
+      that.frame();
     }
 
   }
@@ -616,7 +674,7 @@ function PlayerTools (element, mode) {
 
 
     that_tools.control.play = createElement(ul, "a", { width: "40px" }, { className: "play glyphicon glyphicon-play", title: "播放" });
-
+    // that_tools.control.forward = createElement(ul, "a", { transform: "rotate(90deg)" }, { className: "glyphicon glyphicon glyphicon-eject", title: "单帧进" });
     that_tools.control.begin_time = createElement(ul, "label", { width: "40px" }, {
       className: "begin_time",
       innerText: "00:00",
@@ -645,7 +703,7 @@ function PlayerTools (element, mode) {
       // //that_tools.control.stop.style.display = "none";
       // that_tools.control.slow.style.display = "none";
       // that_tools.control.fast.style.display = "none";
-      // //that_tools.control.forward.style.display = "none";
+      // that_tools.control.forward.style.display = "none";
 
       // that_tools.control.jump_back.style.display = "none";
       // that_tools.control.jump_forward.style.display = "none";
@@ -730,13 +788,21 @@ function PlayerTools (element, mode) {
         if (that_tools.event.onCenterPositionControlTouchEnd) {
           that_tools.event.onCenterPositionControlTouchEnd(e);
         }
-
+        if (timer.visibility) {
+          clearTimeout(timer.visibility);
+        }
+        timer.visibility = setTimeout(function () {
+          that_tools.visibility = false;
+        }, 5 * 1000);
       });
       that_tools.element.addEventListener("click", function (e) {
         if (that_tools.event.onElementClicked) {
           that_tools.event.onElementClicked(e);
         }
-        setTimeout(function () {
+        if (timer.visibility) {
+          clearTimeout(timer.visibility);
+        }
+        timer.visibility = setTimeout(function () {
           that_tools.visibility = false;
         }, 5 * 1000);
       })
@@ -797,6 +863,15 @@ function PlayerTools (element, mode) {
       });
     }
 
+    if (that_tools.control.forward) {
+      that_tools.control.forward.addEventListener("click", function (e) {
+        if (that_tools.event.onForwardControlClicked) {
+          that_tools.event.onForwardControlClicked(e);
+        }
+      });
+    }
+
+
   }
 
   this.event = {
@@ -812,6 +887,7 @@ function PlayerTools (element, mode) {
     onCenterPositionControlTouchStart: function (e) { },
     onCenterPositionControlTouchEnd: function (e) { },
     onCenterPositionControlTouchMove: function (e) { },
+    onForwardControlClicked: function (e) { }
   }
 
 

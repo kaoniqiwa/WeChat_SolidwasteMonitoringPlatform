@@ -44,6 +44,8 @@ import { EventType } from '../../data-core/model/waste-regulation/event-number'
 import GarbageStationServer from './GarbageStationServer'
 import { getQueryVariable } from '../../common/tool'
 import UserLabelAside from './GarbageStationUserLabel'
+import CreateUserLabelAside from './GarbageStationCreateUserLabel'
+import { UserLabel } from '../../data-core/model/user-stystem'
 
 // 模块化方式使用 Swiper库
 Swiper.use([Virtual, Pagination])
@@ -52,6 +54,7 @@ enum ZoomStatus {
   out = 'zoomOut',
   in = 'zoomIn',
 }
+let slideClassName = 'slideIn'
 
 // 使用简单的观察者模式，实现 GarbageStationClient 和 myAside 类的通信
 export default class GarbageStationClient implements IObserver {
@@ -72,6 +75,7 @@ export default class GarbageStationClient implements IObserver {
   type: ResourceType //当前账号的类型
 
   garbageStations: GarbageStationViewModel[] = [] //接口请求到的所有数据
+  userLabels: UserLabel[] = []
 
   garbageStationsChunk: GarbageStationViewModel[] = [] //当前请求到的分页数据
   garbageStationsAcc: GarbageStationViewModel[] = [] //累计请求到的数据
@@ -120,11 +124,26 @@ export default class GarbageStationClient implements IObserver {
     this._showChart = val
     if (this.myChartAside) {
       if (val) {
-        this.elements.container.chartContainer.classList.add('slideIn')
+        this.elements.container.chartContainer.classList.add(slideClassName)
       } else {
-        this.elements.container.chartContainer.classList.remove('slideIn')
+        this.elements.container.chartContainer.classList.remove(slideClassName)
         this.myChartAside.date = new Date()
       }
+    }
+  }
+
+  private _showUserLabel: boolean = false
+  public get showUserLabel(): boolean {
+    return this._showUserLabel
+  }
+  public set showUserLabel(v: boolean) {
+    this._showUserLabel = v
+    if (v) {
+      this.elements.container.userLabelContainer.classList.add(slideClassName)
+    } else {
+      this.elements.container.userLabelContainer.classList.remove(
+        slideClassName
+      )
     }
   }
 
@@ -195,6 +214,22 @@ export default class GarbageStationClient implements IObserver {
       }
       if ('showChart' in args) {
         this.showChart = args.showChart
+      }
+      if ('showUserLabel' in args) {
+        this.showUserLabel = args.showUserLabel
+        if ('id' in args && 'mode' in args) {
+          let a = document.querySelector(`#${args.id}`) as HTMLElement
+          switch (args.mode) {
+            case 'remove':
+              a.classList.remove('has')
+              break
+            case 'create':
+              a.classList.add('has')
+              break
+            default:
+              break
+          }
+        }
       }
       if ('filtered' in args) {
         this.reset()
@@ -435,8 +470,7 @@ export default class GarbageStationClient implements IObserver {
       content_card.dataset['cardname'] = v.Name
       // let promise = v.getUserLabel()
       // promise.then((x) => {
-      //   debugger
-      //   if (x.LabelName) content_card.dataset['cardname'] += x.LabelName
+      //         //   if (x.LabelName) content_card.dataset['cardname'] += x.LabelName
       // })
 
       // 标题
@@ -451,15 +485,45 @@ export default class GarbageStationClient implements IObserver {
 
       let phone = document.createElement('span')
       let a = document.createElement('a')
-      a.className = 'glyphicon glyphicon-earphone'
-      //a.href = 'tel:18930169930'
-      a.style.color = '#32b43e'
-      a.style.fontSize = '12px'
-      a.style.marginLeft = '6px'
+      a.id = `user-label-${v.Id}`
+      a.className = 'user-label glyphicon glyphicon-earphone'
+      if (v.UserLabel) {
+        a.classList.add('has')
+      }
+      a.data = v
       a.onclick = (e) => {
-        debugger
-        this.elements.container.userLabelContainer.classList.add('slideIn')
-        let p = new UserLabelAside()
+        if (!e.target || !e.target.data) {
+          return
+        }
+
+        let data = e.target.data as GarbageStationViewModel
+        let promise = data.getUserLabel()
+
+        promise
+          .then((x) => {
+            let p = new UserLabelAside(
+              this.elements.container.userLabelContainer,
+              data,
+              this.dataController
+            )
+
+            p.init()
+            p.add(this)
+            this.showUserLabel = true
+          })
+          .catch((x) => {
+            let p = new CreateUserLabelAside(
+              this.elements.container.userLabelContainer,
+              data,
+              this.dataController
+            )
+
+            p.init()
+            p.add(this)
+
+            this.showUserLabel = true
+          })
+
         e.stopPropagation()
       }
       phone.appendChild(a)
@@ -674,20 +738,19 @@ export default class GarbageStationClient implements IObserver {
     this.myAside.add(this)
   }
   createChartAside() {
-    let params = this.garbageStationsTotal.map((item) => {
-      return {
-        id: item.Id,
-        name: item.Name,
-      }
-    })
+    // let params = this.garbageStationsTotal.map((item) => {
+    //   return {
+    //     id: item.Id,
+    //     name: item.Name,
+    //   }
+    // })
     //let names = this.garbageStationsTotal.map((item) => item.Name)
 
     //console.log('create chart aside');
-    debugger
     this.myChartAside = new EchartsAside(
       this.elements.container.chartContainer,
       this.dataController,
-      params,
+      this.garbageStationsTotal,
       new Date()
     )
 

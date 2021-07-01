@@ -397,15 +397,15 @@ export default class GarbageDrop implements IObserver {
         title: '状态',
         data: [
           {
-            Name: Language.EventTypeFilter(EventType.GarbageDrop),
+            Name: Language.GarbageDropEventType(EventType.GarbageDrop),
             Id: EventType.GarbageDrop.toString(),
           },
           {
-            Name: Language.EventTypeFilter(EventType.GarbageDropTimeout),
+            Name: Language.GarbageDropEventType(EventType.GarbageDropTimeout),
             Id: EventType.GarbageDropTimeout.toString(),
           },
           {
-            Name: Language.EventTypeFilter(EventType.GarbageDropHandle),
+            Name: Language.GarbageDropEventType(EventType.GarbageDropHandle),
             Id: EventType.GarbageDropHandle.toString(),
           },
         ],

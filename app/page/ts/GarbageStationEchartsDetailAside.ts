@@ -8,7 +8,7 @@ import {
 import IAside from './IAside'
 import MyTemplate, { GarbageDropData } from './myTemplate'
 
-import echartDetailAsideTemplate from '../garbage-station-echartDetailAside.html'
+import echartDetailAsideTemplate from '../garbagestation/garbage-station-echartDetailAside.html'
 import { EventType } from '../../data-core/model/waste-regulation/event-number'
 import {
   CameraImageUrl,
@@ -23,7 +23,7 @@ import { NavigationWindow } from '.'
 
 import '../css/myChartDetailAside.less'
 
-export default class EchartAsideDetail extends IAside {
+export default class EchartsDetailAside extends IAside {
   day!: OneDay
 
   private _id: string = ''

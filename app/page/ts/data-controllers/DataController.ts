@@ -1,6 +1,11 @@
 import { dateFormat } from '../../../common/tool'
+import { DateTime } from '../../../data-core/model/date-time'
 import { PagedList, TimeUnit } from '../../../data-core/model/page'
-import { User } from '../../../data-core/model/user-stystem'
+import {
+  User,
+  UserLabel,
+  UserLabelType,
+} from '../../../data-core/model/user-stystem'
 import { Camera } from '../../../data-core/model/waste-regulation/camera'
 import {
   EventNumber,
@@ -37,16 +42,17 @@ import {
   IGarbageDrop,
   IGarbageStationController,
   IGarbageStationNumberStatistic,
+  IUserLabelController,
   IUserPushManager,
   OneDay,
   Paged,
   StatisticNumber,
 } from './IController'
+import { ViewModelConverter } from './ViewModelConverter'
 import {
   CameraViewModel,
   GarbageStationViewModel,
   IPictureController,
-  ViewModelConverter,
 } from './ViewModels'
 
 export abstract class DataController
@@ -64,6 +70,57 @@ export abstract class DataController
 
   constructor(protected service: Service, roles: ResourceRole[]) {
     this.roles = roles
+  }
+
+  userLabel: IUserLabelController = {
+    get: (garbageStationId: string) => {
+      return this.service.user.label.get(
+        garbageStationId,
+        UserLabelType.garbageStation
+      )
+    },
+    create: async (garbageStationId: string, name: string, number: string) => {
+      let label = new UserLabel()
+      label.LabelId = garbageStationId
+      label.LabelName = name
+      label.createTime = new DateTime()
+      label.updateTime = new DateTime()
+      label.LabelType = UserLabelType.garbageStation
+      label.Content = number
+      let result = await this.service.user.label.post(
+        garbageStationId,
+        label.LabelType,
+        label
+      )
+      return result.FaultCode == 0
+    },
+    update: (garbageStationId: string, name: string, number: string) => {
+      let promise = this.userLabel.get(
+        garbageStationId,
+        UserLabelType.garbageStation
+      )
+      return promise.then(async (x) => {
+        x.Content = number
+        x.LabelName = name
+        x.updateTime = new DateTime()
+        let result = await this.service.user.label.put(
+          garbageStationId,
+          x.LabelType,
+          x
+        )
+        return result.FaultCode == 0
+      })
+    },
+    remove: async (id: string) => {
+      let result = await this.service.user.label.delete(
+        id,
+        UserLabelType.garbageStation
+      )
+      return result.FaultCode == 0
+    },
+    list: (labelIds?: string[]) => {
+      return this.service.user.label.getList({ LabelIds: labelIds })
+    },
   }
 
   picture: IPictureController = {
@@ -160,8 +217,8 @@ export abstract class DataController
   >
 
   getDivision = async (divisionId: string) => {
-    let promise = await this.service.division.get(divisionId)
-    return promise
+    let item = await this.service.division.get(divisionId)
+    return ViewModelConverter.Convert(this.service, item)
   }
   getCameraList = async (
     garbageStationId: string,
@@ -220,7 +277,6 @@ export abstract class DataController
     const promise = await this.service.garbageStation.statisticNumberList({
       Ids: garbageStationIds,
     })
-    debugger
     return promise.Data.map((x) => {
       let result: StatisticNumber = {
         id: x.Id,

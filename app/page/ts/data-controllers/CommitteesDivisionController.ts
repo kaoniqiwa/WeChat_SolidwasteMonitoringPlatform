@@ -10,7 +10,8 @@ import { Service } from '../../../data-core/repuest/service'
 import { DataCache } from './Cache'
 import { DataController } from './DataController'
 import { OneDay, Paged, StatisticNumber } from './IController'
-import { GarbageStationViewModel, ViewModelConverter } from './ViewModels'
+import { ViewModelConverter } from './ViewModelConverter'
+import { GarbageStationViewModel } from './ViewModels'
 
 export class CommitteesDivisionController extends DataController {
   constructor(service: Service, roles: ResourceRole[]) {
@@ -29,15 +30,18 @@ export class CommitteesDivisionController extends DataController {
       })
       list = list.concat(promise.Data)
     }
+    let ids = list.map((x) => x.Id)
     let statisic = await this.service.garbageStation.statisticNumberList({
-      Ids: list.map((x) => x.Id),
+      Ids: ids,
     })
+    let userLabels = await this.userLabel.list(ids)
 
     let result = new Array<GarbageStationViewModel>()
     for (let i = 0; i < list.length; i++) {
       const item = list[i]
       let vm = ViewModelConverter.Convert(this.service, item)
       vm.NumberStatistic = statisic.Data.find((x) => x.Id == vm.Id)
+      vm.UserLabel = userLabels.find((x) => x.LabelId === vm.Id)
       result.push(vm)
     }
     // result = result.sort((a, b) => {

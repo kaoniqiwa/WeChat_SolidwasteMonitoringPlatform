@@ -1,0 +1,49 @@
+<div data-id="${obj.Id}" style="padding: 0 10px">
+  <div class="inner-head">
+    <div class="inner-title">
+      <span class="garbage-station-name"></span
+      ><span><a class="user-label glyphicon glyphicon-earphone"></a></span>
+    </div>
+    <div class="inner-date"></div>
+  </div>
+
+  <div class="inner-statisic">
+    <div class="ratio">
+      <div class="ratio-num garbage-ratio"></div>
+      <div class="ratio-suffix">%</div>
+    </div>
+
+    <div class="item max-garbage-time">
+      <div class="item-title">最大落地:</div>
+      <div class="item-content max-drop"></div>
+    </div>
+    <div class="item garbage-duration">
+      <div class="item-title">总落地:</div>
+      <div class="item-content total-drop"></div>
+    </div>
+
+    <div class="item illegalDrop" detail-type="${EventType.IllegalDrop}">
+      <div class="item-title">乱丢垃圾:</div>
+      <div class="item-content"><span></span>起</div>
+    </div>
+
+    <div class="item" detail-type="${EventType.MixedInto}">
+      <div class="item-title">混合投放:</div>
+      <div class="item-content"><span></span>起</div>
+    </div>
+  </div>
+
+  <div class="inner-info" style="display: none">
+    <div class="item">
+      <div class="name">经霞敏</div>
+      <div class="note">卫生干部</div>
+      <div class="phone">13764296742</div>
+    </div>
+    <div class="item">
+      <div class="name">经霞敏</div>
+      <div class="note">卫生干部</div>
+      <div class="phone">13764296742</div>
+    </div>
+  </div>
+  <div class="inner-chart"></div>
+</div>

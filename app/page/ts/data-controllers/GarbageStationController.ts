@@ -16,7 +16,8 @@ import {
   Paged,
   StatisticNumber,
 } from './IController'
-import { GarbageStationViewModel, ViewModelConverter } from './ViewModels'
+import { ViewModelConverter } from './ViewModelConverter'
+import { GarbageStationViewModel } from './ViewModels'
 
 export class GarbageStationController
   extends DataController
@@ -123,7 +124,6 @@ export class GarbageStationController
         filter.forEach((y) => {
           garbageFullNumber += y.DayNumber
         })
-        debugger
         filter.forEach((y) => {
           garbageDropNumber += y.DayNumber
         })
@@ -264,15 +264,18 @@ export class GarbageStationController
       Ids: this.roles.map((x) => x.Id),
     })
 
+    let ids = promise.Data.map((x) => x.Id)
     let statisic = await this.service.garbageStation.statisticNumberList({
-      Ids: promise.Data.map((x) => x.Id),
+      Ids: ids,
     })
+    let userLabels = await this.userLabel.list(ids)
 
     let result = new Array<GarbageStationViewModel>()
     for (let i = 0; i < promise.Data.length; i++) {
       const item = promise.Data[i]
       let vm = ViewModelConverter.Convert(this.service, item)
       vm.NumberStatistic = statisic.Data.find((x) => x.Id == vm.Id)
+      vm.UserLabel = userLabels.find((x) => x.LabelId === vm.Id)
       result.push(vm)
     }
     // result = result.sort((a, b) => {

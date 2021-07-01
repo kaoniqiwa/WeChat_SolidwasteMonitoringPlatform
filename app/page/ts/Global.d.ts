@@ -15,11 +15,26 @@ declare interface Window {
 declare interface HTMLDivElement {
   data?: any
 }
+declare interface HTMLElement {
+  data?: any
+  RequestFullScreen?: () => void
+  webkitRequestFullScreen?: () => void
+  mozRequestFullScreen?: () => void
+  msRequestFullscreen?: () => void
+}
+declare interface Document {
+  webkitExitFullscreen?: () => void
+  mozCancelFullScreen?: () => void
+  msExitFullscreen?: () => void
+}
 
 declare function getAllPropertyNames<T>(t: T): string[]
 
 declare interface Event {
   path: EventTarget[]
+}
+declare interface EventTarget {
+  data?: any
 }
 
 declare interface Date {

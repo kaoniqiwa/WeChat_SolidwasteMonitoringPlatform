@@ -185,21 +185,21 @@ export class UserLabel {
    */
   Note?: string
 
-  private _createTime?: DateTime
+  private CreateTime?: DateTime
   /**
    *	DateTime	创建时间	M	R
    *
    * @type {DateTime}
    * @memberof UserLabel
    */
-  get CreateTime(): DateTime {
-    return this._createTime!
+  get createTime(): DateTime {
+    return this.CreateTime!
   }
-  set CreateTime(val: DateTime) {
+  set createTime(val: DateTime) {
     if (val instanceof DateTime) {
-      this._createTime = val
+      this.CreateTime = val
     } else {
-      this._createTime = new DateTime(val)
+      this.CreateTime = new DateTime(val)
     }
   }
   /**
@@ -208,15 +208,15 @@ export class UserLabel {
    * @type {DateTime}
    * @memberof UserLabel
    */
-  private _updateTime?: DateTime
-  get UpdateTime(): DateTime {
-    return this._updateTime!
+  private UpdateTime?: DateTime
+  get updateTime(): DateTime {
+    return this.UpdateTime!
   }
-  set UpdateTime(val: DateTime) {
+  set updateTime(val: DateTime) {
     if (val instanceof DateTime) {
-      this._updateTime = val
+      this.UpdateTime = val
     } else {
-      this._updateTime = new DateTime(val)
+      this.UpdateTime = new DateTime(val)
     }
   }
 }

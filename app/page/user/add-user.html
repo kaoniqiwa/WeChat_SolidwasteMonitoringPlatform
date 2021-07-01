@@ -1,137 +1,128 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title></title>
     <link rel="stylesheet" href="../../assets/howell.font/howell.font.css" />
     <link href="../css/index.css" rel="stylesheet" />
-    <link rel="stylesheet" href="../css/aside.css" type='text/css'>    
+    <link rel="stylesheet" href="../css/aside.css" type="text/css" />
     <link rel="stylesheet" href="../css/weui.css" />
-    
-    <link rel="stylesheet" href="../css/add-user.css">
+
+    <link rel="stylesheet" href="../css/add-user.css" />
     <!-- <script type="text/javascript" src="../../assets/zepto.min.js"></script> -->
     <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+  </head>
 
-
-
-
-
-
-</head>
-
-<body>
-    <div class="page" id='addUser'>
+  <body>
+    <div class="page" id="addUser">
+      <header>
         <header>
-            <header>
-                <div class="content">
-                    <div id="back">
-                        <i class="howell-icon-arrow2left"></i>
-                        返回
-                    </div>
-                </div>
-            </header>
+          <div class="content">
+            <div id="back">
+              <i class="howell-icon-arrow2left"></i>
+              返回
+            </div>
+          </div>
         </header>
-        <main>
-            <div class='form'>
-                <div class="form__title">
-                    <div>添加用户</div>
-                </div>
-                <div class='form__content'>
-                    <div class='form__item'>
-                        <div class='item__key'>
-                            用户名
-                        </div>
-                        <div class='item__value'>
-                            <input type="text" placeholder="填写姓名" id='uname'>
-                        </div>
-                    </div>
-                    <div class='form__item'>
-                        <div class='item__key'>手机号</div>
-                        <div class='item__value'>
-                            <input type="text" placeholder="填写手机号" id='uphone' maxlength="11">
-                        </div>
-                    </div>
-                    <div class='form__item'>
-                        <div class='item__key'>性别</div>
-                        <div class='item__value'>
-                            <select name="" id="ugender" class="weui-select">                                
-                                <option value="1">男</option>
-                                <option value="2">女</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class='form__item'>
-                        <div class='item__key'>管理权限</div>
-                        <div class='item__value'>
-                            <div id='type'></div>
-                        </div>
-                    </div>
-                    <div class='form__item' id='divisionArea'>
-                        <div class='item__key'>管辖范围</div>
-                        <div class='item__value' id='area'>
-                            <span>添加</span>
-                            <i class='howell-icon-arrow2right'></i>
-                        </div>
-                    </div>
-
-                    <div class='form__item foo'>
-                        <div class='btn' id='addBtn'>
-                            添加用户
-                        </div>
-                    </div>
-                </div>
+      </header>
+      <main>
+        <div class="form">
+          <div class="form__title">
+            <div>添加用户</div>
+          </div>
+          <div class="form__content">
+            <div class="form__item">
+              <div class="item__key">用户名</div>
+              <div class="item__value">
+                <input type="text" placeholder="填写姓名" id="uname" />
+              </div>
             </div>
+            <div class="form__item">
+              <div class="item__key">手机号</div>
+              <div class="item__value">
+                <input
+                  type="text"
+                  placeholder="填写手机号"
+                  id="uphone"
+                  maxlength="11"
+                />
+              </div>
+            </div>
+            <div class="form__item">
+              <div class="item__key">性别</div>
+              <div class="item__value">
+                <select name="" id="ugender" class="weui-select">
+                  <option value="1">男</option>
+                  <option value="2">女</option>
+                </select>
+              </div>
+            </div>
+            <div class="form__item">
+              <div class="item__key">管理权限</div>
+              <div class="item__value">
+                <div id="type"></div>
+              </div>
+            </div>
+            <div class="form__item" id="divisionArea">
+              <div class="item__key">管辖范围</div>
+              <div class="item__value" id="area">
+                <span>添加</span>
+                <i class="howell-icon-arrow2right"></i>
+              </div>
+            </div>
+
+            <div class="form__item foo">
+              <div class="btn" id="addBtn">添加用户</div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <div class="backdrop"></div>
+      <aside class="aside-content">
+        <header class="aside-title">
+          <select
+            class="weui-select"
+            style="padding-left: 0"
+            id="aside-resource-role"
+          ></select>
+        </header>
+        <main class="aside-main">
+          <template id="aside-template">
+            <div class="aside-item">西江湾路居委会</div>
+          </template>
         </main>
+        <footer class="aside-footer">
+          <div class="footer-reset">重置</div>
+          <div class="footer-confirm">确认</div>
+        </footer>
+      </aside>
 
-
-
-        <div class='backdrop'></div>
-        <aside class='aside-content'>
-            <header class='aside-title'>
-                居委
-            </header>
-            <main class='aside-main'>
-                <template id='aside-template'>
-                    <div class='aside-item'>西江湾路居委会</div>
-                </template>
-            </main>
-            <footer class='aside-footer'>
-                <div class='footer-reset'>重置</div>
-                <div class='footer-confirm'>确认</div>
-            </footer>
-        </aside>
-
-
-        <div id="toast" style="display: none;">
-            <div class="weui-mask_transparent"></div>
-            <div class="weui-toast">
-                <i class="weui-icon-success-no-circle weui-icon_toast"></i>
-                <p class="weui-toast__content">提交成功</p>
-            </div>
+      <div id="toast" style="display: none">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+          <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+          <p class="weui-toast__content">提交成功</p>
         </div>
+      </div>
 
-
-        <div id="warnToast" style="display: none;">
-            <div class="weui-mask_transparent"></div>
-            <div class="weui-toast">
-                <i class="weui-icon-warn weui-icon_toast"></i>
-                <p class="weui-toast__content">提交失败</p>
-            </div>
+      <div id="warnToast" style="display: none">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+          <i class="weui-icon-warn weui-icon_toast"></i>
+          <p class="weui-toast__content">提交失败</p>
         </div>
+      </div>
 
-        <div id="textToast" style="display: none;">
-            <div class="weui-mask_transparent"></div>
-            <div class="weui-toast weui-toast_text">
-                <p class="weui-toast__content">皓维</p>
-            </div>
+      <div id="textToast" style="display: none">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast weui-toast_text">
+          <p class="weui-toast__content">皓维</p>
         </div>
-
-
+      </div>
     </div>
 
     <script src="../ts/add-user.ts"></script>
-</body>
-
+  </body>
 </html>

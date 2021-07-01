@@ -1,13 +1,11 @@
 import Swiper from 'swiper'
-import { UserLabelType } from '../../../data-core/model/user-stystem'
+import {
+  User,
+  UserLabel,
+  UserLabelType,
+} from '../../../data-core/model/user-stystem'
 import { Camera } from '../../../data-core/model/waste-regulation/camera'
 import { Division } from '../../../data-core/model/waste-regulation/division'
-import {
-  CameraImageUrl,
-  GarbageDropEventRecord,
-  IllegalDropEventRecord,
-  MixedIntoEventRecord,
-} from '../../../data-core/model/waste-regulation/event-record'
 import {
   Flags,
   GarbageStation,
@@ -16,7 +14,7 @@ import {
 import { GarbageStationNumberStatistic } from '../../../data-core/model/waste-regulation/garbage-station-number-statistic'
 import { VideoUrl } from '../../../data-core/model/waste-regulation/video-model'
 import { Service } from '../../../data-core/repuest/service'
-import { DataCache } from './Cache'
+import { ViewModelConverter } from './ViewModelConverter'
 
 export interface IImageUrl {
   cameraId: string
@@ -40,6 +38,49 @@ export interface IActiveElement {
   swiper?: Swiper
 }
 
+//#region Division
+export abstract class DivisionViewModel extends Division {
+  constructor(service: Service) {
+    super()
+    this.service = service
+    this.DivisionType
+  }
+  protected service: Service
+  async getGarbageStations() {
+    let promise = await this.service.garbageStation.list({
+      DivisionId: this.Id,
+      PageSize: 999,
+    })
+    return promise.Data.map((x) => {
+      return ViewModelConverter.Convert(this.service, x)
+    })
+  }
+}
+
+export class CountyViewModel extends DivisionViewModel {
+  constructor(service: Service) {
+    super(service)
+  }
+
+  async getCommittees() {
+    let list = await this.service.division.list({
+      ParentId: this.Id,
+      PageSize: 999,
+    })
+    return list.Data.map((x) => {
+      return ViewModelConverter.Convert(this.service, x)
+    })
+  }
+}
+
+export class CommitteesViewModel extends DivisionViewModel {
+  constructor(service: Service) {
+    super(service)
+  }
+}
+//#endregion
+
+//#region GarbageStation
 export class GarbageStationViewModel extends GarbageStation {
   constructor(service: Service) {
     super()
@@ -49,6 +90,19 @@ export class GarbageStationViewModel extends GarbageStation {
 
   NumberStatistic?: GarbageStationNumberStatistic
 
+  private userLabel?: UserLabel
+  get UserLabel() {
+    return this.userLabel
+  }
+  set UserLabel(val: UserLabel | undefined) {
+    this.userLabel = val
+    if (this.onUserLabelChanged) {
+      this.onUserLabelChanged(this.userLabel)
+    }
+  }
+
+  onUserLabelChanged?: (label?: UserLabel) => void
+
   getNumberStatistic() {
     return this.service.garbageStation.statisticNumber(this.Id)
   }
@@ -56,8 +110,23 @@ export class GarbageStationViewModel extends GarbageStation {
   getUserLabel() {
     return this.service.user.label.get(this.Id, UserLabelType.garbageStation)
   }
-}
+  async getDivision() {
+    if (this.DivisionId) {
+      let item = await this.service.division.get(this.DivisionId)
+      return ViewModelConverter.Convert(this.service, item)
+    }
+  }
 
+  async getCameras() {
+    let list = await this.service.camera.list(this.Id)
+    return list.map((x) => {
+      return ViewModelConverter.Convert(this.service, x)
+    })
+  }
+}
+//#endregion
+
+//#region Camera
 export class CameraViewModel extends Camera {
   static readonly defaultImageUrl =
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABIAAAAKIAQAAAAAgULygAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAd2KE6QAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAHdElNRQflAgIBCxpFwPH8AAAAcklEQVR42u3BMQEAAADCoPVPbQZ/oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+A28XAAEDwmj2AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIxLTAyLTAyVDAxOjExOjI2KzAwOjAwOo9+nAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMS0wMi0wMlQwMToxMToyNiswMDowMEvSxiAAAAAASUVORK5CYII='
@@ -90,22 +159,4 @@ export class CameraViewModel extends Camera {
     })
   }
 }
-
-export class ViewModelConverter {
-  static Convert(
-    service: Service,
-    model: GarbageStation
-  ): GarbageStationViewModel
-  static Convert(service: Service, model: Camera): CameraViewModel
-  static Convert(
-    service: Service,
-    model: GarbageStation | Camera
-  ): GarbageStationViewModel | CameraViewModel | undefined {
-    if (model instanceof GarbageStation) {
-      return Object.assign(new GarbageStationViewModel(service), model)
-    } else if (model instanceof Camera) {
-      return Object.assign(new CameraViewModel(service), model)
-    } else {
-    }
-  }
-}
+//#endregion

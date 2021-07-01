@@ -75,7 +75,7 @@ export class VideoPlugin {
     this.webUrl = webUrl
     this.createElement()
     this.eventRegist()
-    // this.webUrl = 'http://127.0.0.1:8116/wsplayer.html'
+    //this.webUrl = 'http://192.168.21.241:8800/video/wsplayer/wsplayer.html'
   }
 
   destory() {

@@ -1,0 +1,50 @@
+.user-label-container .inner-bar {
+  height: 60px !important;
+}
+
+.user-label-container .echart-inner-container .inner-content .inner-main {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.user-label-container #showDatePicker {
+  display: none;
+}
+
+.user-label-container .call .name {
+  font-size: 24px;
+  font-weight: 370;
+}
+
+.user-label-container .button {
+  background-color: #3a94ff;
+  width: 45%;
+  height: 40px;
+  color: white;
+  border-radius: 4.8px;
+}
+
+.user-label-container .weui-form__title {
+  height: 24px;
+  line-height: 24px;
+  font-size: 24px;
+  font-weight: 370;
+}
+
+.user-label-container .glyphicon .glyphicon-edit {
+  font-size: 14px;
+}
+
+.user-label-container .weui-cell__bd {
+  display: flex;
+  justify-content: space-between;
+}
+
+.user-label-container .howell-icon-arrow2right {
+  color: #b2b2b2;
+}
+
+.user-label-container .user-label-delete {
+  font-size: 15px;
+  line-height: 26px;
+}

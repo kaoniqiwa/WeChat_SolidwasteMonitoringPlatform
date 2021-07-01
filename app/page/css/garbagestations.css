@@ -376,3 +376,13 @@ body {
   top: 50%;
   transform: translate(0, -50%);
 }
+
+.user-label {
+  color: #ff9100;
+  font-size: 15px;
+  margin-left: 6px;
+}
+
+.user-label.has {
+  color: #32b43e
+}

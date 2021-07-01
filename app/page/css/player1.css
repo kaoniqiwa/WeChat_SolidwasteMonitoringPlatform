@@ -1118,3 +1118,12 @@
   /*设置边框*/
   box-shadow: 0px 0px 10px #3283E5;
 }
+
+.play.glyphicon-eject {
+  transform: rotate(90deg);
+}
+
+.player .tools .tools-content .bottom ul li .play.glyphicon-eject {
+  padding-left: 0;
+  padding-top: 2px;
+}

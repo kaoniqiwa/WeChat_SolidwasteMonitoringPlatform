@@ -1,6 +1,5 @@
 import { PagedList } from '../../../data-core/model/page'
 import { UserLabel, UserLabelType } from '../../../data-core/model/user-stystem'
-import { Division } from '../../../data-core/model/waste-regulation/division'
 import {
   EventNumber,
   EventType,
@@ -19,6 +18,8 @@ import { VideoUrl } from '../../../data-core/model/waste-regulation/video-model'
 import { ResourceRole, WeChatUser } from '../../../data-core/model/we-chat'
 import {
   CameraViewModel,
+  CommitteesViewModel,
+  CountyViewModel,
   GarbageStationViewModel,
   IPictureController,
 } from './ViewModels'
@@ -144,13 +145,19 @@ export interface IImage {
   ): string | Array<string | undefined> | undefined
 }
 export interface IUserLabelController {
-  getUserLabel(
+  list(labelIds?: string[]): Promise<UserLabel[]>
+  get(garbageStationId: string, labelType: UserLabelType): Promise<UserLabel>
+  create(
     garbageStationId: string,
-    labelType: UserLabelType
-  ): Promise<UserLabel>
-  createUserLabel(label: UserLabel): void
-  updateUserLabel(label: UserLabel): void
-  removeUserLabel(id: string): void
+    name: string,
+    number: string
+  ): Promise<boolean>
+  update(
+    garbageStationId: string,
+    name?: string,
+    number?: string
+  ): Promise<boolean>
+  remove(id: string): Promise<boolean>
 }
 export interface IResourceRoleList {
   getResourceRoleList(): Promise<Array<ResourceRole>>
@@ -249,14 +256,17 @@ export interface IGarbageStationController
     IImage,
     IVodUrl {
   picture: IPictureController
+  userLabel: IUserLabelController
   /**
    * 获取区划
    *
    * @param {string} divisionId 区划ID
-   * @returns {Promise<Division>}
+   * @returns {Promise<CountyViewModel | CommitteesViewModel>}
    * @memberof IGarbageStationController
    */
-  getDivision(divisionId: string): Promise<Division>
+  getDivision(
+    divisionId: string
+  ): Promise<CountyViewModel | CommitteesViewModel>
   /**
    * 获取摄像机列表
    *
@@ -402,3 +412,5 @@ export interface IUserPushManager {
   GetUser(id: string): Promise<WeChatUser>
   SetUser(user: WeChatUser): void
 }
+
+export interface IUserController {}

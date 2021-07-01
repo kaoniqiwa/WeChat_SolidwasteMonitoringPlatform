@@ -15,8 +15,9 @@ import {
 } from './IController'
 import { DataController } from './DataController'
 import { GetEventRecordsParams } from '../../../data-core/model/waste-regulation/event-record-params'
-import { GarbageStationViewModel, ViewModelConverter } from './ViewModels'
+import { GarbageStationViewModel } from './ViewModels'
 import { DataCache } from './Cache'
+import { ViewModelConverter } from './ViewModelConverter'
 
 export class CountDivisionController
   extends DataController
@@ -273,15 +274,18 @@ export class CountDivisionController
         console.error('getGarbageStationList error:', e)
       }
     }
+    let ids = list.map((x) => x.Id)
     let statisic = await this.service.garbageStation.statisticNumberList({
-      Ids: list.map((x) => x.Id),
+      Ids: ids,
     })
+    let userLabels = await this.userLabel.list(ids)
 
     let result = new Array<GarbageStationViewModel>()
     for (let i = 0; i < list.length; i++) {
       const item = list[i]
       let vm = ViewModelConverter.Convert(this.service, item)
       vm.NumberStatistic = statisic.Data.find((x) => x.Id == vm.Id)
+      vm.UserLabel = userLabels.find((x) => x.LabelId === vm.Id)
       result.push(vm)
     }
     // result = result.sort((a, b) => {
