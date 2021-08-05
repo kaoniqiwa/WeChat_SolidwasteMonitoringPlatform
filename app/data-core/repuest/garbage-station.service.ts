@@ -14,7 +14,7 @@ import {
 } from '../model/waste-regulation/trashCan'
 import * as url from '../url/waste-regulation/garbage-station'
 import { PagedList, PageTimeUnitParams } from '../model/page'
-import { Response } from '../model/response'
+import { HowellResponse } from '../model/response'
 import { HowellAuthHttp } from './howell-auth-http'
 import { EventNumberStatistic } from '../model/waste-regulation/division-event-numbers'
 import {
@@ -37,16 +37,16 @@ export class GarbageStationRequestService extends SaveModel {
   async create(item: GarbageStation) {
     let response = await this.requestService.post<
       GarbageStation,
-      Response<GarbageStation>
+      HowellResponse<GarbageStation>
     >(this.url.create(), this.toModel(item, this.formMustField.garbageStation))
     let result = plainToClass(GarbageStation, response.Data)
     return result
   }
 
   async get(id: string) {
-    let response = await this.requestService.get<Response<GarbageStation>>(
-      this.url.get(id)
-    )
+    let response = await this.requestService.get<
+      HowellResponse<GarbageStation>
+    >(this.url.get(id))
     let result = plainToClass(GarbageStation, response.Data)
     return result
   }
@@ -54,7 +54,7 @@ export class GarbageStationRequestService extends SaveModel {
   async set(item: GarbageStation) {
     let response = await this.requestService.put<
       GarbageStation,
-      Response<GarbageStation>
+      HowellResponse<GarbageStation>
     >(
       this.url.edit(item.Id),
       this.toModel(item, this.formMustField.garbageStation)
@@ -64,9 +64,9 @@ export class GarbageStationRequestService extends SaveModel {
   }
 
   async del(id: string) {
-    let response = await this.requestService.delete<Response<GarbageStation>>(
-      this.url.del(id)
-    )
+    let response = await this.requestService.delete<
+      HowellResponse<GarbageStation>
+    >(this.url.del(id))
     let result = plainToClass(GarbageStation, response.Data)
     return result
   }
@@ -74,7 +74,7 @@ export class GarbageStationRequestService extends SaveModel {
   async list(item: GetGarbageStationsParams) {
     let response = await this.requestService.post<
       GetGarbageStationsParams,
-      Response<PagedList<GarbageStation>>
+      HowellResponse<PagedList<GarbageStation>>
     >(this.url.list(), item)
     response.Data.Data = plainToClass(GarbageStation, response.Data.Data)
     return response.Data
@@ -83,7 +83,7 @@ export class GarbageStationRequestService extends SaveModel {
   async volumesHistory(item: PageTimeUnitParams, id: string) {
     let response = await this.requestService.post<
       PageTimeUnitParams,
-      Response<PagedList<GarbageVolume>>
+      HowellResponse<PagedList<GarbageVolume>>
     >(this.url.volumesHistory(id), item)
     response.Data.Data = plainToClass(GarbageVolume, response.Data.Data)
     return response.Data
@@ -92,7 +92,7 @@ export class GarbageStationRequestService extends SaveModel {
   async eventNumbersHistory(item: PageTimeUnitParams, id: string) {
     let response = await this.requestService.post<
       PageTimeUnitParams,
-      Response<PagedList<EventNumberStatistic>>
+      HowellResponse<PagedList<EventNumberStatistic>>
     >(this.url.eventNumbersHistory(id), item)
     response.Data.Data = plainToClass(EventNumberStatistic, response.Data.Data)
     return response.Data
@@ -100,7 +100,7 @@ export class GarbageStationRequestService extends SaveModel {
 
   async statisticNumber(id: string) {
     let response = await this.requestService.get<
-      Response<GarbageStationNumberStatistic>
+      HowellResponse<GarbageStationNumberStatistic>
     >(this.url.statisticNumber(id))
     let result = plainToClass(GarbageStationNumberStatistic, response.Data)
     return result
@@ -109,7 +109,7 @@ export class GarbageStationRequestService extends SaveModel {
   async statisticNumberList(item: GetGarbageStationStatisticNumbersParams) {
     let response = await this.requestService.post<
       GetGarbageStationStatisticNumbersParams,
-      Response<PagedList<GarbageStationNumberStatistic>>
+      HowellResponse<PagedList<GarbageStationNumberStatistic>>
     >(this.url.statisticNumberList(), item)
     response.Data.Data = plainToClass(
       GarbageStationNumberStatistic,
@@ -123,7 +123,7 @@ export class GarbageStationRequestService extends SaveModel {
   ) {
     let response = await this.requestService.post<
       GetGarbageStationStatisticNumbersParamsV2,
-      Response<Array<GarbageStationNumberStatisticV2>>
+      HowellResponse<Array<GarbageStationNumberStatisticV2>>
     >(this.url.statisticNumberHistoryList(), params)
     return plainToClass(GarbageStationNumberStatisticV2, response.Data)
   }
@@ -132,7 +132,7 @@ export class GarbageStationRequestService extends SaveModel {
   ) {
     let response = await this.requestService.post<
       GetGarbageStationStatisticGarbageCountsParams,
-      Response<Array<GarbageStationGarbageCountStatistic>>
+      HowellResponse<Array<GarbageStationGarbageCountStatistic>>
     >(this.url.statisticGarbageCountHistoryList(), params)
     return plainToClass(GarbageStationGarbageCountStatistic, response.Data)
   }
@@ -145,37 +145,37 @@ export class CameraRequestService extends SaveModel {
     this.url = new url.Camera()
   }
   async create(item: Camera) {
-    let response = await this.requestService.post<Camera, Response<Camera>>(
-      this.url.create(item.GarbageStationId),
-      item
-    )
+    let response = await this.requestService.post<
+      Camera,
+      HowellResponse<Camera>
+    >(this.url.create(item.GarbageStationId), item)
     return plainToClass(Camera, response.Data)
   }
 
   async get(garbageStationId: string, cameraId: string) {
-    let response = await this.requestService.get<Response<Camera>>(
+    let response = await this.requestService.get<HowellResponse<Camera>>(
       this.url.get(garbageStationId, cameraId)
     )
     return plainToClass(Camera, response.Data)
   }
 
   async list(garbageStationId: string) {
-    let response = await this.requestService.get<Response<Camera[]>>(
+    let response = await this.requestService.get<HowellResponse<Camera[]>>(
       this.url.create(garbageStationId)
     )
     return plainToClass(Camera, response.Data)
   }
 
   async set(item: Camera) {
-    let response = await this.requestService.put<Camera, Response<Camera>>(
-      this.url.edit(item.GarbageStationId, item.Id),
-      item
-    )
+    let response = await this.requestService.put<
+      Camera,
+      HowellResponse<Camera>
+    >(this.url.edit(item.GarbageStationId, item.Id), item)
     return plainToClass(Camera, response.Data)
   }
 
   async del(garbageStationId: string, cameraId: string) {
-    let response = await this.requestService.delete<Response<Camera>>(
+    let response = await this.requestService.delete<HowellResponse<Camera>>(
       this.url.del(garbageStationId, cameraId)
     )
     return plainToClass(Camera, response.Data)
@@ -184,7 +184,7 @@ export class CameraRequestService extends SaveModel {
   async postList(item: GetGarbageStationCamerasParams) {
     let response = await this.requestService.post<
       GetGarbageStationCamerasParams,
-      Response<PagedList<Camera>>
+      HowellResponse<PagedList<Camera>>
     >(this.url.list(), item)
     response.Data.Data = plainToClass(Camera, response.Data.Data)
     return response.Data
@@ -201,15 +201,15 @@ export class CameraTrashCanRequestService extends SaveModel {
     if (!item.CameraId) {
       throw new Error('cameraId is undefined')
     }
-    let response = await this.requestService.post<TrashCan, Response<TrashCan>>(
-      this.url.create(item.GarbageStationId, item.CameraId),
-      item
-    )
+    let response = await this.requestService.post<
+      TrashCan,
+      HowellResponse<TrashCan>
+    >(this.url.create(item.GarbageStationId, item.CameraId), item)
     return plainToClass(TrashCan, response.Data)
   }
 
   async get(garbageStationId: string, cameraId: string, trashCanId: string) {
-    let response = await this.requestService.get<Response<TrashCan>>(
+    let response = await this.requestService.get<HowellResponse<TrashCan>>(
       this.url.get(garbageStationId, cameraId, trashCanId)
     )
     return plainToClass(TrashCan, response.Data)
@@ -219,22 +219,22 @@ export class CameraTrashCanRequestService extends SaveModel {
     if (!item.CameraId) {
       throw new Error('cameraId is undefined')
     }
-    let response = await this.requestService.put<TrashCan, Response<TrashCan>>(
-      this.url.edit(item.GarbageStationId, item.CameraId, item.Id),
-      item
-    )
+    let response = await this.requestService.put<
+      TrashCan,
+      HowellResponse<TrashCan>
+    >(this.url.edit(item.GarbageStationId, item.CameraId, item.Id), item)
     return plainToClass(TrashCan, response.Data)
   }
 
   async del(garbageStationId: string, cameraId: string, trashCanId: string) {
-    let response = await this.requestService.delete<Response<TrashCan>>(
+    let response = await this.requestService.delete<HowellResponse<TrashCan>>(
       this.url.del(garbageStationId, cameraId, trashCanId)
     )
     return plainToClass(TrashCan, response.Data)
   }
 
   async list(garbageStationId: string, cameraId: string) {
-    let response = await this.requestService.get<Response<TrashCan[]>>(
+    let response = await this.requestService.get<HowellResponse<TrashCan[]>>(
       this.url.list(garbageStationId, cameraId)
     )
     return plainToClass(TrashCan, response.Data)
@@ -248,30 +248,30 @@ export class GarbageStationTrashCanRequestService extends SaveModel {
     this.url = new url.GarbageStationTrashCans()
   }
   async create(item: TrashCan) {
-    let response = await this.requestService.post<TrashCan, Response<TrashCan>>(
-      this.url.create(item.GarbageStationId),
-      item
-    )
+    let response = await this.requestService.post<
+      TrashCan,
+      HowellResponse<TrashCan>
+    >(this.url.create(item.GarbageStationId), item)
     return plainToClass(TrashCan, response.Data)
   }
 
   async get(garbageStationId: string, cameraId: string) {
-    let response = await this.requestService.get<Response<TrashCan>>(
+    let response = await this.requestService.get<HowellResponse<TrashCan>>(
       this.url.get(garbageStationId, cameraId)
     )
     return plainToClass(TrashCan, response.Data)
   }
 
   async set(item: TrashCan) {
-    let response = await this.requestService.put<TrashCan, Response<TrashCan>>(
-      this.url.edit(item.GarbageStationId, item.Id),
-      item
-    )
+    let response = await this.requestService.put<
+      TrashCan,
+      HowellResponse<TrashCan>
+    >(this.url.edit(item.GarbageStationId, item.Id), item)
     return plainToClass(TrashCan, response.Data)
   }
 
   async del(garbageStationId: string, cameraId: string) {
-    let response = await this.requestService.delete<Response<TrashCan>>(
+    let response = await this.requestService.delete<HowellResponse<TrashCan>>(
       this.url.del(garbageStationId, cameraId)
     )
     return plainToClass(TrashCan, response.Data)
@@ -280,7 +280,7 @@ export class GarbageStationTrashCanRequestService extends SaveModel {
   async list(item: GetGarbageStationTrashCansParams) {
     let response = await this.requestService.post<
       GetGarbageStationTrashCansParams,
-      Response<PagedList<TrashCan>>
+      HowellResponse<PagedList<TrashCan>>
     >(this.url.postList(), item)
     return plainToClass(TrashCan, response.Data)
   }
@@ -295,7 +295,7 @@ export class GarbageStationTypeRequestService extends SaveModel {
   async create(item: GarbageStationType) {
     let response = await this.requestService.post<
       GarbageStationType,
-      Response<GarbageStationType>
+      HowellResponse<GarbageStationType>
     >(
       this.url.create(),
       this.toModel(item, this.formMustField.garbageStationType)
@@ -304,16 +304,16 @@ export class GarbageStationTypeRequestService extends SaveModel {
   }
 
   async get(type: string) {
-    let response = await this.requestService.get<Response<GarbageStationType>>(
-      this.url.get(type)
-    )
+    let response = await this.requestService.get<
+      HowellResponse<GarbageStationType>
+    >(this.url.get(type))
     return plainToClass(GarbageStationType, response.Data)
   }
 
   async set(item: GarbageStationType) {
     let response = await this.requestService.put<
       GarbageStationType,
-      Response<GarbageStationType>
+      HowellResponse<GarbageStationType>
     >(
       this.url.edit(item.Type + ''),
       this.toModel(item, this.formMustField.garbageStationType)
@@ -323,14 +323,14 @@ export class GarbageStationTypeRequestService extends SaveModel {
 
   async del(type: string) {
     let response = await this.requestService.delete<
-      Response<GarbageStationType>
+      HowellResponse<GarbageStationType>
     >(this.url.del(type))
     return plainToClass(GarbageStationType, response.Data)
   }
 
   async list() {
     let response = await this.requestService.get<
-      Response<GarbageStationType[]>
+      HowellResponse<GarbageStationType[]>
     >(this.url.list())
     return plainToClass(GarbageStationType, response.Data)
   }

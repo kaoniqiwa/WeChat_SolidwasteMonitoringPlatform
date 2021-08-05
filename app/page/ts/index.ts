@@ -15,6 +15,15 @@ export interface NavigationWindow extends Window {
   pageChange: (index: number, params?: any) => void
 }
 
+export enum NavigationWindowIndex {
+  //task = 0,
+  data = 0,
+  history = 1,
+  garbage_station = 2,
+  garbage_drop = 3,
+  user = 4,
+}
+
 // 命名空间编译成自执行函数
 namespace Navigation {
   window.recordDetails = null

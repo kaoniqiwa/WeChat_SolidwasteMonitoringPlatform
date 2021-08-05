@@ -485,8 +485,11 @@ export default class GarbageStationClient implements IObserver {
 
       let phone = document.createElement('span')
       let a = document.createElement('a')
+      let icon = document.createElement('i')
+      icon.className = 'glyphicon glyphicon-earphone'
+      a.appendChild(icon)
       a.id = `user-label-${v.Id}`
-      a.className = 'user-label glyphicon glyphicon-earphone'
+      a.className = 'user-label'
       if (v.UserLabel) {
         a.classList.add('has')
       }

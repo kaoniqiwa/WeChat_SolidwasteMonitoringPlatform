@@ -1,4 +1,5 @@
-import { DateTime } from './date-time'
+import { Transform } from 'class-transformer'
+import { transformDate } from './transformer'
 import { ResourceRole } from './we-chat'
 
 export class User {
@@ -184,41 +185,22 @@ export class UserLabel {
    * @memberof UserLabel
    */
   Note?: string
-
-  private CreateTime?: DateTime
   /**
    *	DateTime	创建时间	M	R
    *
-   * @type {DateTime}
+   * @type {Date}
    * @memberof UserLabel
    */
-  get createTime(): DateTime {
-    return this.CreateTime!
-  }
-  set createTime(val: DateTime) {
-    if (val instanceof DateTime) {
-      this.CreateTime = val
-    } else {
-      this.CreateTime = new DateTime(val)
-    }
-  }
+  @Transform(transformDate)
+  CreateTime!: Date
   /**
    *	DateTime	更新时间	M	R
    *
    * @type {DateTime}
    * @memberof UserLabel
    */
-  private UpdateTime?: DateTime
-  get updateTime(): DateTime {
-    return this.UpdateTime!
-  }
-  set updateTime(val: DateTime) {
-    if (val instanceof DateTime) {
-      this.UpdateTime = val
-    } else {
-      this.UpdateTime = new DateTime(val)
-    }
-  }
+  @Transform(transformDate)
+  UpdateTime!: Date
 }
 
 export enum UserLabelType {

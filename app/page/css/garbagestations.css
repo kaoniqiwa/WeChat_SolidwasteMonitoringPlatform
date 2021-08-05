@@ -380,7 +380,7 @@ body {
 .user-label {
   color: #ff9100;
   font-size: 15px;
-  margin-left: 6px;
+  padding: 14px;
 }
 
 .user-label.has {

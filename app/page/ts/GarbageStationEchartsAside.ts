@@ -527,7 +527,7 @@ export default class EchartsAside extends IAside implements IObserver {
                 obj.Name
               }</span><span><a id="detail-user-label-${
         obj.Id
-      }" class="user-label glyphicon glyphicon-earphone"></a></span></div>
+      }" class="user-label"><i class="glyphicon glyphicon-earphone"></i></a></span></div>
                 <div class='inner-date'>${dateFormat(
                   this.date,
                   'yyyy年MM月dd日'
@@ -537,6 +537,12 @@ export default class EchartsAside extends IAside implements IObserver {
 
           <div class='inner-statisic'>
               <div class='ratio'>
+                  <div  style="display:none">
+                  <div>联系人</div>
+                  <div>联系人</div>
+                  </div>
+                  <div>
+                  <div  style="display:none">联系人</div></div>
                   <div class='ratio-num'>${obj.GarbageRatio}</div>
                   <div class='ratio-suffix'>%</div>
               </div>

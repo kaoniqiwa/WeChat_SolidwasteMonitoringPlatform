@@ -5,7 +5,7 @@ export interface ResponseBase {
   Id: string
 }
 
-export interface Response<T> extends ResponseBase {
+export interface HowellResponse<T> extends ResponseBase {
   Data: T
 }
 
@@ -16,7 +16,7 @@ export interface ExceptionData {
 }
 
 export interface HttpResponse<T> {
-  data: Response<T>
+  data: HowellResponse<T>
   status: number
   statusText: string
 }

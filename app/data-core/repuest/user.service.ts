@@ -1,7 +1,6 @@
-import { plainToClass } from 'class-transformer'
-import { DateTime } from '../model/date-time'
+import { classToPlain, plainToClass } from 'class-transformer'
 import { PagedList } from '../model/page'
-import { ResponseBase, Response, HttpResponse } from '../model/response'
+import { ResponseBase, HowellResponse, HttpResponse } from '../model/response'
 import { SaveModel } from '../model/save-model'
 import {
   GetUserLabelsParams,
@@ -24,28 +23,30 @@ export class UserRequestService extends SaveModel {
   // 获取用户信息列表
   async list(index: number = 1, size: number = 100) {
     let query = `?PageIndex=${index}&PageSize=${size}`
-    let response = await this.requestService.get<Response<PagedList<User>>>(
-      UserUrl.list() + query
-    )
+    let response = await this.requestService.get<
+      HowellResponse<PagedList<User>>
+    >(UserUrl.list() + query)
     response.Data.Data = plainToClass(User, response.Data.Data)
     return response.Data
   }
   // 创建用户
   create(user: User) {
-    return this.requestService.post<User, ResponseBase>(UserUrl.list(), user)
+    let data = classToPlain(user) as User
+    return this.requestService.post<User, ResponseBase>(UserUrl.list(), data)
   }
   // 获取用户信息
   async get(userId: string) {
-    let response = await this.requestService.get<Response<User>>(
+    let response = await this.requestService.get<HowellResponse<User>>(
       UserUrl.item(userId)
     )
     return plainToClass(User, response.Data)
   }
   // 修改用户信息
   update(user: User) {
+    let data = classToPlain(user) as User
     return this.requestService.put<User, ResponseBase>(
       UserUrl.item(user.Id),
-      user
+      data
     )
   }
   // 删除用户
@@ -55,15 +56,15 @@ export class UserRequestService extends SaveModel {
   // 获取用户下所有规则
   async getRoleList(userId: string, index: number = 1, size: number = 100) {
     let query = `?PageIndex=${index}&PageSize=${size}`
-    let response = await this.requestService.get<Response<PagedList<Role>>>(
-      UserUrl.role.list(userId) + query
-    )
+    let response = await this.requestService.get<
+      HowellResponse<PagedList<Role>>
+    >(UserUrl.role.list(userId) + query)
     response.Data.Data = plainToClass(Role, response.Data.Data)
     return response.Data
   }
   // 获取用户下单个规则
   async getRole(userId: string, roleId: string) {
-    let response = await this.requestService.get<Response<Role>>(
+    let response = await this.requestService.get<HowellResponse<Role>>(
       UserUrl.role.item(userId, roleId)
     )
     return plainToClass(Role, response.Data)
