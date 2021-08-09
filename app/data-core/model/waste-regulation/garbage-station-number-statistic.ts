@@ -1,4 +1,4 @@
-import { IIntervalParams, IPageParams, StatisticTime, TimeUnit } from '../page'
+import { IIntervalParams, IPagedParams, StatisticTime, TimeUnit } from '../page'
 import { EventNumber } from './event-number'
 /**垃圾房数量统计 */
 export class GarbageStationNumberStatistic {
@@ -174,7 +174,7 @@ export class GarbageStationNumberStatistic {
 }
 
 /**获取垃圾房数量参数 */
-export class GetGarbageStationStatisticNumbersParams implements IPageParams {
+export class GetGarbageStationStatisticNumbersParams implements IPagedParams {
   /**页码[1-n](可选) */
   PageIndex?: number
   /**分页大小[1-100](可选) */

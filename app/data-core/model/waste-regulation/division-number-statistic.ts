@@ -1,4 +1,4 @@
-import { IPageParams } from '../page'
+import { IPagedParams } from '../page'
 import { EventNumber } from './event-number'
 /**区划数量统计 */
 export class DivisionNumberStatistic {
@@ -35,7 +35,7 @@ export class DivisionNumberStatistic {
 /// <summary>
 /**获取区划数量参数
  */
-export class GetDivisionStatisticNumbersParams implements IPageParams {
+export class GetDivisionStatisticNumbersParams implements IPagedParams {
   /**页码[1-n](可选) */
   PageIndex?: number
   /**分页大小[1-100](可选) */

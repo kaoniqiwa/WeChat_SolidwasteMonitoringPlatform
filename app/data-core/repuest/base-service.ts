@@ -1,6 +1,6 @@
 import { ClassConstructor, plainToClass } from 'class-transformer'
 import { RequestHelper } from '../dao/request-helper'
-import { IPageParams, PagedList } from '../model/page'
+import { IPagedParams, PagedList } from '../model/page'
 import { HowellResponse } from '../model/response'
 import { HowellAuthHttp } from './howell-auth-http'
 
@@ -37,7 +37,7 @@ export class BaseRequestService {
     response.Data = plainToClass(t, response.Data)
     return response.Data
   }
-  protected async _list<T extends IPageParams, R>(
+  protected async _list<T extends IPagedParams, R>(
     r: ClassConstructor<R>,
     url: string,
     params: T

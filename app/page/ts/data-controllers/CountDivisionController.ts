@@ -154,8 +154,8 @@ export class CountDivisionController
       const response = await this.service.division.eventNumbersHistory(
         {
           TimeUnit: TimeUnit.Day,
-          BeginTime: day.begin.toISOString(),
-          EndTime: day.end.toISOString(),
+          BeginTime: day.begin,
+          EndTime: day.end,
         },
         source.Id
       )
@@ -214,8 +214,8 @@ export class CountDivisionController
       // 以小时为单位获得垃圾投放数量信息
       const data = await this.service.division.eventNumbersHistory(
         {
-          BeginTime: day.begin.toISOString(),
-          EndTime: day.end.toISOString(),
+          BeginTime: day.begin,
+          EndTime: day.end,
           TimeUnit: TimeUnit.Hour,
         },
         role.Id

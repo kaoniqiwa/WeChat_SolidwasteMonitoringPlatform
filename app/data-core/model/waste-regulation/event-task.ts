@@ -1,8 +1,15 @@
 import { Transform, Type } from 'class-transformer'
-import { IIntervalParams, IPageParams } from '../page'
+import {
+  IIntervalParams,
+  IntervalParams,
+  IPagedParams,
+  PagedIntervalParams,
+  PagedParams,
+} from '../page'
 import { transformDate } from '../transformer'
 import { GisPoint } from './division'
 import { CameraImageUrl } from './event-record'
+import 'reflect-metadata'
 
 export enum TaskType {
   /**
@@ -40,7 +47,7 @@ export enum DestinationType {
   garbagestation = 1,
 }
 
-export interface GetEventTasksParams extends IPageParams, IIntervalParams {
+export class GetEventTasksParams extends PagedIntervalParams {
   /**	String[]	任务ID	O */
   Ids?: string[]
   /**	String	任务编号	O */
@@ -73,11 +80,9 @@ export interface GetEventTasksParams extends IPageParams, IIntervalParams {
   HigherThanScore?: number
 }
 
-export interface GetAvailableEventTasksParams
-  extends IPageParams,
-    IIntervalParams {}
+export class GetAvailableEventTasksParams extends PagedIntervalParams {}
 
-export interface GetTaskProcessorsParams extends IPageParams {
+export class GetTaskProcessorsParams extends PagedParams {
   /**	String[]	ID列表	O */
   Ids?: string[]
   /**	String[]	区划ID，街道ID	O */
@@ -90,19 +95,17 @@ export interface GetTaskProcessorsParams extends IPageParams {
   MobileNo?: string
 }
 
-export interface GetProcessorSchemesParams
-  extends IPageParams,
-    IIntervalParams {
+export class GetProcessorSchemesParams extends PagedIntervalParams {
   /**	String[]	处置人员ID列表	O */
   ProcessorIds?: string[]
 }
 
-export interface GetProcessorSchemeDailyParams {
+export class GetProcessorSchemeDailyParams {
   /**	DateTime	日期	M */
-  Date: Date
+  Date!: Date
 }
 
-export interface GetTaskDestinationsParams extends IPageParams {
+export class GetTaskDestinationsParams extends PagedParams {
   /**	String[]	目的地ID	O */
   Ids?: string[]
   /**	String	名称	O */
@@ -111,9 +114,9 @@ export interface GetTaskDestinationsParams extends IPageParams {
   Type?: TaskType
 }
 
-export interface GetEventTasksDailyParams extends IPageParams {
+export class GetEventTasksDailyParams extends PagedParams {
   /**	DateTime	日期	M */
-  Date: Date
+  Date!: Date
   /**	String[]	目的地ID	O */
   DestinationIds?: string[]
   /**	String	目的地名称，支持LIKE	O */
@@ -132,14 +135,12 @@ export interface GetEventTasksDailyParams extends IPageParams {
   IsFinished?: boolean
 }
 
-export interface GetEventTaskSchemeParams {
+export class GetEventTaskSchemeParams {
   /**	DateTime	日期	M */
-  Date: Date
+  Date!: Date
 }
 
-export interface GetTaskDestinationSchemesParams
-  extends IPageParams,
-    IIntervalParams {
+export class GetTaskDestinationSchemesParams extends PagedIntervalParams {
   /**	String[]	目的地ID	O */
   DestinationIds?: string[]
   /**	String	名称	O */

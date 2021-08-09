@@ -5,6 +5,7 @@ import {
   EventType,
 } from '../../../data-core/model/waste-regulation/event-number'
 import { GetEventRecordsParams } from '../../../data-core/model/waste-regulation/event-record-params'
+import { GetEventTasksParams } from '../../../data-core/model/waste-regulation/event-task'
 import { ResourceRole, ResourceType } from '../../../data-core/model/we-chat'
 import { Service } from '../../../data-core/repuest/service'
 import { DataCache } from './Cache'
@@ -96,8 +97,8 @@ export class GarbageStationController
       const response = await this.service.garbageStation.eventNumbersHistory(
         {
           TimeUnit: TimeUnit.Day,
-          BeginTime: day.begin.toISOString(),
-          EndTime: day.end.toISOString(),
+          BeginTime: day.begin,
+          EndTime: day.end,
         },
         source.Id
       )
@@ -218,8 +219,8 @@ export class GarbageStationController
       const role = this.roles[i]
       const data = await this.service.garbageStation.eventNumbersHistory(
         {
-          BeginTime: day.begin.toISOString(),
-          EndTime: day.end.toISOString(),
+          BeginTime: day.begin,
+          EndTime: day.end,
           TimeUnit: TimeUnit.Hour,
         },
         role.Id
@@ -319,5 +320,18 @@ export class GarbageStationController
       params.StationIds = ids
     }
     return params
+  }
+
+  async getEventTaskList(day: OneDay) {
+    let stations = await this.getGarbageStationList()
+    let ids = stations.map((x) => x.Id)
+    this.getGarbageStationStatisticNumberListInToday
+    let today = this.getToday()
+    let params: GetEventTasksParams = {
+      BeginTime: day.begin,
+      EndTime: day.end,
+      Ids: ids,
+    }
+    return this.service.eventTask.list(params)
   }
 }

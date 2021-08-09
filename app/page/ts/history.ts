@@ -207,8 +207,9 @@ export namespace EventHistoryPage {
         template.footer.innerHTML = record.Data.DivisionName
       }
 
-      template.remark.innerHTML = record.EventTime.format('HH:mm:ss')
-
+      if (record.EventTime && record.EventTime.format) {
+        template.remark.innerHTML = record.EventTime.format('HH:mm:ss')
+      }
       let item = document.createElement('div')
       item.id = record.EventId!
       item.setAttribute('divisionid', record.Data.DivisionId!)

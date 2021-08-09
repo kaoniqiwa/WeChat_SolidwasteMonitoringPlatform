@@ -1,6 +1,9 @@
 import { dateFormat } from '../../../common/tool'
-import { DateTime } from '../../../data-core/model/date-time'
-import { PagedList, TimeUnit } from '../../../data-core/model/page'
+import {
+  IntervalParams,
+  PagedList,
+  TimeUnit,
+} from '../../../data-core/model/page'
 import {
   User,
   UserLabel,
@@ -83,8 +86,8 @@ export abstract class DataController
       let label = new UserLabel()
       label.LabelId = garbageStationId
       label.LabelName = name
-      label.createTime = new DateTime()
-      label.updateTime = new DateTime()
+      label.CreateTime = new Date()
+      label.UpdateTime = new Date()
       label.LabelType = UserLabelType.garbageStation
       label.Content = number
       let result = await this.service.user.label.post(
@@ -102,7 +105,7 @@ export abstract class DataController
       return promise.then(async (x) => {
         x.Content = number
         x.LabelName = name
-        x.updateTime = new DateTime()
+        x.UpdateTime = new Date()
         let result = await this.service.user.label.put(
           garbageStationId,
           x.LabelType,
@@ -148,6 +151,24 @@ export abstract class DataController
       date.getDate()
     )
     return dataDate.getTime() - today.getTime() >= 0
+  }
+
+  getToday(): IntervalParams {
+    const now = new Date()
+    const begin = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const end = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      23,
+      59,
+      59,
+      999
+    )
+    return {
+      BeginTime: begin,
+      EndTime: end,
+    }
   }
 
   roles: ResourceRole[]
@@ -541,8 +562,8 @@ export abstract class DataController
     day: OneDay
   ): Promise<GarbageStationNumberStatisticV2[]> {
     let params: GetGarbageStationStatisticNumbersParamsV2 = {
-      BeginTime: day.begin.toISOString(),
-      EndTime: day.end.toISOString(),
+      BeginTime: day.begin,
+      EndTime: day.end,
       GarbageStationIds: ids,
       TimeUnit: TimeUnit.Day,
     }

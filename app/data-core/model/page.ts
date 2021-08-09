@@ -1,3 +1,6 @@
+import { Transform } from 'class-transformer'
+import { transformDate } from './transformer'
+
 export interface Page {
   PageIndex: number
   PageSize: number
@@ -11,7 +14,7 @@ export interface PagedList<T> {
   Data: T[]
 }
 
-export interface IPageParams {
+export interface IPagedParams {
   PageIndex?: number
   PageSize?: number
 }
@@ -54,15 +57,32 @@ export class StatisticTime {
   Week?: number
 }
 export interface IIntervalParams {
-  BeginTime: Date | string
-  EndTime: Date | string
+  BeginTime: Date
+  EndTime: Date
 }
 export class IntervalParams implements IIntervalParams {
   /**开始时间 */
-  BeginTime!: Date | string
+  @Transform(transformDate)
+  BeginTime!: Date
 
   /**结束时间 */
-  EndTime!: Date | string
+  @Transform(transformDate)
+  EndTime!: Date
+}
+export class PagedParams implements IPagedParams {
+  /**页码[1-n](可选) */
+  PageIndex?: number
+  /**分页大小[1-100](可选) */
+  PageSize?: number
+}
+export class PagedIntervalParams
+  extends IntervalParams
+  implements IPagedParams
+{
+  /**页码[1-n](可选) */
+  PageIndex?: number
+  /**分页大小[1-100](可选) */
+  PageSize?: number
 }
 export interface ITimeUnitParams extends IIntervalParams {
   /**统计时间单位:1-Hour，2-Day */
@@ -72,7 +92,7 @@ export class TimeUnitParams extends IntervalParams implements ITimeUnitParams {
   /**统计时间单位:1-Hour，2-Day */
   TimeUnit: TimeUnit = TimeUnit.Day
 }
-export class PageTimeUnitParams extends TimeUnitParams implements IPageParams {
+export class PageTimeUnitParams extends TimeUnitParams implements IPagedParams {
   /**页码[1-n](可选) */
   PageIndex?: number
   /**分页大小[1-100](可选) */

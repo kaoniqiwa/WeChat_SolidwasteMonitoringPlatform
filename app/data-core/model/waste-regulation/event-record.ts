@@ -1,5 +1,5 @@
-import { DateTime } from '../date-time'
-import { Point } from '../point'
+import { Transform } from 'class-transformer'
+import { transformDate } from '../transformer'
 import { EventType } from './event-number'
 import {
   EventData,
@@ -24,18 +24,10 @@ export class EventRecord {
   /**事件ID */
   Id!: string
 
-  private _eventTime?: DateTime = new DateTime()
   /**事件时间 */
-  get EventTime(): DateTime {
-    return this._eventTime!
-  }
-  set EventTime(val: DateTime) {
-    if (val instanceof DateTime) {
-      this._eventTime = val
-    } else {
-      this._eventTime = new DateTime(val)
-    }
-  }
+  @Transform(transformDate)
+  EventTime?: Date
+
   /**事件类型 */
   EventType!: EventType
   /**事件描述信息(可选) */
