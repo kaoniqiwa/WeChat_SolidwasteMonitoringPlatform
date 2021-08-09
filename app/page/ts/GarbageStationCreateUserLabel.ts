@@ -2,9 +2,10 @@ import setUserLabelTemplate from '../garbagestation/garbage-station-details-user
 import '../css/myChartAside.less'
 import '../css/header.less'
 import '../css/garbagestation/userLabel.css'
-import { IGarbageStationController } from './data-controllers/IController'
+
 import AsideModel from './data-controllers/modules/AsideModel'
 import { GarbageStationViewModel } from './data-controllers/ViewModels'
+import { IGarbageStationController } from './data-controllers/modules/IController/IGarbageStationController'
 
 export default class CreateUserLabelAside extends AsideModel {
   get name() {

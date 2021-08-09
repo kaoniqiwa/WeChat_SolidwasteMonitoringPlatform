@@ -38,19 +38,18 @@ import { ResourceRole, WeChatUser } from '../../../data-core/model/we-chat'
 import { Service } from '../../../data-core/repuest/service'
 import { DataCache } from './Cache'
 import {
-  GarbageCountsParams,
-  IDataController,
-  IDetailsEvent,
-  IEventHistory,
-  IGarbageDrop,
-  IGarbageStationController,
-  IGarbageStationNumberStatistic,
   IUserLabelController,
-  IUserPushManager,
   OneDay,
   Paged,
   StatisticNumber,
 } from './IController'
+import { IDataController } from './modules/IController/IDataController'
+import { IDetailsEvent } from './modules/IController/IDetailsEvent'
+import { IEventHistory } from './modules/IController/IEventHistory'
+import { IGarbageDrop } from './modules/IController/IGarbageDrop'
+import { IGarbageStationController } from './modules/IController/IGarbageStationController'
+import { IGarbageStationNumberStatistic } from './modules/IController/IGarbageStationNumberStatistic'
+import { IUserPushManager } from './modules/IController/IUserPushManager'
 import { ViewModelConverter } from './ViewModelConverter'
 import {
   CameraViewModel,

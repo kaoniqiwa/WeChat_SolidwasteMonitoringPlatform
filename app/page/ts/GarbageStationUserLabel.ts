@@ -2,13 +2,13 @@ import userLabelTemplate from '../garbagestation/garbage-station-details-user-la
 import '../css/myChartAside.less'
 import '../css/header.less'
 import '../css/garbagestation/userLabel.css'
-import { IGarbageStationController } from './data-controllers/IController'
 import AsideModel from './data-controllers/modules/AsideModel'
 import { GarbageStationViewModel } from './data-controllers/ViewModels'
 import CreateUserLabelAside from './GarbageStationCreateUserLabel'
 import IObserver from './IObserver'
 import SetUserLabelAside from './GarbageStationSetUserLabel'
 import { UserLabel } from '../../data-core/model/user-stystem'
+import { IGarbageStationController } from './data-controllers/modules/IController/IGarbageStationController'
 
 export default class UserLabelAside extends AsideModel implements IObserver {
   get name() {

@@ -1,9 +1,11 @@
 import { SessionUser } from '../../common/session-user'
 import { EventType } from '../../data-core/model/waste-regulation/event-number'
 import { HowellUri } from '../../data-core/model/waste-regulation/howell-url'
-import { WeChatUser } from '../../data-core/model/we-chat'
+import { ResourceType, WeChatUser } from '../../data-core/model/we-chat'
 import { HowellAuthHttp } from '../../data-core/repuest/howell-auth-http'
 import { HowellHttpClient } from '../../data-core/repuest/http-client'
+import { Service } from '../../data-core/repuest/service'
+import { ControllerFactory } from './data-controllers/ControllerFactory'
 import { OneDay, Paged } from './data-controllers/IController'
 
 export interface NavigationWindow extends Window {
@@ -16,27 +18,28 @@ export interface NavigationWindow extends Window {
 }
 
 export enum NavigationWindowIndex {
-  //task = 0,
+  none = -1,
   data = 0,
-  history = 1,
-  garbage_station = 2,
-  garbage_drop = 3,
-  user = 4,
+  task = 1,
+  history = 2,
+  garbage_station = 3,
+  garbage_drop = 4,
+  user = 5,
 }
 
 // 命名空间编译成自执行函数
 namespace Navigation {
   window.recordDetails = null
   window.showOrHideAside = function (url) {
-    if (index < -1) {
-      index = 3
+    if (index < NavigationWindowIndex.none) {
+      index = NavigationWindowIndex.garbage_drop
       let garbageDropPage = items[index] as HTMLLinkElement
       garbageDropPage.click()
-    } else if (index < 0) {
-      index = 1
+    } else if (index < NavigationWindowIndex.data) {
+      index = NavigationWindowIndex.history
       let historyPage = items[index] as HTMLLinkElement
       historyPage.click()
-    } else if (index > 0) {
+    } else if (index > NavigationWindowIndex.data) {
       // let garbageDropPage = (items[index] as HTMLLinkElement);
       // garbageDropPage.click();
     } else {
@@ -104,17 +107,21 @@ namespace Navigation {
       return false
     }
   }
-
-  ;(window as unknown as NavigationWindow).User = new SessionUser()
-  let index = 0
-
+  let session = new SessionUser()
+  ;(window as unknown as NavigationWindow).User = session
+  let index = NavigationWindowIndex.data
+  if (!session.WUser.CanCreateWeChatUser) {
+    index = NavigationWindowIndex.task
+    items[NavigationWindowIndex.data].style.display = 'none'
+    items[NavigationWindowIndex.task].style.display = ''
+  }
   // 获得OpenId
   var search = decodeURI(document.location.search).substr(1)
 
   var query = search.split('&')
   var querys: any = {
     openid: '',
-    index: '0',
+    index: NavigationWindowIndex.data,
     eventid: '',
     data: '',
   }
@@ -144,7 +151,7 @@ namespace Navigation {
 
         if (querys.eventid) {
           //location.href = "./event-details.html?openid=" + querys.openid + "&eventid=" + querys.eventid;
-          querys.index = '-1'
+          querys.index = NavigationWindowIndex.none
           let eventType = EventType.IllegalDrop
           if (querys.eventtype) {
             eventType = parseInt(querys.eventtype)
@@ -173,6 +180,7 @@ namespace Navigation {
         if (querys.index) {
           index = parseInt(querys.index)
         }
+        debugger
         console.log(index)
         if (index >= 0) {
           // 手动触发按钮点击动作

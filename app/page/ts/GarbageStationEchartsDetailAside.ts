@@ -1,17 +1,11 @@
 import { dateFormat, getAllDay } from '../../common/tool'
-import { DataController } from './data-controllers/DataController'
-import {
-  IGarbageStationController,
-  OneDay,
-  Paged,
-} from './data-controllers/IController'
+import { OneDay, Paged } from './data-controllers/IController'
 import IAside from './IAside'
 import MyTemplate, { GarbageDropData } from './myTemplate'
 
 import echartDetailAsideTemplate from '../garbagestation/garbage-station-echartDetailAside.html'
 import { EventType } from '../../data-core/model/waste-regulation/event-number'
 import {
-  CameraImageUrl,
   GarbageDropEventRecord,
   GarbageFullEventRecord,
   IllegalDropEventRecord,
@@ -22,6 +16,7 @@ import { Language } from './language'
 import { NavigationWindow } from '.'
 
 import '../css/myChartDetailAside.less'
+import { IGarbageStationController } from './data-controllers/modules/IController/IGarbageStationController'
 
 export default class EchartsDetailAside extends IAside {
   day!: OneDay
@@ -279,9 +274,11 @@ export default class EchartsDetailAside extends IAside {
         this.type == EventType.IllegalDrop ||
         this.type == EventType.MixedInto
       ) {
-        obj.EventTime = v.EventTime.format('HH:mm:ss')
+        obj.EventTime = v.EventTime ? v.EventTime.format('HH:mm:ss') : ''
       } else {
-        obj.EventTime = v.EventTime.format('yyyy-MM-dd HH:mm:ss')
+        obj.EventTime = v.EventTime
+          ? v.EventTime.format('yyyy-MM-dd HH:mm:ss')
+          : ''
       }
 
       obj.imageUrls = imageUrls.map((url) => {

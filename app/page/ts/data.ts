@@ -9,15 +9,13 @@ import { HowellAuthHttp } from '../../data-core/repuest/howell-auth-http'
 import { dateFormat, getAllDay } from '../../common/tool'
 import { Service } from '../../data-core/repuest/service'
 import { ResourceType } from '../../data-core/model/we-chat'
-import {
-  IDataController,
-  StatisticNumber,
-} from './data-controllers/IController'
+import { StatisticNumber } from './data-controllers/IController'
 import { ControllerFactory } from './data-controllers/ControllerFactory'
 import Swiper, { Pagination } from 'swiper'
 import { CandlestickOption } from './echart'
 import { GarbageStationGarbageCountStatistic } from '../../data-core/model/waste-regulation/garbage-station-number-statistic'
 import { NavigationWindow } from '.'
+import { IDataController } from './data-controllers/modules/IController/IDataController'
 
 Swiper.use([Pagination])
 

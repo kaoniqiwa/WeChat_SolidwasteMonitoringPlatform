@@ -69,8 +69,8 @@ export class CommitteesDivisionController extends DataController {
       const response = await this.service.garbageStation.eventNumbersHistory(
         {
           TimeUnit: TimeUnit.Day,
-          BeginTime: day.begin.toISOString(),
-          EndTime: day.end.toISOString(),
+          BeginTime: day.begin,
+          EndTime: day.end,
         },
         source.Id
       )
@@ -195,8 +195,8 @@ export class CommitteesDivisionController extends DataController {
       // 以小时为单位获得垃圾投放数量信息
       const data = await this.service.division.eventNumbersHistory(
         {
-          BeginTime: day.begin.toISOString(),
-          EndTime: day.end.toISOString(),
+          BeginTime: day.begin,
+          EndTime: day.end,
           TimeUnit: TimeUnit.Hour,
         },
         role.Id
@@ -206,9 +206,9 @@ export class CommitteesDivisionController extends DataController {
       let begin = new Date(data.Data[0].BeginTime)
       while (begin.getTime() >= day.begin.getTime()) {
         let item = new EventNumberStatistic()
-        item.EndTime = begin.toISOString()
+        item.EndTime = begin
         begin.setHours(begin.getHours() - 1)
-        item.BeginTime = begin.toISOString()
+        item.BeginTime = begin
         item.EventNumbers = [
           {
             EventType: EventType.IllegalDrop,
@@ -265,8 +265,8 @@ export class CommitteesDivisionController extends DataController {
     ids?: string[]
   ) {
     const params = {
-      BeginTime: day.begin.toISOString(),
-      EndTime: day.end.toISOString(),
+      BeginTime: day.begin,
+      EndTime: day.end,
       PageSize: page.size,
       PageIndex: page.index,
       Desc: true,

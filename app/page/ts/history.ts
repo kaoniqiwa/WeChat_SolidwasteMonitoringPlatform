@@ -6,7 +6,7 @@ import { ResourceType } from '../../data-core/model/we-chat'
 import { AsideControl } from './aside'
 import { AsideListPage, AsideListPageWindow, SelectionMode } from './aside-list'
 import { Language } from './language'
-import { IEventHistory, Paged } from './data-controllers/IController'
+import { Paged } from './data-controllers/IController'
 import { ControllerFactory } from './data-controllers/ControllerFactory'
 
 import { EventType } from '../../data-core/model/waste-regulation/event-number'
@@ -21,6 +21,7 @@ import {
 
 import { NavigationWindow } from '.'
 import { DataController } from './data-controllers/DataController'
+import { IEventHistory } from './data-controllers/modules/IController/IEventHistory'
 
 declare var weui: any
 

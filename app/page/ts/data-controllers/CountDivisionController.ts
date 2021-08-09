@@ -6,18 +6,14 @@ import {
 import { GarbageStation } from '../../../data-core/model/waste-regulation/garbage-station'
 import { ResourceRole, ResourceType } from '../../../data-core/model/we-chat'
 import { Service } from '../../../data-core/repuest/service'
-import {
-  IDataController,
-  IGarbageStationController,
-  OneDay,
-  Paged,
-  StatisticNumber,
-} from './IController'
+import { OneDay, Paged, StatisticNumber } from './IController'
 import { DataController } from './DataController'
 import { GetEventRecordsParams } from '../../../data-core/model/waste-regulation/event-record-params'
 import { GarbageStationViewModel } from './ViewModels'
 import { DataCache } from './Cache'
 import { ViewModelConverter } from './ViewModelConverter'
+import { IDataController } from './modules/IController/IDataController'
+import { IGarbageStationController } from './modules/IController/IGarbageStationController'
 
 export class CountDivisionController
   extends DataController

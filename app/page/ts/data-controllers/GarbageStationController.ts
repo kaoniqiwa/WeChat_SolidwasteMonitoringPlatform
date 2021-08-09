@@ -10,19 +10,16 @@ import { ResourceRole, ResourceType } from '../../../data-core/model/we-chat'
 import { Service } from '../../../data-core/repuest/service'
 import { DataCache } from './Cache'
 import { DataController } from './DataController'
-import {
-  IDataController,
-  IGarbageStationController,
-  OneDay,
-  Paged,
-  StatisticNumber,
-} from './IController'
+import { OneDay, Paged, StatisticNumber } from './IController'
+import { IDataController } from './modules/IController/IDataController'
+import { IEventTaskController } from './modules/IController/IEventTaskController'
+import { IGarbageStationController } from './modules/IController/IGarbageStationController'
 import { ViewModelConverter } from './ViewModelConverter'
 import { GarbageStationViewModel } from './ViewModels'
 
 export class GarbageStationController
   extends DataController
-  implements IDataController, IGarbageStationController
+  implements IDataController, IGarbageStationController, IEventTaskController
 {
   constructor(service: Service, roles: ResourceRole[]) {
     super(service, roles)
@@ -322,7 +319,11 @@ export class GarbageStationController
     return params
   }
 
-  async getEventTaskList(day: OneDay) {
+  async getEventTaskList(
+    day: OneDay,
+    isHandle: boolean = false,
+    isFinished: boolean = false
+  ) {
     let stations = await this.getGarbageStationList()
     let ids = stations.map((x) => x.Id)
     this.getGarbageStationStatisticNumberListInToday
@@ -331,6 +332,8 @@ export class GarbageStationController
       BeginTime: day.begin,
       EndTime: day.end,
       Ids: ids,
+      IsHandle: isHandle,
+      IsFinished: isFinished,
     }
     return this.service.eventTask.list(params)
   }

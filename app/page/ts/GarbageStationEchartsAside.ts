@@ -49,15 +49,12 @@ import { Service } from '../../data-core/repuest/service'
 import { ControllerFactory } from './data-controllers/ControllerFactory'
 import { DataController } from './data-controllers/DataController'
 import { EventType } from '../../data-core/model/waste-regulation/event-number'
-import {
-  IDataController,
-  IGarbageStationController,
-  OneDay,
-} from './data-controllers/IController'
+import { OneDay } from './data-controllers/IController'
 import EchartsDetailAside from './GarbageStationEchartsDetailAside'
 import IObserver from './IObserver'
 import UserLabelAside from './GarbageStationUserLabel'
 import CreateUserLabelAside from './GarbageStationCreateUserLabel'
+import { IGarbageStationController } from './data-controllers/modules/IController/IGarbageStationController'
 
 echarts.use([
   GridComponent,

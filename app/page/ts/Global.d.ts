@@ -38,7 +38,7 @@ declare interface EventTarget {
 }
 
 declare interface Date {
-  format?: (format: string) => string
+  format: (format: string) => string
 }
 
 declare function base64encode(data: string): string

@@ -4,7 +4,7 @@ export function getAllDay(date: Date) {
     d = date.getDate()
   return {
     begin: new Date(y, m, d, 0, 0, 0),
-    end: new Date(y, m, d, 23, 59, 59),
+    end: new Date(y, m, d, 23, 59, 59, 999),
   }
 }
 

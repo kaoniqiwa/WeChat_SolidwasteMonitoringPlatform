@@ -71,7 +71,7 @@ export class EventTaskRequestService extends BaseRequestService {
   }
   /** 获取发布任务列表 */
   async list(params: GetEventTasksParams) {
-    return super._post(EventTask, EventTaskUrl.list(), params)
+    return super._list(EventTask, EventTaskUrl.list(), params)
   }
   /** 获取用户辖区下的每日任务数量 */
   async scheme(params: GetEventTaskSchemeParams) {
