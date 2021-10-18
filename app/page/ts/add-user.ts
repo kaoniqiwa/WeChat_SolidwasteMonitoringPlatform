@@ -125,7 +125,7 @@ abstract class UserCreater {
       div!.textContent = v.Name
       div.setAttribute('id', v.Id)
       this.element.aside.asideMain.appendChild(info)
-      debugger
+
       if (this.selectedData.has(v.Id)) {
         div.classList.add('selected')
       }

@@ -82,10 +82,20 @@
             <label class="weui-form-preview__label">报警时间</label>
             <span class="weui-form-preview__value police__time"></span>
           </div>
+          <div
+            class="weui-form-preview__item description-row"
+            style="display: none"
+          >
+            <label class="weui-form-preview__label">备注</label>
+            <div class="weui-form-preview__value description div">
+              <textarea class="textarea description"></textarea>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="page__ft item-content-center">
+        <div class="weui-btn submit__btn" style="display: none">确认处置</div>
         <div class="weui-btn back__btn">返回报警记录</div>
       </div>
     </template>
@@ -93,6 +103,9 @@
     <div class="mui-page mui-page-center" id="detail">
       <div class="mui-page-content full">
         <div class="page__bd full">
+          <header class="header">
+            <div id="back"><i class="howell-icon-arrow2left"></i>返回</div>
+          </header>
           <div class="swiper-container page full" id="swiper-page">
             <div class="swiper-wrapper page"></div>
           </div>

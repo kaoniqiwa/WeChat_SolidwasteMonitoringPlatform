@@ -29,7 +29,7 @@ import {
   CameraImageUrl,
   GarbageDropEventRecord,
 } from '../../data-core/model/waste-regulation/event-record'
-import { IGarbageDrop, Paged } from './data-controllers/IController'
+import { Paged } from './data-controllers/IController'
 import IObserver from './IObserver'
 
 import MyTemplate, { GarbageDropData } from './myTemplate'
@@ -43,6 +43,7 @@ import { NavigationWindow } from '.'
 
 import weui from 'weui.js/dist/weui.js'
 import 'weui'
+import { IGarbageDrop } from './data-controllers/modules/IController/IGarbageDrop'
 export default class GarbageDrop implements IObserver {
   elements: { [key: string]: HTMLElement } // 页面html元素收集器
 
@@ -53,7 +54,7 @@ export default class GarbageDrop implements IObserver {
   parsedDropListChunk: Array<GarbageDropData> = []
   appendType: string = 'chunk'
 
-  eventType?: EventType = void 0 // 筛选状态
+  eventType: EventType = EventType.GarbageDropAll // 筛选状态
   roleTypes: Array<string> = [] // 筛选区域
   roleList: ResourceRole[] = [] // 侧边栏数据
 
@@ -195,6 +196,17 @@ export default class GarbageDrop implements IObserver {
   }
 
   bindEvents() {
+    window.addEventListener('message', function (e) {
+      if (e && e.data) {
+        try {
+          let data = JSON.parse(e.data)
+          let div = document.getElementById(data.eventId) as HTMLElement
+          let processor = div.querySelector('.processor') as HTMLElement
+          processor.innerHTML = data.processor
+        } catch (error) {}
+      }
+    })
+
     this.elements.showDatePicker.addEventListener('click', () => {
       this.showDatePicker()
     })
@@ -306,7 +318,7 @@ export default class GarbageDrop implements IObserver {
    */
   reset() {
     console.log('reset调用')
-    this.eventType = void 0
+    this.eventType = EventType.GarbageDropAll
     this.roleTypes = []
     this.dropPage = null
     this.currentPage.index = 1
@@ -323,6 +335,7 @@ export default class GarbageDrop implements IObserver {
     // this.garbageStations = await this.dataController.getGarbageStationList();
 
     // console.log('roletypes', this.roleTypes)
+
     let data = await this.dataController.getGarbageDropEventList(
       day,
       this.currentPage,
@@ -364,6 +377,8 @@ export default class GarbageDrop implements IObserver {
       obj.EventName = Language.EventTypeFilter(v.EventType)
       obj.index = (this.dropPage!.PageIndex - 1) * this.dropPage!.PageSize + i
 
+      obj.ProcessorName = v.Data.ProcessorName ?? ''
+
       let imageUrls: CameraImageUrl[] = []
       if (v.Data) {
         v.Data.DropImageUrls && imageUrls.push(...v.Data.DropImageUrls)
@@ -377,7 +392,7 @@ export default class GarbageDrop implements IObserver {
         obj.DivisionName = v.Data.DivisionName!
         obj.DivisionId = v.Data.DivisionId!
 
-        obj.EventTime = v.EventTime.format('yyyy-MM-dd HH:mm:ss')
+        obj.EventTime = v.EventTime!.format('yyyy-MM-dd HH:mm:ss')
         obj.imageUrls = imageUrls.map((url) => {
           return this.dataController.getImageUrl(url.ImageUrl) as string
         })

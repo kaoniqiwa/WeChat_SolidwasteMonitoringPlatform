@@ -4,7 +4,7 @@
 import { CandlestickOption } from './echart'
 import IAside from './IAside'
 import { dateFormat, getAllDay } from '../../common/tool'
-import '../css/myChartAside.less'
+import '../css/aside.less'
 import '../css/header.less'
 
 import weui from 'weui.js/dist/weui.js'
@@ -174,7 +174,7 @@ export default class EchartsAside extends IAside implements IObserver {
         ? (document.querySelector(selector) as HTMLElement)
         : selector
 
-    this.innerContainer.classList.add('echart-inner-container')
+    this.innerContainer.classList.add('aside-inner-container')
     this.innerContainer.innerHTML = this.template
     this.date = date // 在设置日期时提前下载好数据
   }
@@ -198,7 +198,7 @@ export default class EchartsAside extends IAside implements IObserver {
       ) as HTMLDivElement,
     }
 
-    this.swiper = new Swiper('.echart-inner-container .swiper-container', {
+    this.swiper = new Swiper('.aside-inner-container .swiper-container', {
       init: true,
       virtual: {
         cache: true, // 一定要缓存

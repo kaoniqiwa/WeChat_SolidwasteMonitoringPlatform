@@ -22,6 +22,8 @@ export class BaseUrl {
    * @memberof BaseUrl
    */
   wechat = '/api/WechatIndex/'
+
+  static tasks = `/api/howell/ver10/tasks_service/`
 }
 export class GarbageBaseUrl extends BaseUrl {
   /**

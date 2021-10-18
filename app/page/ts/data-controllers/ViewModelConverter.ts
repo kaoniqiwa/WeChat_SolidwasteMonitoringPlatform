@@ -3,12 +3,14 @@ import {
   Division,
   DivisionType,
 } from '../../../data-core/model/waste-regulation/division'
+import { EventTask } from '../../../data-core/model/waste-regulation/event-task'
 import { GarbageStation } from '../../../data-core/model/waste-regulation/garbage-station'
 import { Service } from '../../../data-core/repuest/service'
 import {
   CameraViewModel,
   CommitteesViewModel,
   CountyViewModel,
+  EventTaskViewModel,
   GarbageStationViewModel,
 } from './ViewModels'
 
@@ -22,14 +24,18 @@ export class ViewModelConverter {
     service: Service,
     model: Division
   ): CountyViewModel | CommitteesViewModel
+
+  static Convert(service: Service, model: EventTask): EventTaskViewModel
+
   static Convert(
     service: Service,
-    model: GarbageStation | Camera | Division
+    model: GarbageStation | Camera | Division | EventTask
   ):
     | GarbageStationViewModel
     | CameraViewModel
     | CountyViewModel
     | CommitteesViewModel
+    | EventTaskViewModel
     | undefined {
     if (model instanceof GarbageStation) {
       return Object.assign(new GarbageStationViewModel(service), model)
@@ -44,6 +50,8 @@ export class ViewModelConverter {
         default:
           break
       }
+    } else if (model instanceof EventTask) {
+      return Object.assign(new EventTaskViewModel(service), model)
     } else {
     }
   }

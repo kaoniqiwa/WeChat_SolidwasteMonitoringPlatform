@@ -1,4 +1,5 @@
 import { EventType } from '../../data-core/model/waste-regulation/event-number'
+import { TaskType } from '../../data-core/model/waste-regulation/event-task'
 import { StationState } from '../../data-core/model/waste-regulation/garbage-station'
 import { GenderType, ResourceType } from '../../data-core/model/we-chat'
 
@@ -89,6 +90,17 @@ export class Language {
         return '满溢'
       case StationState.Error:
         return '异常'
+      default:
+        return ''
+    }
+  }
+
+  static TaskType(type: TaskType) {
+    switch (type) {
+      case TaskType.full:
+        return '垃圾满溢'
+      case TaskType.retention:
+        return '垃圾滞留'
       default:
         return ''
     }

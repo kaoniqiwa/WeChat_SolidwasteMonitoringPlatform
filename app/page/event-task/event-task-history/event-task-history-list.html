@@ -1,0 +1,49 @@
+<div class="container">
+  <main>
+    <div class="main-bar">
+      <div
+        class="main-bar__item swiper-pagination"
+        id="event-task-history-navigation"
+      ></div>
+      <div class="main-bar__item">
+        <span id="current_count">0</span>/<span id="total_count">0</span>
+      </div>
+    </div>
+    <div class="main-content swiper-container">
+      <div class="swiper-wrapper">
+        <div class="inner-content swiper-slide">
+          <div
+            class="minirefresh-wrap"
+            id="event-task-history-complated_RefreshContainer"
+          >
+            <div class="minirefresh-scroll">
+              <div class="list" id="event-task-history-complated"></div>
+            </div>
+          </div>
+        </div>
+        <div class="inner-content swiper-slide">
+          <div
+            class="minirefresh-wrap"
+            id="event-task-history-timeout_RefreshContainer"
+          >
+            <div class="minirefresh-scroll">
+              <div class="list" id="event-task-history-timeout"></div>
+            </div>
+          </div>
+        </div>
+        <div class="inner-content swiper-slide">
+          <div
+            class="minirefresh-wrap"
+            id="event-task-history-incomplated_RefreshContainer"
+          >
+            <div class="minirefresh-scroll">
+              <div class="list" id="event-task-history-incomplated"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- <footer>footer</footer> -->
+</div>

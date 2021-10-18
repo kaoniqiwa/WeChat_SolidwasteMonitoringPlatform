@@ -8,7 +8,7 @@ declare class Guid {
 
 declare interface Window {
   recordDetails?: any
-  showOrHideAside(url?: string)
+  showOrHideAside(url?: string, params?: any)
   HideUserAside(params?: any): void
 }
 

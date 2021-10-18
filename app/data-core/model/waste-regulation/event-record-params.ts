@@ -55,3 +55,14 @@ export interface GetGarbageDropEventRecordsParams
    */
   IsTimeout?: boolean
 }
+
+export interface GarbageDropProcessParams {
+  /**	String	处置人员名称	M */
+  ProcessorName: string
+  /**	String	处置人员ID	M */
+  ProcessorId: string
+  /**	String	手机号码	M */
+  ProcessorMobileNo: string
+  /**	String	处置描述	O */
+  ProcessDescription?: string
+}

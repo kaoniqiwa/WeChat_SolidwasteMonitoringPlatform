@@ -8,8 +8,9 @@ import {
   IllegalDropEventRecord,
   MixedIntoEventRecord,
 } from '../model/waste-regulation/event-record'
-import { plainToClass } from 'class-transformer'
+import { classToPlain, plainToClass } from 'class-transformer'
 import {
+  GarbageDropProcessParams,
   GetEventRecordsParams,
   GetGarbageDropEventRecordsParams,
 } from '../model/waste-regulation/event-record-params'
@@ -90,5 +91,14 @@ export class EventRequestService {
     >(this.url.garbageDropSingle(id))
 
     return plainToClass(GarbageDropEventRecord, response.Data)
+  }
+
+  async process(id: string, params: GarbageDropProcessParams) {
+    let data = classToPlain(params) as GarbageDropProcessParams
+    let response = await this.requestService.post<
+      GarbageDropProcessParams,
+      HowellResponse<GarbageDropEventRecord>
+    >(this.url.process(id), data)
+    return response.Data
   }
 }

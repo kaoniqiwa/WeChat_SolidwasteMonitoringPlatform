@@ -14,6 +14,7 @@ export interface GarbageDropData {
   EventTime: string
   EventId: string
   index: number
+  ProcessorName: string
 }
 
 // CustomEvent 的 polyfill
@@ -113,13 +114,10 @@ export default class MyTemplate {
       card.setAttribute('division-id', v.DivisionId)
       card.setAttribute('event-type', v.EventType + '')
       card.setAttribute('event-id', v.EventId)
-
       ;(card.querySelector('.station-name') as HTMLElement).textContent =
         v.StationName
-
       ;(card.querySelector('.division-name') as HTMLElement).textContent =
         v.DivisionName
-
       ;(card.querySelector('.event-time') as HTMLElement).textContent =
         v.EventTime
       let statusDiv = card.querySelector<HTMLElement>('.status')
@@ -135,6 +133,10 @@ export default class MyTemplate {
           statusDiv.className = 'card-title__appendix status handle'
         }
       }
+      let processorDiv = card.querySelector<HTMLElement>(
+        '.processor'
+      ) as HTMLElement
+      processorDiv.innerHTML = v.ProcessorName
 
       let cardImg = card.querySelector<HTMLElement>('.card-img')
       if (cardImg) {

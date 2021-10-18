@@ -17,7 +17,7 @@ export enum TaskType {
    */
   retention = 1,
   /**
-   * 垃圾桶满意
+   * 垃圾满溢
    */
   full = 2,
 }

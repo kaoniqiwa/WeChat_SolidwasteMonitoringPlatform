@@ -1,0 +1,95 @@
+.task-details {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.task-details .weui-form-preview__item {
+  display: flex;
+  flex-direction: row;
+}
+
+
+
+.task-details .form-footer {
+  display: flex;
+  padding: 16px;
+  height: 100px;
+  align-items: center;
+}
+
+.task-details .picture img {
+  width: 100%;
+  height: auto;
+  transition: all 2s ease-out;
+  opacity: 1
+}
+
+.task-details .picture {
+  width: 100%;
+}
+
+.task-details .picture>.swiper-pagination {
+  bottom: 5px !important;
+  color: white;
+  height: auto;
+  justify-content: flex-end;
+  align-items: flex-end;
+  position: absolute;
+}
+
+
+.weui-form-preview__value,
+.weui-form-preview__label {
+  font-size: 19.2px;
+}
+
+.full-screen-swiper {
+
+  animation: slideOut 1s;
+  display: none;
+  opacity: 0
+}
+
+.full-screen-swiper.slideIn {
+
+  animation: slideIn 1s;
+  display: block;
+  opacity: 1
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0
+  }
+
+  99% {
+    opacity: 1
+  }
+
+  100% {
+    display: block;
+    opacity: 1
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    opacity: 1
+  }
+
+  99% {
+    opacity: 0
+  }
+
+  100% {
+    display: none;
+    opacity: 0
+  }
+}
+
+.task-details.img-hidden .picture img,
+.task-details.img-hidden .picture>.swiper-pagination {
+  transition: all 0.5s ease-in;
+  opacity: 0;
+}

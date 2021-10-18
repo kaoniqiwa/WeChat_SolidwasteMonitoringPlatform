@@ -1,10 +1,16 @@
 import { EventType } from '../../../../../data-core/model/waste-regulation/event-number'
 import {
+  GarbageDropEventRecord,
   GarbageFullEventRecord,
   IllegalDropEventRecord,
   MixedIntoEventRecord,
 } from '../../../../../data-core/model/waste-regulation/event-record'
-import { IImage, IVodUrl, OneDay } from '../../IController'
+import {
+  GarbageDropProcessParamsViewModel,
+  IImage,
+  IVodUrl,
+  OneDay,
+} from '../../IController'
 import { CameraViewModel, IPictureController } from '../../ViewModels'
 
 export interface IDetailsEvent extends IImage, IVodUrl {
@@ -60,4 +66,10 @@ export interface IDetailsEvent extends IImage, IVodUrl {
     garbageStationId: string,
     cameraId: string
   ): Promise<CameraViewModel>
+
+  Process(
+    eventId: string,
+    userId: string,
+    description: string
+  ): Promise<GarbageDropEventRecord>
 }

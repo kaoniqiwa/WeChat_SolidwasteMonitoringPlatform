@@ -251,7 +251,6 @@ export default class MyAside extends ISubject {
       if (v.atLeastNum > 0) {
         // 选中个数小于要求的个数,则创建提示框
         if (this.filterData.get(k)?.size! < v.atLeastNum) {
-          // debugger
           let $textToast = $(MyWeui.warnToast())
           $textToast
             .find('.weui-toast__content')

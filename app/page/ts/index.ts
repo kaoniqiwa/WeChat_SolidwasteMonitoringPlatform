@@ -20,17 +20,18 @@ export interface NavigationWindow extends Window {
 export enum NavigationWindowIndex {
   none = -1,
   data = 0,
-  task = 1,
-  history = 2,
-  garbage_station = 3,
-  garbage_drop = 4,
-  user = 5,
+  // task = 1,
+  history = 1,
+  garbage_station = 2,
+  garbage_drop = 3,
+  user = 4,
 }
 
 // 命名空间编译成自执行函数
 namespace Navigation {
+  const iframe = document.getElementById('main') as HTMLIFrameElement
   window.recordDetails = null
-  window.showOrHideAside = function (url) {
+  window.showOrHideAside = function (url, params) {
     if (index < NavigationWindowIndex.none) {
       index = NavigationWindowIndex.garbage_drop
       let garbageDropPage = items[index] as HTMLLinkElement
@@ -63,12 +64,17 @@ namespace Navigation {
         details.src = url
       }
     }
+
+    if (params) {
+      let message = JSON.stringify(params)
+      iframe.contentWindow!.postMessage(message, '*')
+    }
   }
 
   const items = document.getElementsByClassName(
     'bar-item'
   ) as unknown as HTMLLinkElement[]
-  const iframe = document.getElementById('main') as HTMLIFrameElement
+
   for (let i = 0; i < items.length; i++) {
     const item = items[i] as HTMLLinkElement
     item.onclick = function () {
@@ -110,11 +116,11 @@ namespace Navigation {
   let session = new SessionUser()
   ;(window as unknown as NavigationWindow).User = session
   let index = NavigationWindowIndex.data
-  if (!session.WUser.CanCreateWeChatUser) {
-    index = NavigationWindowIndex.task
-    items[NavigationWindowIndex.data].style.display = 'none'
-    items[NavigationWindowIndex.task].style.display = ''
-  }
+  // if (session.WUser && !session.WUser.CanCreateWeChatUser) {
+  //   index = NavigationWindowIndex.task
+  //   items[NavigationWindowIndex.data].style.display = 'none'
+  //   items[NavigationWindowIndex.task].style.display = ''
+  // }
   // 获得OpenId
   var search = decodeURI(document.location.search).substr(1)
 
@@ -180,7 +186,6 @@ namespace Navigation {
         if (querys.index) {
           index = parseInt(querys.index)
         }
-        debugger
         console.log(index)
         if (index >= 0) {
           // 手动触发按钮点击动作

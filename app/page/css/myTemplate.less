@@ -6,9 +6,11 @@
     margin: 8px 0;
     padding: 10px 15px;
     box-sizing: border-box;
+
     &:first-child {
       margin-top: 0;
     }
+
     .card-title {
       display: flex;
       align-items: center;
@@ -19,22 +21,26 @@
       &__head {
         font-size: 17px;
       }
+
       &__appendix {
         @h: 18px;
-        font-size: 12px;        
-        padding: 0 2px;
+        font-size: 12px;
+        padding: 2px 5px;
         height: @h;
         text-align: center;
         line-height: @h;
+
         &.handle {
           background-color: #33ff6633;
           background-color: rgba(51, 255, 102, 0.3);
           color: #32b43e;
         }
+
         &.drop {
           background-color: rgba(247, 204, 40, 0.3);
           color: #ff9100;
         }
+
         &.timeout {
           background-color: #ff2e2e33;
           background-color: rgba(255, 46, 46, 0.3);
@@ -42,26 +48,30 @@
         }
       }
     }
+
     .card-img {
       display: flex;
       overflow: auto;
+
       img {
         width: 140px;
         margin: 0 2px;
       }
     }
+
     .card-footer {
       color: #b2b2b2;
       display: flex;
       justify-content: space-between;
       margin-top: 12px;
-      &__head {
-      }
-      &__appendix {
-      }
+
+      &__head {}
+
+      &__appendix {}
     }
   }
 }
+
 #HistoryDropTemplate {
   .record-item {
     height: 104px;
@@ -69,17 +79,21 @@
     padding: 12px;
     display: flex;
     width: calc(100% - 24px);
+
     .left {
       float: left;
+
       img {
         width: 140px;
         height: 80px;
         border-radius: 10px;
       }
     }
+
     .right {
       float: right;
     }
+
     .content {
       width: calc(100% - 156px);
       height: 100%;
@@ -87,7 +101,8 @@
       padding-bottom: 12px;
       margin-bottom: -12px;
       border-bottom: 2px solid #eaeaea;
-      > .title {
+
+      >.title {
         font-size: 19px;
         height: 50%;
         line-height: 40px;
@@ -96,11 +111,13 @@
         width: 100%;
         color: #191919;
       }
+
       .footer {
         height: 40px;
         line-height: 40px;
         vertical-align: middle;
-        > .footer-title {
+
+        >.footer-title {
           font-size: 14.4px;
           color: #888;
 
@@ -111,7 +128,8 @@
                       -o-text-overflow:ellipsis; */
           width: calc(100% - 48px);
         }
-        > .remark {
+
+        >.remark {
           font-size: 12px;
           color: #b2b2b2;
           float: right;

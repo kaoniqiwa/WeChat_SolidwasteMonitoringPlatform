@@ -11,7 +11,6 @@ import {
 import { ResourceRole, ResourceType } from '../../data-core/model/we-chat'
 import { DataController } from './data-controllers/DataController'
 import {
-  IGarbageStationController,
   Paged,
   StatisticNumber,
 } from './data-controllers/IController'

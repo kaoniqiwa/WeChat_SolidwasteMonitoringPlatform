@@ -3,6 +3,7 @@ import { Camera } from './camera'
 import { IPagedParams } from '../page'
 import { __values } from 'tslib'
 import { ResponseData } from '../response-data'
+import { Member } from '../we-chat'
 
 export enum StationState {
   // 正常
@@ -109,6 +110,22 @@ export class GarbageStation extends ResponseData {
    * @memberof GarbageStation
    */
   CountSchedule?: TimeRange[]
+  /**	String	地址	O */
+  Address?: string
+  /**	Int32	垃圾投放点类型	O */
+  DumpPointType?: DumpPointType
+  /**	Int32[]	停用的事件号列表	O */
+  DisableEventTypes?: number[]
+  /**	String	所属网格单元ID	O */
+  GridCellId?: string
+  /**	GarbageParameters	垃圾相关参数	O */
+  GarbageParameters?: GarbageParameters
+  /**	Member[]	人员列表	O */
+  Members?: Member
+  /**	String	IMEI串号	O */
+  IMEI?: string
+  /**	String	小区名称	O */
+  CommunityName?: string
 }
 
 export class Time extends Date {
@@ -172,4 +189,20 @@ export class GetGarbageStationsParams implements IPagedParams {
   WetFull?: boolean
   /**祖辈ID(可选)，返回该ID下的所有子孙区划及其本身的垃圾房 */
   AncestorId?: string
+}
+
+export enum DumpPointType {
+  /** 多分类垃圾厢房（干，湿，可回收，有毒有害）	1 */
+  multiGarbage = 1,
+  /** 多分类露天垃圾投放点（干，湿，可回收，有毒有害）	2 */
+  multiOpenGarbage = 2,
+  /** 二分类垃圾厢房（干，湿）	3 */
+  twoGarbage = 3,
+  /** 二分类露天垃圾投放点（干，湿）	4 */
+  twoOpenGarbage = 4,
+}
+
+export class GarbageParameters {
+  /**	Int32	处置超时时长，单位：分钟，默认：15分钟	O */
+  HandleTimeout?: number
 }

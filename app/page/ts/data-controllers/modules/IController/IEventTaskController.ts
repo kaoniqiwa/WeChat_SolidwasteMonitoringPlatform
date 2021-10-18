@@ -1,11 +1,22 @@
 import { PagedList } from '../../../../../data-core/model/page'
-import { EventTask } from '../../../../../data-core/model/waste-regulation/event-task'
-import { OneDay } from '../../IController'
+import { ILiveUrl, OneDay } from '../../IController'
+import { EventTaskViewModel, IPictureController } from '../../ViewModels'
 
-export interface IEventTaskController {
+export interface IEventTaskController extends ILiveUrl {
+  picture: IPictureController
   getEventTaskList(
     day: OneDay,
     isHandle: boolean,
     isFinished: boolean
-  ): Promise<PagedList<EventTask>>
+  ): Promise<PagedList<EventTaskViewModel>>
+
+  getAvailableEventTaskList(day: OneDay): Promise<PagedList<EventTaskViewModel>>
+
+  Take(id: string): Promise<EventTaskViewModel>
+
+  Daily(
+    date: Date,
+    timeout: boolean,
+    finished: boolean
+  ): Promise<PagedList<EventTaskViewModel>>
 }

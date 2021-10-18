@@ -127,8 +127,24 @@ export interface StatisticNumber {
   garbageDropNumber: number
 }
 
+export interface GarbageDropProcessParamsViewModel {
+  /** String 事件ID */
+  EventId: string
+  /**	String	处置人员名称	M */
+  ProcessorName: string
+  /**	String	处置人员ID	M */
+  ProcessorId: string
+  /**	String	手机号码	M */
+  ProcessorMobileNo: string
+  /**	String	处置描述	O */
+  ProcessDescription?: string
+}
+
 export interface IVodUrl {
   getVodUrl(cameraId: string, begin: Date, end: Date): Promise<VideoUrl>
+}
+export interface ILiveUrl {
+  getLiveUrl(cameraId: string): Promise<VideoUrl>
 }
 export interface IImage {
   getImageUrl(id: string): string | undefined

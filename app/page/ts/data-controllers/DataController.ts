@@ -21,6 +21,7 @@ import {
   MixedIntoEventRecord,
 } from '../../../data-core/model/waste-regulation/event-record'
 import {
+  GarbageDropProcessParams,
   GetEventRecordsParams,
   GetGarbageDropEventRecordsParams,
 } from '../../../data-core/model/waste-regulation/event-record-params'
@@ -38,6 +39,7 @@ import { ResourceRole, WeChatUser } from '../../../data-core/model/we-chat'
 import { Service } from '../../../data-core/repuest/service'
 import { DataCache } from './Cache'
 import {
+  GarbageDropProcessParamsViewModel,
   IUserLabelController,
   OneDay,
   Paged,
@@ -72,6 +74,16 @@ export abstract class DataController
 
   constructor(protected service: Service, roles: ResourceRole[]) {
     this.roles = roles
+  }
+  async Process(eventId: string, userId: string, description: string) {
+    let user = await this.GetUser(userId)
+    let params: GarbageDropProcessParams = {
+      ProcessorId: user.Id ?? '',
+      ProcessorName: user.FirstName ?? '' + user.LastName ?? '',
+      ProcessorMobileNo: user.MobileNo ?? '',
+      ProcessDescription: description,
+    }
+    return this.service.event.process(eventId, params)
   }
 
   userLabel: IUserLabelController = {
@@ -290,6 +302,14 @@ export abstract class DataController
       Protocol: 'ws-ps',
       BeginTime: begin.toISOString(),
       EndTime: end.toISOString(),
+    })
+  }
+
+  getLiveUrl(cameraId: string): Promise<VideoUrl> {
+    return this.service.sr.PreviewUrls({
+      CameraId: cameraId,
+      StreamType: 1,
+      Protocol: 'ws-ps',
     })
   }
 

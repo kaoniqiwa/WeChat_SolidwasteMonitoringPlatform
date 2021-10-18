@@ -1,4 +1,4 @@
-import { ClassConstructor, plainToClass } from 'class-transformer'
+import { ClassConstructor, classToPlain, plainToClass } from 'class-transformer'
 import { RequestHelper } from '../dao/request-helper'
 import { IPagedParams, PagedList } from '../model/page'
 import { HowellResponse } from '../model/response'
@@ -40,15 +40,16 @@ export class BaseRequestService {
   protected async _list<T extends IPagedParams, R>(
     r: ClassConstructor<R>,
     url: string,
-    params: T
+    paramsC: T
   ) {
-    if (!params.PageSize) {
-      params.PageSize = RequestHelper.maxSize
+    if (!paramsC.PageSize) {
+      paramsC.PageSize = RequestHelper.maxSize
     }
+    let params = classToPlain(paramsC)
     let response = await this.requestService.post<
       T,
       HowellResponse<PagedList<R>>
-    >(url, params)
+    >(url, params as T)
 
     response.Data.Data = plainToClass(r, response.Data.Data)
     return response.Data

@@ -18,8 +18,10 @@ export enum EventResourceType {
   IoTSensor = 'IoTSensor',
 }
 
+export class IEventRecord {}
+
 /**事件记录 */
-export class EventRecord {
+export class EventRecord implements IEventRecord {
   EventId?: string
   /**事件ID */
   Id!: string
@@ -50,6 +52,7 @@ export class EventRecord {
   /**事件关键字(可选) */
   EventIndexes?: string[]
 }
+
 export class EventRecordData<T extends EventData> extends EventRecord {
   Data!: T
 }

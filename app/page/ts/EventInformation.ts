@@ -1,5 +1,6 @@
 import {
   dateFormat,
+  getElement,
   getQueryVariable,
   getQueryVariable2,
 } from '../../common/tool'
@@ -10,26 +11,24 @@ import { EventType } from '../../data-core/model/waste-regulation/event-number'
 import { NavigationWindow } from '.'
 import { ImageController } from './data-controllers/modules/ImageControl'
 import { DataController } from './data-controllers/DataController'
-import {
-  GarbageCountsParams,
-  IDetailsEvent,
-  IImage,
-  OneDay,
-  Paged,
-} from './data-controllers/IController'
+import { IImage, OneDay, Paged } from './data-controllers/IController'
 import { ControllerFactory } from './data-controllers/ControllerFactory'
 import { Service } from '../../data-core/repuest/service'
-import { LoopPageControl } from './data-controllers/modules/LoopPageControl'
+import { SwiperPageControl } from './data-controllers/modules/SwiperPageControl'
 import Swiper, { Pagination } from 'swiper'
 import {
   CameraImageUrl,
+  EventRecord,
   GarbageDropEventRecord,
   GarbageFullEventRecord,
+  IEventRecord,
   IllegalDropEventRecord,
   MixedIntoEventRecord,
 } from '../../data-core/model/waste-regulation/event-record'
 import { IImageUrl } from './data-controllers/ViewModels'
-import { DateTime } from '../../data-core/model/date-time'
+import { IDetailsEvent } from './data-controllers/modules/IController/IDetailsEvent'
+import { ToastMessage } from './data-controllers/modules/ToastMessage'
+import { ResourceType } from '../../data-core/model/we-chat'
 
 Swiper.use([Pagination])
 
@@ -47,14 +46,15 @@ class GarbageDropImageUrl extends CameraImageUrl {
 export namespace EventInformationPage {
   export class EventDetail {
     imageController: ImageController
-
-    loopController: LoopPageControl
+    data?: EventRecord
+    loopController: SwiperPageControl
 
     pageIndex?: number
     template: HTMLTemplateElement
     paged?: Paged
     day?: OneDay
     isLoaded: boolean = false
+    message: ToastMessage
 
     get PageIndex() {
       if (this.pageIndex == undefined && this.paged) {
@@ -82,7 +82,7 @@ export namespace EventInformationPage {
         this.dataController.picture
       )
 
-      this.loopController = new LoopPageControl('#swiper-page', {
+      this.loopController = new SwiperPageControl('#swiper-page', {
         callback: (index, element) => {
           if (this.isLoaded) {
             this.PageChange(index, element)
@@ -95,6 +95,11 @@ export namespace EventInformationPage {
       })
 
       this.loopController.init(this.PageIndex)
+      this.message = new ToastMessage({
+        id: 'detail-message',
+        parent: getElement('detail'),
+        autoHide: true,
+      })
     }
 
     async loaded(element: HTMLElement) {
@@ -106,9 +111,10 @@ export namespace EventInformationPage {
       if (index != undefined) {
         index += 1
       }
-      const data = await this.getData(index, this.day)
-      if (data) {
-        this.fillDetail(data, element)
+
+      this.data = await this.getData(index, this.day)
+      if (this.data) {
+        this.fillDetail(this.data, element)
       }
     }
 
@@ -117,11 +123,15 @@ export namespace EventInformationPage {
       if (btn) {
         for (let i = 0; i < btn.length; i++) {
           btn[i].addEventListener('click', () => {
-            window.parent.showOrHideAside()
+            this.onBackClicked()
             // location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
           })
         }
       }
+      let back = document.getElementById('back') as HTMLDivElement
+      back.addEventListener('click', () => {
+        this.onBackClicked()
+      })
       let wrapper = document.querySelector(
         '.swiper-wrapper.page'
       ) as HTMLDivElement
@@ -151,6 +161,18 @@ export namespace EventInformationPage {
 
       if (strEventType) {
         eventType = parseInt(strEventType)
+      }
+
+      switch (eventType) {
+        case EventType.GarbageDrop:
+        case EventType.GarbageDropAll:
+        case EventType.GarbageDropHandle:
+        case EventType.GarbageDropTimeout:
+          ;(document.querySelector('.back__btn') as HTMLElement).style.display =
+            'none'
+          break
+        default:
+          break
       }
 
       if (eventId) {
@@ -183,7 +205,7 @@ export namespace EventInformationPage {
       if (btn) {
         for (let i = 0; i < btn.length; i++) {
           btn[i].addEventListener('click', () => {
-            window.parent.showOrHideAside()
+            this.onBackClicked()
             // location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
           })
         }
@@ -217,8 +239,9 @@ export namespace EventInformationPage {
 
       if (police__time) {
         for (let i = 0; i < police__time.length; i++) {
-          ;(police__time[i] as HTMLSpanElement).innerText =
-            item.EventTime.format('yyyy-MM-dd HH:mm:ss')
+          ;(police__time[i] as HTMLSpanElement).innerText = item.EventTime
+            ? item.EventTime.format('yyyy-MM-dd HH:mm:ss')
+            : ''
         }
       }
 
@@ -262,7 +285,7 @@ export namespace EventInformationPage {
               imgId: 'max-img',
             }
 
-            let interval = this.getEventTimeInterval(item.EventTime)
+            let interval = this.getEventTimeInterval(item.EventTime!)
 
             let url: IImageUrl = {
               url: detail_img.src,
@@ -310,7 +333,7 @@ export namespace EventInformationPage {
       }
     }
 
-    getEventTimeInterval(time: Date | DateTime) {
+    getEventTimeInterval(time: Date) {
       time.setSeconds(time.getSeconds() - 15)
       let begin = new Date(time.getTime())
       time.setSeconds(time.getSeconds() + 30)
@@ -341,7 +364,8 @@ export namespace EventInformationPage {
       if (btn) {
         for (let i = 0; i < btn.length; i++) {
           btn[i].addEventListener('click', () => {
-            window.parent.showOrHideAside()
+            this.onBackClicked()
+
             // location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
           })
         }
@@ -370,8 +394,9 @@ export namespace EventInformationPage {
 
       if (police__time) {
         for (let i = 0; i < police__time.length; i++) {
-          ;(police__time[i] as HTMLSpanElement).innerText =
-            item.EventTime.format('yyyy-MM-dd HH:mm:ss')
+          ;(police__time[i] as HTMLSpanElement).innerText = item.EventTime
+            ? item.EventTime.format('yyyy-MM-dd HH:mm:ss')
+            : ''
         }
       }
 
@@ -390,7 +415,7 @@ export namespace EventInformationPage {
           '.weui-form-preview__item'
         ) as HTMLDivElement
         let urls = new Array<IImageUrl>()
-        let interval = this.getEventTimeInterval(item.EventTime)
+        let interval = this.getEventTimeInterval(item.EventTime!)
         for (let i = 0; i < item.Data.CameraImageUrls.length; i++) {
           let element = template
           if (i > 0) {
@@ -512,54 +537,87 @@ export namespace EventInformationPage {
     ) {
       let source: HTMLElement | Document = element ? element : document
 
-      const police__type = source.getElementsByClassName('police__type'),
-        camera__name = source.querySelector('.camera__name') as HTMLElement,
-        station__name = source.getElementsByClassName('station__name'),
-        rc__name = source.getElementsByClassName('rc__name'),
-        police__time = source.getElementsByClassName('police__time')
+      const police__type = source.querySelector(
+        '.police__type'
+      ) as HTMLSpanElement
+      const camera__name = source.querySelector('.camera__name') as HTMLElement
+      const station__name = source.querySelector(
+        '.station__name'
+      ) as HTMLSpanElement
+      const rc__name = source.querySelector('.rc__name') as HTMLSpanElement
+      const police__time = source.querySelector(
+        '.police__time'
+      ) as HTMLSpanElement
+
+      let description = source.querySelector(
+        '.description'
+      ) as HTMLTextAreaElement
+      let description_row = source.querySelector(
+        '.description-row'
+      ) as HTMLElement
+      let description_div = source.querySelector(
+        '.description.div'
+      ) as HTMLElement
+      description_row.style.display = ''
 
       if (source instanceof HTMLElement) {
         source.id = item.EventId!
       }
 
-      let btn = source.getElementsByClassName('back__btn')
-      if (btn) {
-        for (let i = 0; i < btn.length; i++) {
-          btn[i].addEventListener('click', () => {
-            window.parent.showOrHideAside()
+      let back = source.getElementsByClassName('back__btn')
+      if (back) {
+        for (let i = 0; i < back.length; i++) {
+          if (
+            item.Data.Processed ||
+            this.user.WUser.Resources![0].ResourceType !==
+              ResourceType.GarbageStations
+          ) {
+            ;(back[i] as HTMLElement).style.display = ''
+          } else {
+            ;(back[i] as HTMLElement).style.display = 'none'
+          }
+          back[i].addEventListener('click', () => {
+            this.onBackClicked()
             // location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
           })
         }
       }
 
-      if (police__type) {
-        for (let i = 0; i < police__type.length; i++) {
-          let text = '' //item.EventDescription;
-          if (!text) {
-            text = Language.EventType(item.EventType)
+      let submit = source.getElementsByClassName('submit__btn')
+
+      if (submit) {
+        for (let i = 0; i < submit.length; i++) {
+          if (
+            !item.Data.Processed &&
+            this.user.WUser.Resources![0].ResourceType ===
+              ResourceType.GarbageStations
+          ) {
+            ;(submit[i] as HTMLElement).style.display = ''
+          } else {
+            ;(submit[i] as HTMLElement).style.display = 'none'
           }
-          ;(police__type[i] as HTMLSpanElement).innerText = text
+          submit[i].addEventListener('click', () => {
+            this.onSubmitClicked()
+            // location.href = "./index.html?openId=" + this.user.WUser.OpenId + "&index=" + 1;
+          })
         }
       }
 
-      if (station__name) {
-        for (let i = 0; i < station__name.length; i++) {
-          ;(station__name[i] as HTMLSpanElement).innerText =
-            item.Data.StationName
-        }
-      }
-
-      if (item.Data.DivisionName && rc__name) {
-        for (let i = 0; i < rc__name.length; i++) {
-          ;(rc__name[i] as HTMLSpanElement).innerText = item.Data.DivisionName
-        }
-      }
-
-      if (police__time) {
-        for (let i = 0; i < police__time.length; i++) {
-          ;(police__time[i] as HTMLSpanElement).innerText =
-            item.EventTime.format('yyyy-MM-dd HH:mm:ss')
-        }
+      police__type.innerText = Language.EventType(item.EventType)
+      station__name.innerText = item.Data.StationName
+      rc__name.innerText = item.Data.DivisionName ?? ''
+      police__time.innerText = item.EventTime
+        ? item.EventTime.format('yyyy-MM-dd HH:mm:ss')
+        : ''
+      console.log(item)
+      if (item.Data.Processed) {
+        description_div.innerHTML = item.Data.ProcessDescription ?? ''
+      } else if (
+        this.user.WUser.Resources![0].ResourceType !==
+        ResourceType.GarbageStations
+      ) {
+        description_div.innerHTML = ''
+      } else {
       }
 
       let url: string = DataController.defaultImageUrl
@@ -602,7 +660,7 @@ export namespace EventInformationPage {
           '.weui-form-preview__item'
         ) as HTMLDivElement
         let urls = new Array<IImageUrl>()
-        let interval = this.getEventTimeInterval(item.EventTime)
+        let interval = this.getEventTimeInterval(item.EventTime!)
         for (let i = 0; i < imgUrls.length; i++) {
           let element = template
           if (i > 0) {
@@ -730,84 +788,50 @@ export namespace EventInformationPage {
       }
     }
 
-    fillDetail(
-      item:
-        | IllegalDropEventRecord
-        | MixedIntoEventRecord
-        | GarbageFullEventRecord
-        | GarbageDropEventRecord,
-      element?: HTMLElement
-    ) {
+    onSubmitClicked() {
+      if (
+        this.data &&
+        this.data instanceof GarbageDropEventRecord &&
+        !this.data.Data.Processed
+      ) {
+        let description = document.querySelector(
+          '.description.textarea'
+        ) as HTMLTextAreaElement
+        let response = this.dataController.Process(
+          this.data.EventId!,
+          this.user.WUser.Id!,
+          description.value
+        )
+        response.then((result) => {
+          if (result) {
+            this.message.show('递交成功')
+            setTimeout(() => {
+              window.parent.showOrHideAside(undefined, {
+                eventId: result.Data.StationId,
+                processor: result.Data.ProcessorName,
+              })
+            }, 2 * 1000)
+          }
+        })
+      } else {
+      }
+    }
+
+    onBackClicked() {
+      window.parent.showOrHideAside()
+    }
+
+    fillDetail(item: IEventRecord, element?: HTMLElement) {
       if (item instanceof GarbageFullEventRecord) {
         this.fillGarbageFullEventRecord(item, element)
       } else if (item instanceof GarbageDropEventRecord) {
         this.fillGarbageDropEventRecord(item, element)
-      } else {
+      } else if (
+        item instanceof IllegalDropEventRecord ||
+        item instanceof MixedIntoEventRecord
+      ) {
         this.fillEventRecord(item, element)
-      }
-    }
-
-    drawFrame1(
-      element: HTMLDivElement,
-      item: IllegalDropEventRecord | MixedIntoEventRecord,
-      img: HTMLImageElement
-    ) {
-      if (item && item.Data && item.Data.Objects) {
-        const object = item.Data.Objects[0]
-        element.style.position = 'absolute'
-        let width = Math.abs(object.Polygon[1].X - object.Polygon[0].X)
-        let height = Math.abs(object.Polygon[3].Y - object.Polygon[0].Y)
-        let x = object.Polygon[0].X
-        let y = object.Polygon[0].Y
-        element.style.border = '1px solid red'
-
-        element.style.width = width * 100 + '%'
-        element.style.height = height * 100 + '%'
-
-        element.style.top = y * 100 + '%'
-        element.style.left = x * 100 + '%'
-        element.parentElement!.style.position = 'absolute'
-        element.parentElement!.style.pointerEvents = 'none'
-      }
-    }
-
-    drawFrame2(
-      item: IllegalDropEventRecord | MixedIntoEventRecord,
-      img: HTMLImageElement
-    ) {
-      if (item && item.Data && item.Data.Objects) {
-        const objects = item.Data.Objects
-
-        const width = img.naturalWidth
-        const height = img.naturalHeight
-
-        const canvas = document.createElement('canvas')
-        canvas.width = width
-        canvas.height = height
-        const ctx = canvas.getContext('2d')!
-        ctx.strokeStyle = 'red'
-        ctx.drawImage(img, 0, 0, width, height)
-        for (let i = 0; i < objects.length; i++) {
-          const obj = objects[i]
-          if (!obj.Polygon) continue
-          ctx.beginPath()
-          const first = obj.Polygon[0]
-          let x = first.X * width
-          let y = first.Y * height
-
-          ctx.moveTo(x, y)
-
-          for (let j = obj.Polygon.length - 1; j >= 0; j--) {
-            const point = obj.Polygon[j]
-            x = point.X * width
-            y = point.Y * height
-            ctx.lineTo(x, y)
-            ctx.stroke()
-          }
-          ctx.closePath()
-
-          return ctx.canvas.toDataURL()
-        }
+      } else {
       }
     }
 

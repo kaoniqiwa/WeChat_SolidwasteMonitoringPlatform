@@ -181,11 +181,7 @@ class EventTaskDailyRequestService extends BaseRequestService {
   constructor(requestService: HowellAuthHttp) {
     super(requestService)
   }
-  list(params: GetTaskDestinationSchemesParams) {
-    return super._list(
-      EventTaskDestinationScheme,
-      EventTaskUrl.daily.list(),
-      params
-    )
+  list(params: GetEventTasksDailyParams) {
+    return super._list(EventTask, EventTaskUrl.daily.list(), params)
   }
 }

@@ -22,6 +22,18 @@ export function enumForeach<T>(
   }
 }
 
+export function getElement(html: HTMLElement | string): HTMLElement {
+  if (typeof html === 'string') {
+    if (html.indexOf('#') === 0 || html.indexOf('.') === 0) {
+      return document.querySelector(html) as HTMLElement
+    } else {
+      return document.getElementById(html) as HTMLElement
+    }
+  } else {
+    return html
+  }
+}
+
 export function dateFormat(date: Date, fmt: string) {
   var o = {
     'M+': date.getMonth() + 1, //月份

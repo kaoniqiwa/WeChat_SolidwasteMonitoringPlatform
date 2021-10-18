@@ -1,11 +1,17 @@
-import { TimeUnit } from '../../../data-core/model/page'
+import { PagedList, TimeUnit } from '../../../data-core/model/page'
 import { EventNumberStatistic } from '../../../data-core/model/waste-regulation/division-event-numbers'
 import {
   EventNumber,
   EventType,
 } from '../../../data-core/model/waste-regulation/event-number'
-import { GetEventRecordsParams } from '../../../data-core/model/waste-regulation/event-record-params'
-import { GetEventTasksParams } from '../../../data-core/model/waste-regulation/event-task'
+import { CameraImageUrl } from '../../../data-core/model/waste-regulation/event-record'
+import {
+  EventTask,
+  GetAvailableEventTasksParams,
+  GetEventTasksDailyParams,
+  GetEventTasksParams,
+  TaskType,
+} from '../../../data-core/model/waste-regulation/event-task'
 import { ResourceRole, ResourceType } from '../../../data-core/model/we-chat'
 import { Service } from '../../../data-core/repuest/service'
 import { DataCache } from './Cache'
@@ -15,7 +21,7 @@ import { IDataController } from './modules/IController/IDataController'
 import { IEventTaskController } from './modules/IController/IEventTaskController'
 import { IGarbageStationController } from './modules/IController/IGarbageStationController'
 import { ViewModelConverter } from './ViewModelConverter'
-import { GarbageStationViewModel } from './ViewModels'
+import { EventTaskViewModel, GarbageStationViewModel } from './ViewModels'
 
 export class GarbageStationController
   extends DataController
@@ -326,8 +332,6 @@ export class GarbageStationController
   ) {
     let stations = await this.getGarbageStationList()
     let ids = stations.map((x) => x.Id)
-    this.getGarbageStationStatisticNumberListInToday
-    let today = this.getToday()
     let params: GetEventTasksParams = {
       BeginTime: day.begin,
       EndTime: day.end,
@@ -335,6 +339,162 @@ export class GarbageStationController
       IsHandle: isHandle,
       IsFinished: isFinished,
     }
-    return this.service.eventTask.list(params)
+    let response: PagedList<EventTask>
+
+    try {
+      response = await this.service.eventTask.list(params)
+    } catch (ex) {
+      let datas = new Array()
+      let count = 10
+      for (let i = 0; i < count; i++) {
+        let task = new EventTask()
+        task.Id = i.toString()
+        task.Name = `Name_${i}`
+        task.DestinationAddress = `水电路${i}号`
+        task.DestinationName = `宝宏_水电${i}_1-2`
+        task.CreateTime = new Date()
+        task.TaskType = TaskType.retention
+        task.SceneImageUrls = []
+        for (let j = 0; j < 2; j++) {
+          let url = new CameraImageUrl()
+          url.CameraId = '00310101031111111000005000000000'
+          url.ImageUrl = '610248d90000003320000000'
+          url.CameraName = '测试_' + j
+          task.SceneImageUrls.push(url)
+        }
+        datas.push(task)
+      }
+      response = {
+        Data: datas,
+        Page: {
+          PageCount: count,
+          PageIndex: 1,
+          PageSize: count,
+          RecordCount: count,
+          TotalRecordCount: count,
+        },
+      }
+    }
+
+    let result: PagedList<EventTaskViewModel> = {
+      Page: response.Page,
+      Data: response.Data.map((x) => {
+        return ViewModelConverter.Convert(this.service, x)
+      }),
+    }
+    return result
+  }
+
+  async getAvailableEventTaskList(
+    day: OneDay
+  ): Promise<PagedList<EventTaskViewModel>> {
+    let params: GetAvailableEventTasksParams =
+      new GetAvailableEventTasksParams()
+    params.BeginTime = day.begin
+    params.EndTime = day.end
+    let response: PagedList<EventTask>
+    try {
+      response = await this.service.eventTask.available.list(params)
+    } catch (ex) {
+      let datas = new Array()
+      let count = 10
+      for (let i = 0; i < count; i++) {
+        let task = new EventTask()
+        task.Id = i.toString()
+        task.Name = `Name_${i}`
+        task.DestinationAddress = `水电路${i}号`
+        task.DestinationName = `宝宏_水电${i}_1-2`
+        task.CreateTime = new Date()
+        task.TaskType = TaskType.retention
+        task.SceneImageUrls = []
+        for (let j = 0; j < 2; j++) {
+          let url = new CameraImageUrl()
+          url.CameraId = '00310101031111111000005000000000'
+          url.ImageUrl = '610248d90000003320000000'
+          url.CameraName = '测试_' + j
+          task.SceneImageUrls.push(url)
+        }
+        datas.push(task)
+      }
+      response = {
+        Data: datas,
+        Page: {
+          PageCount: count,
+          PageIndex: 1,
+          PageSize: count,
+          RecordCount: count,
+          TotalRecordCount: count,
+        },
+      }
+    }
+
+    let result: PagedList<EventTaskViewModel> = {
+      Page: response.Page,
+      Data: response.Data.map((x) => {
+        return ViewModelConverter.Convert(this.service, x)
+      }),
+    }
+
+    return result
+  }
+
+  async Take(id: string) {
+    let task = await this.service.eventTask.take(id)
+    return ViewModelConverter.Convert(this.service, task)
+  }
+
+  async Daily(date: Date, timeout: boolean, finished: boolean) {
+    let params = new GetEventTasksDailyParams()
+    params.Date = date
+    if (timeout) {
+      params.IsTimeout = timeout
+    } else if (finished) {
+      params.IsFinished = finished
+    } else {
+    }
+    let response: PagedList<EventTask>
+    try {
+      response = await this.service.eventTask.daily.list(params)
+    } catch (ex) {
+      let datas = new Array()
+      let count = 10
+      for (let i = 0; i < count; i++) {
+        let task = new EventTask()
+        task.Id = i.toString()
+        task.Name = `已完成_${i}`
+        task.DestinationAddress = `历史水电路${i}号`
+        task.DestinationName = `历史宝宏_水电${i}_1-2`
+        task.CreateTime = new Date()
+        task.TaskType = TaskType.retention
+        task.SceneImageUrls = []
+        for (let j = 0; j < 2; j++) {
+          let url = new CameraImageUrl()
+          url.CameraId = '00310101031111111000005000000000'
+          url.ImageUrl = '610248d90000003320000000'
+          url.CameraName = '测试_' + j
+          task.SceneImageUrls.push(url)
+        }
+        datas.push(task)
+      }
+      response = {
+        Data: datas,
+        Page: {
+          PageCount: count,
+          PageIndex: 1,
+          PageSize: count,
+          RecordCount: count,
+          TotalRecordCount: count,
+        },
+      }
+    }
+
+    let result: PagedList<EventTaskViewModel> = {
+      Page: response.Page,
+      Data: response.Data.map((x) => {
+        return ViewModelConverter.Convert(this.service, x)
+      }),
+    }
+
+    return result
   }
 }

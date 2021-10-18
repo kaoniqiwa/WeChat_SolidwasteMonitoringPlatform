@@ -15,7 +15,6 @@
 .inner-main {
   width: 100%;
   height: calc(100% - 40px);
-  top: 52px;
   position: relative;
 
 }
@@ -152,4 +151,28 @@ body {
 
 .main-bar__item.swiper-pagination {
   pointer-events: initial;
+}
+
+
+
+.list {
+  background-color: #efeff4;
+}
+
+.btn-ok {
+  color: white;
+  background-color: #68aeff;
+  font-size: 18px;
+
+  line-height: 40px;
+  text-align: center;
+  height: 40px;
+  width: 100%;
+  vertical-align: middle;
+  border-radius: 25px;
+  letter-spacing: 3px
+}
+
+#finished .btn-ok {
+  background-color: #52c465;
 }

@@ -6,6 +6,7 @@ import {
 } from '../../../data-core/model/user-stystem'
 import { Camera } from '../../../data-core/model/waste-regulation/camera'
 import { Division } from '../../../data-core/model/waste-regulation/division'
+import { EventTask } from '../../../data-core/model/waste-regulation/event-task'
 import {
   Flags,
   GarbageStation,
@@ -157,6 +158,26 @@ export class CameraViewModel extends Camera {
       BeginTime: begin.toISOString(),
       EndTime: end.toISOString(),
     })
+  }
+}
+//#endregion
+
+//#region EventTask
+export class EventTaskViewModel extends EventTask {
+  constructor(service: Service) {
+    super()
+    this.service = service
+  }
+  private service: Service
+
+  private division?: Division
+
+  async getDivision() {
+    if (this.division) return this.division
+    if (this.DivisionId) {
+      this.division = await this.service.division.get(this.DivisionId)
+      return this.division
+    }
   }
 }
 //#endregion

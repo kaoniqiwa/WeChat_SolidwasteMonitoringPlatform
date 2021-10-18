@@ -1,4 +1,4 @@
-import { GarbageBaseUrl } from '../IUrl'
+import { BaseUrl } from '../IUrl'
 
 class EventTaskProcessorsSchemeUrl {
   constructor(private processors: EventTaskProcessorsUrl) {}
@@ -86,7 +86,7 @@ class EventTaskDailyUrl {
 export class EventTaskUrl {
   /** EventTasks */
   static base() {
-    return GarbageBaseUrl.gateway + 'EventTasks'
+    return BaseUrl.tasks + 'EventTasks'
   }
   /** EventTasks/<ID> */
   static item(id: string) {
