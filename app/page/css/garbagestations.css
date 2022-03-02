@@ -272,6 +272,7 @@ body {
 
 .hw-content__card .swiper-container .swiper-wrapper .swiper-slide img {
   width: 100%;
+  height: 100%;
   /* display:none; */
   /* height:73px; */
 }

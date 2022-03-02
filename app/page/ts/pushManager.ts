@@ -84,14 +84,16 @@ namespace PushManagerPage {
     }
 
     submit() {
+      debugger
       let promise = this.getUser()
       promise.then((user) => {
-        var offEvents = []
+        var offEvents = new Array<number>()
         for (const key in this.element.check) {
           if (Object.prototype.hasOwnProperty.call(this.element.check, key)) {
             const check = this.element.check[key] as HTMLInputElement
             if (check.checked == false) {
-              offEvents.push(EventType[parseInt(check.value)])
+              debugger
+              offEvents.push(EventType[check.value])
             }
           }
         }

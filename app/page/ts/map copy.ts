@@ -4,14 +4,10 @@
 //     }): void
 // }
 
-
-
-
 // let showPath: HTMLDivElement = document.querySelector('#show_path') as HTMLDivElement;
 // let solidWaste: HTMLDivElement = document.querySelector('#solid_waste') as HTMLDivElement;
 // let resetBtn: HTMLElement = document.querySelector('#resetBtn') as HTMLElement;
 // let confirmBtn: HTMLElement = document.querySelector('#confirmBtn') as HTMLElement;
-
 
 // let $ = Reflect.get(window, '$');
 // let wx = Reflect.get(window, 'wx');
@@ -37,7 +33,7 @@
 //     wx.checkJsApi({
 //         jsApiList: ['scanQRCode', 'getLocation', 'getLocation', 'openLocation', 'hideOptionMenu','hideMenuItems','hideAllNonBaseMenuItem'],
 //         success: function (res: any) {
-            
+
 //         }
 //     });
 //     wx.hideMenuItems({
@@ -63,7 +59,6 @@
 //                 var speed = res.speed; // 速度，以米/每秒计
 //                 var accuracy = res.accuracy; // 位置精度
 
-
 //                 myLocation = new CesiumDataController.Position(longitude, latitude)
 
 //                 selectPositions = [myLocation]
@@ -82,7 +77,6 @@
 //             }
 //         });
 
-
 //         solidWaste.className = '';
 //         solidWaste.classList.add('slide-fade-leave-active');
 //         solidWaste.classList.add('slide-fade-leave-to');
@@ -90,9 +84,7 @@
 
 //     })
 
-
 // })
-
 
 // // 总共有几页
 // let pageCount: number;
@@ -123,10 +115,8 @@
 
 // let polyLine: CesiumDataController.Polyline | null;
 
-
 // // 初始化侧面板显示状态
 // isShow ? show() : hide();
-
 
 // let h = document.querySelector('.weui-form__control-area')?.clientHeight as number;
 // let h2 = document.querySelector('.mui-content')?.clientHeight as number;
@@ -168,7 +158,6 @@
 //     });
 //     selectedData.clear();
 
-
 //     if (polyLine)
 //         mapClient.Draw.Routing.Remove(polyLine.id);
 //     polyLine = null;
@@ -184,8 +173,6 @@
 // import { SessionUser } from "../../common/session-user";
 // import { ResourceType } from "../../data-core/model/we-chat";
 // import { NavigationWindow } from ".";
-
-
 
 // class StationList {
 //     myList: HTMLElement | null;
@@ -269,7 +256,6 @@
 
 //                     }
 
-
 //                     infoContainer.addEventListener('click', function () {
 //                         let id = this.getAttribute('id');
 //                         let divisionId = this.getAttribute('divisionId');
@@ -282,7 +268,6 @@
 //                             this.classList.add('active');
 //                             storedData.get(id).checked = true;
 //                         }
-
 
 //                         // 保存当前选择的 Id 信息 用于路径规划
 //                         if (selectedData.has(id)) {
@@ -317,11 +302,9 @@
 //     });
 // list.LoadGarbageStation(pageIndex);
 
-
 // let iframe = document.getElementById('iframe') as HTMLIFrameElement;
 // iframe.src = "http://" + window.location.hostname + ":" + window.location.port + "/Amap/map_ts.html?style=none&maptype=2D&v=" + (new Date()).toISOString();
 // mapClient = new CesiumMapClient("iframe");
-
 
 // // console.log(mapClient.Events)
 // mapClient.Events.OnLoading = function () {
@@ -339,7 +322,6 @@
 //     mapClient.Viewer.MoveTo(village.position);
 // }
 
-
 // (function ($: any) {
 //     $('.mui-pagination').on('tap', 'a', function (this: HTMLAnchorElement) {
 //         var li = this.parentNode as HTMLLIElement;
@@ -355,8 +337,6 @@
 //         }
 //     });
 // })(mui);
-
-
 
 // document.addEventListener('touchmove', function () {
 

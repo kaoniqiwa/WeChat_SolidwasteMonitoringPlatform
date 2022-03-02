@@ -569,8 +569,7 @@ export namespace EventInformationPage {
         for (let i = 0; i < back.length; i++) {
           if (
             item.Data.Processed ||
-            this.user.WUser.Resources![0].ResourceType !==
-              ResourceType.GarbageStations
+            this.user.WUser.Resources![0].ResourceType === ResourceType.County
           ) {
             ;(back[i] as HTMLElement).style.display = ''
           } else {
@@ -589,12 +588,11 @@ export namespace EventInformationPage {
         for (let i = 0; i < submit.length; i++) {
           if (
             !item.Data.Processed &&
-            this.user.WUser.Resources![0].ResourceType ===
-              ResourceType.GarbageStations
+            this.user.WUser.Resources![0].ResourceType === ResourceType.County
           ) {
-            ;(submit[i] as HTMLElement).style.display = ''
-          } else {
             ;(submit[i] as HTMLElement).style.display = 'none'
+          } else {
+            ;(submit[i] as HTMLElement).style.display = ''
           }
           submit[i].addEventListener('click', () => {
             this.onSubmitClicked()
@@ -613,8 +611,7 @@ export namespace EventInformationPage {
       if (item.Data.Processed) {
         description_div.innerHTML = item.Data.ProcessDescription ?? ''
       } else if (
-        this.user.WUser.Resources![0].ResourceType !==
-        ResourceType.GarbageStations
+        this.user.WUser.Resources![0].ResourceType === ResourceType.County
       ) {
         description_div.innerHTML = ''
       } else {

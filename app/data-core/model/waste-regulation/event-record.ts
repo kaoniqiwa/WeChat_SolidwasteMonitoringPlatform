@@ -90,7 +90,7 @@ export class CameraImageUrl {
   ImageUrl!: string
 }
 
-/**乱丢垃圾事件记录 */
+/**垃圾落地事件记录 */
 export class IllegalDropEventRecord extends EventRecordData<IllegalDropEventData> {}
 
 /**混合投放事件记录 */

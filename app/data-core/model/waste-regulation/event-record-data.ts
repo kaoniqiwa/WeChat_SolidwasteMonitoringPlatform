@@ -45,7 +45,7 @@ export class GarbageFullEventData extends EventData {
   CameraImageUrls?: CameraImageUrl[]
 }
 
-/**乱丢垃圾事件数据 */
+/**垃圾落地事件数据 */
 export class IllegalDropEventData extends EventData {
   /**垃圾的目标(可选) */
   Objects?: EventDataObject[]
@@ -91,7 +91,7 @@ export class GarbageDropEventData extends EventData {
   @Transform(transformDate)
   HandleTime?: Date
   /**
-   *	小包垃圾落地是否已处置	M
+   *	小包垃圾滞留是否已处置	M
    *
    * @type {boolean}
    * @memberof GarbageFullEventData
@@ -105,7 +105,7 @@ export class GarbageDropEventData extends EventData {
    */
   IsTimeout!: boolean
   /**
-   *	垃圾落地的图片ID、图片地址列表	O
+   *	垃圾滞留的图片ID、图片地址列表	O
    *
    * @type {CameraImageUrl[]}
    * @memberof GarbageFullEventData
@@ -138,4 +138,11 @@ export class GarbageDropEventData extends EventData {
   ProcessTime?: Date
   /**	String	处置描述	O */
   ProcessDescription?: string
+
+  /**	String	小区ID	O */
+  CommunityId?: string
+  /**	String	小区名称	O */
+  CommunityName?: string
+  /**	String	工单号	O */
+  RecordNo?: string
 }

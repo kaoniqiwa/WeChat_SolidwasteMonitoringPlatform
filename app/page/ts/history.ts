@@ -207,7 +207,6 @@ export namespace EventHistoryPage {
       if (record.Data.DivisionName) {
         template.footer.innerHTML = record.Data.DivisionName
       }
-
       if (record.EventTime && record.EventTime.format) {
         template.remark.innerHTML = record.EventTime.format('HH:mm:ss')
       }
@@ -580,7 +579,7 @@ export namespace EventHistoryPage {
           container: '.swiper-container',
           pagination: '.swiper-pagination',
         },
-        navBar: ['乱扔垃圾', '满溢情况', '混合投放', '垃圾落地'],
+        navBar: ['垃圾落地', '满溢情况', '混合投放', '垃圾滞留'],
         callback: (index) => {
           this.SwiperControlChanged(index)
         },

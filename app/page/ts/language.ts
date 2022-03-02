@@ -19,7 +19,7 @@ export class Language {
   static EventType(type: EventType) {
     switch (type) {
       case EventType.IllegalDrop:
-        return '乱丢垃圾事件'
+        return '垃圾落地事件'
       case EventType.MixedInto:
         return '混合投放事件'
       case EventType.GarbageVolume:
@@ -27,11 +27,11 @@ export class Language {
       case EventType.GarbageFull:
         return '垃圾满溢事件'
       case EventType.GarbageDrop:
-        return '小包垃圾落地'
+        return '小包垃圾滞留'
       case EventType.GarbageDropHandle:
         return '小包垃圾处置'
       case EventType.GarbageDropTimeout:
-        return '小包垃圾滞留'
+        return '小包垃圾处置超时'
       default:
         return ''
     }
@@ -39,7 +39,7 @@ export class Language {
   static EventTypeFilter(type: EventType) {
     switch (type) {
       case EventType.IllegalDrop:
-        return '乱丢垃圾事件'
+        return '垃圾落地事件'
       case EventType.MixedInto:
         return '混合投放事件'
       case EventType.GarbageVolume:
@@ -47,7 +47,7 @@ export class Language {
       case EventType.GarbageFull:
         return '垃圾满溢事件'
       case EventType.GarbageDrop:
-        return '垃圾落地'
+        return '垃圾滞留'
       case EventType.GarbageDropHandle:
         return '垃圾处置'
       case EventType.GarbageDropTimeout:

@@ -98,7 +98,7 @@ export interface StatisticNumber {
    */
   name: string
   /**
-   * 乱丢垃圾数量
+   * 垃圾落地数量
    *
    * @type {number}
    * @memberof StatisticNumber
@@ -119,7 +119,7 @@ export interface StatisticNumber {
    */
   garbageFullNumber: number
   /**
-   * 垃圾落地数量
+   * 垃圾滞留数量
    *
    * @type {number}
    * @memberof StatisticNumber

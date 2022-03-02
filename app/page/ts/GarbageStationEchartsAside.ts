@@ -560,7 +560,7 @@ export default class EchartsAside extends IAside implements IObserver {
               <div class='item${
                 obj.illegalDrop === '0' ? ' disable' : ''
               }' detail-type='${EventType.IllegalDrop}'>
-                  <div class='item-title'> 乱丢垃圾:</div>
+                  <div class='item-title'> 垃圾落地:</div>
                   <div class='item-content'>${obj.illegalDrop}起</div>
               </div>
 

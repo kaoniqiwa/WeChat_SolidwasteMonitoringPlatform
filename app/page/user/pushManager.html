@@ -1,89 +1,120 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title></title>
-    <link rel="stylesheet" href="../../assets/howell.font/howell.font.css">
-    <link crossorigin="anonymous"
-        integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
-        href="https://lib.baomitu.com/weui/2.4.1/style/weui.css" rel="stylesheet">
-    <link href="../css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/howell.font/howell.font.css" />
+    <link
+      crossorigin="anonymous"
+      integrity="sha512-r8mu74wxmiX+i6Rg/OuyndR33FrKhLHPo2xgJwnA4HnZoqWUaX8paX7yAroprlBvMQv/0MJCHkjoyZOcUOBTvA=="
+      href="https://lib.baomitu.com/weui/2.4.1/style/weui.css"
+      rel="stylesheet"
+    />
+    <link href="../css/index.css" rel="stylesheet" />
 
-    <link href="../css/aside.css" rel="stylesheet">
-    <link href="../css/pushManager.css" rel="stylesheet">
+    <link href="../css/aside.css" rel="stylesheet" />
+    <link href="../css/pushManager.css" rel="stylesheet" />
     <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
-</head>
+  </head>
 
-<body>
-    <div class='container'>
-        <div class='page' id="getPage">
-            <header class="bar header">
-                <div class='content'>
-                    <div class="left" id="back">
-                        <i class="howell-icon-arrow2left"></i>
-                        返回
-                    </div>
-                </div>
-            </header>
-            <main>
-                <div class="weui-cells weui-cells_form offEvents">
-                    <div class="weui-cell weui-cell_active weui-cell_switch">
-                        <div class="weui-cell__bd">乱丢垃圾</div>
-                        <div class="weui-cell__ft">
-                            <input class="weui-switch" value="IllegalDrop" id="check_IllegalDrop" type="checkbox"
-                                checked />
-                        </div>
-                    </div>
-                    <div class="weui-cell weui-cell_active weui-cell_switch">
-                        <div class="weui-cell__bd">混合投放</div>
-                        <div class="weui-cell__ft">
-                            <input class="weui-switch" value="MixedInto" id="check_MixedInto" type="checkbox" 
-                            checked="true" />
-                        </div>
-                    </div>
-
-                    <div class="weui-cell weui-cell_active weui-cell_switch">
-                        <div class="weui-cell__bd">垃圾满溢</div>
-                        <div class="weui-cell__ft">
-                            <input class="weui-switch" value="GarbageFull" id="check_GarbageFull" type="checkbox"
-                                checked="true" />
-                        </div>
-                    </div>
-
-                    <div class="weui-cell weui-cell_active weui-cell_switch">
-                        <div class="weui-cell__bd">小包垃圾落地</div>
-                        <div class="weui-cell__ft">
-                            <input class="weui-switch" value="GarbageDrop" id="check_GarbageDrop" type="checkbox"
-                            checked="true" />
-                        </div>
-                    </div>
-
-                    <div class="weui-cell weui-cell_active weui-cell_switch">
-                        <div class="weui-cell__bd">小包垃圾滞留</div>
-                        <div class="weui-cell__ft">
-                            <input class="weui-switch" value="GarbageDropTimeout" id="check_GarbageDropTimeout" type="checkbox"
-                            checked="true" />
-                        </div>
-                    </div>
-
-                    <div class="weui-cell weui-cell_active weui-cell_switch">
-                        <div class="weui-cell__bd">小包垃圾处置</div>
-                        <div class="weui-cell__ft">
-                            <input class="weui-switch" value="GarbageDropHandle" id="check_GarbageDropHandle" type="checkbox"
-                            checked="true" />
-                        </div>
-                    </div>
-                </div>
-            </main>
-            
-            <div class="other">
-                <a href="javascript:" class="weui-btn weui-btn_primary ok">确定</a>
+  <body>
+    <div class="container">
+      <div class="page" id="getPage">
+        <header class="bar header">
+          <div class="content">
+            <div class="left" id="back">
+              <i class="howell-icon-arrow2left"></i>
+              返回
             </div>
+          </div>
+        </header>
+        <main>
+          <div class="weui-cells weui-cells_form offEvents">
+            <div class="weui-cell weui-cell_active weui-cell_switch">
+              <div class="weui-cell__bd">垃圾落地</div>
+              <div class="weui-cell__ft">
+                <input
+                  class="weui-switch"
+                  value="IllegalDrop"
+                  id="check_IllegalDrop"
+                  type="checkbox"
+                  checked
+                />
+              </div>
+            </div>
+            <div class="weui-cell weui-cell_active weui-cell_switch">
+              <div class="weui-cell__bd">混合投放</div>
+              <div class="weui-cell__ft">
+                <input
+                  class="weui-switch"
+                  value="MixedInto"
+                  id="check_MixedInto"
+                  type="checkbox"
+                  checked="true"
+                />
+              </div>
+            </div>
+
+            <div class="weui-cell weui-cell_active weui-cell_switch">
+              <div class="weui-cell__bd">垃圾满溢</div>
+              <div class="weui-cell__ft">
+                <input
+                  class="weui-switch"
+                  value="GarbageFull"
+                  id="check_GarbageFull"
+                  type="checkbox"
+                  checked="true"
+                />
+              </div>
+            </div>
+
+            <div class="weui-cell weui-cell_active weui-cell_switch">
+              <div class="weui-cell__bd">小包垃圾滞留</div>
+              <div class="weui-cell__ft">
+                <input
+                  class="weui-switch"
+                  value="GarbageDrop"
+                  id="check_GarbageDrop"
+                  type="checkbox"
+                  checked="true"
+                />
+              </div>
+            </div>
+
+            <div class="weui-cell weui-cell_active weui-cell_switch">
+              <div class="weui-cell__bd">小包垃圾处置超时</div>
+              <div class="weui-cell__ft">
+                <input
+                  class="weui-switch"
+                  value="GarbageDropTimeout"
+                  id="check_GarbageDropTimeout"
+                  type="checkbox"
+                  checked="true"
+                />
+              </div>
+            </div>
+
+            <div class="weui-cell weui-cell_active weui-cell_switch">
+              <div class="weui-cell__bd">小包垃圾处置</div>
+              <div class="weui-cell__ft">
+                <input
+                  class="weui-switch"
+                  value="GarbageDropHandle"
+                  id="check_GarbageDropHandle"
+                  type="checkbox"
+                  checked="true"
+                />
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <div class="other">
+          <a href="javascript:" class="weui-btn weui-btn_primary ok">确定</a>
         </div>
+      </div>
     </div>
     <script src="../ts/pushManager.ts"></script>
-</body>
-
+  </body>
 </html>

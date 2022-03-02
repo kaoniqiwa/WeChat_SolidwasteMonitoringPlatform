@@ -198,7 +198,7 @@ export class CountDivisionController
   }
 
   getHistory = async (day: OneDay) => {
-    // 乱丢垃圾数组
+    // 垃圾落地数组
     const illegalDropResult = new Array<EventNumber>()
 
     // 混合投放数组

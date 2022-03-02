@@ -5,6 +5,7 @@ import { HowellAuthHttp } from './howell-auth-http'
 import { Digest } from './digest'
 import { SessionUser } from '../../common/session-user'
 import { HowellResponse } from '../model/response'
+import { RandomUserPaswordParams } from '../model/user-password'
 
 export class WeChatRequestService extends SaveModel {
   url: url.WeChat

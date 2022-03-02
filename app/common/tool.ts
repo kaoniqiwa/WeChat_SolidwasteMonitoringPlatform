@@ -2,6 +2,14 @@ export function getAllDay(date: Date) {
   let y = date.getFullYear(),
     m = date.getMonth(),
     d = date.getDate()
+  let begin = new Date(y, m, d, 0, 0, 0)
+  let now = new Date()
+  if (y === now.getFullYear() && m === now.getMonth() && d === now.getDate()) {
+    return {
+      begin: begin,
+      end: now,
+    }
+  }
   return {
     begin: new Date(y, m, d, 0, 0, 0),
     end: new Date(y, m, d, 23, 59, 59, 999),

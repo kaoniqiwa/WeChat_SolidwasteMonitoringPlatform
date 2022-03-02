@@ -40,10 +40,10 @@ export default class EchartsDetailAside extends IAside {
     if (this.elements.desc) {
       switch (val) {
         case undefined:
-          txtContent = '垃圾落地'
+          txtContent = '垃圾滞留'
           break
         case EventType.IllegalDrop:
-          txtContent = '乱丢垃圾'
+          txtContent = '垃圾落地'
           break
         case EventType.MixedInto:
           txtContent = '混合投放'

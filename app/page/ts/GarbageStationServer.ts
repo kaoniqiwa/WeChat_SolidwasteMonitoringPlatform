@@ -44,8 +44,8 @@ export default class GarbageStationServer {
     //console.log('eventTypes', this.eventTypes)
     //console.log('roltTypes', this.roleTypes)
     /**
-     *   垃圾落地集合中包含 正常/异常/满溢状态
-     *   如果筛选的条件是垃圾落地和正常，那么筛选出垃圾落地后，再筛选正常会有重复的正常出现
+     *   垃圾滞留集合中包含 正常/异常/满溢状态
+     *   如果筛选的条件是垃圾滞留和正常，那么筛选出垃圾滞留后，再筛选正常会有重复的正常出现
      *
      */
 
@@ -65,7 +65,7 @@ export default class GarbageStationServer {
         let filtered = this.garbageStations.filter((item) => {
           let stationState = item.StationState as Flags<StationState>
           // console.log(stationState, type)
-          // 垃圾落地筛选条件
+          // 垃圾滞留筛选条件
           if (type == this.garbageDropState) {
             let currentGarbageTime =
               item.NumberStatistic?.CurrentGarbageTime! >> 0
@@ -104,7 +104,7 @@ export default class GarbageStationServer {
     resData = Array.from(new Set(roleData)) // 去重
     // console.log('筛选后的数据', resData)
 
-    // 将数据按垃圾落地先排序，默认升序排序
+    // 将数据按垃圾滞留先排序，默认升序排序
     resData.sort((a, b) => {
       let a_time = a.NumberStatistic!.CurrentGarbageTime! >> 0
       let b_time = b.NumberStatistic!.CurrentGarbageTime! >> 0

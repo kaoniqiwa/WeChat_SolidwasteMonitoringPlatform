@@ -10,10 +10,7 @@ import {
 } from '../../data-core/model/waste-regulation/garbage-station-number-statistic'
 import { ResourceRole, ResourceType } from '../../data-core/model/we-chat'
 import { DataController } from './data-controllers/DataController'
-import {
-  Paged,
-  StatisticNumber,
-} from './data-controllers/IController'
+import { Paged, StatisticNumber } from './data-controllers/IController'
 import { Language } from './language'
 import Swiper, { Virtual, Pagination } from 'swiper'
 import $ from 'jquery'
@@ -84,7 +81,7 @@ export default class GarbageStationClient implements IObserver {
   eventTypes: Array<string> = []
   roleTypes: Array<string> = [] // 筛选区域
 
-  garbageDropTitle = '垃圾落地'
+  garbageDropTitle = '垃圾滞留'
   garbageDropState = '999'
 
   roleList: ResourceRole[] = [] // 侧边栏筛选数据

@@ -378,7 +378,7 @@ export default class GarbageDrop implements IObserver {
       obj.index = (this.dropPage!.PageIndex - 1) * this.dropPage!.PageSize + i
 
       obj.ProcessorName = v.Data.ProcessorName ?? ''
-
+      obj.RecordNo = v.Data.RecordNo ?? ''
       let imageUrls: CameraImageUrl[] = []
       if (v.Data) {
         v.Data.DropImageUrls && imageUrls.push(...v.Data.DropImageUrls)
@@ -392,7 +392,7 @@ export default class GarbageDrop implements IObserver {
         obj.DivisionName = v.Data.DivisionName!
         obj.DivisionId = v.Data.DivisionId!
 
-        obj.EventTime = v.EventTime!.format('yyyy-MM-dd HH:mm:ss')
+        obj.EventTime = v.EventTime!.format('HH:mm:ss')
         obj.imageUrls = imageUrls.map((url) => {
           return this.dataController.getImageUrl(url.ImageUrl) as string
         })

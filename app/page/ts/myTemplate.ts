@@ -15,6 +15,7 @@ export interface GarbageDropData {
   EventId: string
   index: number
   ProcessorName: string
+  RecordNo: string
 }
 
 // CustomEvent 的 polyfill
@@ -118,6 +119,8 @@ export default class MyTemplate {
         v.StationName
       ;(card.querySelector('.division-name') as HTMLElement).textContent =
         v.DivisionName
+      ;(card.querySelector('.record-no') as HTMLElement).textContent =
+        v.RecordNo
       ;(card.querySelector('.event-time') as HTMLElement).textContent =
         v.EventTime
       let statusDiv = card.querySelector<HTMLElement>('.status')
