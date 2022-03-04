@@ -270,10 +270,10 @@ export class CommitteesDivisionController extends DataController {
       PageSize: page.size,
       PageIndex: page.index,
       Desc: true,
-      DivisionIds: this.roles.map((x) => x.Id),
+      StationIds: this.roles.map((x) => x.Id),
     }
     if (ids) {
-      params.DivisionIds = ids
+      params.StationIds = ids
     }
     return params
   }
