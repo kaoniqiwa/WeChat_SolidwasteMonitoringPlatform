@@ -12,7 +12,7 @@
 // let $ = Reflect.get(window, '$');
 // let wx = Reflect.get(window, 'wx');
 
-// $.get(`http://51kongkong.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetJsSdkUiPackage?url=${document.location.toString()}&&appid=wx119358d61e31da01`, function (data: any) {
+// $.get(`http://atshljpt.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetJsSdkUiPackage?url=${document.location.toString()}&&appid=wx6e111b9502e7d8e5`, function (data: any) {
 
 //     wx.config({
 //         // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
