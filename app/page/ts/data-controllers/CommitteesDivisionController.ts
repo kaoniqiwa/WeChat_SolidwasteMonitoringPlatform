@@ -4,6 +4,7 @@ import {
   EventNumber,
   EventType,
 } from '../../../data-core/model/waste-regulation/event-number'
+import { GetEventRecordsParams } from '../../../data-core/model/waste-regulation/event-record-params'
 import { GarbageStation } from '../../../data-core/model/waste-regulation/garbage-station'
 import { ResourceRole, ResourceType } from '../../../data-core/model/we-chat'
 import { Service } from '../../../data-core/repuest/service'
@@ -264,13 +265,13 @@ export class CommitteesDivisionController extends DataController {
     type: EventType,
     ids?: string[]
   ) {
-    const params = {
+    const params: GetEventRecordsParams = {
       BeginTime: day.begin,
       EndTime: day.end,
       PageSize: page.size,
       PageIndex: page.index,
       Desc: true,
-      StationIds: this.roles.map((x) => x.Id),
+      DivisionIds: this.roles.map((x) => x.Id),
     }
     if (ids) {
       params.StationIds = ids
