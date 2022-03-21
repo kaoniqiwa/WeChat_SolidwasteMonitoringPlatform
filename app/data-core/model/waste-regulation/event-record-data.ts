@@ -17,6 +17,10 @@ export class EventData {
   StationName!: string
   DivisionId?: string
   DivisionName?: string
+  /**	String	小区ID	O */
+  CommunityId?: string
+  /**	String	小区名称	O */
+  CommunityName?: string
 }
 
 /**归一化坐标点 */

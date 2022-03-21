@@ -385,6 +385,7 @@ export default class GarbageDrop implements IObserver {
         v.Data.HandleImageUrls && imageUrls.push(...v.Data.HandleImageUrls)
         v.Data.TimeoutImageUrls && imageUrls.push(...v.Data.TimeoutImageUrls)
 
+        obj = Object.assign(obj, v.Data)
         // console.log(imageUrls)
         obj.StationName = v.Data.StationName
         obj.StationId = v.Data.StationId
@@ -396,6 +397,7 @@ export default class GarbageDrop implements IObserver {
         obj.imageUrls = imageUrls.map((url) => {
           return this.dataController.getImageUrl(url.ImageUrl) as string
         })
+
         // console.log(imageUrls, obj.imageUrls)
       }
       this.parsedDropListChunk.push(obj)

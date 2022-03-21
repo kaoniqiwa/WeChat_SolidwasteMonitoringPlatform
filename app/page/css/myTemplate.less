@@ -20,6 +20,11 @@
 
       &__head {
         font-size: 17px;
+        white-space: nowrap;
+
+        .timeout {
+          color: #ec2b2b;
+        }
       }
 
       &__appendix {
@@ -29,6 +34,7 @@
         height: @h;
         text-align: center;
         line-height: @h;
+        white-space: nowrap;
 
         &.handle {
           background-color: #33ff6633;
@@ -65,8 +71,15 @@
       display: flex;
       justify-content: space-between;
       margin-top: 12px;
+      white-space: nowrap;
 
-      &__head {}
+      &__head {
+        white-space: nowrap;
+
+        text-overflow: ellipsis;
+
+        -o-text-overflow: ellipsis;
+      }
 
       &__appendix {}
     }

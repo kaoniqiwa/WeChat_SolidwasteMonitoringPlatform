@@ -204,7 +204,7 @@ namespace Navigation {
         window.location.href.indexOf('?')
       )
       let href =
-        'http://51kongkong.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetUserOpenId?appid=wx119358d61e31da01&returnUrl=' +
+        'http://atshljpt.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetUserOpenId?appid=wx6e111b9502e7d8e5&returnUrl=' +
         //+ url+"?data="+search;
         window.location.href
       window.location.href = href

@@ -1,9 +1,10 @@
 import { EventType } from '../../data-core/model/waste-regulation/event-number'
 import { DataController } from './data-controllers/DataController'
 import '../css/myTemplate.less'
+import { GarbageDropEventData } from '../../data-core/model/waste-regulation/event-record-data'
 
 // 数据模板
-export interface GarbageDropData {
+export interface GarbageDropData extends GarbageDropEventData {
   EventType: EventType
   EventName: string
   imageUrls: string[]
@@ -115,8 +116,13 @@ export default class MyTemplate {
       card.setAttribute('division-id', v.DivisionId)
       card.setAttribute('event-type', v.EventType + '')
       card.setAttribute('event-id', v.EventId)
-      ;(card.querySelector('.station-name') as HTMLElement).textContent =
-        v.StationName
+      let timeout = ''
+      if (v.IsTimeout) {
+        timeout = "<i class='timeout howell-icon-alarm'></i>"
+      }
+      ;(
+        card.querySelector('.station-name') as HTMLElement
+      ).innerHTML = `${v.StationName}${timeout}`
       ;(card.querySelector('.division-name') as HTMLElement).textContent =
         v.DivisionName
       ;(card.querySelector('.record-no') as HTMLElement).textContent =
@@ -136,6 +142,8 @@ export default class MyTemplate {
           statusDiv.className = 'card-title__appendix status handle'
         }
       }
+
+      v.IsTimeout
       let processorDiv = card.querySelector<HTMLElement>(
         '.processor'
       ) as HTMLElement

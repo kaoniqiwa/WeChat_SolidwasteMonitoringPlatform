@@ -200,7 +200,8 @@ export namespace EventInformationPage {
         station__name = source.getElementsByClassName('station__name'),
         rc__name = source.getElementsByClassName('rc__name'),
         police__time = source.getElementsByClassName('police__time'),
-        detail_imgs = source.getElementsByClassName('detail_img')
+        detail_imgs = source.getElementsByClassName('detail_img'),
+        community__name = source.getElementsByClassName('community__name')
       let btn = source.getElementsByClassName('back__btn')
       if (btn) {
         for (let i = 0; i < btn.length; i++) {
@@ -234,6 +235,13 @@ export namespace EventInformationPage {
       if (item.Data.DivisionName && rc__name) {
         for (let i = 0; i < rc__name.length; i++) {
           ;(rc__name[i] as HTMLSpanElement).innerText = item.Data.DivisionName
+        }
+      }
+
+      if (community__name) {
+        for (let i = 0; i < community__name.length; i++) {
+          ;(community__name[i] as HTMLSpanElement).innerText =
+            item.Data.CommunityName ?? '-'
         }
       }
 
@@ -545,6 +553,9 @@ export namespace EventInformationPage {
         '.station__name'
       ) as HTMLSpanElement
       const rc__name = source.querySelector('.rc__name') as HTMLSpanElement
+      let community__name = source.querySelector(
+        '.community__name'
+      ) as HTMLSpanElement
       const police__time = source.querySelector(
         '.police__time'
       ) as HTMLSpanElement
@@ -603,7 +614,8 @@ export namespace EventInformationPage {
 
       police__type.innerText = Language.EventType(item.EventType)
       station__name.innerText = item.Data.StationName
-      rc__name.innerText = item.Data.DivisionName ?? ''
+      rc__name.innerText = item.Data.DivisionName ?? '-'
+      community__name.innerText = item.Data.CommunityName ?? '-'
       police__time.innerText = item.EventTime
         ? item.EventTime.format('yyyy-MM-dd HH:mm:ss')
         : ''

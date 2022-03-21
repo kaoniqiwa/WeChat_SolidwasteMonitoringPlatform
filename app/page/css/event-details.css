@@ -17,12 +17,19 @@ body {
 
 }
 
+.weui-form-preview__label {
+  max-width: 4em;
+  white-space: nowrap;
+
+  margin-right: 30px;
+}
+
 .weui-form-preview__value,
 .weui-form-preview__label {
   text-align: left;
-  font-size: 19.2px;
-  margin-right: 30px;
+  font-size: 1em;
 }
+
 
 .red-text {
   color: red;

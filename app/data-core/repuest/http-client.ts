@@ -48,7 +48,7 @@ export namespace HowellHttpClient {
 
       if (eventId && !openid) {
         window.location.href =
-          'http://51kongkong.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetUserOpenId?appid=wx119358d61e31da01&returnUrl=' +
+          'http://atshljpt.com/PlatformManage/WeiXinApi_Mp/WeiXinMpApi.asmx/GetUserOpenId?appid=wx6e111b9502e7d8e5&returnUrl=' +
           window.location.href
       } else if (eventId && openid) {
         if (this.digistWindow.DIGEST == null) {
