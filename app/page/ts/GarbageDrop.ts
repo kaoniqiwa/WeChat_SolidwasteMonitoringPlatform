@@ -107,7 +107,7 @@ export default class GarbageDrop implements IObserver {
     }
   }
 
-  update(args: { type: string; [key: string]: any }) {
+  update(args: { type: string;[key: string]: any }) {
     console.log('通知:', args)
     if (args) {
       if ('type' in args) {
@@ -203,7 +203,7 @@ export default class GarbageDrop implements IObserver {
           let div = document.getElementById(data.eventId) as HTMLElement
           let processor = div.querySelector('.processor') as HTMLElement
           processor.innerHTML = data.processor
-        } catch (error) {}
+        } catch (error) { }
       }
     })
 
@@ -213,33 +213,32 @@ export default class GarbageDrop implements IObserver {
     this.elements.filterBtn.addEventListener('click', () => {
       this.toggle()
     })
-    ;(this.elements.contentContainer as any).addEventListener(
-      'click-card',
-      (e: CustomEvent) => {
-        // console.log(e)
-        let str_filter = ''
+      ; (this.elements.contentContainer as any).addEventListener(
+        'click-card',
+        (e: CustomEvent) => {
+          // console.log(e)
+          let str_filter = ''
 
-        if (this.roleTypes && this.roleTypes.length > 0) {
-          let filter = { sourceIds: this.roleTypes }
+          if (this.roleTypes && this.roleTypes.length > 0) {
+            let filter = { sourceIds: this.roleTypes }
 
-          str_filter = '&filter=' + base64encode(JSON.stringify(filter))
+            str_filter = '&filter=' + base64encode(JSON.stringify(filter))
+          }
+
+          let index = e.detail.index
+
+          const url = `./event-details.html?openid=${this.openId
+            }&pageindex=${index}&eventtype=${this.eventType ?? ''}${str_filter}`
+          console.log(url)
+          window.parent.showOrHideAside(url)
         }
-
-        let index = e.detail.index
-
-        const url = `./event-details.html?openid=${
-          this.openId
-        }&pageindex=${index}&eventtype=${this.eventType ?? ''}${str_filter}`
-        console.log(url)
-        window.parent.showOrHideAside(url)
-      }
-    )
+      )
   }
   showDatePicker() {
     weui.datePicker({
       start: new Date(2020, 12 - 1, 1),
       end: new Date(),
-      onChange: (result: any) => {},
+      onChange: (result: any) => { },
       onConfirm: (result: any) => {
         let date = new Date(
           result[0].value,
@@ -353,12 +352,12 @@ export default class GarbageDrop implements IObserver {
     // console.log('至今请求到的所有数据', this.dropListTotal)
 
     if (window.parent) {
-      ;(window.parent as NavigationWindow).Day = getAllDay(this.date)
-      ;(window.parent as NavigationWindow).RecordPage = {
-        index: data!.Page.PageIndex,
-        size: data!.Page.PageSize,
-        count: data!.Page.TotalRecordCount,
-      }
+      ; (window.parent as NavigationWindow).Day = getAllDay(this.date)
+        ; (window.parent as NavigationWindow).RecordPage = {
+          index: data!.Page.PageIndex,
+          size: data!.Page.PageSize,
+          count: data!.Page.TotalRecordCount,
+        }
     }
   }
   async loadAsideData() {
@@ -394,6 +393,34 @@ export default class GarbageDrop implements IObserver {
         obj.DivisionId = v.Data.DivisionId!
 
         obj.EventTime = v.EventTime!.format('HH:mm:ss')
+        obj.TaskTime = "0分钟"
+        let takeMinutes = 0
+
+        let time = {
+          dorp: new Date(v.Data.DropTime),
+          handle: v.Data.HandleTime ? new Date(v.Data.HandleTime) : undefined,
+          process: v.Data.ProcessTime ? new Date(v.Data.ProcessTime) : undefined
+        }
+        if (v.Data.TakeMinutes) {
+          takeMinutes = v.Data.TakeMinutes
+        }
+        else if (time.process) {
+          takeMinutes = (time.process.getTime() - time.dorp.getTime()) / 1000 / 60
+        }
+        else if (time.handle) {
+          takeMinutes = (time.handle.getTime() - time.dorp.getTime()) / 1000 / 60
+        }
+        else {
+          takeMinutes = (new Date().getTime() - time.dorp.getTime()) / 1000 / 60
+        }
+        let hour = Math.floor(takeMinutes / 60)
+        let minute = Math.ceil(takeMinutes % 60)
+
+        if (hour == 0) {
+          obj.TaskTime = minute + '分钟'
+        } else {
+          obj.TaskTime = hour + '小时' + minute + '分钟'
+        }
         obj.imageUrls = imageUrls.map((url) => {
           return this.dataController.getImageUrl(url.ImageUrl) as string
         })

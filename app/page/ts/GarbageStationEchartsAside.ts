@@ -493,9 +493,9 @@ export default class EchartsAside extends IAside implements IObserver {
         obj.GarbageDuration = GarbageDuration
 
         let maxHour = Math.floor(MaxGarbageTime / 60)
-        let maxMinute = Math.ceil(MaxGarbageTime & 60)
+        let maxMinute = Math.ceil(MaxGarbageTime % 60)
         let totalHour = Math.floor(GarbageDuration / 60)
-        let totalMinute = Math.ceil(GarbageDuration & 60)
+        let totalMinute = Math.ceil(GarbageDuration % 60)
 
         if (maxHour == 0) {
           obj.maxDrop = maxMinute + '分钟'

@@ -16,11 +16,12 @@ export interface GarbageDropData extends GarbageDropEventData {
   EventId: string
   index: number
   ProcessorName: string
-  RecordNo: string
+  RecordNo: string  
+  TaskTime:string
 }
 
 // CustomEvent 的 polyfill
-;(function () {
+; (function () {
   try {
     // a : While a window.CustomEvent object exists, it cannot be called as a constructor.
     // b : There is no window.CustomEvent object
@@ -90,7 +91,7 @@ export default class MyTemplate {
     this.createContent(val)
   }
 
-  constructor() {}
+  constructor() { }
   /**
    *  模板源
    * @param selector
@@ -119,17 +120,15 @@ export default class MyTemplate {
       let timeout = ''
       if (v.IsTimeout) {
         timeout = "<i class='timeout howell-icon-alarm'></i>"
-      }
-      ;(
-        card.querySelector('.station-name') as HTMLElement
-      ).innerHTML = `${v.StationName}${timeout}`
-      ;(card.querySelector('.division-name') as HTMLElement).textContent =
-        v.DivisionName
-      ;(card.querySelector('.record-no') as HTMLElement).textContent =
-        v.RecordNo
-      ;(card.querySelector('.event-time') as HTMLElement).textContent =
-        v.EventTime
-      let statusDiv = card.querySelector<HTMLElement>('.status')
+      };
+      (card.querySelector('.station-name') as HTMLElement).innerHTML = `${v.StationName}${timeout}`;
+      (card.querySelector('.division-name') as HTMLElement).textContent = v.DivisionName;
+      (card.querySelector('.community-name') as HTMLElement).textContent = v.CommunityName ?? "";
+      (card.querySelector('.record-no') as HTMLElement).textContent = v.RecordNo;
+      (card.querySelector('.event-time') as HTMLElement).textContent = v.EventTime;
+      (card.querySelector('.take-time') as HTMLElement).textContent = v.TaskTime;
+
+      let statusDiv = card.querySelector<HTMLElement>('.status');
       if (statusDiv) {
         if (v.EventType == EventType.GarbageDrop) {
           statusDiv.textContent = GarbageDropStatus.GarbageDrop

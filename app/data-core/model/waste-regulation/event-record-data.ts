@@ -149,4 +149,6 @@ export class GarbageDropEventData extends EventData {
   CommunityName?: string
   /**	String	工单号	O */
   RecordNo?: string
+  /**	Double	处置花费时长，单位：分钟	O */
+  TakeMinutes?:number
 }

@@ -15,8 +15,13 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      color: #191919;
-      margin-bottom: 12px;
+      color: #b2b2b2;
+      margin-bottom: 8px;
+
+      &:first-child{
+        margin-bottom: 4px;
+        color: #191919;
+      }
 
       &__head {
         font-size: 17px;
@@ -81,7 +86,14 @@
         -o-text-overflow: ellipsis;
       }
 
-      &__appendix {}
+      &__appendix {
+        &.event-time,&.take-time{
+          width: 90px;
+        }
+        &.take-time{
+          text-align: right;
+        }
+      }
     }
   }
 }
